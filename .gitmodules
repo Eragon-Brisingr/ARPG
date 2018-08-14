@@ -1,0 +1,6 @@
+[submodule "Plugins/XD_UnrealLibraryEx"]
+	path = Plugins/XD_UnrealLibraryEx
+	url = https://github.com/Eragon-Brisingr/XD_UnrealLibraryEx.git
+[submodule "Plugins/XD_SaveGameSystem"]
+	path = Plugins/XD_SaveGameSystem
+	url = https://github.com/Eragon-Brisingr/XD_SaveGameSystem.git
