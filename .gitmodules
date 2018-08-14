@@ -4,3 +4,6 @@
 [submodule "Plugins/XD_SaveGameSystem"]
 	path = Plugins/XD_SaveGameSystem
 	url = https://github.com/Eragon-Brisingr/XD_SaveGameSystem.git
+[submodule "Plugins/XD_GenericGraph"]
+	path = Plugins/XD_GenericGraph
+	url = https://github.com/Eragon-Brisingr/XD_GenericGraph.git
