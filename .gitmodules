@@ -7,3 +7,6 @@
 [submodule "Plugins/XD_GenericGraph"]
 	path = Plugins/XD_GenericGraph
 	url = https://github.com/Eragon-Brisingr/XD_GenericGraph.git
+[submodule "Plugins/XD_ItemSystem"]
+	path = Plugins/XD_ItemSystem
+	url = https://github.com/Eragon-Brisingr/XD_ItemSystem.git
