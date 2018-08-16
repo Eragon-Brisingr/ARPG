@@ -10,3 +10,6 @@
 [submodule "Plugins/XD_ItemSystem"]
 	path = Plugins/XD_ItemSystem
 	url = https://github.com/Eragon-Brisingr/XD_ItemSystem.git
+[submodule "Plugins/XD_GameEventSystem"]
+	path = Plugins/XD_GameEventSystem
+	url = https://github.com/Eragon-Brisingr/XD_GameEventSystem.git
