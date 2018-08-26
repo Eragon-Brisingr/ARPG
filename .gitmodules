@@ -13,3 +13,6 @@
 [submodule "Plugins/XD_GameEventSystem"]
 	path = Plugins/XD_GameEventSystem
 	url = https://github.com/Eragon-Brisingr/XD_GameEventSystem.git
+[submodule "Plugins/XD_CampSystem"]
+	path = Plugins/XD_CampSystem
+	url = https://github.com/Eragon-Brisingr/XD_CampSystem.git
