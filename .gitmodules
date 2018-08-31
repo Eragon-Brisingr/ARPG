@@ -16,3 +16,6 @@
 [submodule "Plugins/XD_CampSystem"]
 	path = Plugins/XD_CampSystem
 	url = https://github.com/Eragon-Brisingr/XD_CampSystem.git
+[submodule "Plugins/XD_TimeSystem"]
+	path = Plugins/XD_TimeSystem
+	url = https://github.com/Eragon-Brisingr/XD_TimeSystem.git
