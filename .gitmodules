@@ -19,3 +19,6 @@
 [submodule "Plugins/XD_TimeSystem"]
 	path = Plugins/XD_TimeSystem
 	url = https://github.com/Eragon-Brisingr/XD_TimeSystem.git
+[submodule "Plugins/XD_EnvironmentSystem"]
+	path = Plugins/XD_EnvironmentSystem
+	url = https://github.com/Eragon-Brisingr/XD_EnvironmentSystem.git
