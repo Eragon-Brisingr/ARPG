@@ -1,2 +1,3 @@
 SaveGameSystem添加安全性检测 检测Outer是否在Actor这个Owner的范围内，不在则报错并推荐使用softref代替。
 
+TimeSystem循环事件可在Tick每帧时间跨度极大时做优化，每小时、每天等等时间可就执行最后一次
