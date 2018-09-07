@@ -13,5 +13,11 @@
 				"CoreUObject"
 			]
 		}
+	],
+	"Plugins": [
+		{
+			"Name": "Niagara",
+			"Enabled": true
+		}
 	]
 }
