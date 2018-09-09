@@ -22,3 +22,6 @@
 [submodule "Plugins/XD_EnvironmentSystem"]
 	path = Plugins/XD_EnvironmentSystem
 	url = https://github.com/Eragon-Brisingr/XD_EnvironmentSystem.git
+[submodule "Plugins/XD_AssetsLibrary"]
+	path = Plugins/XD_AssetsLibrary
+	url = https://github.com/Eragon-Brisingr/XD_AssetsLibrary.git
