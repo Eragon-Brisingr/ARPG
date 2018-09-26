@@ -25,3 +25,6 @@
 [submodule "Plugins/XD_AssetsLibrary"]
 	path = Plugins/XD_AssetsLibrary
 	url = https://github.com/Eragon-Brisingr/XD_AssetsLibrary.git
+[submodule "Plugins/XD_MovementComponentPlugin"]
+	path = Plugins/XD_MovementComponentPlugin
+	url = https://github.com/Eragon-Brisingr/XD_MovementComponentPlugin.git
