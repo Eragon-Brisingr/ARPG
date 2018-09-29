@@ -10,7 +10,17 @@ public class ARPG : ModuleRules
 	
 		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore" });
 
-		PrivateDependencyModuleNames.AddRange(new string[] {  });
+		PrivateDependencyModuleNames.AddRange(new string[]
+		{
+			"XD_UnrealLibraryEx",
+			"XD_SaveGameSystem",
+			"XD_TimeSystem",
+			"XD_MovementComponentPlugin",
+			"XD_GenericGraph",
+			"XD_GameEventSystem",
+			"XD_EnvironmentSystem",
+			"XD_CampSystem"
+		});
 
 		// Uncomment if you are using Slate UI
 		// PrivateDependencyModuleNames.AddRange(new string[] { "Slate", "SlateCore" });

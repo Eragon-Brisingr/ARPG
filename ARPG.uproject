@@ -10,7 +10,9 @@
 			"LoadingPhase": "Default",
 			"AdditionalDependencies": [
 				"Engine",
-				"CoreUObject"
+				"CoreUObject",
+				"XD_MovementComponentPlugin",
+				"XD_SaveGameSystem"
 			]
 		}
 	]
