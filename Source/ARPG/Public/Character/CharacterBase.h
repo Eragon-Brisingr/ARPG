@@ -14,9 +14,9 @@ class ARPG_API ACharacterBase : public ACharacter, public IXD_SaveGameInterface
 
 public:
 	// Sets default values for this character's properties
-	ACharacterBase(const FObjectInitializer& PCIP);
+	ACharacterBase(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
-	UPROPERTY(BlueprintReadOnly, Category = "角色|移动")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Character")
 	class UARPG_MovementComponent* ARPG_MovementComponent;
 protected:
 	// Called when the game starts or when spawned
@@ -29,6 +29,16 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+	//移动行为
+public:
+	UFUNCTION(BlueprintCallable, Category = "角色|行为")
+	void InvokeChangeMoveGait(ECharacterGait Gait);
+
+	UFUNCTION(Reliable, WithValidation, Server)
+	void InvokeChangeMoveGaitToServer(const ECharacterGait& Gait);
+	virtual void InvokeChangeMoveGaitToServer_Implementation(const ECharacterGait& Gait);
+	bool InvokeChangeMoveGaitToServer_Validate(const ECharacterGait& Gait) { return true; }
+
 	//播放Montage
 public:
 	UFUNCTION(BlueprintCallable, Category = "角色|行为")
@@ -36,12 +46,12 @@ public:
 
 	UFUNCTION(Reliable, WithValidation, NetMulticast)
 	void MulticastPlayMontage(UAnimMontage * MontageToPlay, float InPlayRate = 1.f, FName StartSectionName = NAME_None);
-	void MulticastPlayMontage_Implementation(UAnimMontage * MontageToPlay, float InPlayRate = 1.f, FName StartSectionName = NAME_None);
+	virtual void MulticastPlayMontage_Implementation(UAnimMontage * MontageToPlay, float InPlayRate = 1.f, FName StartSectionName = NAME_None);
 	bool MulticastPlayMontage_Validate(UAnimMontage * MontageToPlay, float InPlayRate = 1.f, FName StartSectionName = NAME_None) { return true; }
 
 	UFUNCTION(Reliable, WithValidation, NetMulticast)
 	void MulticastPlayMontageSkipOwner(UAnimMontage * MontageToPlay, float InPlayRate = 1.f, FName StartSectionName = NAME_None);
-	void MulticastPlayMontageSkipOwner_Implementation(UAnimMontage * MontageToPlay, float InPlayRate = 1.f, FName StartSectionName = NAME_None);
+	virtual void MulticastPlayMontageSkipOwner_Implementation(UAnimMontage * MontageToPlay, float InPlayRate = 1.f, FName StartSectionName = NAME_None);
 	bool MulticastPlayMontageSkipOwner_Validate(UAnimMontage * MontageToPlay, float InPlayRate = 1.f, FName StartSectionName = NAME_None) { return true; }
 
 	UFUNCTION(BlueprintCallable, Category = "角色|行为", Reliable, WithValidation, NetMulticast)

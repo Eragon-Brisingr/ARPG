@@ -6,13 +6,15 @@
 
 
 // Sets default values
-ACharacterBase::ACharacterBase(const FObjectInitializer& PCIP)
-	:Super(PCIP.SetDefaultSubobjectClass<UARPG_MovementComponent>(ACharacter::CharacterMovementComponentName))
+ACharacterBase::ACharacterBase(const FObjectInitializer& ObjectInitializer)
+	:Super(ObjectInitializer.SetDefaultSubobjectClass<UARPG_MovementComponent>(ACharacter::CharacterMovementComponentName))
 {
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
 	ARPG_MovementComponent = CastChecked<UARPG_MovementComponent>(GetCharacterMovement());
+
+	bUseControllerRotationYaw = false;
 }
 
 // Called when the game starts or when spawned
@@ -34,6 +36,18 @@ void ACharacterBase::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
+}
+
+void ACharacterBase::InvokeChangeMoveGait(ECharacterGait Gait)
+{
+	InvokeChangeMoveGaitToServer_Implementation(Gait);
+	InvokeChangeMoveGaitToServer(Gait);
+}
+
+void ACharacterBase::InvokeChangeMoveGaitToServer_Implementation(const ECharacterGait& Gait)
+{
+	ARPG_MovementComponent->bInvokeSprint = (Gait == ECharacterGait::Sprinting);
+	ARPG_MovementComponent->SetGait(Gait);
 }
 
 float ACharacterBase::PlayMontage(UAnimMontage * MontageToPlay, float InPlayRate /*= 1.f*/, FName StartSectionName /*= NAME_None*/, bool ClientMaster /*= false*/)

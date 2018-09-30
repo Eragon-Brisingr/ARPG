@@ -7,4 +7,6 @@ AHumanBase::AHumanBase(const FObjectInitializer& PCIP)
 	:Super(PCIP)
 {
 	ARPG_MovementComponent->MovementState.bCanCrouch = true;
+	ARPG_MovementComponent->SetIsReplicated(true);
+
 }

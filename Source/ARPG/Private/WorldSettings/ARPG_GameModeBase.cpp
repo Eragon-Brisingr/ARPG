@@ -19,3 +19,33 @@ void AARPG_GameModeBase::EndPlay(const EEndPlayReason::Type EndPlayReason)
 
 	UXD_SaveGameFunctionLibrary::ShutDownAutoSaveLoadSystem(this);
 }
+
+APawn* AARPG_GameModeBase::SpawnDefaultPawnFor_Implementation(AController* NewPlayer, AActor* StartSpot)
+{
+	if (APlayerController* PlayerController = Cast<APlayerController>(NewPlayer))
+	{
+		if (APawn* Pawn = UXD_SaveGameFunctionLibrary::TryLoadPlayer(PlayerController))
+		{
+			UXD_SaveGameFunctionLibrary::RegisterAutoSavePlayer(Pawn);
+			return Pawn;
+		}
+	}
+	APawn* Pawn = Super::SpawnDefaultPawnFor_Implementation(NewPlayer, StartSpot);
+	UXD_SaveGameFunctionLibrary::RegisterAutoSavePlayer(Pawn);
+	return Pawn;
+}
+
+APawn* AARPG_GameModeBase::SpawnDefaultPawnAtTransform_Implementation(AController* NewPlayer, const FTransform& SpawnTransform)
+{
+	if (APlayerController* PlayerController = Cast<APlayerController>(NewPlayer))
+	{
+		if (APawn* Pawn = UXD_SaveGameFunctionLibrary::TryLoadPlayer(PlayerController))
+		{
+			UXD_SaveGameFunctionLibrary::RegisterAutoSavePlayer(Pawn);
+			return Pawn;
+		}
+	}
+	APawn* Pawn = Super::SpawnDefaultPawnAtTransform_Implementation(NewPlayer, SpawnTransform);
+	UXD_SaveGameFunctionLibrary::RegisterAutoSavePlayer(Pawn);
+	return Pawn;
+}
