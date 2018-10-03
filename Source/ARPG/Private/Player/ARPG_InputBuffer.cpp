@@ -5,3 +5,22 @@
 
 
 
+void FARPG_InputBuffer::InputPressed(EARPG_InputType InputType)
+{
+	Data |= (1 << (uint8)InputType);
+}
+
+void FARPG_InputBuffer::InputReleased(EARPG_InputType InputType)
+{
+	Data &= ~(1 << (uint8)InputType);
+}
+
+bool FARPG_InputBuffer::IsPressed(int32 InputType) const
+{
+	return Data & InputType;
+}
+
+bool FARPG_InputBuffer::IsReleased(int32 InputType) const
+{
+	return !IsPressed(InputType);
+}

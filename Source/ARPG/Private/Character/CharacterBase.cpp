@@ -38,10 +38,33 @@ void ACharacterBase::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 
 }
 
+void ACharacterBase::ARPG_InputPressed(EARPG_InputType InputType)
+{
+	InputBuffer.InputPressed(InputType);
+}
+
+void ACharacterBase::ARPG_InputReleased(EARPG_InputType InputType)
+{
+	InputBuffer.InputReleased(InputType);
+}
+
+bool ACharacterBase::ARPG_InputIsPressed(int32 InputType) const
+{
+	return InputBuffer.IsPressed(InputType);
+}
+
+bool ACharacterBase::ARPG_InputIsReleased(int32 InputType) const
+{
+	return InputBuffer.IsReleased(InputType);
+}
+
 void ACharacterBase::InvokeChangeMoveGait(ECharacterGait Gait)
 {
-	InvokeChangeMoveGaitToServer_Implementation(Gait);
-	InvokeChangeMoveGaitToServer(Gait);
+	if (ARPG_MovementComponent->CurrentGait != Gait)
+	{
+		InvokeChangeMoveGaitToServer_Implementation(Gait);
+		InvokeChangeMoveGaitToServer(Gait);
+	}
 }
 
 void ACharacterBase::InvokeChangeMoveGaitToServer_Implementation(const ECharacterGait& Gait)

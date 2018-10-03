@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "XD_SaveGameInterface.h"
+#include "ARPG_InputBuffer.h"
 #include "CharacterBase.generated.h"
 
 UCLASS()
@@ -16,8 +17,6 @@ public:
 	// Sets default values for this character's properties
 	ACharacterBase(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Character")
-	class UARPG_MovementComponent* ARPG_MovementComponent;
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -29,6 +28,21 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "角色|行为")
+	FARPG_InputBuffer InputBuffer;
+
+	UFUNCTION(BlueprintCallable, Category = "角色|行为")
+	void ARPG_InputPressed(EARPG_InputType InputType);
+
+	UFUNCTION(BlueprintCallable, Category = "角色|行为")
+	void ARPG_InputReleased(EARPG_InputType InputType);
+
+	UFUNCTION(BlueprintCallable, Category = "角色|行为")
+	bool ARPG_InputIsPressed(UPARAM(meta = (Bitmask, BitmaskEnum = "EARPG_InputType")) int32 InputType) const;
+
+	UFUNCTION(BlueprintCallable, Category = "角色|行为")
+	bool ARPG_InputIsReleased(UPARAM(meta = (Bitmask, BitmaskEnum = "EARPG_InputType")) int32 InputType) const;
 	//移动行为
 public:
 	UFUNCTION(BlueprintCallable, Category = "角色|行为")
@@ -64,4 +78,7 @@ public:
 	virtual void PlayMontageToServer_Implementation(UAnimMontage * MontageToPlay, float InPlayRate = 1.f, FName StartSectionName = NAME_None);
 	bool PlayMontageToServer_Validate(UAnimMontage * MontageToPlay, float InPlayRate = 1.f, FName StartSectionName = NAME_None) { return true; }
 	
+public:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Character")
+	class UARPG_MovementComponent* ARPG_MovementComponent;
 };
