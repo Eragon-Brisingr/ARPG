@@ -22,10 +22,11 @@ enum class EARPG_InputType : uint8
 	Left,
 	Right,
 	Backward,
+	Down,
+	Up,
 
 	Dodge,
-	Down,
-	Up
+	Sprint
 };
 ENUM_CLASS_FLAGS(EARPG_InputType);
 
