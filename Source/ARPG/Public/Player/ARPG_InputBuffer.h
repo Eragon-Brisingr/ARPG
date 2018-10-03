@@ -10,33 +10,38 @@
  * 
  */
 
-namespace ARPG_InputBuffer
+UENUM(BlueprintType, meta = (Bitflags))
+enum class EARPG_InputType : uint8
 {
-	UENUM()
-	enum EARPG_InputBuffer
-	{
-		LeftLightAttack,
-		LeftHeavyAttack,
-		RightLightAttack,
-		RightHeavyAttack,
+	LeftLightAttack,
+	LeftHeavyAttack,
+	RightLightAttack,
+	RightHeavyAttack,
 
-		Forward,
-		Left,
-		Right,
-		Backworld,
+	Forward,
+	Left,
+	Right,
+	Backward,
 
-		Dodge,
-		Down,
-		Up
-	};
-}
+	Dodge,
+	Down,
+	Up
+};
+ENUM_CLASS_FLAGS(EARPG_InputType);
 
 USTRUCT(BlueprintType)
 struct ARPG_API FARPG_InputBuffer
 {
 	GENERATED_BODY()
+public:
+	UPROPERTY(EditAnywhere, meta = (Bitmask, BitmaskEnum = "EARPG_InputType"), Category = "输入")
+	int32 Data;
 
+	void InputPressed(EARPG_InputType InputType);
 
+	void InputReleased(EARPG_InputType InputType);
 
+	bool IsPressed(int32 InputType) const;
 
+	bool IsReleased(int32 InputType) const;
 };
