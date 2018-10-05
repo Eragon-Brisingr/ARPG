@@ -6,10 +6,13 @@
 #include "GameFramework/Character.h"
 #include "XD_SaveGameInterface.h"
 #include "ARPG_InputBuffer.h"
+#include "ARPG_LockOnTargetSystem.h"
 #include "CharacterBase.generated.h"
 
 UCLASS()
-class ARPG_API ACharacterBase : public ACharacter, public IXD_SaveGameInterface
+class ARPG_API ACharacterBase : public ACharacter, 
+	public IXD_SaveGameInterface,
+	public IARPG_LockOnTargetInterface
 {
 	GENERATED_BODY()
 
@@ -52,6 +55,20 @@ public:
 	void InvokeChangeMoveGaitToServer(const ECharacterGait& Gait);
 	virtual void InvokeChangeMoveGaitToServer_Implementation(const ECharacterGait& Gait);
 	bool InvokeChangeMoveGaitToServer_Validate(const ECharacterGait& Gait) { return true; }
+
+	//IARPG_LockOnTargetInterface
+public:
+	UPROPERTY(EditDefaultsOnly, Category = "角色|配置")
+	TArray<FName> CanLockedSocketNames;
+
+	UPROPERTY(EditDefaultsOnly, Category = "角色|配置")
+	float MaxLockingDistance = 2000.f;
+
+	virtual FVector GetTargetLocation_Implementation(const FName& CurLockSocketName) const override;
+
+	virtual bool CanLockedOnTarget_Implementation(AController* Invoker, const FName& InvokeLockedSocketName) const override;
+
+	virtual bool CanLockingOnTarget_Implementation(AController* Invoker, const FName& CurLockSocketName, bool& TryLockAgain) const override;
 
 	//播放Montage
 public:

@@ -73,6 +73,39 @@ void ACharacterBase::InvokeChangeMoveGaitToServer_Implementation(const ECharacte
 	ARPG_MovementComponent->SetGait(Gait);
 }
 
+FVector ACharacterBase::GetTargetLocation_Implementation(const FName& CurLockSocketName) const
+{
+	return GetMesh()->GetSocketLocation(CurLockSocketName);
+}
+
+bool ACharacterBase::CanLockedOnTarget_Implementation(AController* Invoker, const FName& InvokeLockedSocketName) const
+{
+	bool TryLockAgain;
+	if (CanLockingOnTarget_Implementation(Invoker, InvokeLockedSocketName, TryLockAgain))
+	{
+		if (CanLockedSocketNames.Contains(InvokeLockedSocketName))
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+bool ACharacterBase::CanLockingOnTarget_Implementation(AController* Invoker, const FName& CurLockSocketName, bool& TryLockAgain) const
+{
+	if (APawn* Pawn = Invoker->GetPawn())
+	{
+		if ((Pawn->GetActorLocation() - GetActorLocation()).Size() > MaxLockingDistance)
+		{
+			TryLockAgain = false;
+			return false;
+		}
+
+		return true;
+	}
+	return false;
+}
+
 float ACharacterBase::PlayMontage(UAnimMontage * MontageToPlay, float InPlayRate /*= 1.f*/, FName StartSectionName /*= NAME_None*/, bool ClientMaster /*= false*/)
 {
 	if (MontageToPlay)
