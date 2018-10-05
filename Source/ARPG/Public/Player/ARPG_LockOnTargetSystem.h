@@ -39,13 +39,15 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "锁定系统")
 	TEnumAsByte<ETraceTypeQuery> VisibilityChannel;
 
-	TArray<AActor*> GetIgnoreActors(class AController* Controller) const;
+	bool TraceCanLockedActor(class AController* Controller, const FVector& Start, const FVector& End, const TArray<AActor*>& IgnoreActors = {}, float Radius = 500.f);
 
-	bool TraceCanLockedActor(class AController* Controller, const FVector& Start, const FVector& End, float Radius = 500.f);
-
-	bool FilterResultToLock(TArray<FHitResult> HitResults, class AController* Controller);
+	bool FilterResultToLock(TArray<FHitResult> HitResults, class AController* Controller, const TArray<AActor*>& IgnoreActors = {});
 
 	void ToggleLockedTarget(class AController* Controller);
+
+	float PreInvokeSwitchSeconds;
+
+	bool InvokeSwitchLockedTarget(class AController* Controller, const FVector& SwitchDirection);
 };
 
 // This class does not need to be modified.

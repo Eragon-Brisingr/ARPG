@@ -24,3 +24,8 @@ bool AARPG_PlayerControllerBase::SetLockedTarget(AActor* Target, const FName& So
 	}
 	return false;
 }
+
+bool AARPG_PlayerControllerBase::InvokeSwitchLockedTarget(bool Left)
+{
+	return LockOnTargetSystem.InvokeSwitchLockedTarget(this, FRotationMatrix(GetControlRotation()).GetScaledAxis(EAxis::Y) * (Left ? 1.f : -1.f));
+}

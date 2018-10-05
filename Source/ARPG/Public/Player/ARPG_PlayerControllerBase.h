@@ -22,6 +22,9 @@ public:
 	FARPG_LockOnTargetSystem LockOnTargetSystem;
 
 	UFUNCTION(BlueprintCallable, Category = "锁定系统")
+	void EnableLockOnTargetSystem(bool Enable) { LockOnTargetSystem.bEnableLockOnSystem = Enable; }
+
+	UFUNCTION(BlueprintCallable, Category = "锁定系统")
 	bool SetLockedTarget(AActor* Target, const FName& SocketName);
 
 	UFUNCTION(BlueprintCallable, Category = "锁定系统")
@@ -29,4 +32,7 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "锁定系统")
 	void ToggleLockedTarget() { LockOnTargetSystem.ToggleLockedTarget(this); }
+
+	UFUNCTION(BlueprintCallable, Category = "锁定系统")
+	bool InvokeSwitchLockedTarget(bool Left);
 };
