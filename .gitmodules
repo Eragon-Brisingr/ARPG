@@ -28,3 +28,6 @@
 [submodule "Plugins/XD_MovementComponentPlugin"]
 	path = Plugins/XD_MovementComponentPlugin
 	url = https://github.com/Eragon-Brisingr/XD_MovementComponentPlugin.git
+[submodule "RawAssets"]
+	path = RawAssets
+	url = https://gitee.com/EragonCode/RawAssets
