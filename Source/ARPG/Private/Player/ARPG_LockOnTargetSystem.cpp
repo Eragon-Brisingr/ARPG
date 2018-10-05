@@ -29,7 +29,7 @@ void FARPG_LockOnTargetSystem::LockOnTargetTick(class AController* Controller, f
 	{
 		if (TryLockAgain)
 		{
-			if (TraceCanLockedActor(Controller, LockedTarget->GetActorLocation(), LockedTarget->GetActorLocation() + FVector(0.f, 0.f, 100.f), 5000.f))
+			if (TraceCanLockedActor(Controller, LockedTarget->GetActorLocation(), LockedTarget->GetActorLocation() + FVector(0.f, 0.f, 100.f), { Controller->GetPawn() }, 5000.f))
 			{
 				return;
 			}
@@ -78,22 +78,17 @@ void FARPG_LockOnTargetSystem::ClearLockedTarget()
 	LockedSocketName = NAME_None;
 }
 
-TArray<AActor*> FARPG_LockOnTargetSystem::GetIgnoreActors(class AController* Controller) const
-{
-	return { Controller->GetPawn(), LockedSocketName.IsNone() ? LockedTarget.Get() : nullptr };
-}
-
-bool FARPG_LockOnTargetSystem::TraceCanLockedActor(class AController* Controller, const FVector& Start, const FVector& End, float Radius /*= 500.f*/)
+bool FARPG_LockOnTargetSystem::TraceCanLockedActor(class AController* Controller, const FVector& Start, const FVector& End, const TArray<AActor*>& IgnoreActors, float Radius /*= 500.f*/)
 {
 	TArray<FHitResult> HitResults;
-	if (UKismetSystemLibrary::SphereTraceMultiForObjects(Controller, Start, End, 500.f, TraceObjectTypes, false, GetIgnoreActors(Controller), EDrawDebugTrace::None, HitResults, false))
+	if (UKismetSystemLibrary::SphereTraceMultiForObjects(Controller, Start, End, 500.f, TraceObjectTypes, false, IgnoreActors, EDrawDebugTrace::None, HitResults, false))
 	{
-		return FilterResultToLock(HitResults, Controller);
+		return FilterResultToLock(HitResults, Controller, IgnoreActors);
 	}
 	return false;
 }
 
-bool FARPG_LockOnTargetSystem::FilterResultToLock(TArray<FHitResult> HitResults, class AController* Controller)
+bool FARPG_LockOnTargetSystem::FilterResultToLock(TArray<FHitResult> HitResults, class AController* Controller, const TArray<AActor*>& IgnoreActors)
 {
 	for (const FHitResult& Hit : HitResults)
 	{
@@ -102,7 +97,7 @@ bool FARPG_LockOnTargetSystem::FilterResultToLock(TArray<FHitResult> HitResults,
 			FVector TargetLocation = CallUnrealInterface(IARPG_LockOnTargetInterface, GetTargetLocation)(Hit.GetActor(), Hit.BoneName);
 
 			FHitResult VisibleCheck;
-			if (UKismetSystemLibrary::LineTraceSingle(Controller, Controller->GetPawn()->GetActorLocation(), TargetLocation, VisibilityChannel, false, GetIgnoreActors(Controller), EDrawDebugTrace::None, VisibleCheck, false))
+			if (UKismetSystemLibrary::LineTraceSingle(Controller, Controller->GetPawn()->GetActorLocation(), TargetLocation, VisibilityChannel, false, IgnoreActors, EDrawDebugTrace::None, VisibleCheck, false))
 			{
 				if (VisibleCheck.GetActor() == Hit.GetActor())
 				{
@@ -125,6 +120,22 @@ void FARPG_LockOnTargetSystem::ToggleLockedTarget(class AController* Controller)
 	{
 		FVector StartLocation = Controller->GetPawn()->GetActorLocation();
 		FVector EndLocation = Controller->GetControlRotation().RotateVector(FVector(MaxTraceDistance, 0.f, 0.f)) + StartLocation;
-		TraceCanLockedActor(Controller, StartLocation, EndLocation);
+		TraceCanLockedActor(Controller, StartLocation, EndLocation, { Controller->GetPawn() });
 	}
+}
+
+bool FARPG_LockOnTargetSystem::InvokeSwitchLockedTarget(class AController* Controller, const FVector& SwitchDirection)
+{
+	float CurrentTimeSeconds = Controller->GetWorld()->GetRealTimeSeconds();
+	if (PreInvokeSwitchSeconds + 0.2f < CurrentTimeSeconds)
+	{
+		PreInvokeSwitchSeconds = CurrentTimeSeconds;
+		if (LockedTarget.IsValid())
+		{
+			FVector StartLocation = LockedTarget->GetActorLocation();
+			FVector EndLocation = StartLocation + SwitchDirection * MaxTraceDistance;
+			return TraceCanLockedActor(Controller, StartLocation, EndLocation, { Controller->GetPawn() , LockedTarget.Get() });
+		}
+	}
+	return false;
 }
