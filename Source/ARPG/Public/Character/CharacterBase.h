@@ -7,6 +7,7 @@
 #include "XD_SaveGameInterface.h"
 #include "ARPG_InputBuffer.h"
 #include "ARPG_LockOnTargetSystem.h"
+#include "ARPG_CharacterAnimType.h"
 #include "CharacterBase.generated.h"
 
 UCLASS()
@@ -31,6 +32,7 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+	//输入
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "角色|行为")
 	FARPG_InputBuffer InputBuffer;
@@ -95,6 +97,23 @@ public:
 	virtual void PlayMontageToServer_Implementation(UAnimMontage * MontageToPlay, float InPlayRate = 1.f, FName StartSectionName = NAME_None);
 	bool PlayMontageToServer_Validate(UAnimMontage * MontageToPlay, float InPlayRate = 1.f, FName StartSectionName = NAME_None) { return true; }
 	
+	UFUNCTION(BlueprintCallable, Category = "角色|行为")
+	void TryPlayMontage(const FARPG_MontageParameter& Montage);
+	//背包相关
+public:
+	UFUNCTION(BlueprintCallable, Category = "角色|物品", Reliable, WithValidation, Server)
+	void MoveItem(class UARPG_InventoryComponent* SourceInventory, class UARPG_InventoryComponent* TargetInventory, class UARPG_ItemCoreBase* ItemCore, int32 Number = 1);
+	virtual void MoveItem_Implementation(class UARPG_InventoryComponent* SourceInventory, class UARPG_InventoryComponent* TargetInventory, class UARPG_ItemCoreBase* ItemCore, int32 Number = 1);
+	bool MoveItem_Validate(class UARPG_InventoryComponent* SourceInventory, class UARPG_InventoryComponent* TargetInventory, class UARPG_ItemCoreBase* ItemCore, int32 Number = 1) { return true; }
+
+	UFUNCTION(BlueprintCallable, Category = "角色|物品", Reliable, WithValidation, Server)
+	void TradeItem(class UARPG_InventoryComponent* TraderInventory, class UARPG_InventoryComponent* BuyerInventory, class UARPG_ItemCoreBase* ItemCore, int32 Number = 1);
+	virtual void TradeItem_Implementation(class UARPG_InventoryComponent* TraderInventory, class UARPG_InventoryComponent* BuyerInventory, class UARPG_ItemCoreBase* ItemCore, int32 Number = 1);
+	bool TradeItem_Validate(class UARPG_InventoryComponent* TraderInventory, class UARPG_InventoryComponent* BuyerInventory, class UARPG_ItemCoreBase* ItemCore, int32 Number = 1) { return true; }
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "背包")
+	class UARPG_InventoryComponent* Inventory;
+
 public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Character")
 	class UARPG_MovementComponent* ARPG_MovementComponent;
