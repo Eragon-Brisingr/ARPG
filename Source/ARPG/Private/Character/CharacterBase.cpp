@@ -3,6 +3,8 @@
 #include "CharacterBase.h"
 #include "XD_CharacterMovementComponent.h"
 #include "ARPG_MovementComponent.h"
+#include "ARPG_InventoryComponent.h"
+#include "ARPG_ItemCoreBase.h"
 
 
 // Sets default values
@@ -13,8 +15,15 @@ ACharacterBase::ACharacterBase(const FObjectInitializer& ObjectInitializer)
 	PrimaryActorTick.bCanEverTick = true;
 
 	ARPG_MovementComponent = CastChecked<UARPG_MovementComponent>(GetCharacterMovement());
+	{
+		bUseControllerRotationYaw = false;
+	}
 
-	bUseControllerRotationYaw = false;
+	Inventory = CreateDefaultSubobject<UARPG_InventoryComponent>(GET_MEMBER_NAME_CHECKED(ACharacterBase, Inventory));
+	{
+
+	}
+
 }
 
 // Called when the game starts or when spawned
@@ -141,7 +150,7 @@ void ACharacterBase::MulticastPlayMontage_Implementation(UAnimMontage * MontageT
 
 void ACharacterBase::MulticastPlayMontageSkipOwner_Implementation(UAnimMontage * MontageToPlay, float InPlayRate /*= 1.f*/, FName StartSectionName /*= NAME_None*/)
 {
-	if ((GetController() && GetController()->IsLocalController()) == false)
+	if (IsLocallyControlled() || GetMesh()->GetAnimInstance()->Montage_IsPlaying(MontageToPlay) == false)
 	{
 		PlayAnimMontage(MontageToPlay, InPlayRate, StartSectionName);
 	}
@@ -155,5 +164,30 @@ void ACharacterBase::StopMontage_Implementation()
 void ACharacterBase::PlayMontageToServer_Implementation(UAnimMontage * MontageToPlay, float InPlayRate /*= 1.f*/, FName StartSectionName /*= NAME_None*/)
 {
 	MulticastPlayMontageSkipOwner(MontageToPlay, InPlayRate, StartSectionName);
+}
+
+void ACharacterBase::TryPlayMontage(const FARPG_MontageParameter& Montage)
+{
+	if (Montage.Condition == nullptr || Montage.Condition.GetDefaultObject()->CanPlayMontage(this))
+	{
+		PlayMontage(Montage.Montage, 1.f, NAME_None, true);
+	}
+}
+
+void ACharacterBase::MoveItem_Implementation(class UARPG_InventoryComponent* SourceInventory, class UARPG_InventoryComponent* TargetInventory, class UARPG_ItemCoreBase* ItemCore, int32 Number /*= 1*/)
+{
+	TargetInventory->GetItemFromOther(SourceInventory, ItemCore, Number);
+}
+
+void ACharacterBase::TradeItem_Implementation(class UARPG_InventoryComponent* TraderInventory, class UARPG_InventoryComponent* BuyerInventory, class UARPG_ItemCoreBase* ItemCore, int32 Number /*= 1*/)
+{
+	if (BuyerInventory == Inventory)
+	{
+		Inventory->BuyItemFromOther(TraderInventory, ItemCore, Number);
+	}
+	else
+	{
+		Inventory->SellItemToOther(TraderInventory, ItemCore, Number);
+	}
 }
 
