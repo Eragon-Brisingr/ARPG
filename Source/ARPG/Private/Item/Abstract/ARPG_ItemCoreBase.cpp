@@ -4,6 +4,11 @@
 #include "ARPG_ItemBase.h"
 
 
+UARPG_ItemCoreBase::UARPG_ItemCoreBase()
+{
+	ItemClass = AARPG_ItemBase::StaticClass();
+}
+
 float UARPG_ItemCoreBase::GetWeight() const
 {
 	return GetItemDefaultActor<AARPG_ItemBase>()->GetWeightImpl(this);
