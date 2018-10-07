@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "XD_ItemBase.h"
+#include "ItemTypeUtils.h"
 #include "ARPG_ItemBase.generated.h"
 
 /**
@@ -14,6 +15,8 @@ class ARPG_API AARPG_ItemBase : public AXD_ItemBase
 {
 	GENERATED_BODY()
 public:
+	AARPG_ItemBase(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
+
 	UPROPERTY(SaveGame, EditDefaultsOnly, BlueprintReadOnly, Category = "物品", meta = (DisplayName = "重量"))
 	float Weight;
 
@@ -44,6 +47,23 @@ public:
 	FText GetItemTypeDescImpl(const class UXD_ItemCoreBase* ItemCore) const;
 	virtual FText GetItemTypeDescImpl_Implementation(const class UXD_ItemCoreBase* ItemCore) const;
 
-	
-	
+public:
+	UFUNCTION(BlueprintNativeEvent, Category = "物品|基础")
+	void UseItemImpl(class UXD_ItemCoreBase* ItemCore, class APawn* ItemOwner, EUseItemInput UseItemInput) const;
+	virtual void UseItemImpl_Implementation(class UXD_ItemCoreBase* ItemCore, class APawn* ItemOwner, EUseItemInput UseItemInput) const{}
+
+	virtual void WhenUse(class ACharacterBase* ItemOwner);
+
+	//子类使用时发生的事件
+	UFUNCTION(BlueprintImplementableEvent, Category = "物品|基础", meta = (DisplayName = "WhenUse"))
+	void ReceiveWhenUse(class ACharacterBase* ItemOwner);
+
+	virtual void WhenNotUse(class ACharacterBase* ItemOwner);
+	//子类停止使用时发生的事件
+	UFUNCTION(BlueprintImplementableEvent, Category = "物品|基础", meta = (DisplayName = "WhenNotUse"))
+	void ReceiveWhenNotUse(class ACharacterBase* ItemOwner);
+
+public:
+	void SetItemSimulatePhysics(bool bSimulate);
+
 };

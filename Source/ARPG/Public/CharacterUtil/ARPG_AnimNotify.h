@@ -4,6 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "Animation/AnimNotifies/AnimNotifyState.h"
+#include <Animation/AnimNotifies/AnimNotify.h>
+#include "HumanType.h"
 #include "ARPG_AnimNotify.generated.h"
 
 /**
@@ -34,5 +36,19 @@ public:
 	virtual void NotifyEnd(USkeletalMeshComponent * MeshComp, UAnimSequenceBase * Animation) override;
 
 	virtual FString GetNotifyName_Implementation() const override;
-	
+};
+
+UCLASS(meta = (DisplayName = "人类_武器位置"))
+class ARPG_API UARPG_Human_TakeWeaponPos : public UAnimNotify
+{
+	GENERATED_BODY()
+public:
+	UARPG_Human_TakeWeaponPos()
+	{
+		bIsNativeBranchingPoint = true;
+	}
+
+	uint8 bPullOutWeapon : 1;
+
+	virtual void Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation) override;
 };

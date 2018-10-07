@@ -10,7 +10,7 @@
 /**
  * 
  */
-UCLASS(Abstract)
+UCLASS()
 class ARPG_API UARPG_ItemCoreBase : public UXD_ItemCoreBase
 {
 	GENERATED_BODY()
@@ -30,4 +30,7 @@ public:
 	UFUNCTION(BlueprintPure, Category = "物品|基础")
 	float GetTradePrice(class UXD_InventoryComponentBase* Invoker, class UXD_InventoryComponentBase* Trader, ETradePart InvokerTradePart) const;
 
+public:
+	UFUNCTION(BlueprintCallable, Category = "物品|基础")
+	void UseItem(class APawn* ItemOwner, EUseItemInput UseItemInput);
 };

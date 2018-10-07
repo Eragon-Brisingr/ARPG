@@ -8,6 +8,8 @@
 #include "ARPG_InputBuffer.h"
 #include "ARPG_LockOnTargetSystem.h"
 #include "ARPG_CharacterAnimType.h"
+#include "ItemTypeUtils.h"
+#include "XD_ItemType.h"
 #include "CharacterBase.generated.h"
 
 UCLASS()
@@ -31,6 +33,27 @@ public:
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+
+public:
+	virtual void WhenGameInit_Implementation() override;
+
+	virtual TArray<struct FXD_Item> GetInitItemList() const;
+	UFUNCTION(BlueprintImplementableEvent, Category = "角色|初始化")
+	TArray<struct FXD_Item> ReceivedGetInitItemList() const;
+
+	//重生用
+public:
+	UPROPERTY(SaveGame, BlueprintReadOnly, Category = "角色|重生")
+	FIntVector BornWorldOrigin;
+
+	UPROPERTY(SaveGame, BlueprintGetter = GetRebornLocation, BlueprintSetter = SetRebornLocation, Category = "角色|重生")
+	FVector BornLocation;
+
+	UFUNCTION(BlueprintSetter)
+	void SetRebornLocation(const FVector& RebornLocation);
+
+	UFUNCTION(BlueprintGetter)
+	FVector GetRebornLocation();
 
 	//输入
 public:
@@ -99,6 +122,7 @@ public:
 	
 	UFUNCTION(BlueprintCallable, Category = "角色|行为")
 	void TryPlayMontage(const FARPG_MontageParameter& Montage);
+
 	//背包相关
 public:
 	UFUNCTION(BlueprintCallable, Category = "角色|物品", Reliable, WithValidation, Server)
@@ -113,6 +137,32 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "背包")
 	class UARPG_InventoryComponent* Inventory;
+
+	//使用道具相关
+public:
+	UFUNCTION(Reliable, WithValidation, Server)
+	void InvokeUseItem(const class UARPG_ItemCoreBase* ItemCore, EUseItemInput UseItemInput);
+	virtual void InvokeUseItem_Implementation(const class UARPG_ItemCoreBase* ItemCore, EUseItemInput UseItemInput);
+	bool InvokeUseItem_Validate(const class UARPG_ItemCoreBase* ItemCore, EUseItemInput UseItemInput) { return true; }
+
+	UFUNCTION(BlueprintCallable, Category = "角色|物品", BlueprintAuthorityOnly)
+	void UseItemImmediately(const class UARPG_ItemCoreBase* ItemCore, EUseItemInput UseItemInput);
+
+	UFUNCTION(BlueprintNativeEvent, Category = "角色|物品")
+	class AARPG_WeaponBase* EquipWaepon(class UARPG_ItemCoreBase* WeaponCore, EUseItemInput UseItemInput);
+	virtual class AARPG_WeaponBase* EquipWaepon_Implementation(class UARPG_ItemCoreBase* WeaponCore, EUseItemInput UseItemInput) { return nullptr; }
+
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnUseItem, ACharacterBase*, Character, const class UARPG_ItemCoreBase*, ItemCore, EUseItemInput, UseItemInput);
+	UPROPERTY(BlueprintAssignable)
+	FOnUseItem OnUseItem;
+
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnEquip, ACharacterBase*, Character, class AARPG_ItemBase*, EquipItem);
+	UPROPERTY(BlueprintAssignable, Category = "角色|物品")
+	FOnEquip OnEquip;
+	 
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnNotEquip, ACharacterBase*, Character, class AARPG_ItemBase*, NotEquipItem);
+	UPROPERTY(BlueprintAssignable, Category = "角色|物品")
+	FOnNotEquip OnNotEquip;
 
 public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Character")

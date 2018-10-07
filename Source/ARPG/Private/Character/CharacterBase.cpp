@@ -5,6 +5,8 @@
 #include "ARPG_MovementComponent.h"
 #include "ARPG_InventoryComponent.h"
 #include "ARPG_ItemCoreBase.h"
+#include <Kismet/GameplayStatics.h>
+#include "XD_LevelFunctionLibrary.h"
 
 
 // Sets default values
@@ -45,6 +47,60 @@ void ACharacterBase::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
+}
+
+void ACharacterBase::WhenGameInit_Implementation()
+{
+	//初始化道具和使用中的道具
+	{
+		TArray<UARPG_ItemCoreBase*> RemoveItems;
+		TArray<FXD_Item> FinalInitItemList = GetInitItemList();
+		//对已存在的进行数量修改
+		for (UARPG_ItemCoreBase* ItemCore : Inventory->GetItemCoreList())
+		{
+			if (const FXD_Item* Item = FinalInitItemList.FindByPredicate([ItemCore](const FXD_Item& E_Item) {return ItemCore->EqualForItemCore(E_Item.ItemCore); }))
+			{
+				ItemCore->Number = Item->ItemCore->Number;
+				FinalInitItemList.RemoveAll([&](const FXD_Item& E) {return E->EqualForItemCore(ItemCore); });
+			}
+			else
+			{
+				RemoveItems.Add(ItemCore);
+			}
+		}
+		//移除初始化列表中不存在的
+		for (UARPG_ItemCoreBase* ItemCore : RemoveItems)
+		{
+			Inventory->ItemCoreList.Remove(ItemCore);
+		}
+		//添加需要添加的
+		Inventory->AddItemArray(FinalInitItemList);
+		Inventory->OnRep_ItemList();
+	}
+
+	//初始化角色坐标
+	{
+		BornLocation = GetActorLocation();
+		BornWorldOrigin = UGameplayStatics::GetWorldOriginLocation(this);
+	}
+}
+
+TArray<struct FXD_Item> ACharacterBase::GetInitItemList() const
+{
+	TArray<FXD_Item> Res = ReceivedGetInitItemList();
+	Res.Append(Inventory->InitItems);
+	return Res;
+}
+
+void ACharacterBase::SetRebornLocation(const FVector& RebornLocation)
+{
+	BornLocation = RebornLocation;
+	BornWorldOrigin = GetWorld()->OriginLocation;
+}
+
+FVector ACharacterBase::GetRebornLocation()
+{
+	return UXD_LevelFunctionLibrary::GetFixedWorldLocation(this, BornWorldOrigin, BornLocation);
 }
 
 void ACharacterBase::ARPG_InputPressed(EARPG_InputType InputType)
@@ -188,6 +244,26 @@ void ACharacterBase::TradeItem_Implementation(class UARPG_InventoryComponent* Tr
 	else
 	{
 		Inventory->SellItemToOther(TraderInventory, ItemCore, Number);
+	}
+}
+
+void ACharacterBase::InvokeUseItem_Implementation(const class UARPG_ItemCoreBase* ItemCore, EUseItemInput UseItemInput)
+{
+
+}
+
+void ACharacterBase::UseItemImmediately(const class UARPG_ItemCoreBase* ItemCore, EUseItemInput UseItemInput)
+{
+	if (!ItemCore)
+		return;
+	for (UARPG_ItemCoreBase* E_ItemCore : Inventory->GetItemCoreList())
+	{
+		if (E_ItemCore->EqualForItemCore(ItemCore))
+		{
+			OnUseItem.Broadcast(this, ItemCore, UseItemInput);
+			E_ItemCore->UseItem(this, UseItemInput);
+			break;
+		}
 	}
 }
 

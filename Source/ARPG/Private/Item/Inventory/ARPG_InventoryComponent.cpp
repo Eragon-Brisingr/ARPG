@@ -4,6 +4,7 @@
 #include "ARPG_ItemCoreBase.h"
 #include "ARPG_MoneyBase.h"
 #include "CharacterBase.h"
+#include "XD_TemplateLibrary.h"
 
 
 
@@ -82,4 +83,9 @@ float UARPG_InventoryComponent::GetStandardMoneyNumber() const
 		}
 	}
 	return StandardMoney;
+}
+
+const TArray<UARPG_ItemCoreBase*>& UARPG_InventoryComponent::GetItemCoreList() const
+{
+	return ArrayCast<UARPG_ItemCoreBase*>(ItemCoreList);
 }
