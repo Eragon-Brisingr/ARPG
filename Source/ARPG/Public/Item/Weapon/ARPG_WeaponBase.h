@@ -27,18 +27,25 @@ class ARPG_API AARPG_WeaponBase : public AARPG_ItemBase
 	GENERATED_BODY()
 	
 public:
+	AARPG_WeaponBase();
+
 	virtual void UseItemImpl_Implementation(class UXD_ItemCoreBase* ItemCore, class APawn* ItemOwner, EUseItemInput UseItemInput) const override;
 
+	virtual void PostInitializeComponents();
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "物品|武器", AdvancedDisplay, meta = (DisplayName = "持武器模式"))
 	EWeaponUseType WeaponUseType = EWeaponUseType::SingleHand;
 
-	UPROPERTY(EditDefaultsOnly, Category = "道具")
+	UPROPERTY(EditDefaultsOnly, Category = "物品|武器")
 	FHumanAttackAnimSet LeftWeaponAnimSet;
 	
-	UPROPERTY(EditDefaultsOnly, Category = "道具")
+	UPROPERTY(EditDefaultsOnly, Category = "物品|武器")
 	FHumanAttackAnimSet RightWeaponAnimSet;
 
+	UPROPERTY(VisibleAnywhere, Category = "物品", Instanced)
+	class USocketMoveTracer* SocketMoveTracer;
+
+	void SetEnableNearAttackTrace(bool Enable);
 	//持武器方式
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "物品|武器", AdvancedDisplay, meta = (DisplayName = "左手持武器插槽名"))

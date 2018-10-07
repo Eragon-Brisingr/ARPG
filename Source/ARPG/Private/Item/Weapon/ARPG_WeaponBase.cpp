@@ -3,6 +3,12 @@
 #include "ARPG_WeaponBase.h"
 #include "CharacterBase.h"
 #include "ARPG_ItemCoreBase.h"
+#include "SocketMoveTraceManager.h"
+
+AARPG_WeaponBase::AARPG_WeaponBase()
+{
+	SocketMoveTracer = CreateDefaultSubobject<USocketMoveTracer>(GET_MEMBER_NAME_CHECKED(AARPG_WeaponBase, SocketMoveTracer));
+}
 
 void AARPG_WeaponBase::UseItemImpl_Implementation(class UXD_ItemCoreBase* ItemCore, class APawn* ItemOwner, EUseItemInput UseItemInput) const
 {
@@ -13,6 +19,18 @@ void AARPG_WeaponBase::UseItemImpl_Implementation(class UXD_ItemCoreBase* ItemCo
 			Character->EquipWaepon(WeaponCore, UseItemInput);
 		}
 	}
+}
+
+void AARPG_WeaponBase::PostInitializeComponents()
+{
+	Super::PostInitializeComponents();
+
+	SocketMoveTracer->InitSocketMoveTracer(GetRootMeshComponent());
+}
+
+void AARPG_WeaponBase::SetEnableNearAttackTrace(bool Enable)
+{
+	SocketMoveTracer->SetEnableTrace(Enable);
 }
 
 void AARPG_WeaponBase::WhenInHand()

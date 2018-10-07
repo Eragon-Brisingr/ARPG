@@ -29,6 +29,8 @@ void AHumanBase::GetLifetimeReplicatedProps(TArray< class FLifetimeProperty > & 
 
 	DOREPLIFETIME(AHumanBase, LeftWeapon);
 	DOREPLIFETIME(AHumanBase, RightWeapon);
+
+	DOREPLIFETIME(AHumanBase, UseWeaponState);
 }
 
 void AHumanBase::WhenGameInit_Implementation()
@@ -283,26 +285,18 @@ void AHumanBase::LetTheWeaponInWeaponBack()
 	}
 }
 
-void AHumanBase::InvokePullOutWeapon_Implementation()
+void AHumanBase::InvokePullOutWeapon()
 {
-	if (PullOutWeaponMontage)
+	if (UseWeaponState == EUseWeaponState::NoneWeapon_Default && CanPlayFullBodyMontage())
 	{
 		PlayMontage(PullOutWeaponMontage);
 	}
-	else
-	{
-		LetTheWeaponInHand();
-	}
 }
 
-void AHumanBase::InvokeTakeBackWeapon_Implementation()
+void AHumanBase::InvokeTakeBackWeapon()
 {
-	if (TakeBackWeaponMontage)
+	if (UseWeaponState == EUseWeaponState::UsingWeapon_Defalut && CanPlayFullBodyMontage())
 	{
 		PlayMontage(TakeBackWeaponMontage);
-	}
-	else
-	{
-		LetTheWeaponInWeaponBack();
 	}
 }

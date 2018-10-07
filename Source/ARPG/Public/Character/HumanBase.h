@@ -82,15 +82,11 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = "角色|行为")
 	class UAnimMontage* TakeBackWeaponMontage;
 
-	UFUNCTION(BlueprintCallable, Category = "角色|行为", Reliable, WithValidation, Server)
+	UFUNCTION(BlueprintCallable, Category = "角色|行为")
 	void InvokePullOutWeapon();
-	virtual void InvokePullOutWeapon_Implementation();
-	bool InvokePullOutWeapon_Validate() { return true; }
 
-	UFUNCTION(BlueprintCallable, Category = "角色|行为", Reliable, WithValidation, Server)
+	UFUNCTION(BlueprintCallable, Category = "角色|行为")
 	void InvokeTakeBackWeapon();
-	virtual void InvokeTakeBackWeapon_Implementation();
-	bool InvokeTakeBackWeapon_Validate() { return true; }
 };
 
 template<typename EquipType>

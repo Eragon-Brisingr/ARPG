@@ -16,6 +16,10 @@ class ARPG_API UARPG_PlayMontageByInput : public UAnimNotifyState
 {
 	GENERATED_BODY()
 public:
+	UARPG_PlayMontageByInput()
+		:bClientMaster(true)
+	{}
+
 	UPROPERTY(EditAnywhere, Category = "动画")
 	uint8 bIsReleased : 1;
 
@@ -48,7 +52,20 @@ public:
 		bIsNativeBranchingPoint = true;
 	}
 
+	UPROPERTY(EditAnywhere, Category = "武器位置")
 	uint8 bPullOutWeapon : 1;
 
 	virtual void Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation) override;
+};
+
+UCLASS(meta = (DisplayName = "人类_武器伤害检测"))
+class ARPG_API UARPG_Human_WeaponTrace : public UAnimNotifyState
+{
+	GENERATED_BODY()
+public:
+	UPROPERTY(EditAnywhere, Category = "攻击检测")
+	uint8 bIsLeftWeapon : 1;
+
+	virtual void NotifyBegin(USkeletalMeshComponent * MeshComp, UAnimSequenceBase * Animation, float TotalDuration) override;
+	virtual void NotifyEnd(USkeletalMeshComponent * MeshComp, UAnimSequenceBase * Animation) override;
 };
