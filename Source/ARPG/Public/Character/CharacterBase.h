@@ -98,7 +98,7 @@ public:
 	//播放Montage
 public:
 	UFUNCTION(BlueprintCallable, Category = "角色|行为")
-	float PlayMontage(UAnimMontage * MontageToPlay, float InPlayRate = 1.f, FName StartSectionName = NAME_None, bool ClientMaster = false);
+	float PlayMontage(UAnimMontage * MontageToPlay, float InPlayRate = 1.f, FName StartSectionName = NAME_None, bool ClientMaster = true);
 
 	UFUNCTION(Reliable, WithValidation, NetMulticast)
 	void MulticastPlayMontage(UAnimMontage * MontageToPlay, float InPlayRate = 1.f, FName StartSectionName = NAME_None);
@@ -122,6 +122,12 @@ public:
 	
 	UFUNCTION(BlueprintCallable, Category = "角色|行为")
 	void TryPlayMontage(const FARPG_MontageParameter& Montage);
+
+	UPROPERTY(EditDefaultsOnly, Category = "角色|行为")
+	FName FullBodySlotName = TEXT("FullBody");
+
+	UFUNCTION(BlueprintCallable, Category = "角色|行为")
+	bool CanPlayFullBodyMontage() const;
 
 	//背包相关
 public:

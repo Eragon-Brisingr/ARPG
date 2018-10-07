@@ -3,6 +3,7 @@
 #include "ARPG_AnimNotify.h"
 #include "CharacterBase.h"
 #include "HumanBase.h"
+#include "Item/Weapon/ARPG_WeaponBase.h"
 
 
 
@@ -16,18 +17,20 @@ void UARPG_PlayMontageByInput::NotifyTick(USkeletalMeshComponent * MeshComp, UAn
 {
 	if (ACharacterBase* Character = Cast<ACharacterBase>(MeshComp->GetOwner()))
 	{
-		if (bIsReleased ? Character->ARPG_InputIsReleased(InputType) : Character->ARPG_InputIsPressed(InputType))
+		if (Character->IsLocallyControlled())
 		{
-			if (UAnimMontage* CurPlayingMontage = Cast<UAnimMontage>(Animation))
+			if (bIsReleased ? Character->ARPG_InputIsReleased(InputType) : Character->ARPG_InputIsPressed(InputType))
 			{
-				if (MeshComp->GetAnimInstance()->Montage_IsPlaying(CurPlayingMontage))
+				if (UAnimMontage* CurPlayingMontage = Cast<UAnimMontage>(Animation))
 				{
-					Character->PlayMontage(Montage, 1.f, StartSectionName, bClientMaster);
+					if (MeshComp->GetAnimInstance()->Montage_IsPlaying(CurPlayingMontage))
+					{
+						Character->PlayMontage(Montage, 1.f, StartSectionName, bClientMaster);
+					}
 				}
 			}
 		}
 	}
-
 }
 
 void UARPG_PlayMontageByInput::NotifyEnd(USkeletalMeshComponent * MeshComp, UAnimSequenceBase * Animation)
@@ -46,11 +49,33 @@ void UARPG_Human_TakeWeaponPos::Notify(USkeletalMeshComponent* MeshComp, UAnimSe
 	{
 		if (bPullOutWeapon)
 		{
-			Human->LeftWeaponInHand();
+			Human->LetTheWeaponInHand();
 		}
 		else
 		{
-			Human->LeftWeaponInWeaponBack();
+			Human->LetTheWeaponInWeaponBack();
+		}
+	}
+}
+
+void UARPG_Human_WeaponTrace::NotifyBegin(USkeletalMeshComponent * MeshComp, UAnimSequenceBase * Animation, float TotalDuration)
+{
+	if (AHumanBase* Human = Cast<AHumanBase>(MeshComp->GetOwner()))
+	{
+		if (AARPG_WeaponBase* Weapon = bIsLeftWeapon ? Human->LeftWeapon : Human->RightWeapon)
+		{
+			Weapon->SetEnableNearAttackTrace(true);
+		}
+	}
+}
+
+void UARPG_Human_WeaponTrace::NotifyEnd(USkeletalMeshComponent * MeshComp, UAnimSequenceBase * Animation)
+{
+	if (AHumanBase* Human = Cast<AHumanBase>(MeshComp->GetOwner()))
+	{
+		if (AARPG_WeaponBase* Weapon = bIsLeftWeapon ? Human->LeftWeapon : Human->RightWeapon)
+		{
+			Weapon->SetEnableNearAttackTrace(false);
 		}
 	}
 }

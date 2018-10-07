@@ -171,7 +171,7 @@ bool ACharacterBase::CanLockingOnTarget_Implementation(AController* Invoker, con
 	return false;
 }
 
-float ACharacterBase::PlayMontage(UAnimMontage * MontageToPlay, float InPlayRate /*= 1.f*/, FName StartSectionName /*= NAME_None*/, bool ClientMaster /*= false*/)
+float ACharacterBase::PlayMontage(UAnimMontage * MontageToPlay, float InPlayRate /*= 1.f*/, FName StartSectionName /*= NAME_None*/, bool ClientMaster /*= true*/)
 {
 	if (MontageToPlay)
 	{
@@ -228,6 +228,11 @@ void ACharacterBase::TryPlayMontage(const FARPG_MontageParameter& Montage)
 	{
 		PlayMontage(Montage.Montage, 1.f, NAME_None, true);
 	}
+}
+
+bool ACharacterBase::CanPlayFullBodyMontage() const
+{
+	return GetMesh()->GetAnimInstance()->GetSlotMontageGlobalWeight(FullBodySlotName) == 0.f;
 }
 
 void ACharacterBase::MoveItem_Implementation(class UARPG_InventoryComponent* SourceInventory, class UARPG_InventoryComponent* TargetInventory, class UARPG_ItemCoreBase* ItemCore, int32 Number /*= 1*/)
