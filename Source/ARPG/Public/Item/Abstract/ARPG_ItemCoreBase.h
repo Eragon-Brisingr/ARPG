@@ -15,6 +15,8 @@ class ARPG_API UARPG_ItemCoreBase : public UXD_ItemCoreBase
 {
 	GENERATED_BODY()
 public:
+	UARPG_ItemCoreBase();
+
 	UFUNCTION(BlueprintPure, Category = "物品|基础")
 	float GetWeight() const;
 
