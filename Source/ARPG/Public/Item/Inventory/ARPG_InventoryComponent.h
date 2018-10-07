@@ -27,4 +27,7 @@ public:
 
 	UFUNCTION(BlueprintPure, Category = "背包")
 	float GetStandardMoneyNumber() const;
+
+	UFUNCTION(BlueprintCallable, Category = "背包")
+	const TArray<UARPG_ItemCoreBase*>& GetItemCoreList() const;
 };

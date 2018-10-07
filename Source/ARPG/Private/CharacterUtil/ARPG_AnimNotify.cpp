@@ -2,6 +2,7 @@
 
 #include "ARPG_AnimNotify.h"
 #include "CharacterBase.h"
+#include "HumanBase.h"
 
 
 
@@ -37,4 +38,19 @@ void UARPG_PlayMontageByInput::NotifyEnd(USkeletalMeshComponent * MeshComp, UAni
 FString UARPG_PlayMontageByInput::GetNotifyName_Implementation() const
 {
 	return FString::Printf(TEXT("输入_动画跳转[%s]"), Montage ? *Montage->GetName() : TEXT("None"));
+}
+
+void UARPG_Human_TakeWeaponPos::Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation)
+{
+	if (AHumanBase* Human = Cast<AHumanBase>(MeshComp->GetOwner()))
+	{
+		if (bPullOutWeapon)
+		{
+			Human->LeftWeaponInHand();
+		}
+		else
+		{
+			Human->LeftWeaponInWeaponBack();
+		}
+	}
 }

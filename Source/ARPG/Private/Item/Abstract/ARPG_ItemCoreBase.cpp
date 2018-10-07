@@ -29,4 +29,8 @@ FText UARPG_ItemCoreBase::GetDescribe() const
 	return GetItemDefaultActor<AARPG_ItemBase>()->Describe;
 }
 
+void UARPG_ItemCoreBase::UseItem(class APawn* ItemOwner, EUseItemInput UseItemInput)
+{
+	GetItemDefaultActor<AARPG_ItemBase>()->UseItemImpl(this, ItemOwner, UseItemInput);
+}
 

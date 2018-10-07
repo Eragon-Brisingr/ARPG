@@ -15,3 +15,11 @@ enum class ETradePart : uint8
 	Buyer,
 	Seller
 };
+
+UENUM(BlueprintType)
+enum class EUseItemInput :uint8
+{
+	LeftMouse,
+	RightMouse
+};
+
