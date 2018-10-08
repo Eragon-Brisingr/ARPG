@@ -2,6 +2,7 @@
 
 #include "ARPG_ItemCoreBase.h"
 #include "ARPG_ItemBase.h"
+#include "CharacterBase.h"
 
 
 UARPG_ItemCoreBase::UARPG_ItemCoreBase()
@@ -36,6 +37,9 @@ FText UARPG_ItemCoreBase::GetDescribe() const
 
 void UARPG_ItemCoreBase::UseItem(class APawn* ItemOwner, EUseItemInput UseItemInput)
 {
-	GetItemDefaultActor<AARPG_ItemBase>()->UseItemImpl(this, ItemOwner, UseItemInput);
+	if (ACharacterBase* Character = Cast<ACharacterBase>(ItemOwner))
+	{
+		GetItemDefaultActor<AARPG_ItemBase>()->UseItemImpl(this, Character, UseItemInput);
+	}
 }
 

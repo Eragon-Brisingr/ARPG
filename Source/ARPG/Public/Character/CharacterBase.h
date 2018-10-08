@@ -158,6 +158,10 @@ public:
 	class AARPG_WeaponBase* EquipWaepon(class UARPG_ItemCoreBase* WeaponCore, EUseItemInput UseItemInput);
 	virtual class AARPG_WeaponBase* EquipWaepon_Implementation(class UARPG_ItemCoreBase* WeaponCore, EUseItemInput UseItemInput) { return nullptr; }
 
+	UFUNCTION(BlueprintNativeEvent, Category = "角色|物品")
+	class AARPG_EquipmentBase* EquipEquipment(class UARPG_ItemCoreBase* EquipmentCore, EUseItemInput UseItemInput);
+	virtual class AARPG_EquipmentBase* EquipEquipment_Implementation(class UARPG_ItemCoreBase* EquipmentCore, EUseItemInput UseItemInput) { return nullptr; }
+
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnUseItem, ACharacterBase*, Character, const class UARPG_ItemCoreBase*, ItemCore, EUseItemInput, UseItemInput);
 	UPROPERTY(BlueprintAssignable)
 	FOnUseItem OnUseItem;

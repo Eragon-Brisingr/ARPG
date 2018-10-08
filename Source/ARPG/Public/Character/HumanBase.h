@@ -27,6 +27,8 @@ public:
 	virtual TArray<struct FXD_Item> GetInitItemList() const override;
 
 	virtual class AARPG_WeaponBase* EquipWaepon_Implementation(class UARPG_ItemCoreBase* WeaponCore, EUseItemInput UseItemInput) override;
+
+	virtual class AARPG_EquipmentBase* EquipEquipment_Implementation(class UARPG_ItemCoreBase* EquipmentCore, EUseItemInput UseItemInput) override;
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "角色|配置|常用", meta = (DisplayName = "默认左手武器", ExposeOnSpawn = "True"), SaveGame)
 	FXD_Item DefaultLeftWeapon;
@@ -87,6 +89,13 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "角色|行为")
 	void InvokeTakeBackWeapon();
+
+	UPROPERTY()
+	TArray<class AARPG_EquipmentBase*> PreEquipmentList;
+	UPROPERTY(ReplicatedUsing = OnRep_EquipmentList, VisibleAnywhere, AdvancedDisplay, BlueprintReadOnly, Category = "角色", SaveGame)
+	TArray<class AARPG_EquipmentBase*> EquipmentList;
+	UFUNCTION()
+	void OnRep_EquipmentList();
 };
 
 template<typename EquipType>

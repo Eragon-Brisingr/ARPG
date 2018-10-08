@@ -7,7 +7,7 @@
 #include "XD_TemplateLibrary.h"
 
 
-
+#define LOCTEXT_NAMESPACE "ARPG_Item"
 
 bool UARPG_InventoryComponent::TradeItem(int32 DeductMoney, UARPG_InventoryComponent* OtherInventory, class UARPG_ItemCoreBase* ItemCore, int32 Number)
 {
@@ -89,3 +89,5 @@ const TArray<UARPG_ItemCoreBase*>& UARPG_InventoryComponent::GetItemCoreList() c
 {
 	return ArrayCast<UARPG_ItemCoreBase*>(ItemCoreList);
 }
+
+#undef LOCTEXT_NAMESPACE

@@ -23,6 +23,7 @@ void AARPG_ItemBase::WhenUse(class ACharacterBase* ItemOwner)
 	bNetUseOwnerRelevancy = true;
 	SetOwner(ItemOwner);
 
+	SetActorEnableCollision(false);
 	SetItemSimulatePhysics(false);
 
 	ReceiveWhenUse(ItemOwner);
