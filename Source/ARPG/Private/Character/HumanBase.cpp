@@ -146,8 +146,6 @@ class AARPG_EquipmentBase* AHumanBase::EquipEquipment_Implementation(class UARPG
 	int32 FindIndex = EquipmentList.IndexOfByPredicate([EquipmentCore](AARPG_EquipmentBase* E_Equipment) {return E_Equipment->EqualForItemCore(EquipmentCore); });
 	if (FindIndex != INDEX_NONE)
 	{
-		EquipmentList[FindIndex]->SetLifeSpan(1.f);
-		EquipmentList[FindIndex]->SetActorHiddenInGame(true);
 		EquipmentList.RemoveAt(FindIndex);
 		ReturnEquipment = nullptr;
 	}
@@ -158,8 +156,6 @@ class AARPG_EquipmentBase* AHumanBase::EquipEquipment_Implementation(class UARPG
 		{
 			if (E_Equipment->EquipmentType & Equipment->EquipmentType)
 			{
-				E_Equipment->SetLifeSpan(1.f);
-				E_Equipment->SetActorHiddenInGame(true);
 				NeedRemoveEquipment.Add(E_Equipment);
 			}
 		}
@@ -368,6 +364,8 @@ void AHumanBase::OnRep_EquipmentList()
 	{
 		if (Equipment)
 		{
+			Equipment->SetLifeSpan(1.f);
+			Equipment->SetActorHiddenInGame(true);
 			Equipment->WhenNotUse(this);
 			OnNotEquip.Broadcast(this, Equipment);
 		}
