@@ -6,6 +6,7 @@
 #include <UnrealNetwork.h>
 #include "ARPG_ItemCoreBase.h"
 #include "ARPG_InventoryComponent.h"
+#include "ARPG_EquipmentBase.h"
 
 AHumanBase::AHumanBase(const FObjectInitializer& PCIP)
 	:Super(PCIP)
@@ -29,6 +30,7 @@ void AHumanBase::GetLifetimeReplicatedProps(TArray< class FLifetimeProperty > & 
 
 	DOREPLIFETIME(AHumanBase, LeftWeapon);
 	DOREPLIFETIME(AHumanBase, RightWeapon);
+	DOREPLIFETIME(AHumanBase, EquipmentList);
 
 	DOREPLIFETIME(AHumanBase, UseWeaponState);
 }
@@ -46,6 +48,14 @@ void AHumanBase::WhenGameInit_Implementation()
 	{
 		UseItemImmediately(ItemCore, EUseItemInput::RightMouse);
 	}
+
+	for (const FXD_Item& DefaultEquipment : DefaultEquipmentList)
+	{
+		if (UARPG_ItemCoreBase* ItemCore = Cast<UARPG_ItemCoreBase>(DefaultEquipment.ItemCore))
+		{
+			UseItemImmediately(ItemCore, EUseItemInput::RightMouse);
+		}
+	}
 }
 
 TArray<struct FXD_Item> AHumanBase::GetInitItemList() const
@@ -62,6 +72,13 @@ TArray<struct FXD_Item> AHumanBase::GetInitItemList() const
 	if (DefaultArrow)
 	{
 		Res.Add(DefaultArrow);
+	}
+	for (const FXD_Item& DefaultEquipment : DefaultEquipmentList)
+	{
+		if (DefaultEquipment)
+		{
+			Res.Add(DefaultEquipment);
+		}
 	}
 	return Res;
 }
@@ -115,6 +132,49 @@ class AARPG_WeaponBase* AHumanBase::EquipWaepon_Implementation(class UARPG_ItemC
 		break;
 	}
 	return nullptr;
+}
+
+class AARPG_EquipmentBase* AHumanBase::EquipEquipment_Implementation(class UARPG_ItemCoreBase* EquipmentCore, EUseItemInput UseItemInput)
+{
+	const AARPG_EquipmentBase* Equipment = EquipmentCore->GetItemDefaultActor<AARPG_EquipmentBase>();
+	if (!Equipment->EquipmentType)
+	{
+		return nullptr;
+	}
+
+	AARPG_EquipmentBase* ReturnEquipment = nullptr;
+	int32 FindIndex = EquipmentList.IndexOfByPredicate([EquipmentCore](AARPG_EquipmentBase* E_Equipment) {return E_Equipment->EqualForItemCore(EquipmentCore); });
+	if (FindIndex != INDEX_NONE)
+	{
+		EquipmentList[FindIndex]->SetLifeSpan(1.f);
+		EquipmentList[FindIndex]->SetActorHiddenInGame(true);
+		EquipmentList.RemoveAt(FindIndex);
+		ReturnEquipment = nullptr;
+	}
+	else
+	{
+		TArray<AARPG_EquipmentBase*> NeedRemoveEquipment;
+		for (AARPG_EquipmentBase* E_Equipment : EquipmentList)
+		{
+			if (E_Equipment->EquipmentType & Equipment->EquipmentType)
+			{
+				E_Equipment->SetLifeSpan(1.f);
+				E_Equipment->SetActorHiddenInGame(true);
+				NeedRemoveEquipment.Add(E_Equipment);
+			}
+		}
+		for (AARPG_EquipmentBase* E_Equipment : NeedRemoveEquipment)
+		{
+			EquipmentList.Remove(E_Equipment);
+		}
+
+		ReturnEquipment = Cast<AARPG_EquipmentBase>(EquipmentCore->SpawnItemActorForOwner(this, this));
+		EquipmentList.Add(ReturnEquipment);
+	}
+
+	OnRep_EquipmentList();
+
+	return ReturnEquipment;
 }
 
 void AHumanBase::OnRep_EquipVariable(class AARPG_ItemBase* CurEquip, class AARPG_ItemBase* PreEquip)
@@ -299,4 +359,27 @@ void AHumanBase::InvokeTakeBackWeapon()
 	{
 		PlayMontage(TakeBackWeaponMontage);
 	}
+}
+
+void AHumanBase::OnRep_EquipmentList()
+{
+	//找出之前的
+	for (AARPG_EquipmentBase* Equipment : TSet<AARPG_EquipmentBase*>(PreEquipmentList).Difference(TSet<AARPG_EquipmentBase*>(EquipmentList)))
+	{
+		if (Equipment)
+		{
+			Equipment->WhenNotUse(this);
+			OnNotEquip.Broadcast(this, Equipment);
+		}
+	}
+	//找出现在的
+	for (AARPG_EquipmentBase* Equipment : TSet<AARPG_EquipmentBase*>(EquipmentList).Difference(TSet<AARPG_EquipmentBase*>(PreEquipmentList)))
+	{
+		if (Equipment)
+		{
+			Equipment->WhenUse(this);
+			OnEquip.Broadcast(this, Equipment);
+		}
+	}
+	PreEquipmentList = EquipmentList;
 }

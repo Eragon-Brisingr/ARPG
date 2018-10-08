@@ -49,8 +49,8 @@ public:
 
 public:
 	UFUNCTION(BlueprintNativeEvent, Category = "物品|基础")
-	void UseItemImpl(class UXD_ItemCoreBase* ItemCore, class APawn* ItemOwner, EUseItemInput UseItemInput) const;
-	virtual void UseItemImpl_Implementation(class UXD_ItemCoreBase* ItemCore, class APawn* ItemOwner, EUseItemInput UseItemInput) const{}
+	void UseItemImpl(class UARPG_ItemCoreBase* ItemCore, class ACharacterBase* ItemOwner, EUseItemInput UseItemInput) const;
+	virtual void UseItemImpl_Implementation(class UARPG_ItemCoreBase* ItemCore, class ACharacterBase* ItemOwner, EUseItemInput UseItemInput) const{}
 
 	virtual void WhenUse(class ACharacterBase* ItemOwner);
 
@@ -62,7 +62,6 @@ public:
 	//子类停止使用时发生的事件
 	UFUNCTION(BlueprintImplementableEvent, Category = "物品|基础", meta = (DisplayName = "WhenNotUse"))
 	void ReceiveWhenNotUse(class ACharacterBase* ItemOwner);
-
 public:
 	void SetItemSimulatePhysics(bool bSimulate);
 

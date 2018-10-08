@@ -29,7 +29,15 @@ class ARPG_API AARPG_WeaponBase : public AARPG_ItemBase
 public:
 	AARPG_WeaponBase();
 
-	virtual void UseItemImpl_Implementation(class UXD_ItemCoreBase* ItemCore, class APawn* ItemOwner, EUseItemInput UseItemInput) const override;
+	virtual void UseItemImpl_Implementation(class UARPG_ItemCoreBase* ItemCore, class ACharacterBase* ItemOwner, EUseItemInput UseItemInput) const override;
+
+	virtual FText GetItemTypeDescImpl_Implementation(const class UXD_ItemCoreBase* ItemCore) const override;
+
+	virtual void WhenUse(class ACharacterBase* ItemOwner) override;
+
+	virtual void WhenNotUse(class ACharacterBase* ItemOwner) override;
+
+	virtual void WhenRemoveFromInventory_Implementation(class AActor* ItemOwner, class UXD_ItemCoreBase* ItemCore, int32 RemoveNumber, int32 ExistNumber) const override;
 
 	virtual void PostInitializeComponents();
 public:
