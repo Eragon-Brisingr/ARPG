@@ -2,6 +2,7 @@
 
 #include "ARPG_EquipmentBase.h"
 #include "CharacterBase.h"
+#include "HumanBase.h"
 
 
 #define LOCTEXT_NAMESPACE "ARPG_Item"
@@ -42,7 +43,18 @@ void AARPG_EquipmentBase::WhenNotUse(class ACharacterBase* ItemOwner)
 
 void AARPG_EquipmentBase::WhenRemoveFromInventory_Implementation(class AActor* ItemOwner, class UXD_ItemCoreBase* ItemCore, int32 RemoveNumber, int32 ExistNumber) const
 {
-
+	if (ExistNumber <= 0)
+	{
+		if (AHumanBase* Human = Cast<AHumanBase>(ItemOwner))
+		{
+			int32 FindIndex = Human->EquipmentList.IndexOfByPredicate([ItemCore](AARPG_EquipmentBase* E_Equipment) {return E_Equipment->EqualForItemCore(ItemCore); });
+			if (FindIndex != INDEX_NONE)
+			{
+				Human->EquipmentList.RemoveAt(FindIndex);
+				Human->OnRep_EquipmentList();
+			}
+		}
+	}
 }
 
 #undef LOCTEXT_NAMESPACE
