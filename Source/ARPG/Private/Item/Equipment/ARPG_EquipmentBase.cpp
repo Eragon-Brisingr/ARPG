@@ -3,6 +3,8 @@
 #include "ARPG_EquipmentBase.h"
 #include "CharacterBase.h"
 #include "HumanBase.h"
+#include "ItemUtility.h"
+#include "XD_DebugFunctionLibrary.h"
 
 
 #define LOCTEXT_NAMESPACE "ARPG_Item"
@@ -24,6 +26,7 @@ FText AARPG_EquipmentBase::GetItemTypeDescImpl_Implementation(const class UXD_It
 
 void AARPG_EquipmentBase::WhenUse(class ACharacterBase* ItemOwner)
 {
+	Item_Display_LOG("%s装备装备%s", *UXD_DebugFunctionLibrary::GetDebugName(ItemOwner), *UXD_DebugFunctionLibrary::GetDebugName(this));
 	Super::WhenUse(ItemOwner);
 
 	AttachToComponent(ItemOwner->GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, EquipSocketName);
