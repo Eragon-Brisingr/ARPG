@@ -5,6 +5,8 @@
 #include "ARPG_ItemCoreBase.h"
 #include "SocketMoveTraceManager.h"
 #include "HumanBase.h"
+#include "ItemUtility.h"
+#include "XD_DebugFunctionLibrary.h"
 
 #define LOCTEXT_NAMESPACE "ARPG_Item"
 
@@ -25,6 +27,7 @@ FText AARPG_WeaponBase::GetItemTypeDescImpl_Implementation(const class UXD_ItemC
 
 void AARPG_WeaponBase::WhenUse(class ACharacterBase* ItemOwner)
 {
+	Item_Display_LOG("%s装备武器%s", *UXD_DebugFunctionLibrary::GetDebugName(ItemOwner), *UXD_DebugFunctionLibrary::GetDebugName(this));
 	Super::WhenUse(ItemOwner);
 }
 
