@@ -27,7 +27,7 @@ class ARPG_API AARPG_WeaponBase : public AARPG_ItemBase
 	GENERATED_BODY()
 	
 public:
-	AARPG_WeaponBase();
+	AARPG_WeaponBase(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 	virtual void UseItemImpl_Implementation(class UARPG_ItemCoreBase* ItemCore, class ACharacterBase* ItemOwner, EUseItemInput UseItemInput) const override;
 
@@ -53,13 +53,17 @@ public:
 	UPROPERTY(VisibleAnywhere, Category = "物品", Instanced)
 	class USocketMoveTracer* SocketMoveTracer;
 
+	//攻击
+public:
 	void SetEnableNearAttackTrace(bool Enable);
+
+	void OnTracedActor(UPrimitiveComponent* HitComponent, const FName& SocketName, AActor* OtherActor, UPrimitiveComponent* OtherComp, const FHitResult& TraceResult);
 	//持武器方式
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "物品|武器", AdvancedDisplay, meta = (DisplayName = "左手持武器插槽名"))
 	FName LeftWeaponInHandSocket = TEXT("weapon_hand_l");
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "物品|武器", AdvancedDisplay, meta = (DisplayName = "左手收回武器插槽名"))
-	FName LeftWeaponInWeaponBackSocket = TEXT("weapon_back_l");
+	FName LeftWeaponInWeaponBackSocket = TEXT("weapon_back_r");
 	virtual void WhenInHand();
 	//拔出武器发生的事件
 	UFUNCTION(BlueprintImplementableEvent, Category = "物品|武器", meta = (DisplayName = "WhenInHand"))
@@ -68,7 +72,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "物品|武器", AdvancedDisplay, meta = (DisplayName = "右手持武器插槽名"))
 	FName RightWeaponInHandSocket = TEXT("weapon_hand_r");
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "物品|武器", AdvancedDisplay, meta = (DisplayName = "右手收回武器插槽名"))
-	FName RightWeaponInWeaponBackSocket = TEXT("weapon_back_r");
+	FName RightWeaponInWeaponBackSocket = TEXT("weapon_back_l");
 	virtual void WhenInWeaponBack();
 	//收回武器发生的事件
 	UFUNCTION(BlueprintImplementableEvent, Category = "物品|武器", meta = (DisplayName = "WhenInWeaponBack"))
