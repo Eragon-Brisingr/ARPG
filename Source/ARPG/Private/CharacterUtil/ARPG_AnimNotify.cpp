@@ -43,6 +43,48 @@ FString UARPG_PlayMontageByInput::GetNotifyName_Implementation() const
 	return FString::Printf(TEXT("输入_动画跳转[%s]"), Montage ? *Montage->GetName() : TEXT("None"));
 }
 
+void UARPG_DefenseState::NotifyBegin(USkeletalMeshComponent * MeshComp, UAnimSequenceBase * Animation, float TotalDuration)
+{
+	if (ACharacterBase* Character = Cast<ACharacterBase>(MeshComp->GetOwner()))
+	{
+		Character->bIsDefense = true;
+	}
+}
+
+void UARPG_DefenseState::NotifyEnd(USkeletalMeshComponent * MeshComp, UAnimSequenceBase * Animation)
+{
+	if (ACharacterBase* Character = Cast<ACharacterBase>(MeshComp->GetOwner()))
+	{
+		Character->bIsDefense = false;
+	}
+}
+
+FString UARPG_DefenseState::GetNotifyName_Implementation() const
+{
+	return TEXT("防御状态");
+}
+
+void UARPG_DefenseSwipeState::NotifyBegin(USkeletalMeshComponent * MeshComp, UAnimSequenceBase * Animation, float TotalDuration)
+{
+	if (ACharacterBase* Character = Cast<ACharacterBase>(MeshComp->GetOwner()))
+	{
+		Character->bIsDefenseSwipe = true;
+	}
+}
+
+void UARPG_DefenseSwipeState::NotifyEnd(USkeletalMeshComponent * MeshComp, UAnimSequenceBase * Animation)
+{
+	if (ACharacterBase* Character = Cast<ACharacterBase>(MeshComp->GetOwner()))
+	{
+		Character->bIsDefenseSwipe = false;
+	}
+}
+
+FString UARPG_DefenseSwipeState::GetNotifyName_Implementation() const
+{
+	return TEXT("防御反击状态");
+}
+
 void UARPG_Human_TakeWeaponPos::Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation)
 {
 	if (AHumanBase* Human = Cast<AHumanBase>(MeshComp->GetOwner()))
