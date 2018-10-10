@@ -5,19 +5,24 @@
 #include "ARPG_ItemCoreBase.h"
 #include "SocketMoveTraceManager.h"
 #include "HumanBase.h"
-#include "ItemUtility.h"
 #include "XD_DebugFunctionLibrary.h"
+#include "ARPG_WeaponCoreBase.h"
+#include "ARPG_Item_Log.h"
+#include "ARPG_Battle_Log.h"
 
 #define LOCTEXT_NAMESPACE "ARPG_Item"
 
-AARPG_WeaponBase::AARPG_WeaponBase()
+AARPG_WeaponBase::AARPG_WeaponBase(const FObjectInitializer& ObjectInitializer)
+	:Super(ObjectInitializer.SetDefaultSubobjectClass<UARPG_WeaponCoreBase>(GET_MEMBER_NAME_CHECKED(AARPG_WeaponBase, InnerItemCore)))
 {
 	SocketMoveTracer = CreateDefaultSubobject<USocketMoveTracer>(GET_MEMBER_NAME_CHECKED(AARPG_WeaponBase, SocketMoveTracer));
+
+	SocketMoveTracer->OnTraceActorNative.BindUObject(this, &AARPG_WeaponBase::OnTracedActor);
 }
 
 void AARPG_WeaponBase::UseItemImpl_Implementation(class UARPG_ItemCoreBase* ItemCore, class ACharacterBase* ItemOwner, EUseItemInput UseItemInput) const
 {
-	ItemOwner->EquipWaepon(ItemCore, UseItemInput);
+	ItemOwner->EquipWaepon(CastChecked<UARPG_WeaponCoreBase>(ItemCore), UseItemInput);
 }
 
 FText AARPG_WeaponBase::GetItemTypeDescImpl_Implementation(const class UXD_ItemCoreBase* ItemCore) const
@@ -71,6 +76,15 @@ void AARPG_WeaponBase::PostInitializeComponents()
 void AARPG_WeaponBase::SetEnableNearAttackTrace(bool Enable)
 {
 	SocketMoveTracer->SetEnableTrace(Enable);
+}
+
+void AARPG_WeaponBase::OnTracedActor(UPrimitiveComponent* HitComponent, const FName& SocketName, AActor* OtherActor, UPrimitiveComponent* OtherComp, const FHitResult& TraceResult)
+{
+	if (ACharacterBase* Character = Cast<ACharacterBase>(GetOwner()))
+	{
+		Battle_Display_LOG("%s所持武器打击到%s", *UXD_DebugFunctionLibrary::GetDebugName(Character), *UXD_DebugFunctionLibrary::GetDebugName(OtherActor));
+		Character->NearAttackSuccessTimeDilation(0.2f);
+	}
 }
 
 void AARPG_WeaponBase::WhenInHand()

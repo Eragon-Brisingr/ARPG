@@ -13,6 +13,8 @@
  */
 DECLARE_DYNAMIC_DELEGATE_FiveParams(FOnTraceActor, UPrimitiveComponent*, HitComponent, const FName&, SocketName, AActor*, OtherActor, UPrimitiveComponent*, OtherComp, const FHitResult&, TraceResult);
 
+DECLARE_DELEGATE_FiveParams(FOnTraceActorNative, UPrimitiveComponent*, const FName&, AActor*, UPrimitiveComponent*, const FHitResult&);
+
 UCLASS(editinlinenew, collapseCategories)
 class ARPG_API USocketMoveTracer : public UObject, public FTickableGameObject
 {
@@ -62,6 +64,7 @@ public:
 	TArray<AActor*> TracedActors;
 public:
 	FOnTraceActor OnTraceActor;
+	FOnTraceActorNative OnTraceActorNative;
 
 	AActor* GetOwner() const;
 

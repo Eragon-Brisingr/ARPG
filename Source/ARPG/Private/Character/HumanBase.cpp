@@ -1,12 +1,14 @@
 ﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 #include "HumanBase.h"
+#include <UnrealNetwork.h>
 #include "ARPG_MovementComponent.h"
 #include "ARPG_WeaponBase.h"
-#include <UnrealNetwork.h>
 #include "ARPG_ItemCoreBase.h"
 #include "ARPG_InventoryComponent.h"
 #include "ARPG_EquipmentBase.h"
+#include "ARPG_WeaponCoreBase.h"
+#include "ARPG_EquipmentCoreBase.h"
 
 AHumanBase::AHumanBase(const FObjectInitializer& PCIP)
 	:Super(PCIP)
@@ -83,7 +85,7 @@ TArray<struct FXD_Item> AHumanBase::GetInitItemList() const
 	return Res;
 }
 
-class AARPG_WeaponBase* AHumanBase::EquipWaepon_Implementation(class UARPG_ItemCoreBase* WeaponCore, EUseItemInput UseItemInput)
+class AARPG_WeaponBase* AHumanBase::EquipWaepon_Implementation(class UARPG_WeaponCoreBase* WeaponCore, EUseItemInput UseItemInput)
 {
 	const AARPG_WeaponBase* Weapon = WeaponCore->GetItemDefaultActor<AARPG_WeaponBase>();
 	switch (Weapon->WeaponUseType)
@@ -134,7 +136,7 @@ class AARPG_WeaponBase* AHumanBase::EquipWaepon_Implementation(class UARPG_ItemC
 	return nullptr;
 }
 
-class AARPG_EquipmentBase* AHumanBase::EquipEquipment_Implementation(class UARPG_ItemCoreBase* EquipmentCore, EUseItemInput UseItemInput)
+class AARPG_EquipmentBase* AHumanBase::EquipEquipment_Implementation(class UARPG_EquipmentCoreBase* EquipmentCore, EUseItemInput UseItemInput)
 {
 	const AARPG_EquipmentBase* Equipment = EquipmentCore->GetItemDefaultActor<AARPG_EquipmentBase>();
 	if (!Equipment->EquipmentType)

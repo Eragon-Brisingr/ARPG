@@ -3,20 +3,22 @@
 #include "ARPG_EquipmentBase.h"
 #include "CharacterBase.h"
 #include "HumanBase.h"
-#include "ItemUtility.h"
 #include "XD_DebugFunctionLibrary.h"
+#include "ARPG_EquipmentCoreBase.h"
+#include "ARPG_Item_Log.h"
 
 
 #define LOCTEXT_NAMESPACE "ARPG_Item"
 
-AARPG_EquipmentBase::AARPG_EquipmentBase()
+AARPG_EquipmentBase::AARPG_EquipmentBase(const FObjectInitializer& ObjectInitializer)
+	:Super(ObjectInitializer.SetDefaultSubobjectClass<UARPG_EquipmentCoreBase>(GET_MEMBER_NAME_CHECKED(AARPG_EquipmentBase, InnerItemCore)))
 {
 	
 }
 
 void AARPG_EquipmentBase::UseItemImpl_Implementation(class UARPG_ItemCoreBase* ItemCore, class ACharacterBase* ItemOwner, EUseItemInput UseItemInput) const
 {
-	ItemOwner->EquipEquipment(ItemCore, UseItemInput);
+	ItemOwner->EquipEquipment(CastChecked<UARPG_EquipmentCoreBase>(ItemCore), UseItemInput);
 }
 
 FText AARPG_EquipmentBase::GetItemTypeDescImpl_Implementation(const class UXD_ItemCoreBase* ItemCore) const

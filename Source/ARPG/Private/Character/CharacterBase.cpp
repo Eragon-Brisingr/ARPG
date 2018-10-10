@@ -272,3 +272,17 @@ void ACharacterBase::UseItemImmediately(const class UARPG_ItemCoreBase* ItemCore
 	}
 }
 
+void ACharacterBase::NearAttackSuccessTimeDilation(float Duration)
+{
+	if (!GetWorld()->GetTimerManager().IsTimerActive(AttackSuccessTimeDilation_TimeHandle))
+	{
+		CustomTimeDilation *= AttackSuccessTimeDilationRate;
+	}
+	GetWorld()->GetTimerManager().SetTimer(AttackSuccessTimeDilation_TimeHandle, this, &ACharacterBase::RecoverAttackSuccessTimeDilation, Duration, false);
+}
+
+void ACharacterBase::RecoverAttackSuccessTimeDilation()
+{
+	CustomTimeDilation /= AttackSuccessTimeDilationRate;
+}
+

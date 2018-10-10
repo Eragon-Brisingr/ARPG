@@ -73,6 +73,7 @@ void USocketMoveTracer::DoTrace(float DeltaTime)
 						TracedInOnceTraceActor.Add(E_Hit.GetActor());
 						TracedActors.Add(E_Hit.GetActor());
 						OnTraceActor.ExecuteIfBound(TargetSocketMesh, TraceSocketList[i], E_Hit.GetActor(), E_Hit.GetComponent(), E_Hit);
+						OnTraceActorNative.ExecuteIfBound(TargetSocketMesh, TraceSocketList[i], E_Hit.GetActor(), E_Hit.GetComponent(), E_Hit);
 					}
 				}
 			}

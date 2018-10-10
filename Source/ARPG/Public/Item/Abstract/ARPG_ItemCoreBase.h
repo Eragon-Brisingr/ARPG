@@ -10,7 +10,7 @@
 /**
  * 
  */
-UCLASS()
+UCLASS(meta = (DisplayName = "物品核心"))
 class ARPG_API UARPG_ItemCoreBase : public UXD_ItemCoreBase
 {
 	GENERATED_BODY()
@@ -34,5 +34,5 @@ public:
 
 public:
 	UFUNCTION(BlueprintCallable, Category = "物品|基础")
-	void UseItem(class APawn* ItemOwner, EUseItemInput UseItemInput);
+	void UseItem(class ACharacterBase* ItemOwner, EUseItemInput UseItemInput);
 };

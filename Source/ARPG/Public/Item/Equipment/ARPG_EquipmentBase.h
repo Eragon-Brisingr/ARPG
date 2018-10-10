@@ -27,7 +27,7 @@ class ARPG_API AARPG_EquipmentBase : public AARPG_ItemBase
 {
 	GENERATED_BODY()
 public:
-	AARPG_EquipmentBase();
+	AARPG_EquipmentBase(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 	virtual void UseItemImpl_Implementation(class UARPG_ItemCoreBase* ItemCore, class ACharacterBase* ItemOwner, EUseItemInput UseItemInput) const override;
 
