@@ -42,6 +42,28 @@ public:
 	virtual FString GetNotifyName_Implementation() const override;
 };
 
+UCLASS(meta = (DisplayName = "状态_防御状态"))
+class ARPG_API UARPG_DefenseState : public UAnimNotifyState
+{
+	GENERATED_BODY()
+public:
+	virtual void NotifyBegin(USkeletalMeshComponent * MeshComp, UAnimSequenceBase * Animation, float TotalDuration) override;
+	virtual void NotifyEnd(USkeletalMeshComponent * MeshComp, UAnimSequenceBase * Animation) override;
+
+	virtual FString GetNotifyName_Implementation() const override;
+};
+
+UCLASS(meta = (DisplayName = "状态_防御反击状态"))
+class ARPG_API UARPG_DefenseSwipeState : public UAnimNotifyState
+{
+	GENERATED_BODY()
+public:
+	virtual void NotifyBegin(USkeletalMeshComponent * MeshComp, UAnimSequenceBase * Animation, float TotalDuration) override;
+	virtual void NotifyEnd(USkeletalMeshComponent * MeshComp, UAnimSequenceBase * Animation) override;
+
+	virtual FString GetNotifyName_Implementation() const override;
+};
+
 UCLASS(meta = (DisplayName = "人类_武器位置"))
 class ARPG_API UARPG_Human_TakeWeaponPos : public UAnimNotify
 {

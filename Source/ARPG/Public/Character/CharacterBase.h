@@ -178,10 +178,23 @@ public:
 public:
 	UFUNCTION(BlueprintCallable, Category = "角色|行为")
 	void NearAttackSuccessTimeDilation(float Duration);
-	static constexpr float AttackSuccessTimeDilationRate = 0.02f;
+	static constexpr float AttackSuccessTimeDilationRate = 0.01f;
 	FTimerHandle AttackSuccessTimeDilation_TimeHandle;
 	void RecoverAttackSuccessTimeDilation();
 
+	//防御
+	UPROPERTY(BlueprintReadWrite, Category = "角色|行为")
+	uint8 bIsDefense : 1;
+	UFUNCTION(BlueprintNativeEvent, BlueprintPure, Category = "角色|行为")
+	bool IsDefenseSucceed(const FVector& DamageFromLocation, const FHitResult& HitInfo) const;
+	virtual bool IsDefenseSucceed_Implementation(const FVector& DamageFromLocation, const FHitResult& HitInfo) const;
+
+	//防御反击
+	UPROPERTY(BlueprintReadWrite, Category = "角色|行为")
+	uint8 bIsDefenseSwipe : 1;
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "角色|行为")
+	bool IsDefenseSwipeSucceed(const FVector& DamageFromLocation, const FHitResult& HitInfo) const;
+	virtual bool IsDefenseSwipeSucceed_Implementation(const FVector& DamageFromLocation, const FHitResult& HitInfo) const;
 public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Character")
 	class UARPG_MovementComponent* ARPG_MovementComponent;

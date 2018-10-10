@@ -286,3 +286,13 @@ void ACharacterBase::RecoverAttackSuccessTimeDilation()
 	CustomTimeDilation /= AttackSuccessTimeDilationRate;
 }
 
+bool ACharacterBase::IsDefenseSucceed_Implementation(const FVector& DamageFromLocation, const FHitResult& HitInfo) const
+{
+	return bIsDefense;
+}
+
+bool ACharacterBase::IsDefenseSwipeSucceed_Implementation(const FVector& DamageFromLocation, const FHitResult& HitInfo) const
+{
+	return bIsDefenseSwipe;
+}
+
