@@ -1,12 +1,30 @@
 ﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 #include "ARPG_AnimNotify.h"
+#include <Components/SkeletalMeshComponent.h>
+#include <Animation/AnimMontage.h>
+#include <Animation/AnimInstance.h>
 #include "CharacterBase.h"
 #include "HumanBase.h"
-#include "Item/Weapon/ARPG_WeaponBase.h"
+#include "ARPG_WeaponBase.h"
 
 
 
+void UARPG_PlayMontageByState::Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation)
+{
+	if (ACharacterBase* Character = Cast<ACharacterBase>(MeshComp->GetOwner()))
+	{
+		if (bClientMaster || Character->HasAuthority())
+		{
+			Character->PlayMontage(Montage, 1.f, StartSectionName, bClientMaster);
+		}
+	}
+}
+
+FString UARPG_PlayMontageByState::GetNotifyName_Implementation() const
+{
+	return FString::Printf(TEXT("动画跳转[%s]"), Montage ? *Montage->GetName() : TEXT("None"));
+}
 
 void UARPG_PlayMontageByInput::NotifyBegin(USkeletalMeshComponent * MeshComp, UAnimSequenceBase * Animation, float TotalDuration)
 {
@@ -106,6 +124,7 @@ void UARPG_Human_WeaponTrace::NotifyBegin(USkeletalMeshComponent * MeshComp, UAn
 	{
 		if (AARPG_WeaponBase* Weapon = bIsLeftWeapon ? Human->LeftWeapon : Human->RightWeapon)
 		{
+			Weapon->ReceiveDamageAction = ReceiveDamageAction;
 			Weapon->SetEnableNearAttackTrace(true);
 		}
 	}
@@ -117,6 +136,7 @@ void UARPG_Human_WeaponTrace::NotifyEnd(USkeletalMeshComponent * MeshComp, UAnim
 	{
 		if (AARPG_WeaponBase* Weapon = bIsLeftWeapon ? Human->LeftWeapon : Human->RightWeapon)
 		{
+			Weapon->ReceiveDamageAction = nullptr;
 			Weapon->SetEnableNearAttackTrace(false);
 		}
 	}

@@ -58,6 +58,8 @@ public:
 	void SetEnableNearAttackTrace(bool Enable);
 
 	void OnTracedActor(UPrimitiveComponent* HitComponent, const FName& SocketName, AActor* OtherActor, UPrimitiveComponent* OtherComp, const FHitResult& TraceResult);
+
+	TSubclassOf<class UReceiveDamageActionBase> ReceiveDamageAction;
 	//持武器方式
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "物品|武器", AdvancedDisplay, meta = (DisplayName = "左手持武器插槽名"))

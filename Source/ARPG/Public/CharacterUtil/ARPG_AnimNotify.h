@@ -3,14 +3,39 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Animation/AnimNotifies/AnimNotifyState.h"
+#include <Animation/AnimNotifies/AnimNotifyState.h>
 #include <Animation/AnimNotifies/AnimNotify.h>
+#include <SubclassOf.h>
 #include "HumanType.h"
 #include "ARPG_AnimNotify.generated.h"
 
 /**
  * 
  */
+UCLASS(meta = (DisplayName = "状态_动画跳转"))
+class ARPG_API UARPG_PlayMontageByState : public UAnimNotify
+{
+	GENERATED_BODY()
+public:
+	UARPG_PlayMontageByState()
+	{
+		bIsNativeBranchingPoint = true;
+	}
+
+	UPROPERTY(EditAnywhere, Category = "动画")
+	class UAnimMontage* Montage;
+
+	UPROPERTY(EditAnywhere, Category = "动画")
+	FName StartSectionName;
+
+	UPROPERTY(EditAnywhere, Category = "动画")
+	uint8 bClientMaster : 1;
+
+	virtual void Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation) override;
+
+	virtual FString GetNotifyName_Implementation() const override;
+};
+
 UCLASS(meta = (DisplayName = "输入_动画跳转"))
 class ARPG_API UARPG_PlayMontageByInput : public UAnimNotifyState
 {
@@ -87,6 +112,9 @@ class ARPG_API UARPG_Human_WeaponTrace : public UAnimNotifyState
 public:
 	UPROPERTY(EditAnywhere, Category = "攻击检测")
 	uint8 bIsLeftWeapon : 1;
+
+	UPROPERTY(EditAnywhere, Category = "攻击检测")
+	TSubclassOf<class UReceiveDamageActionBase> ReceiveDamageAction;
 
 	virtual void NotifyBegin(USkeletalMeshComponent * MeshComp, UAnimSequenceBase * Animation, float TotalDuration) override;
 	virtual void NotifyEnd(USkeletalMeshComponent * MeshComp, UAnimSequenceBase * Animation) override;

@@ -1,12 +1,18 @@
 ﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 #include "CharacterBase.h"
+#include <Engine/World.h>
+#include <Animation/AnimInstance.h>
+#include <Components/SkeletalMeshComponent.h>
+#include <Kismet/GameplayStatics.h>
+#include <TimerManager.h>
 #include "XD_CharacterMovementComponent.h"
 #include "ARPG_MovementComponent.h"
 #include "ARPG_InventoryComponent.h"
 #include "ARPG_ItemCoreBase.h"
-#include <Kismet/GameplayStatics.h>
 #include "XD_LevelFunctionLibrary.h"
+#include "XD_DebugFunctionLibrary.h"
+#include "ARPG_Battle_Log.h"
 
 
 // Sets default values
@@ -294,5 +300,21 @@ bool ACharacterBase::IsDefenseSucceed_Implementation(const FVector& DamageFromLo
 bool ACharacterBase::IsDefenseSwipeSucceed_Implementation(const FVector& DamageFromLocation, const FHitResult& HitInfo) const
 {
 	return bIsDefenseSwipe;
+}
+
+void ACharacterBase::WhenKillOther(ACharacterBase* WhoBeKilled, UObject* KillInstigator)
+{
+	Battle_Display_LOG("%s杀死了%s", *UXD_DebugFunctionLibrary::GetDebugName(this), *UXD_DebugFunctionLibrary::GetDebugName(WhoBeKilled));
+	ReceiveWhenKillOther(WhoBeKilled, KillInstigator);
+	OnKillOther.Broadcast(this, WhoBeKilled, KillInstigator);
+}
+
+void ACharacterBase::WhenDamagedOther(ACharacterBase* WhoBeDamaged, float DamageValue, UObject* DamageInstigator)
+{
+	ensure(DamageValue > 0.f);
+
+	Battle_Display_LOG("%s对%s造成了[%f]点伤害", *UXD_DebugFunctionLibrary::GetDebugName(this), *UXD_DebugFunctionLibrary::GetDebugName(WhoBeDamaged), DamageValue);
+	ReceiveWhenDamagedOther(WhoBeDamaged, DamageValue, DamageInstigator);
+	OnDamagedOther.Broadcast(this, WhoBeDamaged, DamageValue, DamageInstigator);
 }
 
