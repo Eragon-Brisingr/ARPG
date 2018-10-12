@@ -10,6 +10,7 @@
 #include "ARPG_CharacterAnimType.h"
 #include "ItemTypeUtils.h"
 #include "XD_ItemType.h"
+#include "CharacterDamageType.h"
 #include "CharacterBase.generated.h"
 
 UCLASS()
@@ -195,6 +196,21 @@ public:
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "角色|行为")
 	bool IsDefenseSwipeSucceed(const FVector& DamageFromLocation, const FHitResult& HitInfo) const;
 	virtual bool IsDefenseSwipeSucceed_Implementation(const FVector& DamageFromLocation, const FHitResult& HitInfo) const;
+
+	virtual void WhenKillOther(ACharacterBase* WhoBeKilled, UObject* KillInstigator);
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnKillOther, ACharacterBase*, Killer, ACharacterBase*, WhoBeKilled, UObject*, KillInstigator);
+	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category = "角色|状态")
+	FOnKillOther OnKillOther;
+	UFUNCTION(BlueprintImplementableEvent, BlueprintAuthorityOnly, meta = (DisplayName = "WhenDamagedOther"), Category = "角色|行为")
+	void ReceiveWhenKillOther(ACharacterBase* WhoBeKilled, UObject* KillInstigator);
+
+	virtual void WhenDamagedOther(ACharacterBase* WhoBeDamaged, float DamageValue, UObject* DamageInstigator);
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE_FourParams(FOnDamagedOther, ACharacterBase*, Attacker, ACharacterBase*, WhoBeDamaged, float, DamageValue, UObject*, DamageInstigator);
+	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category = "角色|状态")
+	FOnDamagedOther OnDamagedOther;
+	UFUNCTION(BlueprintImplementableEvent, BlueprintAuthorityOnly, meta = (DisplayName = "WhenDamagedOther"), Category = "角色|行为")
+	void ReceiveWhenDamagedOther(ACharacterBase* WhoBeDamaged, float DamageValue, UObject* DamageInstigator);
+
 public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Character")
 	class UARPG_MovementComponent* ARPG_MovementComponent;
