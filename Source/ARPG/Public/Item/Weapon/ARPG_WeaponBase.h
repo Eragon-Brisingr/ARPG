@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Item/Abstract/ARPG_ItemBase.h"
 #include "ARPG_CharacterAnimType.h"
+#include "ExecuteActionSet.h"
 #include "ARPG_WeaponBase.generated.h"
 
 /**
@@ -60,20 +61,27 @@ public:
 	void OnTracedActor(UPrimitiveComponent* HitComponent, const FName& SocketName, AActor* OtherActor, UPrimitiveComponent* OtherComp, const FHitResult& TraceResult);
 
 	TSubclassOf<class UReceiveDamageActionBase> ReceiveDamageAction;
+
+	UPROPERTY(EditDefaultsOnly, Category = "物品|武器", meta = (ShowOnlyInnerProperties))
+	FExecuteActionSet ExecuteActionSet;
+
+	UFUNCTION(BlueprintCallable, Category = "武器|行为")
+	bool TraceForExecuteOther();
+
 	//持武器方式
 public:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "物品|武器", AdvancedDisplay, meta = (DisplayName = "左手持武器插槽名"))
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "物品|武器", AdvancedDisplay, meta = (DisplayName = "左手持武器插槽名"))
 	FName LeftWeaponInHandSocket = TEXT("weapon_hand_l");
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "物品|武器", AdvancedDisplay, meta = (DisplayName = "左手收回武器插槽名"))
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "物品|武器", AdvancedDisplay, meta = (DisplayName = "左手收回武器插槽名"))
 	FName LeftWeaponInWeaponBackSocket = TEXT("weapon_back_r");
 	virtual void WhenInHand();
 	//拔出武器发生的事件
 	UFUNCTION(BlueprintImplementableEvent, Category = "物品|武器", meta = (DisplayName = "WhenInHand"))
 	void ReceiveWhenInHand();
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "物品|武器", AdvancedDisplay, meta = (DisplayName = "右手持武器插槽名"))
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "物品|武器", AdvancedDisplay, meta = (DisplayName = "右手持武器插槽名"))
 	FName RightWeaponInHandSocket = TEXT("weapon_hand_r");
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "物品|武器", AdvancedDisplay, meta = (DisplayName = "右手收回武器插槽名"))
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "物品|武器", AdvancedDisplay, meta = (DisplayName = "右手收回武器插槽名"))
 	FName RightWeaponInWeaponBackSocket = TEXT("weapon_back_l");
 	virtual void WhenInWeaponBack();
 	//收回武器发生的事件

@@ -89,6 +89,31 @@ public:
 	virtual FString GetNotifyName_Implementation() const override;
 };
 
+UCLASS(meta = (DisplayName = "状态_闪避状态"))
+class ARPG_API UARPG_DodgeState : public UAnimNotifyState
+{
+	GENERATED_BODY()
+public:
+	virtual void NotifyBegin(USkeletalMeshComponent * MeshComp, UAnimSequenceBase * Animation, float TotalDuration) override;
+	virtual void NotifyEnd(USkeletalMeshComponent * MeshComp, UAnimSequenceBase * Animation) override;
+
+	virtual FString GetNotifyName_Implementation() const override;
+};
+
+UCLASS(meta = (DisplayName = "属性_增加强韧度"))
+class ARPG_API UARPG_AddToughnessValue : public UAnimNotifyState
+{
+	GENERATED_BODY()
+public:
+	UPROPERTY(EditAnywhere, Category = "属性")
+	float AddToughnessValue = 50.f;
+
+	virtual void NotifyBegin(USkeletalMeshComponent * MeshComp, UAnimSequenceBase * Animation, float TotalDuration) override;
+	virtual void NotifyEnd(USkeletalMeshComponent * MeshComp, UAnimSequenceBase * Animation) override;
+
+	virtual FString GetNotifyName_Implementation() const override;
+};
+
 UCLASS(meta = (DisplayName = "人类_武器位置"))
 class ARPG_API UARPG_Human_TakeWeaponPos : public UAnimNotify
 {

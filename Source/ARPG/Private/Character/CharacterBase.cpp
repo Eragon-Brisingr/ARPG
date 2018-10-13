@@ -13,6 +13,8 @@
 #include "XD_LevelFunctionLibrary.h"
 #include "XD_DebugFunctionLibrary.h"
 #include "ARPG_Battle_Log.h"
+#include "ReceiveDamageActionBase.h"
+#include <Kismet/KismetMathLibrary.h>
 
 
 // Sets default values
@@ -292,14 +294,78 @@ void ACharacterBase::RecoverAttackSuccessTimeDilation()
 	CustomTimeDilation /= AttackSuccessTimeDilationRate;
 }
 
+void ACharacterBase::WhenDodgeSucceed()
+{
+	ReceiveWhenDodgeSucceed();
+	OnDodgeSucceed.Broadcast(this);
+}
+
 bool ACharacterBase::IsDefenseSucceed_Implementation(const FVector& DamageFromLocation, const FHitResult& HitInfo) const
 {
 	return bIsDefense;
 }
 
+void ACharacterBase::WhenDefenseSucceed(float BaseDamage, class ACharacterBase* InstigatedBy, const FHitResult& HitResult)
+{
+	ReceiveWhenDefenseSucceed(BaseDamage, InstigatedBy, HitResult);
+	OnDefenseSucceed.Broadcast(this, BaseDamage, InstigatedBy, HitResult);
+}
+
+void ACharacterBase::WhenAttackedDefenseCharacter(float BaseDamage, ACharacterBase* DefenseSucceedCharacter, const FHitResult& HitResult)
+{
+	ReceiveWhenAttackedDefenseCharacter(BaseDamage, DefenseSucceedCharacter, HitResult);
+}
+
 bool ACharacterBase::IsDefenseSwipeSucceed_Implementation(const FVector& DamageFromLocation, const FHitResult& HitInfo) const
 {
 	return bIsDefenseSwipe;
+}
+
+float ACharacterBase::AddHitStun(float Value)
+{
+	HitStunValue += Value;
+	if (HitStunValue >= ToughnessValue)
+	{
+		float OverflowValue = HitStunValue - ToughnessValue;
+		HitStunValue = 0;
+		GetWorld()->GetTimerManager().ClearTimer(ClearHitStun_TimeHandle);
+		return OverflowValue;
+	}
+	GetWorld()->GetTimerManager().SetTimer(ClearHitStun_TimeHandle, this, &ACharacterBase::ClearHitStun, HitStunClearTime);
+	return -1;
+}
+
+void ACharacterBase::ClearHitStun()
+{
+	HitStunValue = 0;
+}
+
+bool ACharacterBase::CanBeBackstab(ACharacterBase* BackstabInvoker) const
+{
+	if (GetCharacterMovement()->IsMovingOnGround())
+	{
+		FRotator Rotation = UKismetMathLibrary::FindLookAtRotation(BackstabInvoker->GetActorLocation(), GetActorLocation());
+		return FMath::Abs(FRotator::NormalizeAxis(GetActorRotation().Yaw - Rotation.Yaw)) <= 45.f;
+	}
+	return false;
+}
+
+void ACharacterBase::ExecuteOther(ACharacterBase* ExecuteTarget, const FVector& TargetLocation, const FRotator& TargetRotation, UAnimMontage* ExecuteMontage, UAnimMontage* BeExecutedMontage)
+{
+	if (!HasAuthority())
+	{
+		ExecuteOtherToServer_Implementation(ExecuteTarget, TargetLocation, TargetRotation, ExecuteMontage, BeExecutedMontage);
+	}
+	ExecuteOtherToServer(ExecuteTarget, TargetLocation, TargetRotation, ExecuteMontage, BeExecutedMontage);
+}
+
+void ACharacterBase::ExecuteOtherToServer_Implementation(ACharacterBase* ExecuteTarget, const FVector& TargetLocation, const FRotator& TargetRotation, UAnimMontage* ExecuteMontage, UAnimMontage* BeExecutedMontage)
+{
+	ExecuteTargetCharacter = ExecuteTarget;
+	ExecuteTarget->ExecuteFromCharacter = this;
+	SetActorLocationAndRotation(TargetLocation, TargetRotation);
+	PlayMontage(ExecuteMontage);
+	ExecuteTarget->PlayMontage(BeExecutedMontage);
 }
 
 void ACharacterBase::WhenKillOther(ACharacterBase* WhoBeKilled, UObject* KillInstigator)
@@ -316,5 +382,56 @@ void ACharacterBase::WhenDamagedOther(ACharacterBase* WhoBeDamaged, float Damage
 	Battle_Display_LOG("%s对%s造成了[%f]点伤害", *UXD_DebugFunctionLibrary::GetDebugName(this), *UXD_DebugFunctionLibrary::GetDebugName(WhoBeDamaged), DamageValue);
 	ReceiveWhenDamagedOther(WhoBeDamaged, DamageValue, DamageInstigator);
 	OnDamagedOther.Broadcast(this, WhoBeDamaged, DamageValue, DamageInstigator);
+}
+
+float ACharacterBase::ApplyPointDamage(float BaseDamage, float AddHitStunValue, const FVector& HitFromDirection, const FHitResult& HitInfo, class ACharacterBase* EventInstigator, AActor* DamageCauser, TSubclassOf<class UDamageType> DamageTypeClass, TSubclassOf<class UReceiveDamageActionBase> ReceiveDamageAction)
+{
+	float FinalReduceValue = BaseDamage;
+
+	if (!bCanBeDamaged || FinalReduceValue <= 0.f)
+	{
+		return 0.f;
+	}
+
+	if (EventInstigator)
+	{
+		if (ACharacterBase* InstigatorPawn = Cast<ACharacterBase>(EventInstigator))
+		{
+			//闪避
+			if (bIsDodging)
+			{
+				WhenDodgeSucceed();
+				return 0.f;
+			}
+			//防御反击
+			else if (IsDefenseSwipeSucceed(InstigatorPawn->GetActorLocation(), HitInfo))
+			{
+				return 0.f;
+			}
+			//防御
+			else if (IsDefenseSucceed(InstigatorPawn->GetActorLocation(), HitInfo))
+			{
+				WhenDefenseSucceed(FinalReduceValue, EventInstigator, HitInfo);
+				InstigatorPawn->WhenAttackedDefenseCharacter(FinalReduceValue, this, HitInfo);
+				return 0.f;
+			}
+		}
+	}
+
+	if (!(ReceiveDamageAction && ReceiveDamageAction.GetDefaultObject()->PlayReceiveDamageAction(HitFromDirection, this, HitInfo, EventInstigator, DamageCauser)))
+	{
+		float HitStunOverflowValue = AddHitStun(AddHitStunValue);
+		if (HitStunOverflowValue >= 0.f)
+		{
+			ReceivePlayHitStunMontage(FinalReduceValue, HitStunOverflowValue, HitFromDirection, HitInfo, EventInstigator, DamageCauser);
+		}
+		else
+		{
+			HitStunOverflowValue = 0.f;
+		}
+	}
+
+	UGameplayStatics::ApplyPointDamage(this, FinalReduceValue, GetActorLocation(), HitInfo, EventInstigator ? EventInstigator->GetController() : nullptr, DamageCauser, DamageTypeClass);
+	return FinalReduceValue;
 }
 

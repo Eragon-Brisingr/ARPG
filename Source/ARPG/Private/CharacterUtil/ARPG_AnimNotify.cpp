@@ -103,6 +103,48 @@ FString UARPG_DefenseSwipeState::GetNotifyName_Implementation() const
 	return TEXT("防御反击状态");
 }
 
+void UARPG_DodgeState::NotifyBegin(USkeletalMeshComponent * MeshComp, UAnimSequenceBase * Animation, float TotalDuration)
+{
+	if (ACharacterBase* Character = Cast<ACharacterBase>(MeshComp->GetOwner()))
+	{
+		Character->bIsDodging = true;
+	}
+}
+
+void UARPG_DodgeState::NotifyEnd(USkeletalMeshComponent * MeshComp, UAnimSequenceBase * Animation)
+{
+	if (ACharacterBase* Character = Cast<ACharacterBase>(MeshComp->GetOwner()))
+	{
+		Character->bIsDodging = false;
+	}
+}
+
+FString UARPG_DodgeState::GetNotifyName_Implementation() const
+{
+	return TEXT("闪避状态");
+}
+
+void UARPG_AddToughnessValue::NotifyBegin(USkeletalMeshComponent * MeshComp, UAnimSequenceBase * Animation, float TotalDuration)
+{
+	if (ACharacterBase* Character = Cast<ACharacterBase>(MeshComp->GetOwner()))
+	{
+		Character->ToughnessValue += AddToughnessValue;
+	}
+}
+
+void UARPG_AddToughnessValue::NotifyEnd(USkeletalMeshComponent * MeshComp, UAnimSequenceBase * Animation)
+{
+	if (ACharacterBase* Character = Cast<ACharacterBase>(MeshComp->GetOwner()))
+	{
+		Character->ToughnessValue -= AddToughnessValue;
+	}
+}
+
+FString UARPG_AddToughnessValue::GetNotifyName_Implementation() const
+{
+	return FString::Printf(TEXT("增加强韧度[%s]"), *FString::SanitizeFloat(AddToughnessValue, 0));
+}
+
 void UARPG_Human_TakeWeaponPos::Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation)
 {
 	if (AHumanBase* Human = Cast<AHumanBase>(MeshComp->GetOwner()))
