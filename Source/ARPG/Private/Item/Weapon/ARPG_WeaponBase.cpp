@@ -9,7 +9,6 @@
 #include "ARPG_WeaponCoreBase.h"
 #include "ARPG_Item_Log.h"
 #include "ARPG_Battle_Log.h"
-#include "ReceiveDamageActionBase.h"
 
 #define LOCTEXT_NAMESPACE "ARPG_Item"
 
@@ -81,21 +80,24 @@ void AARPG_WeaponBase::SetEnableNearAttackTrace(bool Enable)
 
 void AARPG_WeaponBase::OnTracedActor(UPrimitiveComponent* HitComponent, const FName& SocketName, AActor* OtherActor, UPrimitiveComponent* OtherComp, const FHitResult& TraceResult)
 {
-	if (OtherActor != GetOwner())
+	if (OtherActor != GetItemOwner())
 	{
-		if (ACharacterBase* WeaponOnwer = Cast<ACharacterBase>(GetOwner()))
+		if (ACharacterBase* WeaponOnwer = Cast<ACharacterBase>(GetItemOwner()))
 		{
 			Battle_Display_LOG("%s所持武器打击到%s", *UXD_DebugFunctionLibrary::GetDebugName(WeaponOnwer), *UXD_DebugFunctionLibrary::GetDebugName(OtherActor));
 			WeaponOnwer->NearAttackSuccessTimeDilation(0.2f);
 
 			if (ACharacterBase* ReceiveDamageCharacter = Cast<ACharacterBase>(OtherActor))
-			if (ReceiveDamageAction)
 			{
-				const FVector HitFromDirection = -WeaponOnwer->GetActorForwardVector();
-				ReceiveDamageAction.GetDefaultObject()->PlayReceiveDamageAction(HitFromDirection, ReceiveDamageCharacter, TraceResult);
+				ReceiveDamageCharacter->ApplyPointDamage(40.f, 40.f, TraceResult.ImpactNormal, TraceResult, WeaponOnwer, this, nullptr, ReceiveDamageAction);
 			}
 		}
 	}
+}
+
+bool AARPG_WeaponBase::TraceForExecuteOther()
+{
+	return ExecuteActionSet.TraceForExecuteOther(GetItemOwner());
 }
 
 void AARPG_WeaponBase::WhenInHand()

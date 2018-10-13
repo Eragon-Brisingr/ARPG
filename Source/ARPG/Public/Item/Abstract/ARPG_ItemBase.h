@@ -47,6 +47,8 @@ public:
 	FText GetItemTypeDescImpl(const class UXD_ItemCoreBase* ItemCore) const;
 	virtual FText GetItemTypeDescImpl_Implementation(const class UXD_ItemCoreBase* ItemCore) const;
 
+	UFUNCTION(BlueprintCallable, Category = "物品|基础")
+	class ACharacterBase* GetItemOwner() const;
 public:
 	UFUNCTION(BlueprintNativeEvent, Category = "物品|基础")
 	void UseItemImpl(class UARPG_ItemCoreBase* ItemCore, class ACharacterBase* ItemOwner, EUseItemInput UseItemInput) const;

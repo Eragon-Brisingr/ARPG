@@ -177,11 +177,24 @@ public:
 
 	//战斗相关
 public:
+	//卡刀效果
 	UFUNCTION(BlueprintCallable, Category = "角色|行为")
 	void NearAttackSuccessTimeDilation(float Duration);
 	static constexpr float AttackSuccessTimeDilationRate = 0.01f;
 	FTimerHandle AttackSuccessTimeDilation_TimeHandle;
 	void RecoverAttackSuccessTimeDilation();
+
+	//闪避
+	UPROPERTY(BlueprintReadOnly, Category = "角色|行为")
+	uint8 bIsDodging : 1;
+
+	//闪避
+	virtual void WhenDodgeSucceed();
+	UFUNCTION(BlueprintImplementableEvent, Category = "角色|行为")
+	void ReceiveWhenDodgeSucceed();
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnDodgeSucceed, ACharacterBase*, Character);
+	UPROPERTY(BlueprintAssignable, Category = "角色|事件")
+	FOnDodgeSucceed OnDodgeSucceed;
 
 	//防御
 	UPROPERTY(BlueprintReadWrite, Category = "角色|行为")
@@ -190,6 +203,17 @@ public:
 	bool IsDefenseSucceed(const FVector& DamageFromLocation, const FHitResult& HitInfo) const;
 	virtual bool IsDefenseSucceed_Implementation(const FVector& DamageFromLocation, const FHitResult& HitInfo) const;
 
+	void WhenDefenseSucceed(float BaseDamage, class ACharacterBase* InstigatedBy, const FHitResult& HitResult);
+	UFUNCTION(BlueprintImplementableEvent, BlueprintAuthorityOnly, Category = "角色|行为")
+	void ReceiveWhenDefenseSucceed(float BaseDamage, class ACharacterBase* InstigatedBy, const FHitResult& HitResult);
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE_FourParams(FOnDefenseSucceed, ACharacterBase*, Character, float, BaseDamage, class ACharacterBase*, InstigatedBy, const FHitResult&, HitResult);
+	UPROPERTY(BlueprintAssignable, Category = "角色|事件")
+	FOnDefenseSucceed OnDefenseSucceed;
+
+	void WhenAttackedDefenseCharacter(float BaseDamage, ACharacterBase* DefenseSucceedCharacter, const FHitResult& HitResult);
+	UFUNCTION(BlueprintImplementableEvent, BlueprintAuthorityOnly, Category = "角色|行为")
+	void ReceiveWhenAttackedDefenseCharacter(float BaseDamage, ACharacterBase* DefenseSucceedCharacter, const FHitResult& HitResult);
+
 	//防御反击
 	UPROPERTY(BlueprintReadWrite, Category = "角色|行为")
 	uint8 bIsDefenseSwipe : 1;
@@ -197,20 +221,63 @@ public:
 	bool IsDefenseSwipeSucceed(const FVector& DamageFromLocation, const FHitResult& HitInfo) const;
 	virtual bool IsDefenseSwipeSucceed_Implementation(const FVector& DamageFromLocation, const FHitResult& HitInfo) const;
 
+	//强韧度，当硬直积累量高于该值则播放硬直动画
+	//只可加减
+	float ToughnessValue = 50.f;
+
+	//削韧积累值
+	UPROPERTY(BlueprintReadOnly, Category = "角色|战斗")
+	float HitStunValue;
+
+	UPROPERTY(EditDefaultsOnly, Category = "角色|配置")
+	float HitStunClearTime = 30.f;
+
+	//返回削韧溢出数值，若没溢出则返回-1
+	float AddHitStun(float Value);
+	FTimerHandle ClearHitStun_TimeHandle;
+	void ClearHitStun();
+
+	//处决
+public:
+	//处决受击方
+	UPROPERTY(BlueprintReadWrite, Category = "游戏|行为")
+	ACharacterBase* ExecuteTargetCharacter;
+	//处决攻击方
+	UPROPERTY(BlueprintReadWrite, Category = "角色|行为")
+	ACharacterBase* ExecuteFromCharacter;
+
+	//背刺
+	bool CanBeBackstab(ACharacterBase* BackstabInvoker) const;
+
+	void ExecuteOther(ACharacterBase* ExecuteTarget, const FVector& TargetLocation, const FRotator& TargetRotation, UAnimMontage* ExecuteMontage, UAnimMontage* BeExecutedMontage);
+	UFUNCTION(Reliable, WithValidation, Server)
+	void ExecuteOtherToServer(ACharacterBase* ExecuteTarget, const FVector& TargetLocation, const FRotator& TargetRotation, UAnimMontage* ExecuteMontage, UAnimMontage* BeExecutedMontage);
+	void ExecuteOtherToServer_Implementation(ACharacterBase* ExecuteTarget, const FVector& TargetLocation, const FRotator& TargetRotation, UAnimMontage* ExecuteMontage, UAnimMontage* BeExecutedMontage);
+	bool ExecuteOtherToServer_Validate(ACharacterBase* ExecuteTarget, const FVector& TargetLocation, const FRotator& TargetRotation, UAnimMontage* ExecuteMontage, UAnimMontage* BeExecutedMontage) { return true; }
+
+	//通知
+public:
 	virtual void WhenKillOther(ACharacterBase* WhoBeKilled, UObject* KillInstigator);
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnKillOther, ACharacterBase*, Killer, ACharacterBase*, WhoBeKilled, UObject*, KillInstigator);
-	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category = "角色|状态")
+	UPROPERTY(BlueprintAssignable, Category = "角色|事件")
 	FOnKillOther OnKillOther;
 	UFUNCTION(BlueprintImplementableEvent, BlueprintAuthorityOnly, meta = (DisplayName = "WhenDamagedOther"), Category = "角色|行为")
 	void ReceiveWhenKillOther(ACharacterBase* WhoBeKilled, UObject* KillInstigator);
 
 	virtual void WhenDamagedOther(ACharacterBase* WhoBeDamaged, float DamageValue, UObject* DamageInstigator);
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE_FourParams(FOnDamagedOther, ACharacterBase*, Attacker, ACharacterBase*, WhoBeDamaged, float, DamageValue, UObject*, DamageInstigator);
-	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category = "角色|状态")
+	UPROPERTY(BlueprintAssignable, Category = "角色|事件")
 	FOnDamagedOther OnDamagedOther;
 	UFUNCTION(BlueprintImplementableEvent, BlueprintAuthorityOnly, meta = (DisplayName = "WhenDamagedOther"), Category = "角色|行为")
 	void ReceiveWhenDamagedOther(ACharacterBase* WhoBeDamaged, float DamageValue, UObject* DamageInstigator);
 
+	float ApplyPointDamage(float BaseDamage, float AddHitStunValue, const FVector& HitFromDirection, const FHitResult& HitInfo, class ACharacterBase* EventInstigator, AActor* DamageCauser, TSubclassOf<class UDamageType> DamageTypeClass, TSubclassOf<class UReceiveDamageActionBase> ReceiveDamageAction);
+
+	//播放动画相关
+public:
+	//硬直动画
+	UFUNCTION(BlueprintImplementableEvent, BlueprintAuthorityOnly, Category = "角色|行为")
+	void ReceivePlayHitStunMontage(float BaseDamage, float HitStunOverflowValue, const FVector& HitFromDirection, const FHitResult& HitResult, class ACharacterBase* InstigatedBy, AActor* DamageCauser);
 public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Character")
 	class UARPG_MovementComponent* ARPG_MovementComponent;
