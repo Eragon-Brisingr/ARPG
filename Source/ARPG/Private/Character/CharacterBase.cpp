@@ -194,7 +194,7 @@ float ACharacterBase::PlayMontage(UAnimMontage * MontageToPlay, float InPlayRate
 			}
 			else
 			{
-				PlayAnimMontage(MontageToPlay, InPlayRate, StartSectionName);
+				PlayMontageImpl(MontageToPlay, InPlayRate, StartSectionName);
 				PlayMontageToServer(MontageToPlay, InPlayRate, StartSectionName);
 			}
 		}
@@ -207,16 +207,38 @@ float ACharacterBase::PlayMontage(UAnimMontage * MontageToPlay, float InPlayRate
 	return 0.f;
 }
 
+float ACharacterBase::PlayMontageImpl(UAnimMontage * MontageToPlay, float InPlayRate /*= 1.f*/, FName StartSectionName /*= NAME_None*/)
+{
+	UAnimInstance * AnimInstance = GetMesh()->GetAnimInstance();
+	if (MontageToPlay && AnimInstance)
+	{
+		float const Duration = AnimInstance->Montage_Play(MontageToPlay, InPlayRate, EMontagePlayReturnType::MontageLength, 0.f, true);
+
+		if (Duration > 0.f)
+		{
+			// Start at a given Section.
+			if (StartSectionName != NAME_None)
+			{
+				AnimInstance->Montage_JumpToSection(StartSectionName, MontageToPlay);
+			}
+
+			return Duration;
+		}
+	}
+
+	return 0.f;
+}
+
 void ACharacterBase::MulticastPlayMontage_Implementation(UAnimMontage * MontageToPlay, float InPlayRate /*= 1.f*/, FName StartSectionName /*= NAME_None*/)
 {
-	PlayAnimMontage(MontageToPlay, InPlayRate, StartSectionName);
+	PlayMontageImpl(MontageToPlay, InPlayRate, StartSectionName);
 }
 
 void ACharacterBase::MulticastPlayMontageSkipOwner_Implementation(UAnimMontage * MontageToPlay, float InPlayRate /*= 1.f*/, FName StartSectionName /*= NAME_None*/)
 {
 	if (IsLocallyControlled() || GetMesh()->GetAnimInstance()->Montage_IsPlaying(MontageToPlay) == false)
 	{
-		PlayAnimMontage(MontageToPlay, InPlayRate, StartSectionName);
+		PlayMontageImpl(MontageToPlay, InPlayRate, StartSectionName);
 	}
 }
 
