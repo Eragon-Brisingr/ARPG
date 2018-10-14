@@ -70,7 +70,10 @@ void AARPG_WeaponBase::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
 
-	SocketMoveTracer->InitSocketMoveTracer(GetRootMeshComponent());
+	if (UPrimitiveComponent* Root = Cast<UPrimitiveComponent>(GetRootComponent()))
+	{
+		SocketMoveTracer->InitSocketMoveTracer(Root);
+	}
 }
 
 void AARPG_WeaponBase::SetEnableNearAttackTrace(bool Enable)
