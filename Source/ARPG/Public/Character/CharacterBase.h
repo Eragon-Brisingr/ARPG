@@ -101,6 +101,8 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "角色|行为")
 	float PlayMontage(UAnimMontage * MontageToPlay, float InPlayRate = 1.f, FName StartSectionName = NAME_None, bool ClientMaster = true);
 
+	float PlayMontageImpl(UAnimMontage * MontageToPlay, float InPlayRate = 1.f, FName StartSectionName = NAME_None);
+
 	UFUNCTION(Reliable, WithValidation, NetMulticast)
 	void MulticastPlayMontage(UAnimMontage * MontageToPlay, float InPlayRate = 1.f, FName StartSectionName = NAME_None);
 	virtual void MulticastPlayMontage_Implementation(UAnimMontage * MontageToPlay, float InPlayRate = 1.f, FName StartSectionName = NAME_None);
