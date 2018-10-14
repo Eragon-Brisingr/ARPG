@@ -88,11 +88,13 @@ void AARPG_WeaponBase::OnTracedActor(UPrimitiveComponent* HitComponent, const FN
 		if (ACharacterBase* WeaponOnwer = Cast<ACharacterBase>(GetItemOwner()))
 		{
 			Battle_Display_LOG("%s所持武器打击到%s", *UXD_DebugFunctionLibrary::GetDebugName(WeaponOnwer), *UXD_DebugFunctionLibrary::GetDebugName(OtherActor));
-			WeaponOnwer->NearAttackSuccessTimeDilation(0.2f);
 
 			if (ACharacterBase* ReceiveDamageCharacter = Cast<ACharacterBase>(OtherActor))
 			{
-				ReceiveDamageCharacter->ApplyPointDamage(40.f, 40.f, TraceResult.ImpactNormal, TraceResult, WeaponOnwer, this, nullptr, ReceiveDamageAction);
+				if (ReceiveDamageCharacter->ApplyPointDamage(40.f, 40.f, TraceResult.ImpactNormal, TraceResult, WeaponOnwer, this, nullptr, ReceiveDamageAction) > 0.f)
+				{
+					WeaponOnwer->NearAttackSuccessTimeDilation(0.2f);
+				}
 			}
 		}
 	}
