@@ -191,10 +191,10 @@ public:
 	uint8 bIsDodging : 1;
 
 	//闪避
-	virtual void WhenDodgeSucceed();
+	virtual void WhenDodgeSucceed(float BaseDamage, class ACharacterBase* InstigatedBy, const FHitResult& HitResult);
 	UFUNCTION(BlueprintImplementableEvent, Category = "角色|行为")
-	void ReceiveWhenDodgeSucceed();
-	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnDodgeSucceed, ACharacterBase*, Character);
+	void ReceiveWhenDodgeSucceed(float BaseDamage, class ACharacterBase* InstigatedBy, const FHitResult& HitResult);
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE_FourParams(FOnDodgeSucceed, ACharacterBase*, Character, float, BaseDamage, class ACharacterBase*, InstigatedBy, const FHitResult&, HitResult);
 	UPROPERTY(BlueprintAssignable, Category = "角色|事件")
 	FOnDodgeSucceed OnDodgeSucceed;
 
@@ -273,7 +273,7 @@ public:
 	UFUNCTION(BlueprintImplementableEvent, BlueprintAuthorityOnly, meta = (DisplayName = "WhenDamagedOther"), Category = "角色|行为")
 	void ReceiveWhenDamagedOther(ACharacterBase* WhoBeDamaged, float DamageValue, UObject* DamageInstigator);
 
-	float ApplyPointDamage(float BaseDamage, float AddHitStunValue, const FVector& HitFromDirection, const FHitResult& HitInfo, class ACharacterBase* EventInstigator, AActor* DamageCauser, TSubclassOf<class UDamageType> DamageTypeClass, TSubclassOf<class UReceiveDamageActionBase> ReceiveDamageAction);
+	float ApplyPointDamage(float BaseDamage, float AddHitStunValue, const FVector& HitFromDirection, const FHitResult& HitInfo, class ACharacterBase* InstigatorBy, AActor* DamageCauser, TSubclassOf<class UDamageType> DamageTypeClass, TSubclassOf<class UReceiveDamageActionBase> ReceiveDamageAction);
 
 	//播放动画相关
 public:
