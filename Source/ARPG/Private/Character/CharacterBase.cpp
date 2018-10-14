@@ -316,10 +316,10 @@ void ACharacterBase::RecoverAttackSuccessTimeDilation()
 	CustomTimeDilation /= AttackSuccessTimeDilationRate;
 }
 
-void ACharacterBase::WhenDodgeSucceed()
+void ACharacterBase::WhenDodgeSucceed(float BaseDamage, class ACharacterBase* InstigatedBy, const FHitResult& HitResult)
 {
-	ReceiveWhenDodgeSucceed();
-	OnDodgeSucceed.Broadcast(this);
+	ReceiveWhenDodgeSucceed(BaseDamage, InstigatedBy, HitResult);
+	OnDodgeSucceed.Broadcast(this, BaseDamage, InstigatedBy, HitResult);
 }
 
 bool ACharacterBase::IsDefenseSucceed_Implementation(const FVector& DamageFromLocation, const FHitResult& HitInfo) const
@@ -329,6 +329,7 @@ bool ACharacterBase::IsDefenseSucceed_Implementation(const FVector& DamageFromLo
 
 void ACharacterBase::WhenDefenseSucceed(float BaseDamage, class ACharacterBase* InstigatedBy, const FHitResult& HitResult)
 {
+	Battle_Display_LOG("%s成功防御%s的攻击", *UXD_DebugFunctionLibrary::GetDebugName(this), *UXD_DebugFunctionLibrary::GetDebugName(InstigatedBy));
 	ReceiveWhenDefenseSucceed(BaseDamage, InstigatedBy, HitResult);
 	OnDefenseSucceed.Broadcast(this, BaseDamage, InstigatedBy, HitResult);
 }
@@ -406,7 +407,7 @@ void ACharacterBase::WhenDamagedOther(ACharacterBase* WhoBeDamaged, float Damage
 	OnDamagedOther.Broadcast(this, WhoBeDamaged, DamageValue, DamageInstigator);
 }
 
-float ACharacterBase::ApplyPointDamage(float BaseDamage, float AddHitStunValue, const FVector& HitFromDirection, const FHitResult& HitInfo, class ACharacterBase* EventInstigator, AActor* DamageCauser, TSubclassOf<class UDamageType> DamageTypeClass, TSubclassOf<class UReceiveDamageActionBase> ReceiveDamageAction)
+float ACharacterBase::ApplyPointDamage(float BaseDamage, float AddHitStunValue, const FVector& HitFromDirection, const FHitResult& HitInfo, class ACharacterBase* InstigatorBy, AActor* DamageCauser, TSubclassOf<class UDamageType> DamageTypeClass, TSubclassOf<class UReceiveDamageActionBase> ReceiveDamageAction)
 {
 	float FinalReduceValue = BaseDamage;
 
@@ -415,14 +416,14 @@ float ACharacterBase::ApplyPointDamage(float BaseDamage, float AddHitStunValue, 
 		return 0.f;
 	}
 
-	if (EventInstigator)
+	if (InstigatorBy)
 	{
-		if (ACharacterBase* InstigatorPawn = Cast<ACharacterBase>(EventInstigator))
+		if (ACharacterBase* InstigatorPawn = Cast<ACharacterBase>(InstigatorBy))
 		{
 			//闪避
 			if (bIsDodging)
 			{
-				WhenDodgeSucceed();
+				WhenDodgeSucceed(FinalReduceValue, InstigatorBy, HitInfo);
 				return 0.f;
 			}
 			//防御反击
@@ -433,19 +434,19 @@ float ACharacterBase::ApplyPointDamage(float BaseDamage, float AddHitStunValue, 
 			//防御
 			else if (IsDefenseSucceed(InstigatorPawn->GetActorLocation(), HitInfo))
 			{
-				WhenDefenseSucceed(FinalReduceValue, EventInstigator, HitInfo);
+				WhenDefenseSucceed(FinalReduceValue, InstigatorBy, HitInfo);
 				InstigatorPawn->WhenAttackedDefenseCharacter(FinalReduceValue, this, HitInfo);
 				return 0.f;
 			}
 		}
 	}
 
-	if (!(ReceiveDamageAction && ReceiveDamageAction.GetDefaultObject()->PlayReceiveDamageAction(HitFromDirection, this, HitInfo, EventInstigator, DamageCauser)))
+	if (!(ReceiveDamageAction && ReceiveDamageAction.GetDefaultObject()->PlayReceiveDamageAction(HitFromDirection, this, HitInfo, InstigatorBy, DamageCauser)))
 	{
 		float HitStunOverflowValue = AddHitStun(AddHitStunValue);
 		if (HitStunOverflowValue >= 0.f)
 		{
-			ReceivePlayHitStunMontage(FinalReduceValue, HitStunOverflowValue, HitFromDirection, HitInfo, EventInstigator, DamageCauser);
+			ReceivePlayHitStunMontage(FinalReduceValue, HitStunOverflowValue, HitFromDirection, HitInfo, InstigatorBy, DamageCauser);
 		}
 		else
 		{
@@ -453,7 +454,7 @@ float ACharacterBase::ApplyPointDamage(float BaseDamage, float AddHitStunValue, 
 		}
 	}
 
-	UGameplayStatics::ApplyPointDamage(this, FinalReduceValue, GetActorLocation(), HitInfo, EventInstigator ? EventInstigator->GetController() : nullptr, DamageCauser, DamageTypeClass);
+	UGameplayStatics::ApplyPointDamage(this, FinalReduceValue, GetActorLocation(), HitInfo, InstigatorBy ? InstigatorBy->GetController() : nullptr, DamageCauser, DamageTypeClass);
 	return FinalReduceValue;
 }
 
