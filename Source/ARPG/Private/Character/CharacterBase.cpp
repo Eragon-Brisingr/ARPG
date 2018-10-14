@@ -318,6 +318,7 @@ void ACharacterBase::RecoverAttackSuccessTimeDilation()
 
 void ACharacterBase::WhenDodgeSucceed(float BaseDamage, class ACharacterBase* InstigatedBy, const FHitResult& HitResult)
 {
+	Battle_Display_LOG("%s成功闪避%s的攻击", *UXD_DebugFunctionLibrary::GetDebugName(this), *UXD_DebugFunctionLibrary::GetDebugName(InstigatedBy));
 	ReceiveWhenDodgeSucceed(BaseDamage, InstigatedBy, HitResult);
 	OnDodgeSucceed.Broadcast(this, BaseDamage, InstigatedBy, HitResult);
 }
