@@ -32,7 +32,7 @@ bool FExecuteActionSet::InvokeExecuteOther(class ACharacterBase* Invoker, class 
 	//考虑背刺
 	if (ExecuteTarget->CanBeBackstab(Invoker))
 	{
-		if (const FBackstabAnimData* AttackMontagePair = BackstabMap.Find(ExecuteTarget->GetMesh()->SkeletalMesh->Skeleton))
+		if (const FBackstabAnimData* AttackMontagePair = FindBackstabAnimData(ExecuteTarget))
 		{
 			if (AttackMontagePair->AttackMontage && AttackMontagePair->BeAttackedMontage)
 			{
@@ -53,10 +53,10 @@ bool FExecuteActionSet::TraceForExecuteOther(class ACharacterBase* Invoker)
 {
 	const float TraceDistance = 100.f;
 	FHitResult TraceCharacterResult;
-	if (UKismetSystemLibrary::SphereTraceSingleForObjects(Invoker, Invoker->GetActorLocation(), Invoker->GetActorLocation() + Invoker->GetActorForwardVector() * TraceDistance, 15.f, { UEngineTypes::ConvertToObjectType(ECollisionChannel::ECC_Pawn) }, false, { Invoker }, EDrawDebugTrace::ForDuration, TraceCharacterResult, false))
+	if (UKismetSystemLibrary::SphereTraceSingleForObjects(Invoker, Invoker->GetActorLocation(), Invoker->GetActorLocation() + Invoker->GetActorForwardVector() * TraceDistance, 15.f, { UEngineTypes::ConvertToObjectType(ECollisionChannel::ECC_Pawn) }, false, { Invoker }, EDrawDebugTrace::None, TraceCharacterResult, false))
 	{
 		FHitResult CanExecuteCheckResult;
-		UKismetSystemLibrary::LineTraceSingle(Invoker, Invoker->GetActorLocation(), TraceCharacterResult.GetActor()->GetActorLocation(), UEngineTypes::ConvertToTraceType(ECC_Visibility), false, { Invoker }, EDrawDebugTrace::ForDuration, CanExecuteCheckResult, false);
+		UKismetSystemLibrary::LineTraceSingle(Invoker, Invoker->GetActorLocation(), TraceCharacterResult.GetActor()->GetActorLocation(), UEngineTypes::ConvertToTraceType(ECC_Visibility), false, { Invoker }, EDrawDebugTrace::None, CanExecuteCheckResult, false);
 		if (TraceCharacterResult.GetActor() == CanExecuteCheckResult.GetActor())
 		{
 			if (ACharacterBase* ExecuteTarget = Cast<ACharacterBase>(TraceCharacterResult.GetActor()))
@@ -66,4 +66,16 @@ bool FExecuteActionSet::TraceForExecuteOther(class ACharacterBase* Invoker)
 		}
 	}
 	return false;
+}
+
+const FBackstabAnimData* FExecuteActionSet::FindBackstabAnimData(class ACharacterBase* Character) const
+{
+	for (UClass* Class = Character->GetClass(); Class != ACharacterBase::StaticClass(); Class = Class->GetSuperClass())
+	{
+		if (const FBackstabAnimData* BackstabAnimData = BackstabMap.Find(Class))
+		{
+			return BackstabAnimData;
+		}
+	}
+	return nullptr;
 }
