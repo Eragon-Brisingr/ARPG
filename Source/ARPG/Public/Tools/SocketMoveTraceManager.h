@@ -20,7 +20,7 @@ class ARPG_API USocketMoveTracer : public UObject, public FTickableGameObject
 {
 	GENERATED_BODY()
 public:
-	USocketMoveTracer() = default;
+	USocketMoveTracer();
 
 	virtual void Tick(float DeltaTime) override;
 
@@ -58,7 +58,7 @@ public:
 	}
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "攻击检测")
-	TEnumAsByte<ETraceTypeQuery> TraceTypeQuery = UEngineTypes::ConvertToTraceType(ECollisionChannel::ECC_Visibility);
+	TEnumAsByte<ETraceTypeQuery> TraceTypeQuery;
 
 	UPROPERTY()
 	TArray<AActor*> TracedActors;

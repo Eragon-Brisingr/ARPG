@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Item/Weapon/ARPG_WeaponBase.h"
+#include "ARPG_WeaponBase.h"
 #include "ARPG_BowBase.generated.h"
 
 /**
