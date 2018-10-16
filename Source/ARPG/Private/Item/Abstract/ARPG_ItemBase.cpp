@@ -21,7 +21,7 @@ FText AARPG_ItemBase::GetItemTypeDescImpl_Implementation(const class UXD_ItemCor
 
 class ACharacterBase* AARPG_ItemBase::GetItemOwner() const
 {
-	return CastChecked<ACharacterBase>(Instigator);
+	return Cast<ACharacterBase>(Instigator);
 }
 
 void AARPG_ItemBase::WhenUse(class ACharacterBase* ItemOwner)

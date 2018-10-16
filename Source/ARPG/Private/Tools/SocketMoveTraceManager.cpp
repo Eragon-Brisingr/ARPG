@@ -1,9 +1,16 @@
 ﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 #include "SocketMoveTraceManager.h"
+#include <Components/PrimitiveComponent.h>
+#include "ARPG_CollisionType.h"
 
 
 
+USocketMoveTracer::USocketMoveTracer()
+	:TraceTypeQuery(FARPG_TraceTypeQuery::Visibility)
+{
+
+}
 
 void USocketMoveTracer::Tick(float DeltaTime)
 {
