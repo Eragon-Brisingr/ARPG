@@ -135,12 +135,51 @@ class ARPG_API UARPG_Human_WeaponTrace : public UAnimNotifyState
 {
 	GENERATED_BODY()
 public:
-	UPROPERTY(EditAnywhere, Category = "攻击检测")
+	UPROPERTY(EditAnywhere, Category = "攻击")
 	uint8 bIsLeftWeapon : 1;
 
-	UPROPERTY(EditAnywhere, Category = "攻击检测")
+	UPROPERTY(EditAnywhere, Category = "攻击")
 	TSubclassOf<class UReceiveDamageActionBase> ReceiveDamageAction;
 
 	virtual void NotifyBegin(USkeletalMeshComponent * MeshComp, UAnimSequenceBase * Animation, float TotalDuration) override;
 	virtual void NotifyEnd(USkeletalMeshComponent * MeshComp, UAnimSequenceBase * Animation) override;
+};
+
+UCLASS(meta = (DisplayName = "人类_拔出箭"))
+class ARPG_API UARPG_Human_PullOutArrow : public UAnimNotifyState
+{
+	GENERATED_BODY()
+public:
+	UPROPERTY(EditAnywhere, Category = "攻击")
+	uint8 bIsLeftWeapon : 1;
+
+	virtual void NotifyBegin(USkeletalMeshComponent * MeshComp, UAnimSequenceBase * Animation, float TotalDuration) override;
+	virtual void NotifyEnd(USkeletalMeshComponent * MeshComp, UAnimSequenceBase * Animation) override;
+};
+
+UCLASS(meta = (DisplayName = "人类_拉弓"))
+class ARPG_API UARPG_Human_PullBow : public UAnimNotifyState
+{
+	GENERATED_BODY()
+public:
+	UPROPERTY(EditAnywhere, Category = "攻击")
+	uint8 bIsLeftWeapon : 1;
+
+	virtual void NotifyTick(USkeletalMeshComponent * MeshComp, UAnimSequenceBase * Animation, float FrameDeltaTime) override;
+};
+
+UCLASS(meta = (DisplayName = "人类_射出箭"))
+class ARPG_API UARPG_Human_LaunchArrow : public UAnimNotify
+{
+	GENERATED_BODY()
+public:
+	UARPG_Human_LaunchArrow()
+	{
+		bIsNativeBranchingPoint = true;
+	}
+
+	UPROPERTY(EditAnywhere, Category = "攻击")
+	uint8 bIsLeftWeapon : 1;
+
+	virtual void Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation) override;
 };

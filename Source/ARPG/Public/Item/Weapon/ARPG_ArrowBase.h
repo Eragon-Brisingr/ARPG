@@ -60,10 +60,12 @@ public:
 
 	virtual void NotifyHit(class UPrimitiveComponent* MyComp, AActor* Other, class UPrimitiveComponent* OtherComp, bool bSelfMoved, FVector HitLocation, FVector HitNormal, FVector NormalImpulse, const FHitResult& Hit) override;
 
+	virtual void UseItemImpl_Implementation(class UARPG_ItemCoreBase* ItemCore, class ACharacterBase* ItemOwner, EUseItemInput UseItemInput) const override;
+public:
 	void WhenHitCharacter(USceneComponent* MyComp, AActor* Other, UPrimitiveComponent* OtherComp, const FHitResult& Hit);
 
 	void PostArrowHitOther(UARPG_ProjectileMovementComponent* ProjectileMovementComponent);
 
 	UFUNCTION(BlueprintCallable, Category = "角色|行为")
-	void Release(float ForceSize);
+	void Launch(float ForceSize);
 };

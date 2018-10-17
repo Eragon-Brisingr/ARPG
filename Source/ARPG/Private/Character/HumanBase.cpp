@@ -2,6 +2,7 @@
 
 #include "HumanBase.h"
 #include <UnrealNetwork.h>
+#include <Components/SkeletalMeshComponent.h>
 #include "ARPG_MovementComponent.h"
 #include "ARPG_WeaponBase.h"
 #include "ARPG_ItemCoreBase.h"
@@ -9,6 +10,8 @@
 #include "ARPG_EquipmentBase.h"
 #include "ARPG_WeaponCoreBase.h"
 #include "ARPG_EquipmentCoreBase.h"
+#include "ARPG_ArrowBase.h"
+#include "ARPG_ArrowCoreBase.h"
 
 AHumanBase::AHumanBase(const FObjectInitializer& PCIP)
 	:Super(PCIP)
@@ -22,6 +25,8 @@ AHumanBase::AHumanBase(const FObjectInitializer& PCIP)
 		DefaultLeftWeapon.ShowItemType = AARPG_WeaponBase::StaticClass();
 		DefaultRightWeapon.bShowNumber = false;
 		DefaultRightWeapon.ShowItemType = AARPG_WeaponBase::StaticClass();
+
+		DefaultArrow.ShowItemType = AARPG_ArrowBase::StaticClass();
 #endif
 	}
 }
@@ -41,21 +46,26 @@ void AHumanBase::WhenGameInit_Implementation()
 {
 	Super::WhenGameInit_Implementation();
 
-	if (UARPG_ItemCoreBase* ItemCore = Cast<UARPG_ItemCoreBase>(DefaultLeftWeapon.ItemCore))
+	if (UARPG_ItemCoreBase* WeaponCore = Cast<UARPG_ItemCoreBase>(DefaultLeftWeapon.ItemCore))
 	{
-		UseItemImmediately(ItemCore, EUseItemInput::LeftMouse);
+		UseItemImmediately(WeaponCore, EUseItemInput::LeftMouse);
 	}
 
-	if (UARPG_ItemCoreBase* ItemCore = Cast<UARPG_ItemCoreBase>(DefaultRightWeapon.ItemCore))
+	if (UARPG_ItemCoreBase* WeaponCore = Cast<UARPG_ItemCoreBase>(DefaultRightWeapon.ItemCore))
 	{
-		UseItemImmediately(ItemCore, EUseItemInput::RightMouse);
+		UseItemImmediately(WeaponCore, EUseItemInput::RightMouse);
+	}
+
+	if (UARPG_ItemCoreBase* ArrowCore = Cast<UARPG_ItemCoreBase>(DefaultArrow.ItemCore))
+	{
+		UseItemImmediately(ArrowCore);
 	}
 
 	for (const FXD_Item& DefaultEquipment : DefaultEquipmentList)
 	{
-		if (UARPG_ItemCoreBase* ItemCore = Cast<UARPG_ItemCoreBase>(DefaultEquipment.ItemCore))
+		if (UARPG_ItemCoreBase* EquipmentCore = Cast<UARPG_ItemCoreBase>(DefaultEquipment.ItemCore))
 		{
-			UseItemImmediately(ItemCore, EUseItemInput::RightMouse);
+			UseItemImmediately(EquipmentCore);
 		}
 	}
 }
@@ -134,6 +144,22 @@ class AARPG_WeaponBase* AHumanBase::EquipWaepon_Implementation(class UARPG_Weapo
 		break;
 	}
 	return nullptr;
+}
+
+class AARPG_ArrowBase* AHumanBase::EquipArrow_Implementation(class UARPG_ArrowCoreBase* ArrowCore, EUseItemInput UseItemInput)
+{
+	if (Arrow && Arrow->EqualForItemCore(ArrowCore))
+	{
+		SetArrow(nullptr);
+		return nullptr;
+	}
+	else
+	{
+		AARPG_ArrowBase* CurArrow = Cast<AARPG_ArrowBase>(ArrowCore->SpawnItemActorForOwner(this, this));
+		SetArrow(CurArrow);
+		CurArrow->AttachWeaponTo(GetMesh(), QuiverSocketName);
+		return CurArrow;
+	}
 }
 
 class AARPG_EquipmentBase* AHumanBase::EquipEquipment_Implementation(class UARPG_EquipmentCoreBase* EquipmentCore, EUseItemInput UseItemInput)
@@ -357,6 +383,16 @@ void AHumanBase::InvokeTakeBackWeapon()
 	{
 		PlayMontage(TakeBackWeaponMontage);
 	}
+}
+
+void AHumanBase::SetArrow(class AARPG_ArrowBase* ToArrow)
+{
+	SetEquipVariable(Arrow, ToArrow);
+}
+
+void AHumanBase::OnRep_Arrow(class AARPG_ArrowBase* PreArrow)
+{
+	OnRep_EquipVariable(Arrow, PreArrow);
 }
 
 void AHumanBase::OnRep_EquipmentList()

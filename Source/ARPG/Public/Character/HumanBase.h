@@ -28,6 +28,8 @@ public:
 
 	virtual class AARPG_WeaponBase* EquipWaepon_Implementation(class UARPG_WeaponCoreBase* WeaponCore, EUseItemInput UseItemInput) override;
 
+	virtual class AARPG_ArrowBase* EquipArrow_Implementation(class UARPG_ArrowCoreBase* ArrowCore, EUseItemInput UseItemInput) override;
+
 	virtual class AARPG_EquipmentBase* EquipEquipment_Implementation(class UARPG_EquipmentCoreBase* EquipmentCore, EUseItemInput UseItemInput) override;
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "角色|配置|常用", meta = (DisplayName = "默认左手武器", ExposeOnSpawn = "True"), SaveGame)
@@ -75,7 +77,6 @@ public:
 	void LeftWeaponInWeaponBack();
 
 	void LetTheWeaponInHand();
-
 	void LetTheWeaponInWeaponBack();
 
 	UPROPERTY(EditDefaultsOnly, Category = "角色|行为")
@@ -89,6 +90,19 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "角色|行为")
 	void InvokeTakeBackWeapon();
+
+	UPROPERTY(ReplicatedUsing = OnRep_Arrow, VisibleAnywhere, AdvancedDisplay, BlueprintReadWrite, BlueprintSetter = "SetArrow", Category = "角色", SaveGame)
+	class AARPG_ArrowBase* Arrow;
+	UFUNCTION(BlueprintSetter)
+	void SetArrow(class AARPG_ArrowBase* ToArrow);
+	UFUNCTION()
+	void OnRep_Arrow(class AARPG_ArrowBase* PreArrow);
+
+	UPROPERTY(EditDefaultsOnly, Category = "角色|配置")
+	FName QuiverSocketName = TEXT("Quiver");
+
+	UPROPERTY(EditDefaultsOnly, Category = "角色|配置")
+	FName HoldingArrowSocketName = TEXT("HoldingArrow");
 
 	UPROPERTY()
 	TArray<class AARPG_EquipmentBase*> PreEquipmentList;
