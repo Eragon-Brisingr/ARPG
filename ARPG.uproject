@@ -15,7 +15,8 @@
 				"XD_SaveGameSystem",
 				"XD_EnvironmentSystem",
 				"XD_TimeSystem",
-				"XD_ItemSystem"
+				"XD_ItemSystem",
+				"XD_UnrealLibraryEx"
 			]
 		}
 	]

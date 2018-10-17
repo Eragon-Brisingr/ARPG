@@ -10,11 +10,11 @@
 #include "ARPG_MovementComponent.h"
 #include "ARPG_InventoryComponent.h"
 #include "ARPG_ItemCoreBase.h"
-#include "XD_LevelFunctionLibrary.h"
-#include "XD_DebugFunctionLibrary.h"
 #include "ARPG_Battle_Log.h"
 #include "ReceiveDamageActionBase.h"
 #include <Kismet/KismetMathLibrary.h>
+#include "ARPG_DebugFunctionLibrary.h"
+#include "ARPG_LevelFunctionLibrary.h"
 
 
 // Sets default values
@@ -108,7 +108,7 @@ void ACharacterBase::SetRebornLocation(const FVector& RebornLocation)
 
 FVector ACharacterBase::GetRebornLocation()
 {
-	return UXD_LevelFunctionLibrary::GetFixedWorldLocation(this, BornWorldOrigin, BornLocation);
+	return UARPG_LevelFunctionLibrary::GetFixedWorldLocation(this, BornWorldOrigin, BornLocation);
 }
 
 void ACharacterBase::ARPG_InputPressed(EARPG_InputType InputType)
@@ -318,7 +318,7 @@ void ACharacterBase::RecoverAttackSuccessTimeDilation()
 
 void ACharacterBase::WhenDodgeSucceed(float BaseDamage, class ACharacterBase* InstigatedBy, const FHitResult& HitResult)
 {
-	Battle_Display_LOG("%s成功闪避%s的攻击", *UXD_DebugFunctionLibrary::GetDebugName(this), *UXD_DebugFunctionLibrary::GetDebugName(InstigatedBy));
+	Battle_Display_LOG("%s成功闪避%s的攻击", *UARPG_DebugFunctionLibrary::GetDebugName(this), *UARPG_DebugFunctionLibrary::GetDebugName(InstigatedBy));
 	ReceiveWhenDodgeSucceed(BaseDamage, InstigatedBy, HitResult);
 	OnDodgeSucceed.Broadcast(this, BaseDamage, InstigatedBy, HitResult);
 }
@@ -330,7 +330,7 @@ bool ACharacterBase::IsDefenseSucceed_Implementation(const FVector& DamageFromLo
 
 void ACharacterBase::WhenDefenseSucceed(float BaseDamage, class ACharacterBase* InstigatedBy, const FHitResult& HitResult)
 {
-	Battle_Display_LOG("%s成功防御%s的攻击", *UXD_DebugFunctionLibrary::GetDebugName(this), *UXD_DebugFunctionLibrary::GetDebugName(InstigatedBy));
+	Battle_Display_LOG("%s成功防御%s的攻击", *UARPG_DebugFunctionLibrary::GetDebugName(this), *UARPG_DebugFunctionLibrary::GetDebugName(InstigatedBy));
 	ReceiveWhenDefenseSucceed(BaseDamage, InstigatedBy, HitResult);
 	OnDefenseSucceed.Broadcast(this, BaseDamage, InstigatedBy, HitResult);
 }
@@ -394,7 +394,7 @@ void ACharacterBase::ExecuteOtherToServer_Implementation(ACharacterBase* Execute
 
 void ACharacterBase::WhenKillOther(ACharacterBase* WhoBeKilled, UObject* KillInstigator)
 {
-	Battle_Display_LOG("%s杀死了%s", *UXD_DebugFunctionLibrary::GetDebugName(this), *UXD_DebugFunctionLibrary::GetDebugName(WhoBeKilled));
+	Battle_Display_LOG("%s杀死了%s", *UARPG_DebugFunctionLibrary::GetDebugName(this), *UARPG_DebugFunctionLibrary::GetDebugName(WhoBeKilled));
 	ReceiveWhenKillOther(WhoBeKilled, KillInstigator);
 	OnKillOther.Broadcast(this, WhoBeKilled, KillInstigator);
 }
@@ -403,7 +403,7 @@ void ACharacterBase::WhenDamagedOther(ACharacterBase* WhoBeDamaged, float Damage
 {
 	ensure(DamageValue > 0.f);
 
-	Battle_Display_LOG("%s对%s造成了[%f]点伤害", *UXD_DebugFunctionLibrary::GetDebugName(this), *UXD_DebugFunctionLibrary::GetDebugName(WhoBeDamaged), DamageValue);
+	Battle_Display_LOG("%s对%s造成了[%f]点伤害", *UARPG_DebugFunctionLibrary::GetDebugName(this), *UARPG_DebugFunctionLibrary::GetDebugName(WhoBeDamaged), DamageValue);
 	ReceiveWhenDamagedOther(WhoBeDamaged, DamageValue, DamageInstigator);
 	OnDamagedOther.Broadcast(this, WhoBeDamaged, DamageValue, DamageInstigator);
 }

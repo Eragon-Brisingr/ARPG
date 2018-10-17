@@ -3,8 +3,8 @@
 #include "ARPG_ItemCoreBase.h"
 #include "ARPG_ItemBase.h"
 #include "CharacterBase.h"
-#include "XD_DebugFunctionLibrary.h"
 #include "ARPG_Item_Log.h"
+#include "ARPG_DebugFunctionLibrary.h"
 
 
 UARPG_ItemCoreBase::UARPG_ItemCoreBase()
@@ -41,7 +41,7 @@ void UARPG_ItemCoreBase::UseItem(class ACharacterBase* ItemOwner, EUseItemInput 
 {
 	if (ItemOwner)
 	{
-		Item_Display_LOG("%s使用道具%s", *UXD_DebugFunctionLibrary::GetDebugName(ItemOwner), *UXD_DebugFunctionLibrary::GetDebugName(GetItemDefaultActor()));
+		Item_Display_LOG("%s使用道具%s", *UARPG_DebugFunctionLibrary::GetDebugName(ItemOwner), *UARPG_DebugFunctionLibrary::GetDebugName(GetItemDefaultActor()));
 		GetItemDefaultActor<AARPG_ItemBase>()->UseItemImpl(this, ItemOwner, UseItemInput);
 	}
 }

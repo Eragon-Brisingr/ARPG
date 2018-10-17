@@ -3,9 +3,10 @@
 #include "ARPG_EquipmentBase.h"
 #include "CharacterBase.h"
 #include "HumanBase.h"
-#include "XD_DebugFunctionLibrary.h"
 #include "ARPG_EquipmentCoreBase.h"
 #include "ARPG_Item_Log.h"
+#include "ARPG_DebugFunctionLibrary.h"
+#include <Components/SkeletalMeshComponent.h>
 
 
 #define LOCTEXT_NAMESPACE "ARPG_Item"
@@ -28,9 +29,9 @@ FText AARPG_EquipmentBase::GetItemTypeDescImpl_Implementation(const class UXD_It
 
 void AARPG_EquipmentBase::WhenUse(class ACharacterBase* ItemOwner)
 {
-	Item_Display_LOG("%s装备装备%s", *UXD_DebugFunctionLibrary::GetDebugName(ItemOwner), *UXD_DebugFunctionLibrary::GetDebugName(this));
+	Item_Display_LOG("%s装备装备%s", *UARPG_DebugFunctionLibrary::GetDebugName(ItemOwner), *UARPG_DebugFunctionLibrary::GetDebugName(this));
 	Super::WhenUse(ItemOwner);
-
+	
 	AttachToComponent(ItemOwner->GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, EquipSocketName);
 	if (EquipSocketName.IsNone())
 	{
