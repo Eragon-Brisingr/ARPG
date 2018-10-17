@@ -4,31 +4,25 @@
 
 #include "CoreMinimal.h"
 #include "ARPG_WeaponBase.h"
-#include <Tickable.h>
 #include <Kismet/KismetSystemLibrary.h>
+#include <GameFramework/ProjectileMovementComponent.h>
 #include "ARPG_ArrowBase.generated.h"
 
-UCLASS(editinlinenew)
-class ARPG_API UProjectileTracer : public UObject, public FTickableGameObject
+UCLASS()
+class ARPG_API UARPG_ProjectileMovementComponent : public UProjectileMovementComponent
 {
 	GENERATED_BODY()
 public:
-	UProjectileTracer();
+	UARPG_ProjectileMovementComponent();
 
-	// Inherited via FTickableGameObject
-	virtual void Tick(float DeltaTime) override;
+	virtual void BeginPlay() override;
 
-	virtual TStatId GetStatId() const override { RETURN_QUICK_DECLARE_CYCLE_STAT(UProjectileTracer, STATGROUP_Tickables); }
+	virtual void TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction *ThisTickFunction) override;
 
-	virtual bool IsTickable() const { return bTraceable; }
+	virtual void Activate(bool bReset = false) override;
 
+	virtual void Deactivate() override;
 public:
-	UPROPERTY(EditAnywhere, Category = "检测")
-	uint8 bTraceable : 1;
-
-	UPROPERTY(EditAnywhere, Category = "检测")
-	uint8 bRotationUseVelocity : 1;
-
 	UPROPERTY(EditAnywhere, Category = "检测", meta = (MakeEditWidget = "true"))
 	FVector TraceOriginOffet;
 
@@ -48,13 +42,7 @@ public:
 	UPROPERTY(EditAnywhere, Category = "检测")
 	TEnumAsByte<EDrawDebugTrace::Type> DrawDebugType;
 
-	UFUNCTION(BlueprintCallable, Category = "检测")
-	void SetTraceEnable(bool Enable);
-
-	UFUNCTION(BlueprintCallable, Category = "检测")
-	void SetTargetComponent(class UPrimitiveComponent* TargetComponent);
-
-	DECLARE_DELEGATE_FourParams(FOnTraceActorNative, UPrimitiveComponent*, AActor*, UPrimitiveComponent*, const FHitResult&);
+	DECLARE_DELEGATE_FourParams(FOnTraceActorNative, USceneComponent*, AActor*, UPrimitiveComponent*, const FHitResult&);
 	FOnTraceActorNative OnTraceActorNative;
 };
 
@@ -70,14 +58,11 @@ public:
 	
 	virtual void PostInitializeComponents() override;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "检测", Instanced)
-	UProjectileTracer* ProjectileTracer;
-
 	virtual void NotifyHit(class UPrimitiveComponent* MyComp, AActor* Other, class UPrimitiveComponent* OtherComp, bool bSelfMoved, FVector HitLocation, FVector HitNormal, FVector NormalImpulse, const FHitResult& Hit) override;
 
-	void WhenHitCharacter(UPrimitiveComponent* MyComp, AActor* Other, UPrimitiveComponent* OtherComp, const FHitResult& Hit);
+	void WhenHitCharacter(USceneComponent* MyComp, AActor* Other, UPrimitiveComponent* OtherComp, const FHitResult& Hit);
 
-	void PostArrowHitOther();
+	void PostArrowHitOther(UARPG_ProjectileMovementComponent* ProjectileMovementComponent);
 
 	UFUNCTION(BlueprintCallable, Category = "角色|行为")
 	void Release(float ForceSize);

@@ -6,84 +6,82 @@
 #include <Components/SkeletalMeshComponent.h>
 #include "ARPG_CollisionType.h"
 #include "CharacterBase.h"
+#include "ARPG_ActorFunctionLibrary.h"
 
 
-UProjectileTracer::UProjectileTracer()
-	:ObjectTypes{ FARPG_CollisionObjectType::CharacterMesh },
-	bRotationUseVelocity(true)
+UARPG_ProjectileMovementComponent::UARPG_ProjectileMovementComponent()
+	:ObjectTypes{ FARPG_CollisionObjectType::CharacterMesh }
 {
-
+	bRotationFollowsVelocity = true;
 }
 
-void UProjectileTracer::Tick(float DeltaTime)
+void UARPG_ProjectileMovementComponent::BeginPlay()
 {
-	if (TracedComponent.IsValid())
+	Super::BeginPlay();
+
+	IgnoreActors.Add(GetOwner());
+}
+
+void UARPG_ProjectileMovementComponent::TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction *ThisTickFunction)
+{
+	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+	if (bIsActive && UpdatedComponent)
 	{
 		FHitResult TraceResult;
-		FVector End = TracedComponent->GetComponentTransform().TransformPosition(TraceOriginOffet);
+		FVector End = UpdatedComponent->GetComponentTransform().TransformPosition(TraceOriginOffet);
 
-		if (UKismetSystemLibrary::SphereTraceSingleForObjects(TracedComponent.Get(), PreLocation, End, Radius, ObjectTypes, false, IgnoreActors, DrawDebugType, TraceResult, false))
+		if (UKismetSystemLibrary::SphereTraceSingleForObjects(UpdatedComponent, PreLocation, End, Radius, ObjectTypes, false, IgnoreActors, DrawDebugType, TraceResult, false))
 		{
 			if (OnTraceActorNative.IsBound())
 			{
-				OnTraceActorNative.Execute(TracedComponent.Get(), TraceResult.GetActor(), TraceResult.GetComponent(), TraceResult);
+				OnTraceActorNative.Execute(UpdatedComponent, TraceResult.GetActor(), TraceResult.GetComponent(), TraceResult);
 			}
-		}
-
-		if (TracedComponent->GetComponentVelocity().Size() > 0.f)
-		{
-			TracedComponent->SetWorldRotation(TracedComponent->GetComponentVelocity().Rotation());
 		}
 		PreLocation = End;
 	}
 }
 
-void UProjectileTracer::SetTraceEnable(bool Enable)
+void UARPG_ProjectileMovementComponent::Activate(bool bReset /*= false*/)
 {
-	if (TracedComponent.IsValid() && bTraceable != Enable)
+	if (UpdatedComponent != GetOwner()->GetRootComponent())
 	{
-		bTraceable = Enable;
-		if (Enable)
-		{
-			PreLocation = TracedComponent->GetComponentLocation();
-		}
+		SetUpdatedComponent(GetOwner()->GetRootComponent());
 	}
+	Super::Activate(bReset);
+	PreLocation = UpdatedComponent->GetComponentLocation();
 }
 
-void UProjectileTracer::SetTargetComponent(class UPrimitiveComponent* TargetComponent)
+void UARPG_ProjectileMovementComponent::Deactivate()
 {
-	if (TargetComponent != nullptr && TargetComponent != TracedComponent)
-	{
-		TracedComponent = TargetComponent;
-		IgnoreActors.Add(TargetComponent->GetOwner());
-	}
+	Super::Deactivate();
 }
 
 AARPG_ArrowBase::AARPG_ArrowBase(const FObjectInitializer& ObjectInitializer /*= FObjectInitializer::Get()*/)
 	:Super(ObjectInitializer.SetDefaultSubobjectClass<UARPG_ArrowCoreBase>(GET_MEMBER_NAME_CHECKED(AARPG_ArrowBase, InnerItemCore)))
 {
-	ProjectileTracer = CreateDefaultSubobject<UProjectileTracer>(GET_MEMBER_NAME_CHECKED(AARPG_ArrowBase, ProjectileTracer));
+
 }
 
 void AARPG_ArrowBase::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
-	ProjectileTracer->IgnoreActors.Add(GetItemOwner());
-	ProjectileTracer->TracedComponent = Cast<UPrimitiveComponent>(GetRootComponent());
-	ProjectileTracer->OnTraceActorNative.BindUObject(this, &AARPG_ArrowBase::WhenHitCharacter);
+	
 }
 
 void AARPG_ArrowBase::NotifyHit(class UPrimitiveComponent* MyComp, AActor* Other, class UPrimitiveComponent* OtherComp, bool bSelfMoved, FVector HitLocation, FVector HitNormal, FVector NormalImpulse, const FHitResult& Hit)
 {
-	if (ProjectileTracer && ProjectileTracer->bTraceable)
+	UARPG_ProjectileMovementComponent* ProjectileMovementComponent = FindComponentByClass<UARPG_ProjectileMovementComponent>();
+	if (ProjectileMovementComponent && ProjectileMovementComponent->IsActive())
 	{
-		PostArrowHitOther();
+		PostArrowHitOther(ProjectileMovementComponent);
 
 		if (AARPG_ArrowBase* Arrow = Cast<AARPG_ArrowBase>(Other))
 		{
 			//把扎进物体里里的箭插深点
 			if (AActor* ParentActor = Arrow->GetAttachParentActor())
 			{
+				SetItemSimulatePhysics(true);
+
 				FVector Velocity = GetVelocity();
 				Arrow->AddActorWorldOffset(Velocity.GetSafeNormal() * FMath::GetMappedRangeValueClamped({ 0.f, 3000.f }, { 0.f, 50.f }, Velocity.Size()));
 
@@ -98,38 +96,39 @@ void AARPG_ArrowBase::NotifyHit(class UPrimitiveComponent* MyComp, AActor* Other
 		}
 		else
 		{
-			SetItemSimulatePhysics(false);
 			SetActorLocation(Hit.Location);
 			GetRootComponent()->AttachToComponent(Hit.GetComponent(), FAttachmentTransformRules::KeepWorldTransform, Hit.BoneName);
 		}
 	}
 }
 
-void AARPG_ArrowBase::WhenHitCharacter(UPrimitiveComponent* MyComp, AActor* Other, UPrimitiveComponent* OtherComp, const FHitResult& Hit)
+void AARPG_ArrowBase::WhenHitCharacter(USceneComponent* MyComp, AActor* Other, UPrimitiveComponent* OtherComp, const FHitResult& Hit)
 {
 	if (ACharacterBase* Character = Cast<ACharacterBase>(Other))
 	{
-		PostArrowHitOther();
+		PostArrowHitOther(FindComponentByClass<UARPG_ProjectileMovementComponent>());
 
 		Character->ApplyPointDamage(50.f, 5.f, GetVelocity().GetSafeNormal(), Hit, GetItemOwner(), this, nullptr, nullptr);
 
-		SetItemSimulatePhysics(false);
 		SetActorLocation(Hit.Location);
 		GetRootComponent()->AttachToComponent(Hit.GetComponent(), FAttachmentTransformRules::KeepWorldTransform, Hit.BoneName);
 	}
 }
 
-void AARPG_ArrowBase::PostArrowHitOther()
+void AARPG_ArrowBase::PostArrowHitOther(UARPG_ProjectileMovementComponent* ProjectileMovementComponent)
 {
-	ProjectileTracer->SetTraceEnable(false);
+	ProjectileMovementComponent->DestroyComponent();
 	GetRootMeshComponent()->SetCollisionProfileName(FARPG_CollisionProfile::Item);
 }
 
 void AARPG_ArrowBase::Release(float ForceSize)
 {
-	SetItemSimulatePhysics(true);
 	UPrimitiveComponent* ArrowRootComponent = GetRootMeshComponent();
 	ArrowRootComponent->SetCollisionProfileName(FARPG_CollisionProfile::ArrowReleasing);
-	ArrowRootComponent->AddForce(GetActorForwardVector() * ForceSize);
-	ProjectileTracer->SetTraceEnable(true);
+
+	UARPG_ProjectileMovementComponent* ProjectileMovementComponent = UARPG_ActorFunctionLibrary::AddComponent<UARPG_ProjectileMovementComponent>(this, TEXT("弓箭移动组件"));
+	ProjectileMovementComponent->IgnoreActors.Add(GetItemOwner());
+	ProjectileMovementComponent->Activate(true);
+	ProjectileMovementComponent->OnTraceActorNative.BindUObject(this, &AARPG_ArrowBase::WhenHitCharacter);
+	ProjectileMovementComponent->Velocity = GetActorForwardVector() * ForceSize;
 }
