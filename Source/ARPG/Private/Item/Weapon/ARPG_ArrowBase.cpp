@@ -102,6 +102,14 @@ void AARPG_ArrowBase::NotifyHit(class UPrimitiveComponent* MyComp, AActor* Other
 	}
 }
 
+void AARPG_ArrowBase::UseItemImpl_Implementation(class UARPG_ItemCoreBase* ItemCore, class ACharacterBase* ItemOwner, EUseItemInput UseItemInput) const
+{
+	if (UARPG_ArrowCoreBase* ArrowCore = Cast<UARPG_ArrowCoreBase>(ItemCore))
+	{
+		ItemOwner->EquipArrow(ArrowCore, UseItemInput);
+	}
+}
+
 void AARPG_ArrowBase::WhenHitCharacter(USceneComponent* MyComp, AActor* Other, UPrimitiveComponent* OtherComp, const FHitResult& Hit)
 {
 	if (ACharacterBase* Character = Cast<ACharacterBase>(Other))
@@ -121,7 +129,7 @@ void AARPG_ArrowBase::PostArrowHitOther(UARPG_ProjectileMovementComponent* Proje
 	GetRootMeshComponent()->SetCollisionProfileName(FARPG_CollisionProfile::Item);
 }
 
-void AARPG_ArrowBase::Release(float ForceSize)
+void AARPG_ArrowBase::Launch(float ForceSize)
 {
 	UPrimitiveComponent* ArrowRootComponent = GetRootMeshComponent();
 	ArrowRootComponent->SetCollisionProfileName(FARPG_CollisionProfile::ArrowReleasing);

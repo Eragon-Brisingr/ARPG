@@ -7,6 +7,8 @@
 #include "CharacterBase.h"
 #include "HumanBase.h"
 #include "ARPG_WeaponBase.h"
+#include "ARPG_BowBase.h"
+#include "ARPG_ArrowBase.h"
 
 
 
@@ -180,6 +182,82 @@ void UARPG_Human_WeaponTrace::NotifyEnd(USkeletalMeshComponent * MeshComp, UAnim
 		{
 			Weapon->ReceiveDamageAction = nullptr;
 			Weapon->SetEnableNearAttackTrace(false);
+		}
+	}
+}
+
+void UARPG_Human_PullOutArrow::NotifyBegin(USkeletalMeshComponent * MeshComp, UAnimSequenceBase * Animation, float TotalDuration)
+{
+	if (MeshComp->GetOwner()->HasAuthority() == false)
+	{
+		return;
+	}
+
+	if (AHumanBase* Human = Cast<AHumanBase>(MeshComp->GetOwner()))
+	{
+		if (AARPG_WeaponBase* Weapon = bIsLeftWeapon ? Human->LeftWeapon : Human->RightWeapon)
+		{
+			if (AARPG_BowBase* Bow = Cast<AARPG_BowBase>(Weapon))
+			{
+				Bow->SpawnArrowInHand();
+				Bow->HoldingTime = 0.f;
+			}
+		}
+	}
+}
+
+void UARPG_Human_PullOutArrow::NotifyEnd(USkeletalMeshComponent * MeshComp, UAnimSequenceBase * Animation)
+{
+	if (MeshComp->GetOwner()->HasAuthority() == false)
+	{
+		return;
+	}
+
+	if (AHumanBase* Human = Cast<AHumanBase>(MeshComp->GetOwner()))
+	{
+		if (AARPG_WeaponBase* Weapon = bIsLeftWeapon ? Human->LeftWeapon : Human->RightWeapon)
+		{
+			if (AARPG_BowBase* Bow = Cast<AARPG_BowBase>(Weapon))
+			{
+				if (Bow->HoldingArrow)
+				{
+					Bow->HoldingArrow->Destroy();
+					Bow->HoldingArrow = nullptr;
+				}
+			}
+		}
+	}
+}
+
+void UARPG_Human_PullBow::NotifyTick(USkeletalMeshComponent * MeshComp, UAnimSequenceBase * Animation, float FrameDeltaTime)
+{
+	if (MeshComp->GetOwner()->HasAuthority() == false)
+	{
+		return;
+	}
+
+	if (AHumanBase* Human = Cast<AHumanBase>(MeshComp->GetOwner()))
+	{
+		if (AARPG_WeaponBase* Weapon = bIsLeftWeapon ? Human->LeftWeapon : Human->RightWeapon)
+		{
+			if (AARPG_BowBase* Bow = Cast<AARPG_BowBase>(Weapon))
+			{
+				Bow->HoldingTime += FrameDeltaTime;
+			}
+		}
+	}
+}
+
+void UARPG_Human_LaunchArrow::Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation)
+{
+	if (AHumanBase* Human = Cast<AHumanBase>(MeshComp->GetOwner()))
+	{
+		if (AARPG_WeaponBase* Weapon = bIsLeftWeapon ? Human->LeftWeapon : Human->RightWeapon)
+		{
+			if (AARPG_BowBase* Bow = Cast<AARPG_BowBase>(Weapon))
+			{
+				Bow->LaunchArrow();
+			}
 		}
 	}
 }

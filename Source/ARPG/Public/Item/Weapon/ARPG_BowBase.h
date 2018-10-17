@@ -16,6 +16,12 @@ class ARPG_API AARPG_BowBase : public AARPG_WeaponBase
 public:
 	AARPG_BowBase(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 	
+	UPROPERTY()
+	class AARPG_ArrowBase* HoldingArrow;
+
+	float HoldingTime;
 	
-	
+	void SpawnArrowInHand();
+
+	void LaunchArrow();
 };

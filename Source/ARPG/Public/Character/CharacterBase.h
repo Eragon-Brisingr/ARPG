@@ -155,11 +155,15 @@ public:
 	bool InvokeUseItem_Validate(const class UARPG_ItemCoreBase* ItemCore, EUseItemInput UseItemInput) { return true; }
 
 	UFUNCTION(BlueprintCallable, Category = "角色|物品", BlueprintAuthorityOnly)
-	void UseItemImmediately(const class UARPG_ItemCoreBase* ItemCore, EUseItemInput UseItemInput);
+	void UseItemImmediately(const class UARPG_ItemCoreBase* ItemCore, EUseItemInput UseItemInput = EUseItemInput::LeftMouse);
 
 	UFUNCTION(BlueprintNativeEvent, Category = "角色|物品")
 	class AARPG_WeaponBase* EquipWaepon(class UARPG_WeaponCoreBase* WeaponCore, EUseItemInput UseItemInput);
 	virtual class AARPG_WeaponBase* EquipWaepon_Implementation(class UARPG_WeaponCoreBase* WeaponCore, EUseItemInput UseItemInput) { return nullptr; }
+	
+	UFUNCTION(BlueprintNativeEvent, Category = "角色|物品")
+	class AARPG_ArrowBase* EquipArrow(class UARPG_ArrowCoreBase* ArrowCore, EUseItemInput UseItemInput);
+	virtual class AARPG_ArrowBase* EquipArrow_Implementation(class UARPG_ArrowCoreBase* ArrowCore, EUseItemInput UseItemInput) { return nullptr; }
 
 	UFUNCTION(BlueprintNativeEvent, Category = "角色|物品")
 	class AARPG_EquipmentBase* EquipEquipment(class UARPG_EquipmentCoreBase* EquipmentCore, EUseItemInput UseItemInput);
