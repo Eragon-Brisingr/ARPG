@@ -102,7 +102,10 @@ public:
 	FName QuiverSocketName = TEXT("Quiver");
 
 	UPROPERTY(EditDefaultsOnly, Category = "角色|配置")
-	FName HoldingArrowSocketName = TEXT("HoldingArrow");
+	FName LeftHandHoldingArrowSocketName = TEXT("HoldingArrow_l");
+
+	UPROPERTY(EditDefaultsOnly, Category = "角色|配置")
+	FName RightHandHoldingArrowSocketName = TEXT("HoldingArrow_r");
 
 	UPROPERTY()
 	TArray<class AARPG_EquipmentBase*> PreEquipmentList;

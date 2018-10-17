@@ -22,7 +22,7 @@ void AARPG_BowBase::SpawnArrowInHand()
 		{
 			HoldingArrow = Cast<AARPG_ArrowBase>(Human->Arrow->GetItemCore()->SpawnItemActorForOwner(this, Human));
 			HoldingArrow->SetItemSimulatePhysics(false);
-			HoldingArrow->AttachWeaponTo(Human->GetMesh(), Human->HoldingArrowSocketName);
+			HoldingArrow->AttachWeaponTo(Human->GetMesh(), Human->LeftWeapon == this ? Human->LeftHandHoldingArrowSocketName : Human->RightHandHoldingArrowSocketName);
 		}
 	}
 }
