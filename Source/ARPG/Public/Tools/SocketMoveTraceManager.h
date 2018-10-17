@@ -33,8 +33,7 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "攻击检测")
 	uint8 bEnableTrace : 1;
 
-	UPROPERTY(BlueprintReadWrite, BlueprintReadWrite, Category = "攻击检测")
-	UPrimitiveComponent* TargetSocketMesh;
+	TWeakObjectPtr<UPrimitiveComponent> TargetSocketMesh;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "攻击检测")
 	float StepLength = 20.f;

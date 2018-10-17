@@ -14,17 +14,20 @@ USocketMoveTracer::USocketMoveTracer()
 
 void USocketMoveTracer::Tick(float DeltaTime)
 {
-	DoTrace(DeltaTime);
+	if (TargetSocketMesh.IsValid())
+	{
+		DoTrace(DeltaTime);
+	}
 }
 
 UWorld* USocketMoveTracer::GetTickableGameObjectWorld() const
 {
-	return TargetSocketMesh ? TargetSocketMesh->GetWorld() : nullptr;
+	return TargetSocketMesh.IsValid() ? TargetSocketMesh->GetWorld() : nullptr;
 }
 
 AActor* USocketMoveTracer::GetOwner() const
 {
-	return TargetSocketMesh ? TargetSocketMesh->GetOwner() : nullptr;
+	return TargetSocketMesh.IsValid() ? TargetSocketMesh->GetOwner() : nullptr;
 }
 
 void USocketMoveTracer::InitSocketMoveTracer(UPrimitiveComponent* TargetComponent)
@@ -71,7 +74,7 @@ void USocketMoveTracer::DoTrace(float DeltaTime)
 
 			TArray<FHitResult> Hits;
 
-			if (UKismetSystemLibrary::SphereTraceMulti(TargetSocketMesh, TraceStart, TraceEnd, StepLength / 2.f, TraceTypeQuery, true, TracedActors, GetDebugType(), Hits, true))
+			if (UKismetSystemLibrary::SphereTraceMulti(TargetSocketMesh.Get(), TraceStart, TraceEnd, StepLength / 2.f, TraceTypeQuery, true, TracedActors, GetDebugType(), Hits, true))
 			{
 				for (const FHitResult& E_Hit : Hits)
 				{
@@ -79,8 +82,8 @@ void USocketMoveTracer::DoTrace(float DeltaTime)
 					{
 						TracedInOnceTraceActor.Add(E_Hit.GetActor());
 						TracedActors.Add(E_Hit.GetActor());
-						OnTraceActor.ExecuteIfBound(TargetSocketMesh, TraceSocketList[i], E_Hit.GetActor(), E_Hit.GetComponent(), E_Hit);
-						OnTraceActorNative.ExecuteIfBound(TargetSocketMesh, TraceSocketList[i], E_Hit.GetActor(), E_Hit.GetComponent(), E_Hit);
+						OnTraceActor.ExecuteIfBound(TargetSocketMesh.Get(), TraceSocketList[i], E_Hit.GetActor(), E_Hit.GetComponent(), E_Hit);
+						OnTraceActorNative.ExecuteIfBound(TargetSocketMesh.Get(), TraceSocketList[i], E_Hit.GetActor(), E_Hit.GetComponent(), E_Hit);
 					}
 				}
 			}

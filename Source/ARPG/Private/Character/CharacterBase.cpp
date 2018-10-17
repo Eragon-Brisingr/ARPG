@@ -236,7 +236,7 @@ void ACharacterBase::MulticastPlayMontage_Implementation(UAnimMontage * MontageT
 
 void ACharacterBase::MulticastPlayMontageSkipOwner_Implementation(UAnimMontage * MontageToPlay, float InPlayRate /*= 1.f*/, FName StartSectionName /*= NAME_None*/)
 {
-	if (IsLocallyControlled() || GetMesh()->GetAnimInstance()->Montage_IsPlaying(MontageToPlay) == false)
+	if (IsLocallyControlled() == false || GetMesh()->GetAnimInstance()->Montage_IsPlaying(MontageToPlay) == false)
 	{
 		PlayMontageImpl(MontageToPlay, InPlayRate, StartSectionName);
 	}

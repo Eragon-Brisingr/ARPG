@@ -188,11 +188,6 @@ void UARPG_Human_WeaponTrace::NotifyEnd(USkeletalMeshComponent * MeshComp, UAnim
 
 void UARPG_Human_PullOutArrow::NotifyBegin(USkeletalMeshComponent * MeshComp, UAnimSequenceBase * Animation, float TotalDuration)
 {
-	if (MeshComp->GetOwner()->HasAuthority() == false)
-	{
-		return;
-	}
-
 	if (AHumanBase* Human = Cast<AHumanBase>(MeshComp->GetOwner()))
 	{
 		if (AARPG_WeaponBase* Weapon = bIsLeftWeapon ? Human->LeftWeapon : Human->RightWeapon)
@@ -208,11 +203,6 @@ void UARPG_Human_PullOutArrow::NotifyBegin(USkeletalMeshComponent * MeshComp, UA
 
 void UARPG_Human_PullOutArrow::NotifyEnd(USkeletalMeshComponent * MeshComp, UAnimSequenceBase * Animation)
 {
-	if (MeshComp->GetOwner()->HasAuthority() == false)
-	{
-		return;
-	}
-
 	if (AHumanBase* Human = Cast<AHumanBase>(MeshComp->GetOwner()))
 	{
 		if (AARPG_WeaponBase* Weapon = bIsLeftWeapon ? Human->LeftWeapon : Human->RightWeapon)
@@ -231,11 +221,6 @@ void UARPG_Human_PullOutArrow::NotifyEnd(USkeletalMeshComponent * MeshComp, UAni
 
 void UARPG_Human_PullBow::NotifyTick(USkeletalMeshComponent * MeshComp, UAnimSequenceBase * Animation, float FrameDeltaTime)
 {
-	if (MeshComp->GetOwner()->HasAuthority() == false)
-	{
-		return;
-	}
-
 	if (AHumanBase* Human = Cast<AHumanBase>(MeshComp->GetOwner()))
 	{
 		if (AARPG_WeaponBase* Weapon = bIsLeftWeapon ? Human->LeftWeapon : Human->RightWeapon)
