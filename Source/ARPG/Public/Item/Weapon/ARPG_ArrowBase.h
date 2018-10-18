@@ -58,14 +58,22 @@ public:
 	
 	virtual void PostInitializeComponents() override;
 
-	virtual void NotifyHit(class UPrimitiveComponent* MyComp, AActor* Other, class UPrimitiveComponent* OtherComp, bool bSelfMoved, FVector HitLocation, FVector HitNormal, FVector NormalImpulse, const FHitResult& Hit) override;
-
 	virtual void UseItemImpl_Implementation(class UARPG_ItemCoreBase* ItemCore, class ACharacterBase* ItemOwner, EUseItemInput UseItemInput) const override;
 public:
 	void WhenHitCharacter(USceneComponent* MyComp, AActor* Other, UPrimitiveComponent* OtherComp, const FHitResult& Hit);
+	
+	UFUNCTION()
+	void WhenArrowHitEnvironment(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
 
 	void PostArrowHitOther(UARPG_ProjectileMovementComponent* ProjectileMovementComponent);
 
-	UFUNCTION(BlueprintCallable, Category = "角色|行为")
+	UFUNCTION(Unreliable, NetMulticast, WithValidation)
 	void Launch(float ForceSize);
+	void Launch_Implementation(float ForceSize);
+	bool Launch_Validate(float ForceSize) { return true; }
+
+	void ClientArrowStop();
+
+	virtual void OnRep_AttachmentReplication() override;
+
 };

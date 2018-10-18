@@ -64,7 +64,5 @@ public:
 	//子类停止使用时发生的事件
 	UFUNCTION(BlueprintImplementableEvent, Category = "物品|基础", meta = (DisplayName = "WhenNotUse"))
 	void ReceiveWhenNotUse(class ACharacterBase* ItemOwner);
-public:
-	void SetItemSimulatePhysics(bool bSimulate);
 
 };

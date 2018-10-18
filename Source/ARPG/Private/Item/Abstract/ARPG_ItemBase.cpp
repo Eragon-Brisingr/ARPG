@@ -40,12 +40,4 @@ void AARPG_ItemBase::WhenNotUse(class ACharacterBase* ItemOwner)
 	ReceiveWhenNotUse(ItemOwner);
 }
 
-void AARPG_ItemBase::SetItemSimulatePhysics(bool bSimulate)
-{
-	if (UPrimitiveComponent* Root = Cast<UPrimitiveComponent>(RootComponent))
-	{
-		Root->SetSimulatePhysics(bSimulate);
-	}
-}
-
 #undef LOCTEXT_NAMESPACE

@@ -68,14 +68,37 @@ void AARPG_ArrowBase::PostInitializeComponents()
 	
 }
 
-void AARPG_ArrowBase::NotifyHit(class UPrimitiveComponent* MyComp, AActor* Other, class UPrimitiveComponent* OtherComp, bool bSelfMoved, FVector HitLocation, FVector HitNormal, FVector NormalImpulse, const FHitResult& Hit)
+void AARPG_ArrowBase::UseItemImpl_Implementation(class UARPG_ItemCoreBase* ItemCore, class ACharacterBase* ItemOwner, EUseItemInput UseItemInput) const
 {
-	UARPG_ProjectileMovementComponent* ProjectileMovementComponent = FindComponentByClass<UARPG_ProjectileMovementComponent>();
-	if (ProjectileMovementComponent && ProjectileMovementComponent->IsActive())
+	if (UARPG_ArrowCoreBase* ArrowCore = Cast<UARPG_ArrowCoreBase>(ItemCore))
+	{
+		ItemOwner->EquipArrow(ArrowCore, UseItemInput);
+	}
+}
+
+void AARPG_ArrowBase::WhenHitCharacter(USceneComponent* MyComp, AActor* Other, UPrimitiveComponent* OtherComp, const FHitResult& Hit)
+{
+	if (HasAuthority())
+	{
+		if (ACharacterBase* Character = Cast<ACharacterBase>(Other))
+		{
+			PostArrowHitOther(FindComponentByClass<UARPG_ProjectileMovementComponent>());
+
+			Character->ApplyPointDamage(50.f, 5.f, GetVelocity().GetSafeNormal(), Hit, GetItemOwner(), this, nullptr, nullptr);
+
+			SetActorLocation(Hit.Location);
+			GetRootComponent()->AttachToComponent(Hit.GetComponent(), FAttachmentTransformRules::KeepWorldTransform, Hit.BoneName);
+		}
+	}
+}
+
+void AARPG_ArrowBase::WhenArrowHitEnvironment(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
+{
+	if (UARPG_ProjectileMovementComponent* ProjectileMovementComponent = FindComponentByClass<UARPG_ProjectileMovementComponent>())
 	{
 		PostArrowHitOther(ProjectileMovementComponent);
 
-		if (AARPG_ArrowBase* Arrow = Cast<AARPG_ArrowBase>(Other))
+		if (AARPG_ArrowBase* Arrow = Cast<AARPG_ArrowBase>(OtherActor))
 		{
 			//把扎进物体里里的箭插深点
 			if (AActor* ParentActor = Arrow->GetAttachParentActor())
@@ -86,11 +109,14 @@ void AARPG_ArrowBase::NotifyHit(class UPrimitiveComponent* MyComp, AActor* Other
 				Arrow->AddActorWorldOffset(Velocity.GetSafeNormal() * FMath::GetMappedRangeValueClamped({ 0.f, 3000.f }, { 0.f, 50.f }, Velocity.Size()));
 
 				//假如扎在角色身上，则造成伤害
-				if (ACharacterBase* Character = Cast<ACharacterBase>(ParentActor))
+				if (HasAuthority())
 				{
-					FHitResult ArrowTraceRes;
-					bool TraceSucceed = Character->ActorLineTraceSingle(ArrowTraceRes, Arrow->GetActorLocation(), Arrow->GetActorLocation() + Arrow->GetActorForwardVector() * 100.f, ECC_Visibility, FCollisionQueryParams(NAME_None, true));
-					Character->ApplyPointDamage(50.f, 5.f, GetVelocity().GetSafeNormal(), TraceSucceed ? ArrowTraceRes : Hit, GetItemOwner(), this, nullptr, nullptr);
+					if (ACharacterBase* Character = Cast<ACharacterBase>(ParentActor))
+					{
+						FHitResult ArrowTraceRes;
+						bool TraceSucceed = Character->ActorLineTraceSingle(ArrowTraceRes, Arrow->GetActorLocation(), Arrow->GetActorLocation() + Arrow->GetActorForwardVector() * 100.f, ECC_Visibility, FCollisionQueryParams(NAME_None, true));
+						Character->ApplyPointDamage(50.f, 5.f, GetVelocity().GetSafeNormal(), TraceSucceed ? ArrowTraceRes : Hit, GetItemOwner(), this, nullptr, nullptr);
+					}
 				}
 			}
 		}
@@ -102,41 +128,43 @@ void AARPG_ArrowBase::NotifyHit(class UPrimitiveComponent* MyComp, AActor* Other
 	}
 }
 
-void AARPG_ArrowBase::UseItemImpl_Implementation(class UARPG_ItemCoreBase* ItemCore, class ACharacterBase* ItemOwner, EUseItemInput UseItemInput) const
-{
-	if (UARPG_ArrowCoreBase* ArrowCore = Cast<UARPG_ArrowCoreBase>(ItemCore))
-	{
-		ItemOwner->EquipArrow(ArrowCore, UseItemInput);
-	}
-}
-
-void AARPG_ArrowBase::WhenHitCharacter(USceneComponent* MyComp, AActor* Other, UPrimitiveComponent* OtherComp, const FHitResult& Hit)
-{
-	if (ACharacterBase* Character = Cast<ACharacterBase>(Other))
-	{
-		PostArrowHitOther(FindComponentByClass<UARPG_ProjectileMovementComponent>());
-
-		Character->ApplyPointDamage(50.f, 5.f, GetVelocity().GetSafeNormal(), Hit, GetItemOwner(), this, nullptr, nullptr);
-
-		SetActorLocation(Hit.Location);
-		GetRootComponent()->AttachToComponent(Hit.GetComponent(), FAttachmentTransformRules::KeepWorldTransform, Hit.BoneName);
-	}
-}
-
 void AARPG_ArrowBase::PostArrowHitOther(UARPG_ProjectileMovementComponent* ProjectileMovementComponent)
 {
 	ProjectileMovementComponent->DestroyComponent();
-	GetRootMeshComponent()->SetCollisionProfileName(FARPG_CollisionProfile::Item);
+	SetItemCollisionProfileName(FARPG_CollisionProfile::Item);
+	GetRootMeshComponent()->OnComponentHit.RemoveDynamic(this, &AARPG_ArrowBase::WhenArrowHitEnvironment);
 }
 
-void AARPG_ArrowBase::Launch(float ForceSize)
+void AARPG_ArrowBase::Launch_Implementation(float ForceSize)
 {
-	UPrimitiveComponent* ArrowRootComponent = GetRootMeshComponent();
-	ArrowRootComponent->SetCollisionProfileName(FARPG_CollisionProfile::ArrowReleasing);
+	if (UPrimitiveComponent* ArrowRootComponent = GetRootMeshComponent())
+	{
+		SetItemCollisionProfileName(FARPG_CollisionProfile::ArrowReleasing);
 
-	UARPG_ProjectileMovementComponent* ProjectileMovementComponent = UARPG_ActorFunctionLibrary::AddComponent<UARPG_ProjectileMovementComponent>(this, TEXT("弓箭移动组件"));
-	ProjectileMovementComponent->IgnoreActors.Add(GetItemOwner());
-	ProjectileMovementComponent->Activate(true);
-	ProjectileMovementComponent->OnTraceActorNative.BindUObject(this, &AARPG_ArrowBase::WhenHitCharacter);
-	ProjectileMovementComponent->Velocity = GetActorForwardVector() * ForceSize;
+		UARPG_ProjectileMovementComponent* ProjectileMovementComponent = UARPG_ActorFunctionLibrary::AddComponent<UARPG_ProjectileMovementComponent>(this, TEXT("弓箭移动组件"));
+		ProjectileMovementComponent->IgnoreActors.Add(GetItemOwner());
+		ProjectileMovementComponent->Activate(true);
+		ProjectileMovementComponent->OnTraceActorNative.BindUObject(this, &AARPG_ArrowBase::WhenHitCharacter);
+
+		ProjectileMovementComponent->Velocity = GetActorForwardVector() * ForceSize;
+		ArrowRootComponent->OnComponentHit.AddDynamic(this, &AARPG_ArrowBase::WhenArrowHitEnvironment);
+	}
+}
+
+void AARPG_ArrowBase::ClientArrowStop()
+{
+	if (UARPG_ProjectileMovementComponent* ProjectileMovementComponent = FindComponentByClass<UARPG_ProjectileMovementComponent>())
+	{
+		PostArrowHitOther(ProjectileMovementComponent);
+	}
+}
+
+void AARPG_ArrowBase::OnRep_AttachmentReplication()
+{
+	Super::OnRep_AttachmentReplication();
+
+	if (GetAttachmentReplication().AttachParent)
+	{
+		ClientArrowStop();
+	}
 }
