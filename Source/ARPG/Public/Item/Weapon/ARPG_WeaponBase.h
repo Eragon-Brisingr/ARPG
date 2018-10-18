@@ -45,12 +45,6 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "物品|武器", AdvancedDisplay, meta = (DisplayName = "持武器模式"))
 	EWeaponUseType WeaponUseType = EWeaponUseType::SingleHand;
 
-	UPROPERTY(EditDefaultsOnly, Category = "物品|武器")
-	FHumanAttackAnimSet LeftWeaponAnimSet;
-	
-	UPROPERTY(EditDefaultsOnly, Category = "物品|武器")
-	FHumanAttackAnimSet RightWeaponAnimSet;
-
 	UPROPERTY(VisibleAnywhere, Category = "物品", Instanced)
 	class USocketMoveTracer* SocketMoveTracer;
 
@@ -89,4 +83,13 @@ public:
 	void ReceiveWhenInWeaponBack();
 
 	void AttachWeaponTo(class USceneComponent* InParent, FName InSocketName);
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "动画", Instanced)
+	class UARPG_AttackAnimSetBase* AttackAnimSet;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "动画")
+	FARPG_MontageParameter DodogeForwardLeftAttack;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "动画")
+	FARPG_MontageParameter DodogeForwardRightAttack;
 };

@@ -45,4 +45,8 @@ public:
 	bool IsPressed(int32 InputType) const;
 
 	bool IsReleased(int32 InputType) const;
+
+	bool IsAnyPressed(int32 InputType) const;
+
+	bool IsAllReleased(int32 InputType) const;
 };
