@@ -114,6 +114,20 @@ public:
 	virtual FString GetNotifyName_Implementation() const override;
 };
 
+UCLASS(meta = (DisplayName = "动画_覆盖瞄准偏移"))
+class ARPG_API UARPG_SetAimOffsetOverride : public UAnimNotifyState
+{
+	GENERATED_BODY()
+public:
+	UPROPERTY(EditAnywhere, Category = "动画")
+	class UAimOffsetBlendSpace* AimOffsetOverride;
+
+	virtual void NotifyBegin(USkeletalMeshComponent * MeshComp, UAnimSequenceBase * Animation, float TotalDuration) override;
+	virtual void NotifyEnd(USkeletalMeshComponent * MeshComp, UAnimSequenceBase * Animation) override;
+
+	virtual FString GetNotifyName_Implementation() const override;
+};
+
 UCLASS(meta = (DisplayName = "人类_武器位置"))
 class ARPG_API UARPG_Human_TakeWeaponPos : public UAnimNotify
 {

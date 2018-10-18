@@ -96,7 +96,7 @@ public:
 
 	virtual bool CanLockingOnTarget_Implementation(AController* Invoker, const FName& CurLockSocketName, bool& TryLockAgain) const override;
 
-	//播放Montage
+	//动画
 public:
 	UFUNCTION(BlueprintCallable, Category = "角色|行为")
 	float PlayMontage(UAnimMontage * MontageToPlay, float InPlayRate = 1.f, FName StartSectionName = NAME_None, bool ClientMaster = true);
@@ -131,6 +131,9 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "角色|行为")
 	bool CanPlayFullBodyMontage() const;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "角色", AdvancedDisplay)
+	class UAimOffsetBlendSpace* AimOffsetOverride;
 
 	//背包相关
 public:
