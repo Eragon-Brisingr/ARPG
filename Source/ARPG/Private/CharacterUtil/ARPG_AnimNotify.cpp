@@ -4,6 +4,7 @@
 #include <Components/SkeletalMeshComponent.h>
 #include <Animation/AnimMontage.h>
 #include <Animation/AnimInstance.h>
+#include <Animation/AimOffsetBlendSpace.h>
 #include "CharacterBase.h"
 #include "HumanBase.h"
 #include "ARPG_WeaponBase.h"
@@ -145,6 +146,27 @@ void UARPG_AddToughnessValue::NotifyEnd(USkeletalMeshComponent * MeshComp, UAnim
 FString UARPG_AddToughnessValue::GetNotifyName_Implementation() const
 {
 	return FString::Printf(TEXT("增加强韧度[%s]"), *FString::SanitizeFloat(AddToughnessValue, 0));
+}
+
+void UARPG_SetAimOffsetOverride::NotifyBegin(USkeletalMeshComponent * MeshComp, UAnimSequenceBase * Animation, float TotalDuration)
+{
+	if (ACharacterBase* Character = Cast<ACharacterBase>(MeshComp->GetOwner()))
+	{
+		Character->AimOffsetOverride = AimOffsetOverride;
+	}
+}
+
+void UARPG_SetAimOffsetOverride::NotifyEnd(USkeletalMeshComponent * MeshComp, UAnimSequenceBase * Animation)
+{
+	if (ACharacterBase* Character = Cast<ACharacterBase>(MeshComp->GetOwner()))
+	{
+		Character->AimOffsetOverride = nullptr;
+	}
+}
+
+FString UARPG_SetAimOffsetOverride::GetNotifyName_Implementation() const
+{
+	return FString::Printf(TEXT("瞄准偏移为[%s]"), AimOffsetOverride ? *AimOffsetOverride->GetName() : TEXT("None"));
 }
 
 void UARPG_Human_TakeWeaponPos::Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation)
