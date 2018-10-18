@@ -132,6 +132,16 @@ bool ACharacterBase::ARPG_InputIsReleased(int32 InputType) const
 	return InputBuffer.IsReleased(InputType);
 }
 
+bool ACharacterBase::ARPG_AnyInputIsPressed(int32 InputType) const
+{
+	return InputBuffer.IsAnyPressed(InputType);
+}
+
+bool ACharacterBase::ARPG_AllInputIsReleased(int32 InputType) const
+{
+	return InputBuffer.IsAllReleased(InputType);
+}
+
 void ACharacterBase::InvokeChangeMoveGait(ECharacterGait Gait)
 {
 	if (ARPG_MovementComponent->CurrentGait != Gait)

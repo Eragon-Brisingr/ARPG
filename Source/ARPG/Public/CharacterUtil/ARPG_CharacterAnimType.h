@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include <Kismet/BlueprintFunctionLibrary.h>
+#include <SubclassOf.h>
 #include "ARPG_CharacterAnimType.generated.h"
 
 /**
@@ -67,4 +68,37 @@ class ARPG_API UARPG_AnimFunctionLibrary : public UBlueprintFunctionLibrary
 {
 	GENERATED_BODY()
 public:
+};
+
+UCLASS(editinlinenew, Abstract, collapseCategories)
+class ARPG_API UARPG_AttackAnimSetBase : public UObject
+{
+	GENERATED_BODY()
+public:
+	UFUNCTION(BlueprintCallable, Category = "攻击", BlueprintNativeEvent)
+	void InvokePlay(class ACharacterBase* Character) const;
+	virtual void InvokePlay_Implementation(class ACharacterBase* Character) const {}
+};
+
+UCLASS()
+class ARPG_API UARPG_AttackAnimSetNormal : public UARPG_AttackAnimSetBase
+{
+	GENERATED_BODY()
+public:
+	virtual void InvokePlay_Implementation(class ACharacterBase* Character) const override;
+
+	UPROPERTY(EditAnywhere, Category = "动画")
+	FARPG_MontageParameter LeftLightAttack;
+
+	UPROPERTY(EditAnywhere, Category = "动画")
+	FARPG_MontageParameter LeftHeavyAttack;
+
+	UPROPERTY(EditAnywhere, Category = "动画")
+	FARPG_MontageParameter RightLightAttack;
+
+	UPROPERTY(EditAnywhere, Category = "动画")
+	FARPG_MontageParameter RightHeavyAttack;
+
+	UPROPERTY(EditAnywhere, Category = "动画")
+	FARPG_MontageParameter SprintAttack;
 };

@@ -72,6 +72,12 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "角色|行为")
 	bool ARPG_InputIsReleased(UPARAM(meta = (Bitmask, BitmaskEnum = "EARPG_InputType")) int32 InputType) const;
+
+	UFUNCTION(BlueprintCallable, Category = "角色|行为")
+	bool ARPG_AnyInputIsPressed(UPARAM(meta = (Bitmask, BitmaskEnum = "EARPG_InputType")) int32 InputType) const;
+
+	UFUNCTION(BlueprintCallable, Category = "角色|行为")
+	bool ARPG_AllInputIsReleased(UPARAM(meta = (Bitmask, BitmaskEnum = "EARPG_InputType")) int32 InputType) const;
 	//移动行为
 public:
 	UFUNCTION(BlueprintCallable, Category = "角色|行为")

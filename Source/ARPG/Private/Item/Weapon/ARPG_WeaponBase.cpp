@@ -9,6 +9,7 @@
 #include "ARPG_WeaponCoreBase.h"
 #include "ARPG_Item_Log.h"
 #include "ARPG_Battle_Log.h"
+#include "ARPG_CharacterAnimType.h"
 
 #define LOCTEXT_NAMESPACE "ARPG_Item"
 
@@ -16,8 +17,11 @@ AARPG_WeaponBase::AARPG_WeaponBase(const FObjectInitializer& ObjectInitializer)
 	:Super(ObjectInitializer.SetDefaultSubobjectClass<UARPG_WeaponCoreBase>(GET_MEMBER_NAME_CHECKED(AARPG_WeaponBase, InnerItemCore)))
 {
 	SocketMoveTracer = CreateDefaultSubobject<USocketMoveTracer>(GET_MEMBER_NAME_CHECKED(AARPG_WeaponBase, SocketMoveTracer));
+	{
+		SocketMoveTracer->OnTraceActorNative.BindUObject(this, &AARPG_WeaponBase::OnTracedActor);
+	}
 
-	SocketMoveTracer->OnTraceActorNative.BindUObject(this, &AARPG_WeaponBase::OnTracedActor);
+	AttackAnimSet = CreateDefaultSubobject<UARPG_AttackAnimSetNormal>(GET_MEMBER_NAME_CHECKED(AARPG_WeaponBase, AttackAnimSet));
 }
 
 void AARPG_WeaponBase::UseItemImpl_Implementation(class UARPG_ItemCoreBase* ItemCore, class ACharacterBase* ItemOwner, EUseItemInput UseItemInput) const
