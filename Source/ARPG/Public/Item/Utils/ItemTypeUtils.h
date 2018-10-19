@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "UObject/NoExportTypes.h"
+#include "XD_ItemType.h"
 #include "ItemTypeUtils.generated.h"
 
 /**
@@ -23,3 +23,10 @@ enum class EUseItemInput :uint8
 	RightMouse
 };
 
+USTRUCT(BlueprintType)
+struct ARPG_API FARPG_Item : public FXD_Item
+{
+	GENERATED_BODY()
+public:
+	FARPG_Item();
+};

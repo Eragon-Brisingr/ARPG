@@ -18,6 +18,16 @@
 				"XD_ItemSystem",
 				"XD_UnrealLibraryEx"
 			]
+		},
+		{
+			"Name": "ARPG_Editor",
+			"Type": "Editor",
+			"LoadingPhase": "PostEngineInit",
+			"AdditionalDependencies": [
+				"CoreUObject",
+				"UnrealEd",
+				"BlueprintGraph"
+			]
 		}
 	]
 }

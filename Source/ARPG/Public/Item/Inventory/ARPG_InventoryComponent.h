@@ -14,6 +14,10 @@ class ARPG_API UARPG_InventoryComponent : public UXD_InventoryComponentBase
 {
 	GENERATED_BODY()
 
+public:
+	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly, Category = "背包")
+	void AddItemArray(const TArray<FARPG_Item>& Items);
+
 	//金钱相关
 public:
 	bool TradeItem(int32 DeductMoney, UARPG_InventoryComponent* OtherInventory, class UARPG_ItemCoreBase* ItemCore, int32 Number);

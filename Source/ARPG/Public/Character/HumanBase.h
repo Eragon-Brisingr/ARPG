@@ -24,7 +24,7 @@ public:
 
 	virtual void WhenGameInit_Implementation() override;
 
-	virtual TArray<struct FXD_Item> GetInitItemList() const override;
+	virtual TArray<struct FARPG_Item> GetInitItemList() const override;
 
 	virtual class AARPG_WeaponBase* EquipWaepon_Implementation(class UARPG_WeaponCoreBase* WeaponCore, EUseItemInput UseItemInput) override;
 
@@ -33,16 +33,16 @@ public:
 	virtual class AARPG_EquipmentBase* EquipEquipment_Implementation(class UARPG_EquipmentCoreBase* EquipmentCore, EUseItemInput UseItemInput) override;
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "角色|配置|常用", meta = (DisplayName = "默认左手武器", ExposeOnSpawn = "True"), SaveGame)
-	FXD_Item DefaultLeftWeapon;
+	FARPG_Item DefaultLeftWeapon;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "角色|配置|常用", meta = (DisplayName = "默认右手武器", ExposeOnSpawn = "True"), SaveGame)
-	FXD_Item DefaultRightWeapon;
+	FARPG_Item DefaultRightWeapon;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "角色|配置|常用", meta = (DisplayName = "默认箭", ExposeOnSpawn = "True"), SaveGame)
-	FXD_Item DefaultArrow;
+	FARPG_Item DefaultArrow;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "角色|配置|常用", meta = (DisplayName = "默认装备列表", ExposeOnSpawn = "True"), SaveGame)
-	TArray<FXD_Item> DefaultEquipmentList;
+	TArray<FARPG_Item> DefaultEquipmentList;
 	
 	//装备相关
 public:

@@ -61,7 +61,7 @@ void AHumanBase::WhenGameInit_Implementation()
 		UseItemImmediately(ArrowCore);
 	}
 
-	for (const FXD_Item& DefaultEquipment : DefaultEquipmentList)
+	for (const FARPG_Item& DefaultEquipment : DefaultEquipmentList)
 	{
 		if (UARPG_ItemCoreBase* EquipmentCore = Cast<UARPG_ItemCoreBase>(DefaultEquipment.ItemCore))
 		{
@@ -70,9 +70,9 @@ void AHumanBase::WhenGameInit_Implementation()
 	}
 }
 
-TArray<struct FXD_Item> AHumanBase::GetInitItemList() const
+TArray<struct FARPG_Item> AHumanBase::GetInitItemList() const
 {
-	TArray<FXD_Item> Res = Super::GetInitItemList();
+	TArray<FARPG_Item> Res = Super::GetInitItemList();
 	if (DefaultLeftWeapon)
 	{
 		Res.Add(DefaultLeftWeapon);
@@ -85,7 +85,7 @@ TArray<struct FXD_Item> AHumanBase::GetInitItemList() const
 	{
 		Res.Add(DefaultArrow);
 	}
-	for (const FXD_Item& DefaultEquipment : DefaultEquipmentList)
+	for (const FARPG_Item& DefaultEquipment : DefaultEquipmentList)
 	{
 		if (DefaultEquipment)
 		{

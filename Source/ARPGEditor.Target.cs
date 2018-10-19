@@ -9,6 +9,6 @@ public class ARPGEditorTarget : TargetRules
 	{
 		Type = TargetType.Editor;
 
-		ExtraModuleNames.AddRange( new string[] { "ARPG" } );
+		ExtraModuleNames.AddRange( new string[] { "ARPG", "ARPG_Editor" } );
 	}
 }

@@ -38,9 +38,9 @@ public:
 public:
 	virtual void WhenGameInit_Implementation() override;
 
-	virtual TArray<struct FXD_Item> GetInitItemList() const;
+	virtual TArray<struct FARPG_Item> GetInitItemList() const;
 	UFUNCTION(BlueprintImplementableEvent, Category = "角色|初始化")
-	TArray<struct FXD_Item> ReceivedGetInitItemList() const;
+	TArray<struct FARPG_Item> ReceivedGetInitItemList() const;
 
 	//重生用
 public:

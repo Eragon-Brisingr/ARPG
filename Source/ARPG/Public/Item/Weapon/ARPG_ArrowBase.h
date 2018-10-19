@@ -49,7 +49,7 @@ public:
 /**
  * 
  */
-UCLASS()
+UCLASS(Abstract)
 class ARPG_API AARPG_ArrowBase : public AARPG_WeaponBase
 {
 	GENERATED_BODY()
