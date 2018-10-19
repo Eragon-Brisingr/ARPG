@@ -15,6 +15,7 @@
 #include <Kismet/KismetMathLibrary.h>
 #include "ARPG_DebugFunctionLibrary.h"
 #include "ARPG_LevelFunctionLibrary.h"
+#include "XD_TemplateLibrary.h"
 
 
 // Sets default values
@@ -63,14 +64,14 @@ void ACharacterBase::WhenGameInit_Implementation()
 	//初始化道具和使用中的道具
 	{
 		TArray<UARPG_ItemCoreBase*> RemoveItems;
-		TArray<FXD_Item> FinalInitItemList = GetInitItemList();
+		TArray<FARPG_Item> FinalInitItemList = GetInitItemList();
 		//对已存在的进行数量修改
 		for (UARPG_ItemCoreBase* ItemCore : Inventory->GetItemCoreList())
 		{
-			if (const FXD_Item* Item = FinalInitItemList.FindByPredicate([ItemCore](const FXD_Item& E_Item) {return ItemCore->EqualForItemCore(E_Item.ItemCore); }))
+			if (const FARPG_Item* Item = FinalInitItemList.FindByPredicate([ItemCore](const FARPG_Item& E_Item) {return ItemCore->EqualForItemCore(E_Item.ItemCore); }))
 			{
 				ItemCore->Number = Item->ItemCore->Number;
-				FinalInitItemList.RemoveAll([&](const FXD_Item& E) {return E->EqualForItemCore(ItemCore); });
+				FinalInitItemList.RemoveAll([&](const FARPG_Item& E) {return E->EqualForItemCore(ItemCore); });
 			}
 			else
 			{
@@ -94,10 +95,10 @@ void ACharacterBase::WhenGameInit_Implementation()
 	}
 }
 
-TArray<struct FXD_Item> ACharacterBase::GetInitItemList() const
+TArray<struct FARPG_Item> ACharacterBase::GetInitItemList() const
 {
-	TArray<FXD_Item> Res = ReceivedGetInitItemList();
-	Res.Append(Inventory->InitItems);
+	TArray<FARPG_Item> Res = ReceivedGetInitItemList();
+	Res.Append(ArrayCast<FARPG_Item>(Inventory->InitItems));
 	return Res;
 }
 

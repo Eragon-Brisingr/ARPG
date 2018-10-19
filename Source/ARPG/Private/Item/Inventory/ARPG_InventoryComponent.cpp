@@ -9,6 +9,11 @@
 
 #define LOCTEXT_NAMESPACE "ARPG_Item"
 
+void UARPG_InventoryComponent::AddItemArray(const TArray<FARPG_Item>& Items)
+{
+	UXD_InventoryComponentBase::AddItemArray(ArrayCast<FXD_Item>(Items));
+}
+
 bool UARPG_InventoryComponent::TradeItem(int32 DeductMoney, UARPG_InventoryComponent* OtherInventory, class UARPG_ItemCoreBase* ItemCore, int32 Number)
 {
 	TArray<class UARPG_ItemCoreBase*> SpendedMoneys;
