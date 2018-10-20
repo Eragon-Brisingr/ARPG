@@ -7,54 +7,10 @@
 #include "ARPG_CollisionType.h"
 #include "CharacterBase.h"
 #include "ARPG_ActorFunctionLibrary.h"
+#include "HumanBase.h"
+#include "ARPG_ProjectileMovementComponent.h"
 
 
-UARPG_ProjectileMovementComponent::UARPG_ProjectileMovementComponent()
-	:ObjectTypes{ FARPG_CollisionObjectType::CharacterMesh }
-{
-	bRotationFollowsVelocity = true;
-}
-
-void UARPG_ProjectileMovementComponent::BeginPlay()
-{
-	Super::BeginPlay();
-
-	IgnoreActors.Add(GetOwner());
-}
-
-void UARPG_ProjectileMovementComponent::TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction *ThisTickFunction)
-{
-	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-	if (bIsActive && UpdatedComponent)
-	{
-		FHitResult TraceResult;
-		FVector End = UpdatedComponent->GetComponentTransform().TransformPosition(TraceOriginOffet);
-
-		if (UKismetSystemLibrary::SphereTraceSingleForObjects(UpdatedComponent, PreLocation, End, Radius, ObjectTypes, false, IgnoreActors, DrawDebugType, TraceResult, false))
-		{
-			if (OnTraceActorNative.IsBound())
-			{
-				OnTraceActorNative.Execute(UpdatedComponent, TraceResult.GetActor(), TraceResult.GetComponent(), TraceResult);
-			}
-		}
-		PreLocation = End;
-	}
-}
-
-void UARPG_ProjectileMovementComponent::Activate(bool bReset /*= false*/)
-{
-	if (UpdatedComponent != GetOwner()->GetRootComponent())
-	{
-		SetUpdatedComponent(GetOwner()->GetRootComponent());
-	}
-	Super::Activate(bReset);
-	PreLocation = UpdatedComponent->GetComponentLocation();
-}
-
-void UARPG_ProjectileMovementComponent::Deactivate()
-{
-	Super::Deactivate();
-}
 
 AARPG_ArrowBase::AARPG_ArrowBase(const FObjectInitializer& ObjectInitializer /*= FObjectInitializer::Get()*/)
 	:Super(ObjectInitializer.SetDefaultSubobjectClass<UARPG_ArrowCoreBase>(GET_MEMBER_NAME_CHECKED(AARPG_ArrowBase, InnerItemCore)))
@@ -73,6 +29,17 @@ void AARPG_ArrowBase::UseItemImpl_Implementation(class UARPG_ItemCoreBase* ItemC
 	if (UARPG_ArrowCoreBase* ArrowCore = Cast<UARPG_ArrowCoreBase>(ItemCore))
 	{
 		ItemOwner->EquipArrow(ArrowCore, UseItemInput);
+	}
+}
+
+void AARPG_ArrowBase::WhenRemoveFromInventory_Implementation(class AActor* ItemOwner, class UXD_ItemCoreBase* ItemCore, int32 RemoveNumber, int32 ExistNumber) const
+{
+	if (ExistNumber <= 0)
+	{
+		if (AHumanBase* Human = Cast<AHumanBase>(ItemOwner))
+		{
+			Human->SetArrow(nullptr);
+		}
 	}
 }
 

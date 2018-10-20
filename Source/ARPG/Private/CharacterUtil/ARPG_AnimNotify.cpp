@@ -263,7 +263,7 @@ void UARPG_Human_LaunchArrow::Notify(USkeletalMeshComponent* MeshComp, UAnimSequ
 		{
 			if (AARPG_BowBase* Bow = Cast<AARPG_BowBase>(Weapon))
 			{
-				Bow->LaunchArrow();
+				Bow->LaunchArrow(FullBowTime);
 			}
 		}
 	}
