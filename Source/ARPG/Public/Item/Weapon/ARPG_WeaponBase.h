@@ -52,7 +52,7 @@ public:
 public:
 	void SetEnableNearAttackTrace(bool Enable);
 
-	void OnTracedActor(UPrimitiveComponent* HitComponent, const FName& SocketName, AActor* OtherActor, UPrimitiveComponent* OtherComp, const FHitResult& TraceResult);
+	void WhenAttackTracedActor(UPrimitiveComponent* HitComponent, const FName& SocketName, AActor* OtherActor, UPrimitiveComponent* OtherComp, const FHitResult& TraceResult);
 
 	TSubclassOf<class UReceiveDamageActionBase> ReceiveDamageAction;
 
@@ -61,6 +61,10 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "武器|行为")
 	bool TraceForExecuteOther();
+
+	void SetEnableFallingAttackTrace(bool Enable);
+
+	void WhenFallingAttackTracedActor(UPrimitiveComponent* HitComponent, const FName& SocketName, AActor* OtherActor, UPrimitiveComponent* OtherComp, const FHitResult& TraceResult);
 
 	//持武器方式
 public:

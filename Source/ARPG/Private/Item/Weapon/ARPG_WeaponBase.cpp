@@ -18,7 +18,7 @@ AARPG_WeaponBase::AARPG_WeaponBase(const FObjectInitializer& ObjectInitializer)
 {
 	SocketMoveTracer = CreateDefaultSubobject<USocketMoveTracer>(GET_MEMBER_NAME_CHECKED(AARPG_WeaponBase, SocketMoveTracer));
 	{
-		SocketMoveTracer->OnTraceActorNative.BindUObject(this, &AARPG_WeaponBase::OnTracedActor);
+		SocketMoveTracer->OnTraceActorNative.BindUObject(this, &AARPG_WeaponBase::WhenAttackTracedActor);
 	}
 
 	AttackAnimSet = CreateDefaultSubobject<UARPG_AttackAnimSetNormal>(GET_MEMBER_NAME_CHECKED(AARPG_WeaponBase, AttackAnimSet));
@@ -82,10 +82,14 @@ void AARPG_WeaponBase::PostInitializeComponents()
 
 void AARPG_WeaponBase::SetEnableNearAttackTrace(bool Enable)
 {
+	if (Enable)
+	{
+		SocketMoveTracer->OnTraceActorNative.BindUObject(this, &AARPG_WeaponBase::WhenAttackTracedActor);
+	}
 	SocketMoveTracer->SetEnableTrace(Enable);
 }
 
-void AARPG_WeaponBase::OnTracedActor(UPrimitiveComponent* HitComponent, const FName& SocketName, AActor* OtherActor, UPrimitiveComponent* OtherComp, const FHitResult& TraceResult)
+void AARPG_WeaponBase::WhenAttackTracedActor(UPrimitiveComponent* HitComponent, const FName& SocketName, AActor* OtherActor, UPrimitiveComponent* OtherComp, const FHitResult& TraceResult)
 {
 	if (OtherActor != GetItemOwner())
 	{
@@ -107,6 +111,20 @@ void AARPG_WeaponBase::OnTracedActor(UPrimitiveComponent* HitComponent, const FN
 bool AARPG_WeaponBase::TraceForExecuteOther()
 {
 	return ExecuteActionSet.TraceForExecuteOther(GetItemOwner());
+}
+
+void AARPG_WeaponBase::SetEnableFallingAttackTrace(bool Enable)
+{
+	if (Enable)
+	{
+		SocketMoveTracer->OnTraceActorNative.BindUObject(this, &AARPG_WeaponBase::WhenFallingAttackTracedActor);
+	}
+	SocketMoveTracer->SetEnableTrace(Enable);
+}
+
+void AARPG_WeaponBase::WhenFallingAttackTracedActor(UPrimitiveComponent* HitComponent, const FName& SocketName, AActor* OtherActor, UPrimitiveComponent* OtherComp, const FHitResult& TraceResult)
+{
+	WhenAttackTracedActor(HitComponent, SocketName, OtherActor, OtherComp, TraceResult);
 }
 
 void AARPG_WeaponBase::WhenInHand()
