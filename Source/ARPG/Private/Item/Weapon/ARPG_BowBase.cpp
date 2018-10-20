@@ -5,6 +5,8 @@
 #include "ARPG_BowCoreBase.h"
 #include "HumanBase.h"
 #include "ARPG_ArrowBase.h"
+#include "CharacterBase.h"
+#include "ARPG_InventoryComponent.h"
 
 
 
@@ -27,12 +29,20 @@ void AARPG_BowBase::SpawnArrowInHand()
 	}
 }
 
-void AARPG_BowBase::LaunchArrow()
+void AARPG_BowBase::LaunchArrow(float FullBowTime)
 {
 	if (HoldingArrow)
 	{
+		if (HasAuthority())
+		{
+			if (ACharacterBase* Character = GetItemOwner())
+			{
+				Character->Inventory->RemoveItemCore(HoldingArrow->GetItemCore());
+			}
+		}
+
 		HoldingArrow->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
-		HoldingArrow->Launch(3000.f);
+		HoldingArrow->Launch(FMath::GetMappedRangeValueClamped({ 0.f, FullBowTime }, { 500.f, 3000.f }, HoldingTime));
 
 		HoldingArrow = nullptr;
 	}

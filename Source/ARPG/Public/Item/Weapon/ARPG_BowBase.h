@@ -23,5 +23,5 @@ public:
 	
 	void SpawnArrowInHand();
 
-	void LaunchArrow();
+	void LaunchArrow(float FullBowTime);
 };

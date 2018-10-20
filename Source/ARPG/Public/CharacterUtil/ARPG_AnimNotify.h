@@ -22,13 +22,13 @@ public:
 		bIsNativeBranchingPoint = true;
 	}
 
-	UPROPERTY(EditAnywhere, Category = "动画")
+	UPROPERTY(EditAnywhere, Category = "动画", meta = (DisplayName = "跳转的蒙太奇"))
 	class UAnimMontage* Montage;
 
-	UPROPERTY(EditAnywhere, Category = "动画")
+	UPROPERTY(EditAnywhere, Category = "动画", meta = (DisplayName = "跳转片段名"))
 	FName StartSectionName;
 
-	UPROPERTY(EditAnywhere, Category = "动画")
+	UPROPERTY(EditAnywhere, Category = "动画", meta = (DisplayName = "客户端主导"))
 	uint8 bClientMaster : 1;
 
 	virtual void Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation) override;
@@ -45,19 +45,19 @@ public:
 		:bClientMaster(true)
 	{}
 
-	UPROPERTY(EditAnywhere, Category = "动画")
+	UPROPERTY(EditAnywhere, Category = "动画", meta = (DisplayName = "判断松开状态"))
 	uint8 bIsReleased : 1;
 
-	UPROPERTY(EditAnywhere, meta = (Bitmask, BitmaskEnum = "EARPG_InputType"), Category = "动画")
+	UPROPERTY(EditAnywhere, meta = (Bitmask, BitmaskEnum = "EARPG_InputType"), Category = "动画", meta = (DisplayName = "输入类型"))
 	int32 InputType;
 
-	UPROPERTY(EditAnywhere, Category = "动画")
+	UPROPERTY(EditAnywhere, Category = "动画", meta = (DisplayName = "跳转的蒙太奇"))
 	class UAnimMontage* Montage;
 	
-	UPROPERTY(EditAnywhere, Category = "动画")
+	UPROPERTY(EditAnywhere, Category = "动画", meta = (DisplayName = "跳转片段名"))
 	FName StartSectionName;
 
-	UPROPERTY(EditAnywhere, Category = "动画")
+	UPROPERTY(EditAnywhere, Category = "动画", meta = (DisplayName = "客户端主导"))
 	uint8 bClientMaster : 1;
 
 	virtual void NotifyBegin(USkeletalMeshComponent * MeshComp, UAnimSequenceBase * Animation, float TotalDuration) override;
@@ -138,7 +138,7 @@ public:
 		bIsNativeBranchingPoint = true;
 	}
 
-	UPROPERTY(EditAnywhere, Category = "武器位置")
+	UPROPERTY(EditAnywhere, Category = "武器位置", meta = (DisplayName = "为左手武器"))
 	uint8 bPullOutWeapon : 1;
 
 	virtual void Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation) override;
@@ -149,10 +149,10 @@ class ARPG_API UARPG_Human_WeaponTrace : public UAnimNotifyState
 {
 	GENERATED_BODY()
 public:
-	UPROPERTY(EditAnywhere, Category = "攻击")
+	UPROPERTY(EditAnywhere, Category = "攻击", meta = (DisplayName = "为左手武器"))
 	uint8 bIsLeftWeapon : 1;
 
-	UPROPERTY(EditAnywhere, Category = "攻击")
+	UPROPERTY(EditAnywhere, Category = "攻击", meta = (DisplayName = "特殊受击动作"))
 	TSubclassOf<class UReceiveDamageActionBase> ReceiveDamageAction;
 
 	virtual void NotifyBegin(USkeletalMeshComponent * MeshComp, UAnimSequenceBase * Animation, float TotalDuration) override;
@@ -164,7 +164,7 @@ class ARPG_API UARPG_Human_PullOutArrow : public UAnimNotifyState
 {
 	GENERATED_BODY()
 public:
-	UPROPERTY(EditAnywhere, Category = "攻击")
+	UPROPERTY(EditAnywhere, Category = "攻击", meta = (DisplayName = "为左手武器"))
 	uint8 bIsLeftWeapon : 1;
 
 	virtual void NotifyBegin(USkeletalMeshComponent * MeshComp, UAnimSequenceBase * Animation, float TotalDuration) override;
@@ -176,7 +176,7 @@ class ARPG_API UARPG_Human_PullBow : public UAnimNotifyState
 {
 	GENERATED_BODY()
 public:
-	UPROPERTY(EditAnywhere, Category = "攻击")
+	UPROPERTY(EditAnywhere, Category = "攻击", meta = (DisplayName = "为左手武器"))
 	uint8 bIsLeftWeapon : 1;
 
 	virtual void NotifyTick(USkeletalMeshComponent * MeshComp, UAnimSequenceBase * Animation, float FrameDeltaTime) override;
@@ -192,8 +192,11 @@ public:
 		bIsNativeBranchingPoint = true;
 	}
 
-	UPROPERTY(EditAnywhere, Category = "攻击")
+	UPROPERTY(EditAnywhere, Category = "攻击", meta = (DisplayName = "为左手武器"))
 	uint8 bIsLeftWeapon : 1;
+
+	UPROPERTY(EditAnywhere, Category = "攻击", meta = (DisplayName = "拉满弓所需时间"))
+	float FullBowTime = 2.f;
 
 	virtual void Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation) override;
 };
