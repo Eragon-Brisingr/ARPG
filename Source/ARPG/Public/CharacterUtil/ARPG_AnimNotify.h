@@ -159,6 +159,18 @@ public:
 	virtual void NotifyEnd(USkeletalMeshComponent * MeshComp, UAnimSequenceBase * Animation) override;
 };
 
+UCLASS(meta = (DisplayName = "人类_下落攻击检测"))
+class ARPG_API UARPG_Human_FallingAttackTrace : public UAnimNotifyState
+{
+	GENERATED_BODY()
+public:
+	UPROPERTY(EditAnywhere, Category = "攻击", meta = (DisplayName = "为左手武器"))
+	uint8 bIsLeftWeapon : 1;
+
+	virtual void NotifyBegin(USkeletalMeshComponent * MeshComp, UAnimSequenceBase * Animation, float TotalDuration) override;
+	virtual void NotifyEnd(USkeletalMeshComponent * MeshComp, UAnimSequenceBase * Animation) override;
+};
+
 UCLASS(meta = (DisplayName = "人类_拔出箭"))
 class ARPG_API UARPG_Human_PullOutArrow : public UAnimNotifyState
 {

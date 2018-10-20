@@ -208,6 +208,28 @@ void UARPG_Human_WeaponTrace::NotifyEnd(USkeletalMeshComponent * MeshComp, UAnim
 	}
 }
 
+void UARPG_Human_FallingAttackTrace::NotifyBegin(USkeletalMeshComponent * MeshComp, UAnimSequenceBase * Animation, float TotalDuration)
+{
+	if (AHumanBase* Human = Cast<AHumanBase>(MeshComp->GetOwner()))
+	{
+		if (AARPG_WeaponBase* Weapon = bIsLeftWeapon ? Human->LeftWeapon : Human->RightWeapon)
+		{
+			Weapon->SetEnableFallingAttackTrace(true);
+		}
+	}
+}
+
+void UARPG_Human_FallingAttackTrace::NotifyEnd(USkeletalMeshComponent * MeshComp, UAnimSequenceBase * Animation)
+{
+	if (AHumanBase* Human = Cast<AHumanBase>(MeshComp->GetOwner()))
+	{
+		if (AARPG_WeaponBase* Weapon = bIsLeftWeapon ? Human->LeftWeapon : Human->RightWeapon)
+		{
+			Weapon->SetEnableFallingAttackTrace(false);
+		}
+	}
+}
+
 void UARPG_Human_PullOutArrow::NotifyBegin(USkeletalMeshComponent * MeshComp, UAnimSequenceBase * Animation, float TotalDuration)
 {
 	if (AHumanBase* Human = Cast<AHumanBase>(MeshComp->GetOwner()))
