@@ -28,7 +28,7 @@ void UARPG_AttackAnimSetNormal::InvokePlay_Implementation(class ACharacterBase* 
 				{
 					if (IsSprinting)
 					{
-						Character->TryPlayMontage(SprintAttack);
+						Character->TryPlayMontage(LeftSprintAttack);
 					}
 					else
 					{
@@ -41,7 +41,14 @@ void UARPG_AttackAnimSetNormal::InvokePlay_Implementation(class ACharacterBase* 
 				}
 				else if (Character->ARPG_InputIsPressed(1 << (uint8)EARPG_InputType::RightLightAttack))
 				{
-					Character->TryPlayMontage(RightLightAttack);
+					if (IsSprinting)
+					{
+						Character->TryPlayMontage(RightSprintAttack);
+					}
+					else
+					{
+						Character->TryPlayMontage(RightLightAttack);
+					}
 				}
 				else if (Character->ARPG_InputIsPressed(1 << (uint8)EARPG_InputType::RightHeavyAttack))
 				{
