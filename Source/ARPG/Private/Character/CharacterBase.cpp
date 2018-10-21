@@ -463,6 +463,7 @@ float ACharacterBase::ApplyPointDamage(float BaseDamage, float AddHitStunValue, 
 		}
 		else
 		{
+			ReceivePlayNormalDamageMontage(FinalReduceValue, HitFromDirection, HitInfo, InstigatorBy, DamageCauser);
 			HitStunOverflowValue = 0.f;
 		}
 	}
