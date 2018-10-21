@@ -100,5 +100,8 @@ public:
 	FARPG_MontageParameter RightHeavyAttack;
 
 	UPROPERTY(EditAnywhere, Category = "动画")
-	FARPG_MontageParameter SprintAttack;
+	FARPG_MontageParameter LeftSprintAttack;
+
+	UPROPERTY(EditAnywhere, Category = "动画")
+	FARPG_MontageParameter RightSprintAttack;
 };
