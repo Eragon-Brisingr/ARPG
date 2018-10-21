@@ -290,9 +290,13 @@ public:
 
 	//播放动画相关
 public:
-	//硬直动画
-	UFUNCTION(BlueprintImplementableEvent, BlueprintAuthorityOnly, Category = "角色|行为")
+	//硬直动画接口，会打断攻击行为
+	UFUNCTION(BlueprintImplementableEvent, BlueprintAuthorityOnly, Category = "角色|行为", meta = (DisplayName = "PlayHitStunMontage"))
 	void ReceivePlayHitStunMontage(float BaseDamage, float HitStunOverflowValue, const FVector& HitFromDirection, const FHitResult& HitResult, class ACharacterBase* InstigatedBy, AActor* DamageCauser);
+
+	//普通状态下的受击动画接口，不会打断攻击行为
+	UFUNCTION(BlueprintImplementableEvent, BlueprintAuthorityOnly, Category = "角色|行为", meta = (DisplayName = "PlayNormalDamageMontage"))
+	void ReceivePlayNormalDamageMontage(float BaseDamage, const FVector& HitFromDirection, const FHitResult& HitResult, class ACharacterBase* InstigatedBy, AActor* DamageCauser);
 public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Character")
 	class UARPG_MovementComponent* ARPG_MovementComponent;
