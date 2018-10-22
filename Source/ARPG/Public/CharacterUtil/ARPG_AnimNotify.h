@@ -12,7 +12,7 @@
 /**
  * 
  */
-UCLASS(meta = (DisplayName = "状态_动画跳转"))
+UCLASS(meta = (DisplayName = "条件_动画跳转"))
 class ARPG_API UARPG_PlayMontageByState : public UAnimNotify
 {
 	GENERATED_BODY()
@@ -35,6 +35,31 @@ public:
 
 	virtual FString GetNotifyName_Implementation() const override;
 };
+
+UCLASS(meta = (DisplayName = "条件_动画跳转"))
+class ARPG_API UARPG_PlayMontageCheckState : public UAnimNotifyState
+{
+	GENERATED_BODY()
+public:
+	UARPG_PlayMontageCheckState() = default;
+
+	UPROPERTY(EditAnywhere, Category = "动画")
+	TSubclassOf<class UARPG_AnimPlayCondition> Condition;
+
+	UPROPERTY(EditAnywhere, Category = "动画", meta = (DisplayName = "跳转的蒙太奇"))
+	class UAnimMontage* Montage;
+
+	UPROPERTY(EditAnywhere, Category = "动画", meta = (DisplayName = "跳转片段名"))
+	FName StartSectionName;
+
+	UPROPERTY(EditAnywhere, Category = "动画", meta = (DisplayName = "客户端主导"))
+	uint8 bClientMaster : 1;
+
+	virtual void NotifyTick(USkeletalMeshComponent * MeshComp, UAnimSequenceBase * Animation, float FrameDeltaTime) override;
+
+	virtual FString GetNotifyName_Implementation() const override;
+};
+
 
 UCLASS(meta = (DisplayName = "输入_动画跳转"))
 class ARPG_API UARPG_PlayMontageByInput : public UAnimNotifyState
