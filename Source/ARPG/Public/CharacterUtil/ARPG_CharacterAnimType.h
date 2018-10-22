@@ -12,7 +12,7 @@
  */
 
 UCLASS(const, Abstract, Blueprintable, BlueprintType)
-class UARPG_MontagePlayCondition : public UObject
+class UARPG_AnimPlayCondition : public UObject
 {
 	GENERATED_BODY()
 public:
@@ -22,7 +22,7 @@ public:
 };
 
 UCLASS()
-class UMPC_WeaponAttackNormal : public UARPG_MontagePlayCondition
+class UMPC_WeaponAttackNormal : public UARPG_AnimPlayCondition
 {
 	GENERATED_BODY()
 public:
@@ -39,7 +39,7 @@ public:
 	{}
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "动画")
-	TSubclassOf<class UARPG_MontagePlayCondition> Condition;
+	TSubclassOf<class UARPG_AnimPlayCondition> Condition;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "动画")
 	class UAnimMontage* Montage;
@@ -104,4 +104,10 @@ public:
 
 	UPROPERTY(EditAnywhere, Category = "动画")
 	FARPG_MontageParameter RightSprintAttack;
+
+	UPROPERTY(EditAnywhere, Category = "动画")
+	FARPG_MontageParameter LeftFallingAttack;
+
+	UPROPERTY(EditAnywhere, Category = "动画")
+	FARPG_MontageParameter RightFallingAttack;
 };

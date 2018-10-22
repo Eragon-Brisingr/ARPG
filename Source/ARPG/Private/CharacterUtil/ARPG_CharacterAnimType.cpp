@@ -15,20 +15,26 @@ void UARPG_AttackAnimSetNormal::InvokePlay_Implementation(class ACharacterBase* 
 		{
 		case EMovementMode::MOVE_Walking:
 		case EMovementMode::MOVE_NavWalking:
+		case EMovementMode::MOVE_Falling:
 		{
-			bool IsSprinting = Character->ARPG_MovementComponent->IsSprinting();
-
 			if (Character->ARPG_MovementComponent->IsCrouching())
 			{
 
 			}
 			else
 			{
+				bool IsSprinting = Character->ARPG_MovementComponent->IsSprinting();
+				bool IsFalling = Character->ARPG_MovementComponent->IsFalling();
+
 				if (Character->ARPG_InputIsPressed(1 << (uint8)EARPG_InputType::LeftLightAttack))
 				{
 					if (IsSprinting)
 					{
 						Character->TryPlayMontage(LeftSprintAttack);
+					}
+					else if (IsFalling)
+					{
+						Character->TryPlayMontage(LeftFallingAttack);
 					}
 					else
 					{
@@ -43,7 +49,11 @@ void UARPG_AttackAnimSetNormal::InvokePlay_Implementation(class ACharacterBase* 
 				{
 					if (IsSprinting)
 					{
-						Character->TryPlayMontage(RightSprintAttack);
+   						Character->TryPlayMontage(RightSprintAttack);
+					}
+					else if (IsFalling)
+					{
+						Character->TryPlayMontage(RightFallingAttack);
 					}
 					else
 					{
