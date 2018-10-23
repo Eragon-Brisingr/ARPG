@@ -42,10 +42,16 @@ public:
 
 	virtual void PostInitializeComponents();
 public:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "物品|武器", AdvancedDisplay, meta = (DisplayName = "持武器模式"))
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "武器", meta = (DisplayName = "持武器模式"))
 	EWeaponUseType WeaponUseType = EWeaponUseType::SingleHand;
 
-	UPROPERTY(VisibleAnywhere, Category = "物品", Instanced)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "武器", meta = (DisplayName = "基础削韧"))
+	float BaseAddHitStunValue = 10.f;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "武器", meta = (DisplayName = "基础物理攻击"))
+	float BasePhysicsAttack = 100.f;
+
+	UPROPERTY(VisibleAnywhere, Category = "武器", Instanced)
 	class USocketMoveTracer* SocketMoveTracer;
 
 	//攻击
@@ -56,7 +62,7 @@ public:
 
 	TSubclassOf<class UReceiveDamageActionBase> ReceiveDamageAction;
 
-	UPROPERTY(EditDefaultsOnly, Category = "物品|武器", meta = (ShowOnlyInnerProperties))
+	UPROPERTY(EditDefaultsOnly, Category = "武器", meta = (ShowOnlyInnerProperties))
 	FExecuteActionSet ExecuteActionSet;
 
 	UFUNCTION(BlueprintCallable, Category = "武器|行为")
@@ -68,22 +74,22 @@ public:
 
 	//持武器方式
 public:
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "物品|武器", AdvancedDisplay, meta = (DisplayName = "左手持武器插槽名"))
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "武器", AdvancedDisplay, meta = (DisplayName = "左手持武器插槽名"))
 	FName LeftWeaponInHandSocket = TEXT("weapon_hand_l");
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "物品|武器", AdvancedDisplay, meta = (DisplayName = "左手收回武器插槽名"))
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "武器", AdvancedDisplay, meta = (DisplayName = "左手收回武器插槽名"))
 	FName LeftWeaponInWeaponBackSocket = TEXT("weapon_back_r");
 	virtual void WhenInHand();
 	//拔出武器发生的事件
-	UFUNCTION(BlueprintImplementableEvent, Category = "物品|武器", meta = (DisplayName = "WhenInHand"))
+	UFUNCTION(BlueprintImplementableEvent, Category = "武器", meta = (DisplayName = "WhenInHand"))
 	void ReceiveWhenInHand();
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "物品|武器", AdvancedDisplay, meta = (DisplayName = "右手持武器插槽名"))
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "武器", AdvancedDisplay, meta = (DisplayName = "右手持武器插槽名"))
 	FName RightWeaponInHandSocket = TEXT("weapon_hand_r");
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "物品|武器", AdvancedDisplay, meta = (DisplayName = "右手收回武器插槽名"))
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "武器", AdvancedDisplay, meta = (DisplayName = "右手收回武器插槽名"))
 	FName RightWeaponInWeaponBackSocket = TEXT("weapon_back_l");
 	virtual void WhenInWeaponBack();
 	//收回武器发生的事件
-	UFUNCTION(BlueprintImplementableEvent, Category = "物品|武器", meta = (DisplayName = "WhenInWeaponBack"))
+	UFUNCTION(BlueprintImplementableEvent, Category = "武器", meta = (DisplayName = "WhenInWeaponBack"))
 	void ReceiveWhenInWeaponBack();
 
 	void AttachWeaponTo(class USceneComponent* InParent, FName InSocketName);
