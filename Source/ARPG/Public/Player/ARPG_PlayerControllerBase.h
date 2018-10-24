@@ -43,7 +43,7 @@ public:
 	bool ClearLockedTarget_ToServer_Validate() { return true; }
 
 	UFUNCTION(BlueprintCallable, Category = "锁定系统")
-	void ToggleLockedTarget() { LockOnTargetSystem.ToggleLockedTarget(this); }
+	void ToggleLockedTarget();
 
 	UFUNCTION(BlueprintCallable, Category = "锁定系统")
 	bool InvokeSwitchLockedTarget(bool Left);
