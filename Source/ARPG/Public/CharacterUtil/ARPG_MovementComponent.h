@@ -13,7 +13,8 @@ UCLASS()
 class ARPG_API UARPG_MovementComponent : public UXD_CharacterMovementComponent
 {
 	GENERATED_BODY()
-	
+public:
+	virtual void TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction *ThisTickFunction) override;
 	
 	
 	
