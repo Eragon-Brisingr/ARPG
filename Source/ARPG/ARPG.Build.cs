@@ -12,6 +12,8 @@ public class ARPG : ModuleRules
 
 		PrivateDependencyModuleNames.AddRange(new string[]
 		{
+            "AIModule",
+
 			"XD_UnrealLibraryEx",
 			"XD_SaveGameSystem",
 			"XD_TimeSystem",

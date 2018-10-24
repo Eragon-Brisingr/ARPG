@@ -15,14 +15,39 @@ void AARPG_PlayerControllerBase::Tick(float DeltaSeconds)
 	}
 }
 
+AActor* AARPG_PlayerControllerBase::GetLockedTarget() const
+{
+	return LockOnTargetSystem.LockedTarget.Get();
+}
+
 bool AARPG_PlayerControllerBase::SetLockedTarget(AActor* Target, const FName& SocketName)
 {
 	if (LockOnTargetSystem.CanLockedOn(this, Target, SocketName))
 	{
 		LockOnTargetSystem.SetLockedTarget(Target, SocketName);
+		SetLockedTarget_ToServer(Target, SocketName);
 		return true;
 	}
 	return false;
+}
+
+void AARPG_PlayerControllerBase::SetLockedTarget_ToServer_Implementation(AActor* Target, const FName& SocketName)
+{
+	if (LockOnTargetSystem.CanLockedOn(this, Target, SocketName))
+	{
+		LockOnTargetSystem.SetLockedTarget(Target, SocketName);
+	}
+}
+
+void AARPG_PlayerControllerBase::ClearLockedTarget()
+{
+	LockOnTargetSystem.ClearLockedTarget();
+	ClearLockedTarget_ToServer();
+}
+
+void AARPG_PlayerControllerBase::ClearLockedTarget_ToServer_Implementation()
+{
+	LockOnTargetSystem.ClearLockedTarget();
 }
 
 bool AARPG_PlayerControllerBase::InvokeSwitchLockedTarget(bool Left)
