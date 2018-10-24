@@ -174,8 +174,15 @@ class ARPG_API UARPG_Human_WeaponTrace : public UAnimNotifyState
 {
 	GENERATED_BODY()
 public:
+	UARPG_Human_WeaponTrace()
+		:bClearIgnoreList(true)
+	{}
+
 	UPROPERTY(EditAnywhere, Category = "攻击", meta = (DisplayName = "为左手武器"))
 	uint8 bIsLeftWeapon : 1;
+
+	UPROPERTY(EditAnywhere, Category = "攻击", meta = (DisplayName = "清空攻击到对象列表"))
+	uint8 bClearIgnoreList : 1;
 
 	UPROPERTY(EditAnywhere, Category = "攻击", meta = (DisplayName = "特殊受击动作"))
 	TSubclassOf<class UReceiveDamageActionBase> ReceiveDamageAction;
@@ -189,8 +196,15 @@ class ARPG_API UARPG_Human_FallingAttackTrace : public UAnimNotifyState
 {
 	GENERATED_BODY()
 public:
+	UARPG_Human_FallingAttackTrace()
+		:bClearIgnoreList(true)
+	{}
+
 	UPROPERTY(EditAnywhere, Category = "攻击", meta = (DisplayName = "为左手武器"))
 	uint8 bIsLeftWeapon : 1;
+
+	UPROPERTY(EditAnywhere, Category = "攻击", meta = (DisplayName = "清空攻击到对象列表"))
+	uint8 bClearIgnoreList : 1;
 
 	virtual void NotifyBegin(USkeletalMeshComponent * MeshComp, UAnimSequenceBase * Animation, float TotalDuration) override;
 	virtual void NotifyEnd(USkeletalMeshComponent * MeshComp, UAnimSequenceBase * Animation) override;
