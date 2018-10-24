@@ -80,13 +80,17 @@ void AARPG_WeaponBase::PostInitializeComponents()
 	}
 }
 
-void AARPG_WeaponBase::SetEnableNearAttackTrace(bool Enable)
+void AARPG_WeaponBase::SetEnableNearAttackTrace(bool Enable, bool ClearIgnoreList /*= true*/)
 {
 	if (Enable)
 	{
 		SocketMoveTracer->OnTraceActorNative.BindUObject(this, &AARPG_WeaponBase::WhenAttackTracedActor);
+		SocketMoveTracer->EnableTrace(ClearIgnoreList);
 	}
-	SocketMoveTracer->SetEnableTrace(Enable);
+	else
+	{
+		SocketMoveTracer->DisableTrace();
+	}
 }
 
 void AARPG_WeaponBase::WhenAttackTracedActor(UPrimitiveComponent* HitComponent, const FName& SocketName, AActor* OtherActor, UPrimitiveComponent* OtherComp, const FHitResult& TraceResult)
@@ -113,13 +117,17 @@ bool AARPG_WeaponBase::TraceForExecuteOther()
 	return ExecuteActionSet.TraceForExecuteOther(GetItemOwner());
 }
 
-void AARPG_WeaponBase::SetEnableFallingAttackTrace(bool Enable)
+void AARPG_WeaponBase::SetEnableFallingAttackTrace(bool Enable, bool ClearIgnoreList /*= true*/)
 {
 	if (Enable)
 	{
 		SocketMoveTracer->OnTraceActorNative.BindUObject(this, &AARPG_WeaponBase::WhenFallingAttackTracedActor);
+		SocketMoveTracer->EnableTrace(ClearIgnoreList);
 	}
-	SocketMoveTracer->SetEnableTrace(Enable);
+	else
+	{
+		SocketMoveTracer->DisableTrace();
+	}
 }
 
 void AARPG_WeaponBase::WhenFallingAttackTracedActor(UPrimitiveComponent* HitComponent, const FName& SocketName, AActor* OtherActor, UPrimitiveComponent* OtherComp, const FHitResult& TraceResult)

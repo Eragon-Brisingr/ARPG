@@ -56,7 +56,7 @@ public:
 
 	//攻击
 public:
-	void SetEnableNearAttackTrace(bool Enable);
+	void SetEnableNearAttackTrace(bool Enable, bool ClearIgnoreList = true);
 
 	void WhenAttackTracedActor(UPrimitiveComponent* HitComponent, const FName& SocketName, AActor* OtherActor, UPrimitiveComponent* OtherComp, const FHitResult& TraceResult);
 
@@ -68,7 +68,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "武器|行为")
 	bool TraceForExecuteOther();
 
-	void SetEnableFallingAttackTrace(bool Enable);
+	void SetEnableFallingAttackTrace(bool Enable, bool ClearIgnoreList = true);
 
 	void WhenFallingAttackTracedActor(UPrimitiveComponent* HitComponent, const FName& SocketName, AActor* OtherActor, UPrimitiveComponent* OtherComp, const FHitResult& TraceResult);
 

@@ -44,15 +44,25 @@ void USocketMoveTracer::InitSocketMoveTracer(UPrimitiveComponent* TargetComponen
 	}
 }
 
-void USocketMoveTracer::StartTraceSetting()
+void USocketMoveTracer::EnableTrace(bool ClearIgnoreList /*= true*/)
 {
-	TracedActors.RemoveAt(2, TracedActors.Num() - 2);
-	RecordPrePosition();
+	if (bEnableTrace != true)
+	{
+		bEnableTrace = true;
+		if (ClearIgnoreList)
+		{
+			TracedActors.RemoveAt(2, TracedActors.Num() - 2);
+		}
+		RecordPrePosition();
+	}
 }
 
-void USocketMoveTracer::EndTraceSetting()
+void USocketMoveTracer::DisableTrace()
 {
-
+	if (bEnableTrace != false)
+	{
+		bEnableTrace = false;
+	}
 }
 
 void USocketMoveTracer::DoTrace(float DeltaTime)
@@ -116,13 +126,12 @@ void USocketMoveTracer::ClearTraceSocketList()
 
 void USocketMoveTracer::SetEnableTrace(bool Enable)
 {
-	bEnableTrace = Enable;
 	if (bEnableTrace)
 	{
-		StartTraceSetting();
+		EnableTrace();
 	}
 	else
 	{
-		EndTraceSetting();
+		DisableTrace();
 	}
 }

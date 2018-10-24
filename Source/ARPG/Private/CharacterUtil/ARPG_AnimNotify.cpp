@@ -236,7 +236,7 @@ void UARPG_Human_FallingAttackTrace::NotifyBegin(USkeletalMeshComponent * MeshCo
 	{
 		if (AARPG_WeaponBase* Weapon = bIsLeftWeapon ? Human->LeftWeapon : Human->RightWeapon)
 		{
-			Weapon->SetEnableFallingAttackTrace(true);
+			Weapon->SetEnableFallingAttackTrace(true, bClearIgnoreList);
 		}
 	}
 }
@@ -247,7 +247,7 @@ void UARPG_Human_FallingAttackTrace::NotifyEnd(USkeletalMeshComponent * MeshComp
 	{
 		if (AARPG_WeaponBase* Weapon = bIsLeftWeapon ? Human->LeftWeapon : Human->RightWeapon)
 		{
-			Weapon->SetEnableFallingAttackTrace(false);
+			Weapon->SetEnableFallingAttackTrace(false, bClearIgnoreList);
 		}
 	}
 }

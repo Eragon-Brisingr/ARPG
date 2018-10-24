@@ -70,9 +70,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "游戏|检测")
 	void InitSocketMoveTracer(UPrimitiveComponent* TargetComponent);
 
-	void StartTraceSetting();
+	void EnableTrace(bool ClearIgnoreList = true);
 
-	void EndTraceSetting();
+	void DisableTrace();
 
 	void DoTrace(float DeltaTime);
 
