@@ -8,5 +8,7 @@
 
 FARPG_Item::FARPG_Item()
 {
+#if WITH_EDITOR
 	ShowItemType = AARPG_ItemBase::StaticClass();
+#endif
 }

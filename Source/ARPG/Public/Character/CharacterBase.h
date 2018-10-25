@@ -39,7 +39,7 @@ public:
 	virtual void WhenGameInit_Implementation() override;
 
 	virtual TArray<struct FARPG_Item> GetInitItemList() const;
-	UFUNCTION(BlueprintImplementableEvent, Category = "角色|初始化")
+	UFUNCTION(BlueprintImplementableEvent, Category = "角色|初始化", meta = (DisplayName = "GetInitItemList"))
 	TArray<struct FARPG_Item> ReceivedGetInitItemList() const;
 
 	//重生用
