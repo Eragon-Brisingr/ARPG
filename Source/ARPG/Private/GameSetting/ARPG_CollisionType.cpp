@@ -5,11 +5,11 @@
 
 
 
-const EObjectTypeQuery FARPG_CollisionObjectType::Pawn = UEngineTypes::ConvertToObjectType(ECC_Pawn);
+const EObjectTypeQuery FARPG_CollisionObjectType::Pawn = EObjectTypeQuery::ObjectTypeQuery3;
 
-const ETraceTypeQuery FARPG_TraceTypeQuery::Visibility = UEngineTypes::ConvertToTraceType(ECollisionChannel::ECC_Visibility);
+const ETraceTypeQuery FARPG_TraceTypeQuery::Visibility = ETraceTypeQuery::TraceTypeQuery1;
 
-const ETraceTypeQuery FARPG_TraceTypeQuery::Camera = UEngineTypes::ConvertToTraceType(ECollisionChannel::ECC_Camera);
+const ETraceTypeQuery FARPG_TraceTypeQuery::Camera = ETraceTypeQuery::TraceTypeQuery2;
 
 const FName FARPG_CollisionProfile::Item = TEXT("Item");
 
