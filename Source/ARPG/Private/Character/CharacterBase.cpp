@@ -195,7 +195,11 @@ float ACharacterBase::PlayMontage(UAnimMontage * MontageToPlay, float InPlayRate
 {
 	if (MontageToPlay)
 	{
-		if (ClientMaster)
+		if (HasAuthority())
+		{
+			MulticastPlayMontage(MontageToPlay, InPlayRate, StartSectionName);
+		}
+		else if (ClientMaster)
 		{
 			if (HasAuthority())
 			{
@@ -209,10 +213,6 @@ float ACharacterBase::PlayMontage(UAnimMontage * MontageToPlay, float InPlayRate
 				PlayMontageImpl(MontageToPlay, InPlayRate, StartSectionName);
 				PlayMontageToServer(MontageToPlay, InPlayRate, StartSectionName);
 			}
-		}
-		else if (HasAuthority())
-		{
-			MulticastPlayMontage(MontageToPlay, InPlayRate, StartSectionName);
 		}
 		return MontageToPlay->GetPlayLength();
 	}
