@@ -201,6 +201,9 @@ public:
 	UPROPERTY(EditAnywhere, Category = "攻击", meta = (DisplayName = "特殊受击动作"))
 	TSubclassOf<class UReceiveDamageActionBase> ReceiveDamageAction;
 
+	UPROPERTY(EditAnywhere, Category = "攻击", meta = (DisplayName = "削韧增加量"))
+	float AddHitStunValue = 0.f;
+
 	virtual void NotifyBegin(USkeletalMeshComponent * MeshComp, UAnimSequenceBase * Animation, float TotalDuration) override;
 	virtual void NotifyEnd(USkeletalMeshComponent * MeshComp, UAnimSequenceBase * Animation) override;
 
@@ -221,6 +224,12 @@ public:
 
 	UPROPERTY(EditAnywhere, Category = "攻击", meta = (DisplayName = "清空攻击到对象列表"))
 	uint8 bClearIgnoreList : 1;
+
+	UPROPERTY(EditAnywhere, Category = "攻击", meta = (DisplayName = "特殊受击动作"))
+	TSubclassOf<class UReceiveDamageActionBase> ReceiveDamageAction;
+
+	UPROPERTY(EditAnywhere, Category = "攻击", meta = (DisplayName = "削韧增加量"))
+	float AddHitStunValue = 0.f;
 
 	virtual void NotifyBegin(USkeletalMeshComponent * MeshComp, UAnimSequenceBase * Animation, float TotalDuration) override;
 	virtual void NotifyEnd(USkeletalMeshComponent * MeshComp, UAnimSequenceBase * Animation) override;

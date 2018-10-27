@@ -72,6 +72,12 @@ public:
 
 	void WhenFallingAttackTracedActor(UPrimitiveComponent* HitComponent, const FName& SocketName, AActor* OtherActor, UPrimitiveComponent* OtherComp, const FHitResult& TraceResult);
 
+	float GetHitStunValue() const { return BaseAddHitStunValue + AnimAddHitStunValue; }
+	float GetPhysicsAttackValue() const { return BasePhysicsAttack; }
+	//攻击时的额外数据
+public:
+	float AnimAddHitStunValue = 0.f;
+
 	//持武器方式
 public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "武器", AdvancedDisplay, meta = (DisplayName = "左手持武器插槽名"))
