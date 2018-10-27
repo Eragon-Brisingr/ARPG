@@ -21,6 +21,7 @@ public:
 	UPROPERTY(EditAnywhere, Category = "锁定系统", meta = (ShowOnlyInnerProperties))
 	FARPG_LockOnTargetSystem LockOnTargetSystem;
 
+	UFUNCTION(BlueprintCallable, Category = "锁定系统")
 	AActor* GetLockedTarget() const;
 
 	UFUNCTION(BlueprintCallable, Category = "锁定系统")
@@ -42,8 +43,9 @@ public:
 	void ClearLockedTarget_ToServer_Implementation();
 	bool ClearLockedTarget_ToServer_Validate() { return true; }
 
+	//返回值代表是否锁定了目标
 	UFUNCTION(BlueprintCallable, Category = "锁定系统")
-	void ToggleLockedTarget();
+	bool ToggleLockedTarget();
 
 	UFUNCTION(BlueprintCallable, Category = "锁定系统")
 	bool InvokeSwitchLockedTarget(bool Left);

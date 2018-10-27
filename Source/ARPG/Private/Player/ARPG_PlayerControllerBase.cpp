@@ -1,17 +1,20 @@
 ﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 #include "ARPG_PlayerControllerBase.h"
-
-
+#include "CharacterBase.h"
 
 
 void AARPG_PlayerControllerBase::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 
-	if (IsLocalController())
+	if (HasAuthority() || IsLocalController())
 	{
 		LockOnTargetSystem.LockOnTargetTick(this, DeltaSeconds);
+		if (ACharacterBase* Character = Cast<ACharacterBase>(GetPawn()))
+		{
+			Character->SetIsLockedOther(LockOnTargetSystem.LockedTarget.IsValid());
+		}
 	}
 }
 
@@ -50,16 +53,18 @@ void AARPG_PlayerControllerBase::ClearLockedTarget_ToServer_Implementation()
 	LockOnTargetSystem.ClearLockedTarget();
 }
 
-void AARPG_PlayerControllerBase::ToggleLockedTarget()
+bool AARPG_PlayerControllerBase::ToggleLockedTarget()
 {
 	LockOnTargetSystem.ToggleLockedTarget(this);
 	if (LockOnTargetSystem.LockedTarget.IsValid())
 	{
 		SetLockedTarget_ToServer(LockOnTargetSystem.LockedTarget.Get(), LockOnTargetSystem.LockedSocketName);
+		return true;
 	}
 	else
 	{
 		ClearLockedTarget_ToServer();
+		return false;
 	}
 }
 
