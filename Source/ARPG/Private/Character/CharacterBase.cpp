@@ -308,7 +308,10 @@ void ACharacterBase::TradeItem_Implementation(class UARPG_InventoryComponent* Tr
 
 void ACharacterBase::InvokeUseItem_Implementation(const class UARPG_ItemCoreBase* ItemCore, EUseItemInput UseItemInput)
 {
-
+	if (ARPG_MovementComponent->IsMovingOnGround() && CanPlayFullBodyMontage())
+	{
+		UseItemImmediately(ItemCore, UseItemInput);
+	}
 }
 
 void ACharacterBase::UseItemImmediately(const class UARPG_ItemCoreBase* ItemCore, EUseItemInput UseItemInput)
