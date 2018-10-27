@@ -16,6 +16,7 @@
 #include "ARPG_DebugFunctionLibrary.h"
 #include "ARPG_LevelFunctionLibrary.h"
 #include "XD_TemplateLibrary.h"
+#include "UnrealNetwork.h"
 
 
 // Sets default values
@@ -57,6 +58,13 @@ void ACharacterBase::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
+}
+
+void ACharacterBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(ACharacterBase, bIsLockedOther);
 }
 
 void ACharacterBase::WhenGameInit_Implementation()
@@ -402,6 +410,11 @@ void ACharacterBase::ExecuteOtherToServer_Implementation(ACharacterBase* Execute
 	SetActorLocationAndRotation(TargetLocation, TargetRotation);
 	PlayMontage(ExecuteMontage);
 	ExecuteTarget->PlayMontage(BeExecutedMontage);
+}
+
+void ACharacterBase::OnRep_IsLockedOther()
+{
+	ARPG_MovementComponent->bAiming = bIsLockedOther;
 }
 
 void ACharacterBase::WhenKillOther(ACharacterBase* WhoBeKilled, UObject* KillInstigator)

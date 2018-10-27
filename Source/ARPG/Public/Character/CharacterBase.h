@@ -35,6 +35,7 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+	virtual void GetLifetimeReplicatedProps(TArray< class FLifetimeProperty > & OutLifetimeProps) const override;
 public:
 	virtual void WhenGameInit_Implementation() override;
 
@@ -269,6 +270,20 @@ public:
 	void ExecuteOtherToServer(ACharacterBase* ExecuteTarget, const FVector& TargetLocation, const FRotator& TargetRotation, UAnimMontage* ExecuteMontage, UAnimMontage* BeExecutedMontage);
 	void ExecuteOtherToServer_Implementation(ACharacterBase* ExecuteTarget, const FVector& TargetLocation, const FRotator& TargetRotation, UAnimMontage* ExecuteMontage, UAnimMontage* BeExecutedMontage);
 	bool ExecuteOtherToServer_Validate(ACharacterBase* ExecuteTarget, const FVector& TargetLocation, const FRotator& TargetRotation, UAnimMontage* ExecuteMontage, UAnimMontage* BeExecutedMontage) { return true; }
+
+	UPROPERTY(ReplicatedUsing = "OnRep_IsLockedOther")
+	uint8 bIsLockedOther : 1;
+	UFUNCTION()
+	void OnRep_IsLockedOther();
+
+	void SetIsLockedOther(bool IsLockedOther)
+	{
+		if (bIsLockedOther != IsLockedOther)
+		{
+			bIsLockedOther = IsLockedOther;
+			OnRep_IsLockedOther();
+		}
+	}
 
 	//通知
 public:
