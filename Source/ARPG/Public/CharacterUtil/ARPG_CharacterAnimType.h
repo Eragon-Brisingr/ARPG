@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include <Kismet/BlueprintFunctionLibrary.h>
 #include <SubclassOf.h>
+#include "CharacterType.h"
 #include "ARPG_CharacterAnimType.generated.h"
 
 /**
@@ -45,24 +46,6 @@ public:
 	class UAnimMontage* Montage;
 };
 
-USTRUCT(BlueprintType)
-struct FHumanAttackAnimSet
-{
-	GENERATED_BODY()
-public:
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "动画")
-	FARPG_MontageParameter LightAttack;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "动画")
-	FARPG_MontageParameter HeavyAttack;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "动画")
-	FARPG_MontageParameter SprintAttack;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "动画")
-	FARPG_MontageParameter DodogeForwardAttack;
-};
-
 UCLASS()
 class ARPG_API UARPG_AnimFunctionLibrary : public UBlueprintFunctionLibrary
 {
@@ -78,6 +61,10 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "攻击", BlueprintNativeEvent)
 	void InvokePlay(class ACharacterBase* Character) const;
 	virtual void InvokePlay_Implementation(class ACharacterBase* Character) const {}
+
+	UFUNCTION(BlueprintCallable, Category = "攻击", BlueprintNativeEvent)
+	void InvokePlayDodgeAnim(class ACharacterBase* Character, EDodgeDirection DodgeDirection) const;
+	virtual void InvokePlayDodgeAnim_Implementation(class ACharacterBase* Character, EDodgeDirection DodgeDirection) const {}
 };
 
 UCLASS()
@@ -86,6 +73,8 @@ class ARPG_API UARPG_AttackAnimSetNormal : public UARPG_AttackAnimSetBase
 	GENERATED_BODY()
 public:
 	virtual void InvokePlay_Implementation(class ACharacterBase* Character) const override;
+
+	virtual void InvokePlayDodgeAnim_Implementation(class ACharacterBase* Character, EDodgeDirection DodgeDirection) const override;
 
 	UPROPERTY(EditAnywhere, Category = "动画")
 	FARPG_MontageParameter LeftLightAttack;
@@ -110,4 +99,10 @@ public:
 
 	UPROPERTY(EditAnywhere, Category = "动画")
 	FARPG_MontageParameter RightFallingAttack;
+
+	UPROPERTY(EditDefaultsOnly, Category = "动画")
+	FARPG_MontageParameter DodogeForwardLeftAttack;
+
+	UPROPERTY(EditDefaultsOnly, Category = "动画")
+	FARPG_MontageParameter DodogeForwardRightAttack;
 };

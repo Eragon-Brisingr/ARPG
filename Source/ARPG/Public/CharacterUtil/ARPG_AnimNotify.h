@@ -6,9 +6,8 @@
 #include <Animation/AnimNotifies/AnimNotifyState.h>
 #include <Animation/AnimNotifies/AnimNotify.h>
 #include <SubclassOf.h>
-#include "HumanType.h"
+#include "CharacterType.h"
 #include "ARPG_AnimNotify.generated.h"
-
 /**
  * 
  */
@@ -125,6 +124,19 @@ public:
 	virtual FString GetNotifyName_Implementation() const override;
 };
 
+UCLASS(meta = (DisplayName = "输入_闪避攻击"))
+class ARPG_API UARPG_DodgeAttack : public UAnimNotifyState
+{
+	GENERATED_BODY()
+public:
+	UPROPERTY(EditAnywhere, Category = "动画")
+	EDodgeDirection DodgeDirection;
+
+	virtual void NotifyTick(USkeletalMeshComponent * MeshComp, UAnimSequenceBase * Animation, float FrameDeltaTime) override;
+
+	virtual FString GetNotifyName_Implementation() const override;
+};
+
 UCLASS(meta = (DisplayName = "属性_增加强韧度"))
 class ARPG_API UARPG_AddToughnessValue : public UAnimNotifyState
 {
@@ -167,6 +179,8 @@ public:
 	uint8 bPullOutWeapon : 1;
 
 	virtual void Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation) override;
+
+	virtual FString GetNotifyName_Implementation() const override;
 };
 
 UCLASS(meta = (DisplayName = "人类_武器伤害检测"))
@@ -189,6 +203,8 @@ public:
 
 	virtual void NotifyBegin(USkeletalMeshComponent * MeshComp, UAnimSequenceBase * Animation, float TotalDuration) override;
 	virtual void NotifyEnd(USkeletalMeshComponent * MeshComp, UAnimSequenceBase * Animation) override;
+
+	virtual FString GetNotifyName_Implementation() const override;
 };
 
 UCLASS(meta = (DisplayName = "人类_下落攻击检测"))

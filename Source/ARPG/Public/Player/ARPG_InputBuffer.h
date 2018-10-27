@@ -30,6 +30,11 @@ enum class EARPG_InputType : uint8
 };
 ENUM_CLASS_FLAGS(EARPG_InputType);
 
+namespace ARPG_InputType
+{
+	constexpr int32 ToBitMask(EARPG_InputType InputType) { return 1 << (uint8)InputType; }
+}
+
 USTRUCT(BlueprintType)
 struct ARPG_API FARPG_InputBuffer
 {

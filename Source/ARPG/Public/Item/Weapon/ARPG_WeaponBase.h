@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Item/Abstract/ARPG_ItemBase.h"
+#include "ARPG_ItemBase.h"
 #include "ARPG_CharacterAnimType.h"
 #include "ExecuteActionSet.h"
 #include "ARPG_WeaponBase.generated.h"
@@ -96,10 +96,4 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "动画", Instanced)
 	class UARPG_AttackAnimSetBase* AttackAnimSet;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "动画")
-	FARPG_MontageParameter DodogeForwardLeftAttack;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "动画")
-	FARPG_MontageParameter DodogeForwardRightAttack;
 };

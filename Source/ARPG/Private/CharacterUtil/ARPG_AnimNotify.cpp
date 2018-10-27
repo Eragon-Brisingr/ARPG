@@ -149,6 +149,41 @@ FString UARPG_DodgeState::GetNotifyName_Implementation() const
 	return TEXT("闪避状态");
 }
 
+void UARPG_DodgeAttack::NotifyTick(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, float FrameDeltaTime)
+{
+	if (AHumanBase* Human = Cast<AHumanBase>(MeshComp->GetOwner()))
+	{
+		if (Human->IsLocallyControlled())
+		{
+			if (UAnimMontage* CurPlayingMontage = Cast<UAnimMontage>(Animation))
+			{
+				if (MeshComp->GetAnimInstance()->Montage_IsPlaying(CurPlayingMontage))
+				{
+					if (Human->ARPG_AnyInputIsPressed(ARPG_InputType::ToBitMask(EARPG_InputType::LeftLightAttack) | ARPG_InputType::ToBitMask(EARPG_InputType::LeftHeavyAttack)))
+					{
+						if (Human->LeftWeapon)
+						{
+							Human->LeftWeapon->AttackAnimSet->InvokePlayDodgeAnim(Human, DodgeDirection);
+						}
+					}
+					else if (Human->ARPG_AnyInputIsPressed(ARPG_InputType::ToBitMask(EARPG_InputType::RightLightAttack) | ARPG_InputType::ToBitMask(EARPG_InputType::RightHeavyAttack)))
+					{
+						if (Human->RightWeapon)
+						{
+							Human->RightWeapon->AttackAnimSet->InvokePlayDodgeAnim(Human, DodgeDirection);
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+FString UARPG_DodgeAttack::GetNotifyName_Implementation() const
+{
+	return TEXT("闪避攻击");
+}
+
 void UARPG_AddToughnessValue::NotifyBegin(USkeletalMeshComponent * MeshComp, UAnimSequenceBase * Animation, float TotalDuration)
 {
 	if (ACharacterBase* Character = Cast<ACharacterBase>(MeshComp->GetOwner()))
@@ -206,6 +241,11 @@ void UARPG_Human_TakeWeaponPos::Notify(USkeletalMeshComponent* MeshComp, UAnimSe
 	}
 }
 
+FString UARPG_Human_TakeWeaponPos::GetNotifyName_Implementation() const
+{
+	return TEXT("武器位置");
+}
+
 void UARPG_Human_WeaponTrace::NotifyBegin(USkeletalMeshComponent * MeshComp, UAnimSequenceBase * Animation, float TotalDuration)
 {
 	if (AHumanBase* Human = Cast<AHumanBase>(MeshComp->GetOwner()))
@@ -228,6 +268,11 @@ void UARPG_Human_WeaponTrace::NotifyEnd(USkeletalMeshComponent * MeshComp, UAnim
 			Weapon->SetEnableNearAttackTrace(false);
 		}
 	}
+}
+
+FString UARPG_Human_WeaponTrace::GetNotifyName_Implementation() const
+{
+	return TEXT("武器伤害检测");
 }
 
 void UARPG_Human_FallingAttackTrace::NotifyBegin(USkeletalMeshComponent * MeshComp, UAnimSequenceBase * Animation, float TotalDuration)

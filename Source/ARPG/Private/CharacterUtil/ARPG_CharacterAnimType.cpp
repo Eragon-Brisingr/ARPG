@@ -70,3 +70,20 @@ void UARPG_AttackAnimSetNormal::InvokePlay_Implementation(class ACharacterBase* 
 		}
 	}
 }
+
+void UARPG_AttackAnimSetNormal::InvokePlayDodgeAnim_Implementation(class ACharacterBase* Character, EDodgeDirection DodgeDirection) const
+{
+	switch (Character->ARPG_MovementComponent->MovementMode)
+	{
+	case EMovementMode::MOVE_Walking:
+	case EMovementMode::MOVE_NavWalking:
+		if (Character->ARPG_AnyInputIsPressed(ARPG_InputType::ToBitMask(EARPG_InputType::LeftLightAttack) | ARPG_InputType::ToBitMask(EARPG_InputType::LeftHeavyAttack)))
+		{
+			Character->TryPlayMontage(DodogeForwardLeftAttack);
+		}
+		else if (Character->ARPG_AnyInputIsPressed(ARPG_InputType::ToBitMask(EARPG_InputType::RightLightAttack) | ARPG_InputType::ToBitMask(EARPG_InputType::RightHeavyAttack)))
+		{
+			Character->TryPlayMontage(DodogeForwardRightAttack);
+		}
+	}
+}
