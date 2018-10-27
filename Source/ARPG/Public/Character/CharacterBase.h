@@ -159,7 +159,7 @@ public:
 
 	//使用道具相关
 public:
-	UFUNCTION(Reliable, WithValidation, Server)
+	UFUNCTION(BlueprintCallable, Category = "角色|物品", Reliable, WithValidation, Server)
 	void InvokeUseItem(const class UARPG_ItemCoreBase* ItemCore, EUseItemInput UseItemInput);
 	virtual void InvokeUseItem_Implementation(const class UARPG_ItemCoreBase* ItemCore, EUseItemInput UseItemInput);
 	bool InvokeUseItem_Validate(const class UARPG_ItemCoreBase* ItemCore, EUseItemInput UseItemInput) { return true; }

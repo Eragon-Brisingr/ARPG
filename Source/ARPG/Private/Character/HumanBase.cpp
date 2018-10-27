@@ -223,11 +223,19 @@ void AHumanBase::SetLeftWeapon(class AARPG_WeaponBase* ToLeftWeapon)
 void AHumanBase::OnRep_LeftWeapon(class AARPG_WeaponBase* PreLeftWeapon)
 {
 	OnRep_EquipVariable(LeftWeapon, PreLeftWeapon);
+	if (LeftWeapon == nullptr && RightWeapon == nullptr)
+	{
+		UseWeaponState = EUseWeaponState::NoneWeapon_Default;
+	}
 }
 
 void AHumanBase::SetRightWeapon(class AARPG_WeaponBase* ToRightWeapon)
 {
 	SetEquipVariable(RightWeapon, ToRightWeapon);
+	if (LeftWeapon == nullptr && RightWeapon == nullptr)
+	{
+		UseWeaponState = EUseWeaponState::NoneWeapon_Default;
+	}
 }
 
 void AHumanBase::OnRep_RightWeapon(class AARPG_WeaponBase* PreRightWeapon)
@@ -265,13 +273,10 @@ class AARPG_WeaponBase* AHumanBase::EquipSingleRightWeapon(class UARPG_ItemCoreB
 	}
 	//Spawn武器并装备
 	SetRightWeapon(Cast<AARPG_WeaponBase>(WeaponCore->SpawnItemActorForOwner(this, this)));
-	if (UseWeaponState == EUseWeaponState::NoneWeapon_Default)
+	RightWeaponInWeaponBack();
+	if (UseWeaponState != EUseWeaponState::NoneWeapon_Default)
 	{
-		RightWeaponInWeaponBack();
-	}
-	else
-	{
-		//WhenPullOutWeapon();
+		PlayMontage(PullOutWeaponMontage);
 	}
 
 	return RightWeapon;
@@ -307,13 +312,10 @@ class AARPG_WeaponBase* AHumanBase::EquipSingleLeftWeapon(class UARPG_ItemCoreBa
 	}
 	//Spawn武器并装备
 	SetLeftWeapon(Cast<AARPG_WeaponBase>(WeaponCore->SpawnItemActorForOwner(this, this)));
-	if (UseWeaponState == EUseWeaponState::NoneWeapon_Default)
+	LeftWeaponInWeaponBack();
+	if (UseWeaponState != EUseWeaponState::NoneWeapon_Default)
 	{
-		LeftWeaponInWeaponBack();
-	}
-	else
-	{
-		//WhenPullOutWeapon();
+		PlayMontage(PullOutWeaponMontage);
 	}
 
 	return LeftWeapon;
@@ -371,9 +373,12 @@ void AHumanBase::LetTheWeaponInWeaponBack()
 
 void AHumanBase::InvokePullOutWeapon()
 {
-	if (UseWeaponState == EUseWeaponState::NoneWeapon_Default && CanPlayFullBodyMontage())
+	if (LeftWeapon || RightWeapon)
 	{
-		PlayMontage(PullOutWeaponMontage);
+		if (UseWeaponState == EUseWeaponState::NoneWeapon_Default && CanPlayFullBodyMontage())
+		{
+			PlayMontage(PullOutWeaponMontage);
+		}
 	}
 }
 
