@@ -103,7 +103,7 @@ void AARPG_WeaponBase::WhenAttackTracedActor(UPrimitiveComponent* HitComponent, 
 
 			if (ACharacterBase* ReceiveDamageCharacter = Cast<ACharacterBase>(OtherActor))
 			{
-				if (ReceiveDamageCharacter->ApplyPointDamage(BasePhysicsAttack, BaseAddHitStunValue, TraceResult.ImpactNormal, TraceResult, WeaponOnwer, this, nullptr, ReceiveDamageAction) > 0.f)
+				if (ReceiveDamageCharacter->ApplyPointDamage(GetPhysicsAttackValue(), GetHitStunValue(), TraceResult.ImpactNormal, TraceResult, WeaponOnwer, this, nullptr, ReceiveDamageAction) > 0.f)
 				{
 					WeaponOnwer->NearAttackSuccessTimeDilation(0.2f);
 				}

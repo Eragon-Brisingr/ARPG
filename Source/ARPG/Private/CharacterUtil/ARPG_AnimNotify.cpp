@@ -253,6 +253,7 @@ void UARPG_Human_WeaponTrace::NotifyBegin(USkeletalMeshComponent * MeshComp, UAn
 		if (AARPG_WeaponBase* Weapon = bIsLeftWeapon ? Human->LeftWeapon : Human->RightWeapon)
 		{
 			Weapon->ReceiveDamageAction = ReceiveDamageAction;
+			Weapon->AnimAddHitStunValue = AddHitStunValue;
 			Weapon->SetEnableNearAttackTrace(true);
 		}
 	}
@@ -281,6 +282,8 @@ void UARPG_Human_FallingAttackTrace::NotifyBegin(USkeletalMeshComponent * MeshCo
 	{
 		if (AARPG_WeaponBase* Weapon = bIsLeftWeapon ? Human->LeftWeapon : Human->RightWeapon)
 		{
+			Weapon->ReceiveDamageAction = ReceiveDamageAction;
+			Weapon->AnimAddHitStunValue = AddHitStunValue;
 			Weapon->SetEnableFallingAttackTrace(true, bClearIgnoreList);
 		}
 	}
