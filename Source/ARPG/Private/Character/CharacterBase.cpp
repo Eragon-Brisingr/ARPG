@@ -64,10 +64,7 @@ void ACharacterBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if (HasAuthority() || IsLocallyControlled())
-	{
-		ARPG_MovementComponent->SetRotationMode(bIsLockedOther && ARPG_MovementComponent->bInvokeSprint == false ? ECharacterRotationMode::LookingDirection : ECharacterRotationMode::VelocityDirection);
-	}
+	ARPG_MovementComponent->SetRotationMode(bIsLockedOther && ARPG_MovementComponent->bInvokeSprint == false ? ECharacterRotationMode::LookingDirection : ECharacterRotationMode::VelocityDirection);
 }
 
 // Called to bind functionality to input
