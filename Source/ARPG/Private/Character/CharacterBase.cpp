@@ -46,6 +46,19 @@ void ACharacterBase::BeginPlay()
 	
 }
 
+void ACharacterBase::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	Super::EndPlay(EndPlayReason);
+
+	//删除角色身上的东西
+	TArray<AActor*> AttachedActors;
+	GetAttachedActors(AttachedActors);
+	for (AActor* Actor : AttachedActors)
+	{
+		Actor->Destroy();
+	}
+}
+
 // Called every frame
 void ACharacterBase::Tick(float DeltaTime)
 {
