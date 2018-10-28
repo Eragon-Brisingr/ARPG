@@ -15,6 +15,8 @@ class ARPG_API UARPG_InventoryComponent : public UXD_InventoryComponentBase
 	GENERATED_BODY()
 
 public:
+	UARPG_InventoryComponent();
+
 	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly, Category = "背包")
 	void AddItemArray(const TArray<FARPG_Item>& Items);
 
