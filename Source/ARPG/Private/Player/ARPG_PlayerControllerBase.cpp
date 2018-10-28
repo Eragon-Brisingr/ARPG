@@ -13,7 +13,7 @@ void AARPG_PlayerControllerBase::Tick(float DeltaSeconds)
 		LockOnTargetSystem.LockOnTargetTick(this, DeltaSeconds);
 		if (ACharacterBase* Character = Cast<ACharacterBase>(GetPawn()))
 		{
-			Character->SetIsLockedOther(LockOnTargetSystem.LockedTarget.IsValid());
+			Character->SetLockedTarget(LockOnTargetSystem.LockedTarget.Get());
 		}
 	}
 }
