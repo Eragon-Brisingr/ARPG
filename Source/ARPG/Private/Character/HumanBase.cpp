@@ -201,6 +201,17 @@ class AARPG_EquipmentBase* AHumanBase::EquipEquipment_Implementation(class UARPG
 	return ReturnEquipment;
 }
 
+void AHumanBase::OnRep_UseWeaponState()
+{
+	ARPG_MovementComponent->bAiming = UseWeaponState != EUseWeaponState::NoneWeapon_Default ? true : false;
+}
+
+void AHumanBase::SetUseWeaponState(EUseWeaponState NewUseWeaponState)
+{
+	UseWeaponState = NewUseWeaponState;
+	OnRep_UseWeaponState();
+}
+
 void AHumanBase::OnRep_EquipVariable(class AARPG_ItemBase* CurEquip, class AARPG_ItemBase* PreEquip)
 {
 	if (PreEquip)
@@ -223,10 +234,6 @@ void AHumanBase::SetLeftWeapon(class AARPG_WeaponBase* ToLeftWeapon)
 void AHumanBase::OnRep_LeftWeapon(class AARPG_WeaponBase* PreLeftWeapon)
 {
 	OnRep_EquipVariable(LeftWeapon, PreLeftWeapon);
-	if (LeftWeapon == nullptr && RightWeapon == nullptr)
-	{
-		UseWeaponState = EUseWeaponState::NoneWeapon_Default;
-	}
 }
 
 void AHumanBase::SetRightWeapon(class AARPG_WeaponBase* ToRightWeapon)
@@ -234,7 +241,7 @@ void AHumanBase::SetRightWeapon(class AARPG_WeaponBase* ToRightWeapon)
 	SetEquipVariable(RightWeapon, ToRightWeapon);
 	if (LeftWeapon == nullptr && RightWeapon == nullptr)
 	{
-		UseWeaponState = EUseWeaponState::NoneWeapon_Default;
+		SetUseWeaponState(EUseWeaponState::NoneWeapon_Default);
 	}
 }
 
@@ -252,7 +259,7 @@ class AARPG_WeaponBase* AHumanBase::EquipSingleRightWeapon(class UARPG_ItemCoreB
 			SetRightWeapon(nullptr);
 			if (LeftWeapon == nullptr)
 			{
-				UseWeaponState = EUseWeaponState::NoneWeapon_Default;
+				SetUseWeaponState(EUseWeaponState::NoneWeapon_Default);
 			}
 			return nullptr;
 		}
@@ -291,7 +298,7 @@ class AARPG_WeaponBase* AHumanBase::EquipSingleLeftWeapon(class UARPG_ItemCoreBa
 			SetLeftWeapon(nullptr);
 			if (RightWeapon == nullptr)
 			{
-				UseWeaponState = EUseWeaponState::NoneWeapon_Default;
+				SetUseWeaponState(EUseWeaponState::NoneWeapon_Default);
 			}
 			return nullptr;
 		}
@@ -347,7 +354,7 @@ void AHumanBase::LeftWeaponInWeaponBack()
 
 void AHumanBase::LetTheWeaponInHand()
 {
-	UseWeaponState = EUseWeaponState::UsingWeapon_Defalut;
+	SetUseWeaponState(EUseWeaponState::UsingWeapon_Defalut);
 	if (LeftWeapon)
 	{
 		LeftWeaponInHand();
@@ -360,7 +367,7 @@ void AHumanBase::LetTheWeaponInHand()
 
 void AHumanBase::LetTheWeaponInWeaponBack()
 {
-	UseWeaponState = EUseWeaponState::NoneWeapon_Default;
+	SetUseWeaponState(EUseWeaponState::NoneWeapon_Default);
 	if (LeftWeapon)
 	{
 		LeftWeaponInWeaponBack();

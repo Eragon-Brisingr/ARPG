@@ -105,6 +105,7 @@ public:
 
 	virtual bool CanLockingOnTarget_Implementation(AController* Invoker, const FName& CurLockSocketName, bool& TryLockAgain) const override;
 
+	virtual void SetLockedTarget(AActor* NewLockedTarget) {}
 	//动画
 public:
 	UFUNCTION(BlueprintCallable, Category = "角色|行为")
@@ -272,20 +273,6 @@ public:
 	void ExecuteOtherToServer(ACharacterBase* ExecuteTarget, const FVector& TargetLocation, const FRotator& TargetRotation, UAnimMontage* ExecuteMontage, UAnimMontage* BeExecutedMontage);
 	void ExecuteOtherToServer_Implementation(ACharacterBase* ExecuteTarget, const FVector& TargetLocation, const FRotator& TargetRotation, UAnimMontage* ExecuteMontage, UAnimMontage* BeExecutedMontage);
 	bool ExecuteOtherToServer_Validate(ACharacterBase* ExecuteTarget, const FVector& TargetLocation, const FRotator& TargetRotation, UAnimMontage* ExecuteMontage, UAnimMontage* BeExecutedMontage) { return true; }
-
-	UPROPERTY(ReplicatedUsing = "OnRep_IsLockedOther")
-	uint8 bIsLockedOther : 1;
-	UFUNCTION()
-	void OnRep_IsLockedOther();
-
-	void SetIsLockedOther(bool IsLockedOther)
-	{
-		if (bIsLockedOther != IsLockedOther)
-		{
-			bIsLockedOther = IsLockedOther;
-			OnRep_IsLockedOther();
-		}
-	}
 
 	//通知
 public:

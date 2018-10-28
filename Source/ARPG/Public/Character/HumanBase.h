@@ -46,8 +46,11 @@ public:
 	
 	//装备相关
 public:
-	UPROPERTY(Replicated, SaveGame, VisibleAnywhere, BlueprintReadOnly, Category = "角色", AdvancedDisplay)
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "角色", AdvancedDisplay, ReplicatedUsing = OnRep_UseWeaponState, SaveGame)
 	EUseWeaponState UseWeaponState;
+	UFUNCTION()
+	void OnRep_UseWeaponState();
+	void SetUseWeaponState(EUseWeaponState NewUseWeaponState);
 
 	template<typename EquipType>
 	void SetEquipVariable(EquipType*& CurEquip, EquipType* ToEquip);

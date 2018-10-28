@@ -64,7 +64,8 @@ void ACharacterBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	ARPG_MovementComponent->SetRotationMode(bIsLockedOther && ARPG_MovementComponent->bInvokeSprint == false ? ECharacterRotationMode::LookingDirection : ECharacterRotationMode::VelocityDirection);
+	//TODO 挪入bAiming与bInvokeSprint的Setter驱动而不是轮询
+	ARPG_MovementComponent->SetRotationMode(ARPG_MovementComponent->bAiming && ARPG_MovementComponent->bInvokeSprint == false ? ECharacterRotationMode::LookingDirection : ECharacterRotationMode::VelocityDirection);
 }
 
 // Called to bind functionality to input
@@ -77,8 +78,6 @@ void ACharacterBase::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 void ACharacterBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-
-	DOREPLIFETIME(ACharacterBase, bIsLockedOther);
 }
 
 void ACharacterBase::WhenGameInit_Implementation()
@@ -427,11 +426,6 @@ void ACharacterBase::ExecuteOtherToServer_Implementation(ACharacterBase* Execute
 	SetActorLocationAndRotation(TargetLocation, TargetRotation);
 	PlayMontage(ExecuteMontage);
 	ExecuteTarget->PlayMontage(BeExecutedMontage);
-}
-
-void ACharacterBase::OnRep_IsLockedOther()
-{
-	ARPG_MovementComponent->bAiming = bIsLockedOther;
 }
 
 void ACharacterBase::WhenKillOther(ACharacterBase* WhoBeKilled, UObject* KillInstigator)
