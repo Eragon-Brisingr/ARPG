@@ -9,6 +9,13 @@
 
 #define LOCTEXT_NAMESPACE "ARPG_Item"
 
+UARPG_InventoryComponent::UARPG_InventoryComponent()
+{
+#if WITH_EDITOR
+	InitItemsType = AARPG_ItemBase::StaticClass();
+#endif
+}
+
 void UARPG_InventoryComponent::AddItemArray(const TArray<FARPG_Item>& Items)
 {
 	UXD_InventoryComponentBase::AddItemArray(ArrayCast<FXD_Item>(Items));
