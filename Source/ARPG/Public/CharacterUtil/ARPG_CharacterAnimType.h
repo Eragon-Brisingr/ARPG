@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include <Kismet/BlueprintFunctionLibrary.h>
 #include <SubclassOf.h>
+#include <Animation/AnimMetaData.h>
 #include "CharacterType.h"
 #include "ARPG_CharacterAnimType.generated.h"
 
@@ -30,6 +31,12 @@ public:
 	virtual bool CanPlayMontage_Implementation(class ACharacterBase* Character) const { return true; }
 };
 
+UCLASS(meta = (DisplayName = "能在下落时播放"))
+class ARPG_API UAMD_CanPlayWhenFalling : public UAnimMetaData
+{
+	GENERATED_BODY()
+};
+
 USTRUCT(BlueprintType)
 struct FARPG_MontageParameter
 {
@@ -51,6 +58,7 @@ class ARPG_API UARPG_AnimFunctionLibrary : public UBlueprintFunctionLibrary
 {
 	GENERATED_BODY()
 public:
+	static void CheckAndFixAnimData(UAnimMontage* Montage, TSubclassOf<class UAnimMetaData> AnimMetaType);
 };
 
 UCLASS(editinlinenew, Abstract, collapseCategories)

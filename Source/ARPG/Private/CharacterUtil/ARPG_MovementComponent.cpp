@@ -41,3 +41,10 @@ void UARPG_MovementComponent::TickComponent(float DeltaTime, enum ELevelTick Tic
 		}
 	}
 }
+
+void UARPG_MovementComponent::OnMovementModeChanged(EMovementMode PreviousMovementMode, uint8 PreviousCustomMode)
+{
+	Super::OnMovementModeChanged(PreviousMovementMode, PreviousCustomMode);
+
+	OnARPGMovementModeChanged.Broadcast(this, PreviousMovementMode, PreviousCustomMode);
+}

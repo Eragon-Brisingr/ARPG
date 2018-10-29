@@ -16,6 +16,10 @@ class ARPG_API UARPG_MovementComponent : public UXD_CharacterMovementComponent
 public:
 	virtual void TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction *ThisTickFunction) override;
 	
-	
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnMovementModeChanged, UARPG_MovementComponent*, MovementComponent, EMovementMode, PreviousMovementMode, uint8, PreviousCustomMode);
+	UPROPERTY(BlueprintAssignable)
+	FOnMovementModeChanged OnARPGMovementModeChanged;
+
+	virtual void OnMovementModeChanged(EMovementMode PreviousMovementMode, uint8 PreviousCustomMode) override;
 	
 };
