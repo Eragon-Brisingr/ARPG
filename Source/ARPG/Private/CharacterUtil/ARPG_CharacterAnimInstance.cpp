@@ -39,7 +39,7 @@ void UARPG_CharacterAnimInstance::OnMovementModeChanged(class UARPG_MovementComp
 				UAnimMontage* ActiveMontage = MontageInstance->Montage;
 				if (!ActiveMontage->GetMetaData().ContainsByPredicate([](UAnimMetaData* E) {return E && E->IsA<UAMD_CanPlayWhenFalling>(); }))
 				{
-					Montage_Stop(1.f, ActiveMontage);
+					Montage_Stop(0.5, ActiveMontage);
 				}
 			}
 		}

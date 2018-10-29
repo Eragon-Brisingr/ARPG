@@ -15,7 +15,6 @@ void UARPG_AnimFunctionLibrary::CheckAndFixAnimData(UAnimMontage* Montage, TSubc
 		if (!Montage->GetMetaData().ContainsByPredicate([&](UAnimMetaData* E) {return E && E->IsA(AnimMetaType); }))
 		{
 			Montage->AddMetaData(NewObject<UAMD_CanPlayWhenFalling>(Montage));
-			Montage->MarkPackageDirty();
 			Anim_Warning_LOG("%s中不存在%s元数据，自动添加", *UARPG_DebugFunctionLibrary::GetDebugName(Montage), *UARPG_DebugFunctionLibrary::GetDebugName(AnimMetaType));
 		}
 	}
