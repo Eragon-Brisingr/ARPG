@@ -173,9 +173,86 @@ public:
 		bIsNativeBranchingPoint = true;
 	}
 
+	UPROPERTY(EditAnywhere, Category = "处决", meta = (DisplayName = "处决伤害对象"))
 	TSubclassOf<class UARPG_ApplyExecuteDamageFunctor> ApplyExecuteDamageFunctor;
 
 	virtual void Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation) override;
+
+	virtual FString GetNotifyName_Implementation() const override;
+};
+
+UCLASS(Blueprintable, abstract, const)
+class ARPG_API UARPG_SetReceiveDamageActionFunctorBase : public UObject
+{
+	GENERATED_BODY()
+public:
+	virtual void SetReceiveDamageAction(USkeletalMeshComponent* MeshComp, TSubclassOf<class UReceiveDamageActionBase> ReceiveDamageAction) const
+	{
+		ReceiveSetReceiveDamageAction(MeshComp, ReceiveDamageAction);
+	}
+	UFUNCTION(BlueprintImplementableEvent, Category = "函数子", meta = (DisplayName = "SetReceiveDamageAction"))
+	void ReceiveSetReceiveDamageAction(USkeletalMeshComponent* MeshComp, TSubclassOf<class UReceiveDamageActionBase> ReceiveDamageAction) const;
+};
+
+UCLASS(meta = (DisplayName = "动画_设置特殊受击动画"))
+class ARPG_API UARPG_SetReceiveDamageAction : public UAnimNotify
+{
+	GENERATED_BODY()
+public:
+	UARPG_SetReceiveDamageAction()
+	{
+		bIsNativeBranchingPoint = true;
+	}
+
+	UPROPERTY(EditAnywhere, Category = "动画", meta = (DisplayName = "作用对象"))
+	TSubclassOf<class UARPG_SetReceiveDamageActionFunctorBase> SetReceiveDamageActionFunctor;
+	
+	UPROPERTY(EditAnywhere, Category = "攻击", meta = (DisplayName = "特殊受击动画"))
+	TSubclassOf<class UReceiveDamageActionBase> ReceiveDamageAction;
+
+	virtual void Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation) override;
+
+	virtual FString GetNotifyName_Implementation() const override;
+};
+
+UCLASS(Blueprintable, abstract, const)
+class ARPG_API UARPG_SetAddHitStunValueFunctorBase : public UObject
+{
+	GENERATED_BODY()
+public:
+	virtual void SetAddHitStunValue(USkeletalMeshComponent* MeshComp, float AddHitStunValue) const
+	{
+		ReceiveSetAddHitStunValue(MeshComp, AddHitStunValue);
+	}
+	UFUNCTION(BlueprintImplementableEvent, Category = "函数子", meta = (DisplayName = "SetAddHitStunValue"))
+	void ReceiveSetAddHitStunValue(USkeletalMeshComponent* MeshComp, float AddHitStunValue) const;
+
+	virtual void Reset(USkeletalMeshComponent* MeshComp, float AddHitStunValue) const
+	{
+		ReceiveReset(MeshComp, AddHitStunValue);
+	}
+	UFUNCTION(BlueprintImplementableEvent, Category = "函数子", meta = (DisplayName = "Reset"))
+	void ReceiveReset(USkeletalMeshComponent* MeshComp, float AddHitStunValue) const;
+};
+
+UCLASS(meta = (DisplayName = "动画_设置动画增加削韧量"))
+class ARPG_API UARPG_SetAddHitStunValue : public UAnimNotifyState
+{
+	GENERATED_BODY()
+public:
+	UARPG_SetAddHitStunValue()
+	{
+		bIsNativeBranchingPoint = true;
+	}
+
+	UPROPERTY(EditAnywhere, Category = "攻击", meta = (DisplayName = "削韧增加量"))
+	float AddHitStunValue = 0.f;
+
+	UPROPERTY(EditAnywhere, Category = "动画", meta = (DisplayName = "作用对象"))
+	TSubclassOf<class UARPG_SetAddHitStunValueFunctorBase> SetAddHitStunValueFunctor;
+
+	virtual void NotifyBegin(USkeletalMeshComponent * MeshComp, UAnimSequenceBase * Animation, float TotalDuration) override;
+	virtual void NotifyEnd(USkeletalMeshComponent * MeshComp, UAnimSequenceBase * Animation) override;
 
 	virtual FString GetNotifyName_Implementation() const override;
 };

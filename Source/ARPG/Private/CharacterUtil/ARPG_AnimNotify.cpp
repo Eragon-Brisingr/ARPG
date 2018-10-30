@@ -204,3 +204,37 @@ FString UARPG_ApplyExecuteDamage::GetNotifyName_Implementation() const
 {
 	return TEXT("造成处决伤害");
 }
+
+void UARPG_SetReceiveDamageAction::Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation)
+{
+	if (SetReceiveDamageActionFunctor)
+	{
+		SetReceiveDamageActionFunctor.GetDefaultObject()->SetReceiveDamageAction(MeshComp, ReceiveDamageAction);
+	}
+}
+
+FString UARPG_SetReceiveDamageAction::GetNotifyName_Implementation() const
+{
+	return TEXT("设置特殊受击动画");
+}
+
+void UARPG_SetAddHitStunValue::NotifyBegin(USkeletalMeshComponent * MeshComp, UAnimSequenceBase * Animation, float TotalDuration)
+{
+	if (SetAddHitStunValueFunctor)
+	{
+		SetAddHitStunValueFunctor.GetDefaultObject()->SetAddHitStunValue(MeshComp, AddHitStunValue);
+	}
+}
+
+void UARPG_SetAddHitStunValue::NotifyEnd(USkeletalMeshComponent * MeshComp, UAnimSequenceBase * Animation)
+{
+	if (SetAddHitStunValueFunctor)
+	{
+		SetAddHitStunValueFunctor.GetDefaultObject()->Reset(MeshComp, AddHitStunValue);
+	}
+}
+
+FString UARPG_SetAddHitStunValue::GetNotifyName_Implementation() const
+{
+	return TEXT("设置动画增加削韧量");
+}
