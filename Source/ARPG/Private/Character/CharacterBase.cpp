@@ -64,8 +64,8 @@ void ACharacterBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	//TODO 挪入bAiming与bInvokeSprint的Setter驱动而不是轮询
-	ARPG_MovementComponent->SetRotationMode(ARPG_MovementComponent->bAiming && ARPG_MovementComponent->bInvokeSprint == false ? ECharacterRotationMode::LookingDirection : ECharacterRotationMode::VelocityDirection);
+	//TODO 挪入bIsLockingOther与bInvokeSprint的Setter驱动而不是轮询
+	ARPG_MovementComponent->SetRotationMode(bIsLockingOther && ARPG_MovementComponent->bInvokeSprint == false ? ECharacterRotationMode::LookingDirection : ECharacterRotationMode::VelocityDirection);
 }
 
 // Called to bind functionality to input
@@ -78,6 +78,8 @@ void ACharacterBase::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 void ACharacterBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(ACharacterBase, bIsLockingOther);
 }
 
 void ACharacterBase::WhenGameInit_Implementation()

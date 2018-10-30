@@ -105,7 +105,13 @@ public:
 
 	virtual bool CanLockingOnTarget_Implementation(AController* Invoker, const FName& CurLockSocketName, bool& TryLockAgain) const override;
 
-	virtual void SetLockedTarget(AActor* NewLockedTarget) {}
+	UPROPERTY(Replicated)
+	uint8 bIsLockingOther : 1;
+
+	virtual void SetLockedTarget(AActor* NewLockedTarget)
+	{
+		bIsLockingOther = NewLockedTarget ? true : false;
+	}
 	//动画
 public:
 	UFUNCTION(BlueprintCallable, Category = "角色|行为")
