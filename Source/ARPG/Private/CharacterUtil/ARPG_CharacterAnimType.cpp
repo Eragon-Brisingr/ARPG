@@ -5,6 +5,7 @@
 #include "ARPG_MovementComponent.h"
 #include "ARPG_Anim_Log.h"
 #include "ARPG_DebugFunctionLibrary.h"
+#include <Package.h>
 
 
 
@@ -15,7 +16,16 @@ void UARPG_AnimFunctionLibrary::CheckAndFixAnimData(UAnimMontage* Montage, TSubc
 		if (!Montage->GetMetaData().ContainsByPredicate([&](UAnimMetaData* E) {return E && E->IsA(AnimMetaType); }))
 		{
 			Montage->AddMetaData(NewObject<UAMD_CanPlayWhenFalling>(Montage));
-			Anim_Warning_LOG("%s中不存在%s元数据，自动添加", *UARPG_DebugFunctionLibrary::GetDebugName(Montage), *UARPG_DebugFunctionLibrary::GetDebugName(AnimMetaType));
+			if (UPackage* Package = Montage->GetTypedOuter<UPackage>())
+			{
+				const bool bIsDirty = Package->IsDirty();
+				if (!bIsDirty)
+				{
+					Package->SetDirtyFlag(true);
+				}
+				Package->PackageMarkedDirtyEvent.Broadcast(Package, bIsDirty);
+			}
+			Anim_Error_Log("%s中不存在%s元数据，自动添加", *UARPG_DebugFunctionLibrary::GetDebugName(Montage), *UARPG_DebugFunctionLibrary::GetDebugName(AnimMetaType));
 		}
 	}
 }
