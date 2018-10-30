@@ -3,8 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Character/CharacterBase.h"
-#include "XD_ItemType.h"
+#include "CharacterBase.h"
 #include "HumanType.h"
 #include "HumanBase.generated.h"
 
