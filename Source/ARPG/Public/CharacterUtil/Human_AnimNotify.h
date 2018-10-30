@@ -7,6 +7,7 @@
 #include "Animation/AnimNotifies/AnimNotify.h"
 #include "CharacterType.h"
 #include <SubclassOf.h>
+#include "ARPG_AnimNotify.h"
 #include "Human_AnimNotify.generated.h"
 
 /**
@@ -136,3 +137,40 @@ public:
 
 	virtual void Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation) override;
 };
+
+UCLASS(meta = (DisplayName = "人类左手武器"))
+class USRDAF_LeftWeapon : public UARPG_SetReceiveDamageActionFunctorBase
+{
+	GENERATED_BODY()
+public:
+	virtual void SetReceiveDamageAction(USkeletalMeshComponent* MeshComp, TSubclassOf<class UReceiveDamageActionBase> ReceiveDamageAction) const override;
+};
+
+UCLASS(meta = (DisplayName = "人类右手武器"))
+class USRDAF_RightWeapon : public UARPG_SetReceiveDamageActionFunctorBase
+{
+	GENERATED_BODY()
+public:
+	virtual void SetReceiveDamageAction(USkeletalMeshComponent* MeshComp, TSubclassOf<class UReceiveDamageActionBase> ReceiveDamageAction) const override;
+};
+
+UCLASS(meta = (DisplayName = "人类左手武器"))
+class USAHSVF_LeftWeapon : public UARPG_SetAddHitStunValueFunctorBase
+{
+	GENERATED_BODY()
+public:
+	virtual void SetAddHitStunValue(USkeletalMeshComponent* MeshComp, float AddHitStunValue) const override;
+
+	virtual void Reset(USkeletalMeshComponent* MeshComp, float AddHitStunValue) const override;
+};
+
+UCLASS(meta = (DisplayName = "人类左手武器"))
+class USAHSVF_RightWeapon : public UARPG_SetAddHitStunValueFunctorBase
+{
+	GENERATED_BODY()
+public:
+	virtual void SetAddHitStunValue(USkeletalMeshComponent* MeshComp, float AddHitStunValue) const override;
+
+	virtual void Reset(USkeletalMeshComponent* MeshComp, float AddHitStunValue) const override;
+};
+

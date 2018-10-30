@@ -179,5 +179,68 @@ void UARPG_Human_LaunchArrow::Notify(USkeletalMeshComponent* MeshComp, UAnimSequ
 	}
 }
 
+void USRDAF_LeftWeapon::SetReceiveDamageAction(USkeletalMeshComponent* MeshComp, TSubclassOf<class UReceiveDamageActionBase> ReceiveDamageAction) const
+{
+	if (AHumanBase* Human = Cast<AHumanBase>(MeshComp->GetOwner()))
+	{
+		if (Human->LeftWeapon)
+		{
+			Human->LeftWeapon->ReceiveDamageAction = ReceiveDamageAction;
+		}
+	}
+}
 
+void USRDAF_RightWeapon::SetReceiveDamageAction(USkeletalMeshComponent* MeshComp, TSubclassOf<class UReceiveDamageActionBase> ReceiveDamageAction) const
+{
+	if (AHumanBase* Human = Cast<AHumanBase>(MeshComp->GetOwner()))
+	{
+		if (Human->RightWeapon)
+		{
+			Human->RightWeapon->ReceiveDamageAction = ReceiveDamageAction;
+		}
+	}
+}
 
+void USAHSVF_LeftWeapon::SetAddHitStunValue(USkeletalMeshComponent* MeshComp, float AddHitStunValue) const
+{
+	if (AHumanBase* Human = Cast<AHumanBase>(MeshComp->GetOwner()))
+	{
+		if (Human->LeftWeapon)
+		{
+			Human->LeftWeapon->AnimAddHitStunValue += AddHitStunValue;
+		}
+	}
+}
+
+void USAHSVF_LeftWeapon::Reset(USkeletalMeshComponent* MeshComp, float AddHitStunValue) const
+{
+	if (AHumanBase* Human = Cast<AHumanBase>(MeshComp->GetOwner()))
+	{
+		if (Human->LeftWeapon)
+		{
+			Human->LeftWeapon->AnimAddHitStunValue -= AddHitStunValue;
+		}
+	}
+}
+
+void USAHSVF_RightWeapon::SetAddHitStunValue(USkeletalMeshComponent* MeshComp, float AddHitStunValue) const
+{
+	if (AHumanBase* Human = Cast<AHumanBase>(MeshComp->GetOwner()))
+	{
+		if (Human->RightWeapon)
+		{
+			Human->RightWeapon->AnimAddHitStunValue += AddHitStunValue;
+		}
+	}
+}
+
+void USAHSVF_RightWeapon::Reset(USkeletalMeshComponent* MeshComp, float AddHitStunValue) const
+{
+	if (AHumanBase* Human = Cast<AHumanBase>(MeshComp->GetOwner()))
+	{
+		if (Human->RightWeapon)
+		{
+			Human->RightWeapon->AnimAddHitStunValue -= AddHitStunValue;
+		}
+	}
+}
