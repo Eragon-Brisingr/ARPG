@@ -62,6 +62,8 @@ public:
 
 	TSubclassOf<class UReceiveDamageActionBase> ReceiveDamageAction;
 
+	float BeakBackDistance = 20.f;
+
 	UPROPERTY(EditDefaultsOnly, Category = "武器", meta = (ShowOnlyInnerProperties))
 	FExecuteActionSet ExecuteActionSet;
 

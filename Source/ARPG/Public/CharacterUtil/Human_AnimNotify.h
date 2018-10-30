@@ -65,6 +65,9 @@ public:
 	UPROPERTY(EditAnywhere, Category = "攻击", meta = (DisplayName = "削韧增加量"))
 	float AddHitStunValue = 0.f;
 
+	UPROPERTY(EditAnywhere, Category = "攻击", meta = (DisplayName = "击退距离"))
+	float BeakBackDistance = 20.f;
+
 	virtual void NotifyBegin(USkeletalMeshComponent * MeshComp, UAnimSequenceBase * Animation, float TotalDuration) override;
 	virtual void NotifyEnd(USkeletalMeshComponent * MeshComp, UAnimSequenceBase * Animation) override;
 
@@ -164,7 +167,7 @@ public:
 	virtual void Reset(USkeletalMeshComponent* MeshComp, float AddHitStunValue) const override;
 };
 
-UCLASS(meta = (DisplayName = "人类左手武器"))
+UCLASS(meta = (DisplayName = "人类右手武器"))
 class USAHSVF_RightWeapon : public UARPG_SetAddHitStunValueFunctorBase
 {
 	GENERATED_BODY()
@@ -174,3 +177,18 @@ public:
 	virtual void Reset(USkeletalMeshComponent* MeshComp, float AddHitStunValue) const override;
 };
 
+UCLASS(meta = (DisplayName = "人类左手武器"))
+class USBBDF_LeftWeapon : public UARPG_SetBeakBackDistanceFunctorBase
+{
+	GENERATED_BODY()
+public:
+	virtual void SetBeakBackDistance(USkeletalMeshComponent* MeshComp, float BeakBackDistance) const override;
+};
+
+UCLASS(meta = (DisplayName = "人类右手武器"))
+class USBBDF_RightWeapon : public UARPG_SetBeakBackDistanceFunctorBase
+{
+	GENERATED_BODY()
+public:
+	virtual void SetBeakBackDistance(USkeletalMeshComponent* MeshComp, float BeakBackDistance) const override;
+};

@@ -256,3 +256,37 @@ public:
 
 	virtual FString GetNotifyName_Implementation() const override;
 };
+
+UCLASS(abstract, Blueprintable, const)
+class ARPG_API UARPG_SetBeakBackDistanceFunctorBase : public UObject
+{
+	GENERATED_BODY()
+public:
+	virtual void SetBeakBackDistance(USkeletalMeshComponent* MeshComp, float BeakBackDistance) const
+	{
+		ReceiveBeakBackDistance(MeshComp, BeakBackDistance);
+	}
+	UFUNCTION(BlueprintImplementableEvent, Category = "函数子", meta = (DisplayName = "BeakBackDistance"))
+	void ReceiveBeakBackDistance(USkeletalMeshComponent* MeshComp, float BeakBackDistance) const;
+};
+
+UCLASS(meta = (DisplayName = "动画_设置击退距离"))
+class ARPG_API UARPG_SetBeakBackDistance : public UAnimNotify
+{
+	GENERATED_BODY()
+public:
+	UARPG_SetBeakBackDistance()
+	{
+		bIsNativeBranchingPoint = true;
+	}
+
+	UPROPERTY(EditAnywhere, Category = "动画", meta = (DisplayName = "击退距离"))
+	float BeakBackDistance = 20.f;
+
+	UPROPERTY(EditAnywhere, Category = "动画", meta = (DisplayName = "作用对象"))
+	TSubclassOf<class UARPG_SetBeakBackDistanceFunctorBase> SetBeakBackDistanceFunctor;
+
+	virtual void Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation) override;
+
+	virtual FString GetNotifyName_Implementation() const override;
+};

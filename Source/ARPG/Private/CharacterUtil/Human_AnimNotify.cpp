@@ -72,6 +72,7 @@ void UARPG_Human_WeaponTrace::NotifyBegin(USkeletalMeshComponent * MeshComp, UAn
 		{
 			Weapon->ReceiveDamageAction = ReceiveDamageAction;
 			Weapon->AnimAddHitStunValue = AddHitStunValue;
+			Weapon->BeakBackDistance = BeakBackDistance;
 			Weapon->SetEnableNearAttackTrace(true);
 		}
 	}
@@ -241,6 +242,28 @@ void USAHSVF_RightWeapon::Reset(USkeletalMeshComponent* MeshComp, float AddHitSt
 		if (Human->RightWeapon)
 		{
 			Human->RightWeapon->AnimAddHitStunValue -= AddHitStunValue;
+		}
+	}
+}
+
+void USBBDF_LeftWeapon::SetBeakBackDistance(USkeletalMeshComponent* MeshComp, float BeakBackDistance) const
+{
+	if (AHumanBase* Human = Cast<AHumanBase>(MeshComp->GetOwner()))
+	{
+		if (Human->LeftWeapon)
+		{
+			Human->LeftWeapon->BeakBackDistance = BeakBackDistance;
+		}
+	}
+}
+
+void USBBDF_RightWeapon::SetBeakBackDistance(USkeletalMeshComponent* MeshComp, float BeakBackDistance) const
+{
+	if (AHumanBase* Human = Cast<AHumanBase>(MeshComp->GetOwner()))
+	{
+		if (Human->RightWeapon)
+		{
+			Human->RightWeapon->BeakBackDistance = BeakBackDistance;
 		}
 	}
 }

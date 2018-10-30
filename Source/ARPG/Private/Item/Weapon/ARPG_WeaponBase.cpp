@@ -106,6 +106,10 @@ void AARPG_WeaponBase::WhenAttackTracedActor(UPrimitiveComponent* HitComponent, 
 				if (ReceiveDamageCharacter->ApplyPointDamage(GetPhysicsAttackValue(), GetHitStunValue(), TraceResult.ImpactNormal, TraceResult, WeaponOnwer, this, nullptr, ReceiveDamageAction) > 0.f)
 				{
 					WeaponOnwer->NearAttackSuccessTimeDilation(0.2f);
+
+					//击退效果
+					FVector BeakBackOffset = (ReceiveDamageCharacter->GetActorLocation() - WeaponOnwer->GetActorLocation()).GetSafeNormal2D() * BeakBackDistance;
+					ReceiveDamageCharacter->AddActorWorldOffset(BeakBackOffset, true);
 				}
 			}
 		}
