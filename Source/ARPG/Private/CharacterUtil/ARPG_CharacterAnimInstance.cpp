@@ -15,6 +15,13 @@ void UARPG_CharacterAnimInstance::NativeInitializeAnimation()
 {
 	Super::NativeInitializeAnimation();
 
+#if WITH_EDITOR
+	if (!GetWorld()->IsGameWorld())
+	{
+		return;
+	}
+#endif
+
 	if (ACharacterBase* Character = Cast<ACharacterBase>(TryGetPawnOwner()))
 	{
 		Character->ARPG_MovementComponent->OnARPGMovementModeChanged.AddDynamic(this, &UARPG_CharacterAnimInstance::OnMovementModeChanged);

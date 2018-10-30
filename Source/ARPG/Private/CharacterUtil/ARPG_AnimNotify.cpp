@@ -6,6 +6,8 @@
 #include <Animation/AnimInstance.h>
 #include <Animation/AimOffsetBlendSpace.h>
 #include "CharacterBase.h"
+#include "ARPG_DebugFunctionLibrary.h"
+#include "ReceiveDamageActionBase.h"
 
 
 void UARPG_PlayMontageByState::Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation)
@@ -215,7 +217,7 @@ void UARPG_SetReceiveDamageAction::Notify(USkeletalMeshComponent* MeshComp, UAni
 
 FString UARPG_SetReceiveDamageAction::GetNotifyName_Implementation() const
 {
-	return TEXT("设置特殊受击动画");
+	return FString::Printf(TEXT("设置特殊受击动画"), *UARPG_DebugFunctionLibrary::GetDebugName(ReceiveDamageAction));
 }
 
 void UARPG_SetAddHitStunValue::NotifyBegin(USkeletalMeshComponent * MeshComp, UAnimSequenceBase * Animation, float TotalDuration)
@@ -236,5 +238,18 @@ void UARPG_SetAddHitStunValue::NotifyEnd(USkeletalMeshComponent * MeshComp, UAni
 
 FString UARPG_SetAddHitStunValue::GetNotifyName_Implementation() const
 {
-	return TEXT("设置动画增加削韧量");
+	return FString::Printf(TEXT("设置动画增加削韧量[%s]"), AddHitStunValue);
+}
+
+void UARPG_SetBeakBackDistance::Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation)
+{
+	if (SetBeakBackDistanceFunctor)
+	{
+		SetBeakBackDistanceFunctor.GetDefaultObject()->SetBeakBackDistance(MeshComp, BeakBackDistance);
+	}
+}
+
+FString UARPG_SetBeakBackDistance::GetNotifyName_Implementation() const
+{
+	return FString::Printf(TEXT("设置击退距离[%s]"), BeakBackDistance);
 }
