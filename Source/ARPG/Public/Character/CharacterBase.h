@@ -9,8 +9,6 @@
 #include "ARPG_LockOnTargetSystem.h"
 #include "ARPG_CharacterAnimType.h"
 #include "ItemTypeUtils.h"
-#include "XD_ItemType.h"
-#include "CharacterDamageType.h"
 #include "CharacterBase.generated.h"
 
 UCLASS()
