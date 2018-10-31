@@ -36,10 +36,7 @@ bool AARPG_PlayerControllerBase::SetLockedTarget(AActor* Target, const FName& So
 
 void AARPG_PlayerControllerBase::SetLockedTarget_ToServer_Implementation(AActor* Target, const FName& SocketName)
 {
-	if (LockOnTargetSystem.CanLockedOn(this, Target, SocketName))
-	{
-		LockOnTargetSystem.SetLockedTarget(Target, SocketName);
-	}
+	LockOnTargetSystem.SetLockedTarget(Target, SocketName);
 }
 
 void AARPG_PlayerControllerBase::ClearLockedTarget()
