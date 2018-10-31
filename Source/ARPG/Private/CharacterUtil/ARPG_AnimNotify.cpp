@@ -8,6 +8,8 @@
 #include "CharacterBase.h"
 #include "ARPG_DebugFunctionLibrary.h"
 #include "ReceiveDamageActionBase.h"
+#include "XD_MacrosLibrary.h"
+#include <GameFramework/CharacterMovementComponent.h>
 
 
 void UARPG_PlayMontageByState::Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation)
@@ -144,6 +146,39 @@ void UARPG_DodgeState::NotifyEnd(USkeletalMeshComponent * MeshComp, UAnimSequenc
 FString UARPG_DodgeState::GetNotifyName_Implementation() const
 {
 	return TEXT("闪避状态");
+}
+
+void UARPG_SetMovementMode::NotifyBegin(USkeletalMeshComponent * MeshComp, UAnimSequenceBase * Animation, float TotalDuration)
+{
+	if (ACharacter* Character = Cast<ACharacter>(MeshComp))
+	{
+		switch (MovementMode)
+		{
+		case ESettableMovement::Fly:
+			Character->GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Flying);
+			break;
+		}
+	}
+}
+
+void UARPG_SetMovementMode::NotifyEnd(USkeletalMeshComponent * MeshComp, UAnimSequenceBase * Animation)
+{
+	if (ACharacter* Character = Cast<ACharacter>(MeshComp))
+	{
+		Character->GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
+	}
+}
+
+FString UARPG_SetMovementMode::GetNotifyName_Implementation() const
+{
+#if WITH_EDITOR
+	if (MovementModeEnum == nullptr)
+	{
+		MovementModeEnum = FindObject<UEnum>(ANY_PACKAGE, *GET_TYPE_NAME_STRING_CHECKED(EMovementMode));
+	}
+	return FString::Printf(TEXT("移动模式[%s]"), *MovementModeEnum->GetNameStringByValue((int64)MovementMode));
+#endif
+	return FString();
 }
 
 void UARPG_AddToughnessValue::NotifyBegin(USkeletalMeshComponent * MeshComp, UAnimSequenceBase * Animation, float TotalDuration)
