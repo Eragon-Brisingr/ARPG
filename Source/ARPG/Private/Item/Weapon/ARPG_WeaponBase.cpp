@@ -10,6 +10,7 @@
 #include "ARPG_Item_Log.h"
 #include "ARPG_Battle_Log.h"
 #include "ARPG_CharacterAnimType.h"
+#include "ARPG_ActorFunctionLibrary.h"
 
 #define LOCTEXT_NAMESPACE "ARPG_Item"
 
@@ -109,7 +110,7 @@ void AARPG_WeaponBase::WhenAttackTracedActor(UPrimitiveComponent* HitComponent, 
 
 					//击退效果
 					FVector BeakBackOffset = (ReceiveDamageCharacter->GetActorLocation() - WeaponOnwer->GetActorLocation()).GetSafeNormal2D() * BeakBackDistance;
-					ReceiveDamageCharacter->AddActorWorldOffset(BeakBackOffset, true);
+					UARPG_ActorFunctionLibrary::PushActorTo(ReceiveDamageCharacter, BeakBackOffset);
 				}
 			}
 		}

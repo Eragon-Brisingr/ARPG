@@ -17,6 +17,7 @@
 #include "ARPG_LevelFunctionLibrary.h"
 #include "XD_TemplateLibrary.h"
 #include "UnrealNetwork.h"
+#include "ARPG_ActorFunctionLibrary.h"
 
 
 // Sets default values
@@ -425,7 +426,7 @@ void ACharacterBase::ExecuteOtherToServer_Implementation(ACharacterBase* Execute
 {
 	ExecuteTargetCharacter = ExecuteTarget;
 	ExecuteTarget->ExecuteFromCharacter = this;
-	SetActorLocationAndRotation(TargetLocation, TargetRotation);
+	UARPG_ActorFunctionLibrary::MoveActorTo(this, TargetLocation, TargetRotation);
 	PlayMontage(ExecuteMontage);
 	ExecuteTarget->PlayMontage(BeExecutedMontage);
 }
