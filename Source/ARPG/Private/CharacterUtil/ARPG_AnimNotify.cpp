@@ -174,9 +174,9 @@ FString UARPG_SetMovementMode::GetNotifyName_Implementation() const
 #if WITH_EDITOR
 	if (MovementModeEnum == nullptr)
 	{
-		MovementModeEnum = FindObject<UEnum>(ANY_PACKAGE, *GET_TYPE_NAME_STRING_CHECKED(EMovementMode));
+		MovementModeEnum = FindObject<UEnum>(ANY_PACKAGE, *GET_TYPE_CPP_NAME_STRING_CHECKED(ESettableMovement));
 	}
-	return FString::Printf(TEXT("移动模式[%s]"), *MovementModeEnum->GetNameStringByValue((int64)MovementMode));
+	return FString::Printf(TEXT("移动模式[%s]"), *MovementModeEnum->GetDisplayNameTextByValue((int64)MovementMode).ToString());
 #endif
 	return FString();
 }
