@@ -6,6 +6,7 @@
 #include <Animation/AnimNotifies/AnimNotifyState.h>
 #include <Animation/AnimNotifies/AnimNotify.h>
 #include <SubclassOf.h>
+#include <Engine/EngineTypes.h>
 #include "ARPG_AnimNotify.generated.h"
 /**
  * 
@@ -120,6 +121,31 @@ public:
 	virtual void NotifyEnd(USkeletalMeshComponent * MeshComp, UAnimSequenceBase * Animation) override;
 
 	virtual FString GetNotifyName_Implementation() const override;
+};
+
+UENUM(BlueprintType)
+enum class ESettableMovement : uint8
+{
+	Fly UMETA(DisplayName = "飞行")
+};
+
+UCLASS(meta = (DisplayName = "状态_设置移动模式"))
+class ARPG_API UARPG_SetMovementMode : public UAnimNotifyState
+{
+	GENERATED_BODY()
+public:
+	UPROPERTY(EditAnywhere, Category = "移动模式")
+	ESettableMovement MovementMode = ESettableMovement::Fly;
+
+	virtual void NotifyBegin(USkeletalMeshComponent * MeshComp, UAnimSequenceBase * Animation, float TotalDuration) override;
+	virtual void NotifyEnd(USkeletalMeshComponent * MeshComp, UAnimSequenceBase * Animation) override;
+
+	virtual FString GetNotifyName_Implementation() const override;
+
+#if WITH_EDITORONLY_DATA
+	UPROPERTY()
+	mutable UEnum* MovementModeEnum;
+#endif
 };
 
 UCLASS(meta = (DisplayName = "属性_增加强韧度"))
