@@ -3,7 +3,6 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Kismet/BlueprintFunctionLibrary.h"
 #include "XD_ActorFunctionLibrary.h"
 #include "ARPG_ActorFunctionLibrary.generated.h"
 
@@ -15,6 +14,8 @@ class ARPG_API UARPG_ActorFunctionLibrary : public UXD_ActorFunctionLibrary
 {
 	GENERATED_BODY()
 public:
+	static TMap<TWeakObjectPtr<USceneComponent>, FDelegateHandle> MovingComponentMap;
+
 	UFUNCTION(BlueprintCallable, Category = "游戏|移动")
 	static void MoveComponentTo(USceneComponent* Component, const FVector& TargetRelativeLocation, const FRotator& TargetRelativeRotation, float OverTime = 0.2f, bool Sweep = true);
 	
