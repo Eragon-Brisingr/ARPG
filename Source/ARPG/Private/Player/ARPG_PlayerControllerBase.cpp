@@ -67,5 +67,10 @@ bool AARPG_PlayerControllerBase::ToggleLockedTarget()
 
 bool AARPG_PlayerControllerBase::InvokeSwitchLockedTarget(bool Left)
 {
-	return LockOnTargetSystem.InvokeSwitchLockedTarget(this, FRotationMatrix(GetControlRotation()).GetScaledAxis(EAxis::Y) * (Left ? 1.f : -1.f));
+	bool Succeed = LockOnTargetSystem.InvokeSwitchLockedTarget(this, FRotationMatrix(GetControlRotation()).GetScaledAxis(EAxis::Y) * (Left ? 1.f : -1.f));
+	if (Succeed && LockOnTargetSystem.LockedTarget.IsValid())
+	{
+		SetLockedTarget_ToServer(LockOnTargetSystem.LockedTarget.Get(), LockOnTargetSystem.LockedSocketName);
+	}
+	return Succeed;
 }
