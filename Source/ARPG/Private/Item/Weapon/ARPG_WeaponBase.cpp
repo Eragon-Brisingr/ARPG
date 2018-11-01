@@ -18,12 +18,6 @@
 AARPG_WeaponBase::AARPG_WeaponBase(const FObjectInitializer& ObjectInitializer)
 	:Super(ObjectInitializer.SetDefaultSubobjectClass<UARPG_WeaponCoreBase>(GET_MEMBER_NAME_CHECKED(AARPG_WeaponBase, InnerItemCore)))
 {
-	SocketMoveTracer = CreateDefaultSubobject<USocketMoveTracer>(GET_MEMBER_NAME_CHECKED(AARPG_WeaponBase, SocketMoveTracer));
-	{
-		SocketMoveTracer->Config = &SocketMoveTracerConfig;
-		SocketMoveTracer->OnTraceActorNative.BindUObject(this, &AARPG_WeaponBase::WhenAttackTracedActor);
-	}
-
 	AttackAnimSet = CreateDefaultSubobject<UARPG_AttackAnimSetNormal>(GET_MEMBER_NAME_CHECKED(AARPG_WeaponBase, AttackAnimSet));
 }
 
@@ -40,6 +34,12 @@ FText AARPG_WeaponBase::GetItemTypeDescImpl_Implementation(const class UXD_ItemC
 void AARPG_WeaponBase::WhenUse(class ACharacterBase* ItemOwner)
 {
 	Item_Display_LOG("%s装备武器%s", *UXD_DebugFunctionLibrary::GetDebugName(ItemOwner), *UXD_DebugFunctionLibrary::GetDebugName(this));
+	if (UPrimitiveComponent* Root = Cast<UPrimitiveComponent>(GetRootComponent()))
+	{
+		SocketMoveTracer = NewObject<USocketMoveTracer>(this, GET_MEMBER_NAME_CHECKED(AARPG_WeaponBase, SocketMoveTracer));
+		SocketMoveTracer->OnTraceActorNative.BindUObject(this, &AARPG_WeaponBase::WhenAttackTracedActor);
+		SocketMoveTracer->InitSocketMoveTracer(Root, SocketMoveTracerConfig);
+	}
 	Super::WhenUse(ItemOwner);
 }
 
@@ -76,11 +76,6 @@ void AARPG_WeaponBase::WhenRemoveFromInventory_Implementation(class AActor* Item
 void AARPG_WeaponBase::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
-
-	if (UPrimitiveComponent* Root = Cast<UPrimitiveComponent>(GetRootComponent()))
-	{
-		SocketMoveTracer->InitSocketMoveTracer(Root);
-	}
 }
 
 void AARPG_WeaponBase::SetEnableNearAttackTrace(bool Enable, bool ClearIgnoreList /*= true*/)

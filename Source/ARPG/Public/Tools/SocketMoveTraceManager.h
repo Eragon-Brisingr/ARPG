@@ -80,7 +80,7 @@ public:
 	AActor* GetOwner() const;
 
 	UFUNCTION(BlueprintCallable, Category = "游戏|检测")
-	void InitSocketMoveTracer(UPrimitiveComponent* TargetComponent);
+	void InitSocketMoveTracer(UPrimitiveComponent* TargetComponent, FSocketMoveTracerConfig& SocketMoveTracerConfig);
 
 	UFUNCTION(BlueprintCallable, Category = "游戏|检测")
 	void EnableTrace(bool ClearIgnoreList = true);
