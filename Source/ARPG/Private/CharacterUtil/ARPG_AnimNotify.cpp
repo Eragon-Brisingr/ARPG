@@ -171,11 +171,10 @@ void UARPG_EnableAttackTracer::NotifyBegin(USkeletalMeshComponent * MeshComp, UA
 			if (ValidSocketMoveTracer == nullptr)
 			{
 				ValidSocketMoveTracer = NewObject<USocketMoveTracer>(Character);
-				ValidSocketMoveTracer->InitSocketMoveTracer(MeshComp);
 			}
 		}
 
-		ValidSocketMoveTracer->Config = &SocketMoveTracerConfig;
+		ValidSocketMoveTracer->InitSocketMoveTracer(MeshComp, SocketMoveTracerConfig);
 		ValidSocketMoveTracer->EnableTrace(true);
 	}
 }

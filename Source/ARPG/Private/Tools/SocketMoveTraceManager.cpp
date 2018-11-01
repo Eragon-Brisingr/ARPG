@@ -35,8 +35,9 @@ AActor* USocketMoveTracer::GetOwner() const
 	return TargetSocketMesh.IsValid() ? TargetSocketMesh->GetOwner() : nullptr;
 }
 
-void USocketMoveTracer::InitSocketMoveTracer(UPrimitiveComponent* TargetComponent)
+void USocketMoveTracer::InitSocketMoveTracer(UPrimitiveComponent* TargetComponent, FSocketMoveTracerConfig& SocketMoveTracerConfig)
 {
+	Config = &SocketMoveTracerConfig;
 	if (TargetComponent)
 	{
 		TargetSocketMesh = TargetComponent;
