@@ -1,6 +1,7 @@
 ﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 #include "ARPG_WeaponBase.h"
+#include <Components/PrimitiveComponent.h>
 #include "CharacterBase.h"
 #include "ARPG_ItemCoreBase.h"
 #include "SocketMoveTraceManager.h"
@@ -19,6 +20,7 @@ AARPG_WeaponBase::AARPG_WeaponBase(const FObjectInitializer& ObjectInitializer)
 {
 	SocketMoveTracer = CreateDefaultSubobject<USocketMoveTracer>(GET_MEMBER_NAME_CHECKED(AARPG_WeaponBase, SocketMoveTracer));
 	{
+		SocketMoveTracer->Config = &SocketMoveTracerConfig;
 		SocketMoveTracer->OnTraceActorNative.BindUObject(this, &AARPG_WeaponBase::WhenAttackTracedActor);
 	}
 

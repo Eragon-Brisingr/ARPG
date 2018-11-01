@@ -6,6 +6,7 @@
 #include "ARPG_ItemBase.h"
 #include "ARPG_CharacterAnimType.h"
 #include "ExecuteActionSet.h"
+#include "SocketMoveTraceManager.h"
 #include "ARPG_WeaponBase.generated.h"
 
 /**
@@ -51,8 +52,11 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "武器", meta = (DisplayName = "基础物理攻击"))
 	float BasePhysicsAttack = 100.f;
 
-	UPROPERTY(VisibleAnywhere, Category = "武器", Instanced)
+	UPROPERTY()
 	class USocketMoveTracer* SocketMoveTracer;
+
+	UPROPERTY(EditAnywhere, Category = "武器", meta = (ShowOnlyInnerProperties))
+	FSocketMoveTracerConfig SocketMoveTracerConfig;
 
 	//攻击
 public:

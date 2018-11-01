@@ -5,11 +5,11 @@
 #include <Animation/AnimMontage.h>
 #include <Animation/AnimInstance.h>
 #include <Animation/AimOffsetBlendSpace.h>
+#include <GameFramework/CharacterMovementComponent.h>
 #include "CharacterBase.h"
 #include "ARPG_DebugFunctionLibrary.h"
 #include "ReceiveDamageActionBase.h"
 #include "XD_MacrosLibrary.h"
-#include <GameFramework/CharacterMovementComponent.h>
 
 
 void UARPG_PlayMontageByState::Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation)
@@ -146,6 +146,61 @@ void UARPG_DodgeState::NotifyEnd(USkeletalMeshComponent * MeshComp, UAnimSequenc
 FString UARPG_DodgeState::GetNotifyName_Implementation() const
 {
 	return TEXT("闪避状态");
+}
+
+void UARPG_EnableAttackTracer::NotifyBegin(USkeletalMeshComponent * MeshComp, UAnimSequenceBase * Animation, float TotalDuration)
+{
+	if (ACharacterBase* Character = Cast<ACharacterBase>(MeshComp->GetOwner()))
+	{
+		USocketMoveTracer*& ValidSocketMoveTracer = Character->SocketMoveTracerMap.FindOrAdd(this);
+		if (ValidSocketMoveTracer == nullptr)
+		{
+			for (TPair<UAnimNotifyState*, USocketMoveTracer*>& Pair : Character->SocketMoveTracerMap)
+			{
+				if (USocketMoveTracer* SocketMoveTracer = Pair.Value)
+				{
+					if (SocketMoveTracer->bEnableTrace == false)
+					{
+						ValidSocketMoveTracer = SocketMoveTracer;
+						Pair.Value = nullptr;
+						break;
+					}
+				}
+			}
+
+			if (ValidSocketMoveTracer == nullptr)
+			{
+				ValidSocketMoveTracer = NewObject<USocketMoveTracer>(Character);
+				ValidSocketMoveTracer->InitSocketMoveTracer(MeshComp);
+			}
+		}
+
+		ValidSocketMoveTracer->Config = &SocketMoveTracerConfig;
+		ValidSocketMoveTracer->EnableTrace(true);
+	}
+}
+
+#if WITH_EDITOR
+void UARPG_EnableAttackTracer::NotifyTick(USkeletalMeshComponent * MeshComp, UAnimSequenceBase * Animation, float FrameDeltaTime)
+{
+
+}
+#endif
+
+void UARPG_EnableAttackTracer::NotifyEnd(USkeletalMeshComponent * MeshComp, UAnimSequenceBase * Animation)
+{
+	if (ACharacterBase* Character = Cast<ACharacterBase>(MeshComp->GetOwner()))
+	{
+		if (USocketMoveTracer* ValidSocketMoveTracer = Character->SocketMoveTracerMap.FindOrAdd(this))
+		{
+			ValidSocketMoveTracer->DisableTrace();
+		}
+	}
+}
+
+FString UARPG_EnableAttackTracer::GetNotifyName_Implementation() const
+{
+	return TEXT("启用攻击检测");
 }
 
 void UARPG_SetMovementMode::NotifyBegin(USkeletalMeshComponent * MeshComp, UAnimSequenceBase * Animation, float TotalDuration)

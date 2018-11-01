@@ -15,6 +15,28 @@ DECLARE_DYNAMIC_DELEGATE_FiveParams(FOnTraceActor, UPrimitiveComponent*, HitComp
 
 DECLARE_DELEGATE_FiveParams(FOnTraceActorNative, UPrimitiveComponent*, const FName&, AActor*, UPrimitiveComponent*, const FHitResult&);
 
+USTRUCT(BlueprintType)
+struct FSocketMoveTracerConfig
+{
+	GENERATED_BODY()
+public:
+	FSocketMoveTracerConfig();
+
+	UPROPERTY(EditAnywhere, Category = "攻击检测", meta = (DisplayName = "检测步长"))
+	float StepLength = 20.f;
+
+	UPROPERTY(EditAnywhere, Category = "攻击检测", meta = (DisplayName = "插槽列表"))
+	TArray<FName> TraceSocketList;
+
+#if WITH_EDITORONLY_DATA
+	UPROPERTY(EditAnywhere, Category = "攻击检测", meta = (DisplayName = "调试模式"))
+	TEnumAsByte<EDrawDebugTrace::Type> DebugType = EDrawDebugTrace::None;
+#endif
+
+	UPROPERTY(EditAnywhere, Category = "攻击检测", meta = (DisplayName = "检测碰撞通道"))
+	TEnumAsByte<ETraceTypeQuery> TraceTypeQuery;
+};
+
 UCLASS(editinlinenew, collapseCategories)
 class ARPG_API USocketMoveTracer : public UObject, public FTickableGameObject
 {
@@ -33,31 +55,21 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "攻击检测")
 	uint8 bEnableTrace : 1;
 
-	TWeakObjectPtr<UPrimitiveComponent> TargetSocketMesh;
+	FSocketMoveTracerConfig* Config;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "攻击检测")
-	float StepLength = 20.f;
+	TWeakObjectPtr<UPrimitiveComponent> TargetSocketMesh;
 
 	TArray<FVector> PrePosList;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "攻击检测")
-	TArray<FName> TraceSocketList;
-
-#if WITH_EDITORONLY_DATA
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "攻击检测")
-	TEnumAsByte<EDrawDebugTrace::Type> DebugType = EDrawDebugTrace::None;
-#endif
+	TArray<FName>& GetTraceSocketList() const { return Config->TraceSocketList; }
 
 	FORCEINLINE TEnumAsByte<EDrawDebugTrace::Type> GetDebugType() const
 	{
 #if WITH_EDITORONLY_DATA
-		return DebugType;
+		return Config->DebugType;
 #endif
 		return EDrawDebugTrace::None;
 	}
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "攻击检测")
-	TEnumAsByte<ETraceTypeQuery> TraceTypeQuery;
 
 	UPROPERTY()
 	TArray<AActor*> TracedActors;
@@ -70,18 +82,13 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "游戏|检测")
 	void InitSocketMoveTracer(UPrimitiveComponent* TargetComponent);
 
+	UFUNCTION(BlueprintCallable, Category = "游戏|检测")
 	void EnableTrace(bool ClearIgnoreList = true);
 
+	UFUNCTION(BlueprintCallable, Category = "游戏|检测")
 	void DisableTrace();
 
 	void DoTrace(float DeltaTime);
 
 	void RecordPrePosition();
-
-	void SetTraceSocketList(const TArray<FName>& SocketList);
-
-	void ClearTraceSocketList();
-
-	UFUNCTION(BlueprintCallable, Category = "游戏|检测")
-	void SetEnableTrace(bool Enable);
 };

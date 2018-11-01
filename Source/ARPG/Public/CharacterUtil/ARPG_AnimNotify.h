@@ -7,6 +7,7 @@
 #include <Animation/AnimNotifies/AnimNotify.h>
 #include <SubclassOf.h>
 #include <Engine/EngineTypes.h>
+#include "SocketMoveTraceManager.h"
 #include "ARPG_AnimNotify.generated.h"
 /**
  * 
@@ -118,6 +119,23 @@ class ARPG_API UARPG_DodgeState : public UAnimNotifyState
 	GENERATED_BODY()
 public:
 	virtual void NotifyBegin(USkeletalMeshComponent * MeshComp, UAnimSequenceBase * Animation, float TotalDuration) override;
+	virtual void NotifyEnd(USkeletalMeshComponent * MeshComp, UAnimSequenceBase * Animation) override;
+
+	virtual FString GetNotifyName_Implementation() const override;
+};
+
+UCLASS(meta = (DisplayName = "检测_启用攻击检测"))
+class ARPG_API UARPG_EnableAttackTracer : public UAnimNotifyState
+{
+	GENERATED_BODY()
+public:
+	UPROPERTY(EditAnywhere, Category = "攻击检测", meta = (DisplayName = "检测配置", ShowOnlyInnerProperties))
+	FSocketMoveTracerConfig SocketMoveTracerConfig;
+
+	virtual void NotifyBegin(USkeletalMeshComponent * MeshComp, UAnimSequenceBase * Animation, float TotalDuration) override;
+#if WITH_EDITOR
+	virtual void NotifyTick(USkeletalMeshComponent * MeshComp, UAnimSequenceBase * Animation, float FrameDeltaTime) override;
+#endif
 	virtual void NotifyEnd(USkeletalMeshComponent * MeshComp, UAnimSequenceBase * Animation) override;
 
 	virtual FString GetNotifyName_Implementation() const override;
