@@ -53,10 +53,10 @@ struct ARPG_API FExecuteActionSet
 {
 	GENERATED_BODY()
 public:
-	UPROPERTY(EditAnywhere, Category = "物品|武器", meta = (DisplayName = "背刺动画集"))
+	UPROPERTY(EditAnywhere, Category = "动画", meta = (DisplayName = "背刺动画集"))
 	TMap<UClass*, FBackstabAnimData> BackstabMap;
 
-	UPROPERTY(EditAnywhere, Category = "物品|武器", meta = (DisplayName = "处决动画集"))
+	UPROPERTY(EditAnywhere, Category = "动画", meta = (DisplayName = "处决动画集"))
 	TMap<UAnimMontage*, FExecuteAnimData> ExecuteMontageMap;
 
 	//处决

@@ -260,6 +260,9 @@ public:
 	FTimerHandle ClearHitStun_TimeHandle;
 	void ClearHitStun();
 
+	UPROPERTY()
+	TMap<class UAnimNotifyState*, class USocketMoveTracer*> SocketMoveTracerMap;
+
 	//处决
 public:
 	//处决受击方

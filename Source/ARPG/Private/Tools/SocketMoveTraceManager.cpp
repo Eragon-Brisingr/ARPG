@@ -6,8 +6,13 @@
 
 
 
-USocketMoveTracer::USocketMoveTracer()
+FSocketMoveTracerConfig::FSocketMoveTracerConfig()
 	:TraceTypeQuery(FARPG_TraceTypeQuery::Visibility)
+{
+
+}
+
+USocketMoveTracer::USocketMoveTracer()
 {
 
 }
@@ -36,11 +41,11 @@ void USocketMoveTracer::InitSocketMoveTracer(UPrimitiveComponent* TargetComponen
 	{
 		TargetSocketMesh = TargetComponent;
 		TracedActors.Append({ GetOwner(), GetOwner()->GetOwner() });
-		if (TraceSocketList.Num() < 2)
+		if (GetTraceSocketList().Num() < 2)
 		{
-			TraceSocketList = TargetSocketMesh->GetAllSocketNames();
+			GetTraceSocketList() = TargetSocketMesh->GetAllSocketNames();
 		}
-		PrePosList.SetNum(TraceSocketList.Num());
+		PrePosList.SetNum(GetTraceSocketList().Num());
 	}
 }
 
@@ -68,14 +73,14 @@ void USocketMoveTracer::DisableTrace()
 void USocketMoveTracer::DoTrace(float DeltaTime)
 {
 	TArray<AActor*> TracedInOnceTraceActor;
-	for (int i = 1; i < TraceSocketList.Num(); ++i)
+	for (int i = 1; i < GetTraceSocketList().Num(); ++i)
 	{
-		float StepAddAlpha = StepLength / (PrePosList[i - 1] - PrePosList[i]).Size();
+		float StepAddAlpha = Config->StepLength / (PrePosList[i - 1] - PrePosList[i]).Size();
 
 		FVector TraceStart_Start = PrePosList[i - 1];
 		FVector TraceStart_End = PrePosList[i];
-		FVector TraceEnd_Start = TargetSocketMesh->GetSocketLocation(TraceSocketList[i - 1]);
-		FVector TraceEnd_End = TargetSocketMesh->GetSocketLocation(TraceSocketList[i]);
+		FVector TraceEnd_Start = TargetSocketMesh->GetSocketLocation(GetTraceSocketList()[i - 1]);
+		FVector TraceEnd_End = TargetSocketMesh->GetSocketLocation(GetTraceSocketList()[i]);
 
 		for (float Alpha = 0; Alpha < 1.f; Alpha += StepAddAlpha)
 		{
@@ -84,7 +89,7 @@ void USocketMoveTracer::DoTrace(float DeltaTime)
 
 			TArray<FHitResult> Hits;
 
-			if (UKismetSystemLibrary::SphereTraceMulti(TargetSocketMesh.Get(), TraceStart, TraceEnd, StepLength / 2.f, TraceTypeQuery, true, TracedActors, GetDebugType(), Hits, true))
+			if (UKismetSystemLibrary::SphereTraceMulti(TargetSocketMesh.Get(), TraceStart, TraceEnd, Config->StepLength / 2.f, Config->TraceTypeQuery, true, TracedActors, GetDebugType(), Hits, true))
 			{
 				for (const FHitResult& E_Hit : Hits)
 				{
@@ -92,8 +97,8 @@ void USocketMoveTracer::DoTrace(float DeltaTime)
 					{
 						TracedInOnceTraceActor.Add(E_Hit.GetActor());
 						TracedActors.Add(E_Hit.GetActor());
-						OnTraceActor.ExecuteIfBound(TargetSocketMesh.Get(), TraceSocketList[i], E_Hit.GetActor(), E_Hit.GetComponent(), E_Hit);
-						OnTraceActorNative.ExecuteIfBound(TargetSocketMesh.Get(), TraceSocketList[i], E_Hit.GetActor(), E_Hit.GetComponent(), E_Hit);
+						OnTraceActor.ExecuteIfBound(TargetSocketMesh.Get(), GetTraceSocketList()[i], E_Hit.GetActor(), E_Hit.GetComponent(), E_Hit);
+						OnTraceActorNative.ExecuteIfBound(TargetSocketMesh.Get(), GetTraceSocketList()[i], E_Hit.GetActor(), E_Hit.GetComponent(), E_Hit);
 					}
 				}
 			}
@@ -106,32 +111,8 @@ void USocketMoveTracer::DoTrace(float DeltaTime)
 
 void USocketMoveTracer::RecordPrePosition()
 {
-	for (int i = 0; i < TraceSocketList.Num(); ++i)
+	for (int i = 0; i < GetTraceSocketList().Num(); ++i)
 	{
-		PrePosList[i] = TargetSocketMesh->GetSocketLocation(TraceSocketList[i]);
-	}
-}
-
-void USocketMoveTracer::SetTraceSocketList(const TArray<FName>& SocketList)
-{
-	TraceSocketList = SocketList;
-	PrePosList.SetNum(TraceSocketList.Num());
-}
-
-void USocketMoveTracer::ClearTraceSocketList()
-{
-	TraceSocketList.Empty();
-	PrePosList.Empty();
-}
-
-void USocketMoveTracer::SetEnableTrace(bool Enable)
-{
-	if (bEnableTrace)
-	{
-		EnableTrace();
-	}
-	else
-	{
-		DisableTrace();
+		PrePosList[i] = TargetSocketMesh->GetSocketLocation(GetTraceSocketList()[i]);
 	}
 }
