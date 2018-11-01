@@ -6,55 +6,43 @@
 #include <Ticker.h>
 #include <GameFramework/Actor.h>
 
+TMap<TWeakObjectPtr<USceneComponent>, FDelegateHandle> UARPG_ActorFunctionLibrary::MovingComponentMap;
+
 void UARPG_ActorFunctionLibrary::MoveComponentTo(USceneComponent* Component, const FVector& TargetRelativeLocation, const FRotator& TargetRelativeRotation, float OverTime /*= 0.2f*/, bool Sweep /*= true*/)
 {
 	if (Component)
 	{
-		class FMoveComponentHelper
+		if (Component)
 		{
-		public:
-			TWeakObjectPtr<USceneComponent> _Component;
-			float _OverTime;
-			float _ExecuteTime = 0.f;
-			FVector _StartRelativeLocation;
-			FVector _TargetRelativeLocation;
-			FRotator _StartRelativeRotation;
-			FRotator _TargetRelativeRotation;
-			bool _bSweep;
+			TWeakObjectPtr<USceneComponent> _Component = Component;
+			if (FDelegateHandle* TickerHandle = MovingComponentMap.Find(_Component))
+			{
+				FTicker::GetCoreTicker().RemoveTicker(*TickerHandle);
+			}
 
-			bool Tick(float DeltaSeconds)
+			float _ExecuteTime = 0.f;
+			const FVector _StartRelativeLocation = Component->RelativeLocation;
+			const FRotator _StartRelativeRotation = Component->RelativeRotation;
+			MovingComponentMap.FindOrAdd(Component) = FTicker::GetCoreTicker().AddTicker(FTickerDelegate::CreateLambda([=](float DeltaSeconds) mutable
 			{
 				if (_Component.IsValid())
 				{
-					if (_ExecuteTime < _OverTime)
+					if (_ExecuteTime < OverTime)
 					{
 						_ExecuteTime += DeltaSeconds;
-						FVector DeltaRelativeLocation = UKismetMathLibrary::VLerp(_StartRelativeLocation, _TargetRelativeLocation, _ExecuteTime / _OverTime);
-						FRotator DeltaRelativeRotation = UKismetMathLibrary::RLerp(_StartRelativeRotation, _TargetRelativeRotation, _ExecuteTime / _OverTime, true);
-						_Component->SetRelativeLocationAndRotation(DeltaRelativeLocation, DeltaRelativeRotation, _bSweep);
+						const FVector DeltaRelativeLocation = UKismetMathLibrary::VLerp(_StartRelativeLocation, TargetRelativeLocation, _ExecuteTime / OverTime);
+						const FRotator DeltaRelativeRotation = UKismetMathLibrary::RLerp(_StartRelativeRotation, TargetRelativeRotation, _ExecuteTime / OverTime, true);
+						_Component->SetRelativeLocationAndRotation(DeltaRelativeLocation, DeltaRelativeRotation, Sweep);
 						return true;
 					}
 					else
 					{
-						_Component->SetRelativeLocationAndRotation(_TargetRelativeLocation, _TargetRelativeRotation, _bSweep);
+						_Component->SetRelativeLocationAndRotation(TargetRelativeLocation, TargetRelativeRotation, Sweep);
 					}
 				}
-				delete this;
+				MovingComponentMap.Remove(_Component);
 				return false;
-			}
-		};
-
-		if (Component)
-		{
-			FMoveComponentHelper* MoveComponentHelper(new FMoveComponentHelper());
-			MoveComponentHelper->_Component = Component;
-			MoveComponentHelper->_StartRelativeLocation = Component->RelativeLocation;
-			MoveComponentHelper->_TargetRelativeLocation = TargetRelativeLocation;
-			MoveComponentHelper->_StartRelativeRotation = Component->RelativeRotation;
-			MoveComponentHelper->_TargetRelativeRotation = TargetRelativeRotation;
-			MoveComponentHelper->_OverTime = OverTime;
-			MoveComponentHelper->_bSweep = Sweep;
-			FTicker::GetCoreTicker().AddTicker(FTickerDelegate::CreateRaw(MoveComponentHelper, &FMoveComponentHelper::Tick));
+			}));
 		}
 	}
 }
@@ -63,41 +51,28 @@ void UARPG_ActorFunctionLibrary::PushComponentTo(USceneComponent* Component, con
 {
 	if (Component)
 	{
-		class FPushComponentHelper
+		TWeakObjectPtr<USceneComponent> _Component = Component;
+		if (FDelegateHandle* TickerHandle = MovingComponentMap.Find(_Component))
 		{
-		public:
-			TWeakObjectPtr<USceneComponent> _Component;
-			float _OverTime;
-			float _ExecuteTime = 0.f;
-			FVector _Distance;
-			bool _bSweep;
-
-			bool Tick(float DeltaSeconds)
-			{
-				if (_Component.IsValid())
-				{
-					if (_ExecuteTime < _OverTime)
-					{
-						_ExecuteTime += DeltaSeconds;
-
-						_Component->AddWorldOffset(_Distance * DeltaSeconds / _OverTime, _bSweep);
-						return true;
-					}
-				}
-				delete this;
-				return false;
-			}
-		};
-
-		if (Component)
-		{
-			FPushComponentHelper* MoveComponentHelper(new FPushComponentHelper());
-			MoveComponentHelper->_Component = Component;
-			MoveComponentHelper->_Distance = Distance;
-			MoveComponentHelper->_OverTime = OverTime;
-			MoveComponentHelper->_bSweep = Sweep;
-			FTicker::GetCoreTicker().AddTicker(FTickerDelegate::CreateRaw(MoveComponentHelper, &FPushComponentHelper::Tick));
+			FTicker::GetCoreTicker().RemoveTicker(*TickerHandle);
 		}
+
+		float _ExecuteTime = 0.f;
+		MovingComponentMap.FindOrAdd(_Component) = FTicker::GetCoreTicker().AddTicker(FTickerDelegate::CreateLambda([=](float DeltaSeconds) mutable
+		{
+			if (_Component.IsValid())
+			{
+				if (_ExecuteTime < OverTime)
+				{
+					_ExecuteTime += DeltaSeconds;
+
+					_Component->AddWorldOffset(Distance * DeltaSeconds / OverTime, Sweep);
+					return true;
+				}
+			}
+			MovingComponentMap.Remove(_Component);
+			return false;
+		}));
 	}
 }
 
