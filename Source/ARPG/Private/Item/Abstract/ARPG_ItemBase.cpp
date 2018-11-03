@@ -4,6 +4,7 @@
 #include <Components/PrimitiveComponent.h>
 #include "CharacterBase.h"
 #include "ARPG_ItemCoreBase.h"
+#include "ARPG_CollisionType.h"
 
 
 #define LOCTEXT_NAMESPACE "ARPG_Item"
@@ -35,6 +36,10 @@ void AARPG_ItemBase::WhenUse(class ACharacterBase* ItemOwner)
 	SetOwner(ItemOwner);
 	SetItemOwner(ItemOwner);
 
+	if (UPrimitiveComponent* Root = Cast<UPrimitiveComponent>(GetRootComponent()))
+	{
+		Root->SetCollisionResponseToChannel(FARPG_ECollisionChannel::AI_Sight, ECollisionResponse::ECR_Ignore);
+	}
 	SetActorEnableCollision(false);
 	SetItemSimulatePhysics(false);
 

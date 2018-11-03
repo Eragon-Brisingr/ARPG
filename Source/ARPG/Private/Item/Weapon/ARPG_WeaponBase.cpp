@@ -93,7 +93,7 @@ void AARPG_WeaponBase::SetEnableNearAttackTrace(bool Enable, bool ClearIgnoreLis
 
 void AARPG_WeaponBase::WhenAttackTracedActor(UPrimitiveComponent* HitComponent, const FName& SocketName, AActor* OtherActor, UPrimitiveComponent* OtherComp, const FHitResult& TraceResult)
 {
-	if (OtherActor != GetItemOwner())
+	if (OtherActor && OtherActor != GetItemOwner())
 	{
 		if (ACharacterBase* WeaponOnwer = Cast<ACharacterBase>(GetItemOwner()))
 		{
