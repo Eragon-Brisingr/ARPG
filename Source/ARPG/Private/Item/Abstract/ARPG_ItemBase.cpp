@@ -24,10 +24,16 @@ class ACharacterBase* AARPG_ItemBase::GetItemOwner() const
 	return Cast<ACharacterBase>(Instigator);
 }
 
+void AARPG_ItemBase::SetItemOwner(ACharacterBase* ItemOwner)
+{
+	Instigator = ItemOwner;
+}
+
 void AARPG_ItemBase::WhenUse(class ACharacterBase* ItemOwner)
 {
 	bNetUseOwnerRelevancy = true;
 	SetOwner(ItemOwner);
+	SetItemOwner(ItemOwner);
 
 	SetActorEnableCollision(false);
 	SetItemSimulatePhysics(false);

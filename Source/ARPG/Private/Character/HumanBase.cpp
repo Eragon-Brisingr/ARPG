@@ -70,6 +70,34 @@ void AHumanBase::WhenGameInit_Implementation()
 	}
 }
 
+void AHumanBase::WhenLoad_Implementation()
+{
+	Super::WhenLoad_Implementation();
+
+	if (LeftWeapon)
+	{
+		OnRep_LeftWeapon(nullptr);
+	}
+	if (RightWeapon)
+	{
+		OnRep_RightWeapon(nullptr);
+	}
+	if (Arrow)
+	{
+		OnRep_Arrow(nullptr);
+		Arrow->AttachWeaponTo(GetMesh(), QuiverSocketName);
+	}
+	if (UseWeaponState == EUseWeaponState::NoneWeapon_Default)
+	{
+		LetTheWeaponInWeaponBack();
+	}
+	else
+	{
+		LetTheWeaponInHand();
+	}
+	OnRep_EquipmentList();
+}
+
 TArray<struct FARPG_Item> AHumanBase::GetInitItemList() const
 {
 	TArray<FARPG_Item> Res = Super::GetInitItemList();
@@ -203,7 +231,7 @@ class AARPG_EquipmentBase* AHumanBase::EquipEquipment_Implementation(class UARPG
 
 void AHumanBase::OnRep_UseWeaponState()
 {
-	ARPG_MovementComponent->bAiming = UseWeaponState != EUseWeaponState::NoneWeapon_Default ? true : false;
+	ARPG_MovementComponent->bAiming = (UseWeaponState != EUseWeaponState::NoneWeapon_Default);
 }
 
 void AHumanBase::SetUseWeaponState(EUseWeaponState NewUseWeaponState)

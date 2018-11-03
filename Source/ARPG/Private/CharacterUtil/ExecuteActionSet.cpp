@@ -52,17 +52,20 @@ bool FExecuteActionSet::InvokeExecuteOther(class ACharacterBase* Invoker, class 
 
 bool FExecuteActionSet::TraceForExecuteOther(class ACharacterBase* Invoker)
 {
-	const float TraceDistance = 100.f;
-	FHitResult TraceCharacterResult;
-	if (UKismetSystemLibrary::SphereTraceSingleForObjects(Invoker, Invoker->GetActorLocation(), Invoker->GetActorLocation() + Invoker->GetActorForwardVector() * TraceDistance, 15.f, { FARPG_CollisionObjectType::Pawn }, false, { Invoker }, EDrawDebugTrace::None, TraceCharacterResult, false))
+	if (Invoker)
 	{
-		FHitResult CanExecuteCheckResult;
-		UKismetSystemLibrary::LineTraceSingle(Invoker, Invoker->GetActorLocation(), TraceCharacterResult.GetActor()->GetActorLocation(), FARPG_TraceTypeQuery::Visibility, false, { Invoker }, EDrawDebugTrace::None, CanExecuteCheckResult, false);
-		if (TraceCharacterResult.GetActor() == CanExecuteCheckResult.GetActor())
+		const float TraceDistance = 100.f;
+		FHitResult TraceCharacterResult;
+		if (UKismetSystemLibrary::SphereTraceSingleForObjects(Invoker, Invoker->GetActorLocation(), Invoker->GetActorLocation() + Invoker->GetActorForwardVector() * TraceDistance, 15.f, { FARPG_CollisionObjectType::Pawn }, false, { Invoker }, EDrawDebugTrace::None, TraceCharacterResult, false))
 		{
-			if (ACharacterBase* ExecuteTarget = Cast<ACharacterBase>(TraceCharacterResult.GetActor()))
+			FHitResult CanExecuteCheckResult;
+			UKismetSystemLibrary::LineTraceSingle(Invoker, Invoker->GetActorLocation(), TraceCharacterResult.GetActor()->GetActorLocation(), FARPG_TraceTypeQuery::Visibility, false, { Invoker }, EDrawDebugTrace::None, CanExecuteCheckResult, false);
+			if (TraceCharacterResult.GetActor() == CanExecuteCheckResult.GetActor())
 			{
-				return InvokeExecuteOther(Invoker, ExecuteTarget);
+				if (ACharacterBase* ExecuteTarget = Cast<ACharacterBase>(TraceCharacterResult.GetActor()))
+				{
+					return InvokeExecuteOther(Invoker, ExecuteTarget);
+				}
 			}
 		}
 	}

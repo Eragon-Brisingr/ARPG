@@ -49,6 +49,9 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "物品|基础")
 	class ACharacterBase* GetItemOwner() const;
+
+	UFUNCTION(BlueprintCallable, Category = "物品|基础")
+	void SetItemOwner(ACharacterBase* ItemOwner);
 public:
 	UFUNCTION(BlueprintNativeEvent, Category = "物品|基础")
 	void UseItemImpl(class UARPG_ItemCoreBase* ItemCore, class ACharacterBase* ItemOwner, EUseItemInput UseItemInput) const;
