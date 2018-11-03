@@ -23,6 +23,8 @@ public:
 
 	virtual void WhenGameInit_Implementation() override;
 
+	virtual void WhenLoad_Implementation() override;
+
 	virtual TArray<struct FARPG_Item> GetInitItemList() const override;
 
 	virtual class AARPG_WeaponBase* EquipWaepon_Implementation(class UARPG_WeaponCoreBase* WeaponCore, EUseItemInput UseItemInput) override;

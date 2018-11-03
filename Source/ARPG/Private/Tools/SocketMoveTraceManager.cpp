@@ -52,7 +52,7 @@ void USocketMoveTracer::InitSocketMoveTracer(UPrimitiveComponent* TargetComponen
 
 void USocketMoveTracer::EnableTrace(bool ClearIgnoreList /*= true*/)
 {
-	if (bEnableTrace != true)
+	if (bEnableTrace != true && Config)
 	{
 		bEnableTrace = true;
 		if (ClearIgnoreList)
@@ -73,6 +73,11 @@ void USocketMoveTracer::DisableTrace()
 
 void USocketMoveTracer::DoTrace(float DeltaTime)
 {
+	if (!Config)
+	{
+		return;
+	}
+
 	TArray<AActor*> TracedInOnceTraceActor;
 	for (int i = 1; i < GetTraceSocketList().Num(); ++i)
 	{
