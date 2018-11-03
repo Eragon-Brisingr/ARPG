@@ -217,7 +217,7 @@ public:
 		bIsNativeBranchingPoint = true;
 	}
 
-	UPROPERTY(EditAnywhere, Category = "处决", meta = (DisplayName = "处决伤害对象"))
+	UPROPERTY(EditAnywhere, Category = "处决", meta = (DisplayName = "处决伤害计算"))
 	TSubclassOf<class UARPG_ApplyExecuteDamageFunctor> ApplyExecuteDamageFunctor;
 
 	virtual void Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation) override;
