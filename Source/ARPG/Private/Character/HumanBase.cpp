@@ -12,6 +12,7 @@
 #include "ARPG_EquipmentCoreBase.h"
 #include "ARPG_ArrowBase.h"
 #include "ARPG_ArrowCoreBase.h"
+#include <Kismet/KismetMathLibrary.h>
 
 AHumanBase::AHumanBase(const FObjectInitializer& PCIP)
 	:Super(PCIP)
@@ -227,6 +228,11 @@ class AARPG_EquipmentBase* AHumanBase::EquipEquipment_Implementation(class UARPG
 	OnRep_EquipmentList();
 
 	return ReturnEquipment;
+}
+
+bool AHumanBase::IsDefenseSucceed_Implementation(const FVector& DamageFromLocation, const FHitResult& HitInfo) const
+{
+	return Super::IsDefenseSucceed_Implementation(DamageFromLocation, HitInfo) && UKismetMathLibrary::InRange_FloatFloat((UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), DamageFromLocation) - GetActorRotation()).Yaw, -90.f, 90.f);
 }
 
 void AHumanBase::OnRep_UseWeaponState()
