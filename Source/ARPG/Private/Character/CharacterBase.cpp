@@ -37,6 +37,8 @@ ACharacterBase::ACharacterBase(const FObjectInitializer& ObjectInitializer)
 
 	}
 
+	DodgeAnimSet = CreateDefaultSubobject<UARPG_DodgeAnimSetNormal>(GET_MEMBER_NAME_CHECKED(ACharacterBase, DodgeAnimSet));
+
 	GetMesh()->MeshComponentUpdateFlag = EMeshComponentUpdateFlag::AlwaysTickPoseAndRefreshBones;
 }
 
@@ -299,6 +301,64 @@ void ACharacterBase::TryPlayMontage(const FARPG_MontageParameter& Montage)
 bool ACharacterBase::CanPlayFullBodyMontage() const
 {
 	return GetMesh()->GetAnimInstance()->GetSlotMontageGlobalWeight(FullBodySlotName) == 0.f;
+}
+
+void ACharacterBase::InvokeDodge()
+{
+	if (ARPG_InputIsPressed(ARPG_InputType::ToBitMask(EARPG_InputType::Dodge)))
+	{
+		if (ARPG_InputIsPressed(ARPG_InputType::ToBitMask(EARPG_InputType::Forward)))
+		{
+			DodgeByControlRotation(0.f);
+		}
+		else if (ARPG_InputIsPressed(ARPG_InputType::ToBitMask(EARPG_InputType::Backward)))
+		{
+			DodgeByControlRotation(-180.f);
+		}
+		else if (ARPG_InputIsPressed(ARPG_InputType::ToBitMask(EARPG_InputType::Left)))
+		{
+			DodgeByControlRotation(-90.f);
+		}
+		else if (ARPG_InputIsPressed(ARPG_InputType::ToBitMask(EARPG_InputType::Right)))
+		{
+			DodgeByControlRotation(90.f);
+		}
+	}
+}
+
+void ACharacterBase::DodgeByControlRotation(float Direction)
+{
+	FRotator ControllerRotation = GetControlRotation();
+	ControllerRotation.Yaw += Direction;
+	FRotator DeltaRotation = GetActorRotation() - ControllerRotation;
+	DeltaRotation.Normalize();
+	float DodgeDirection = DeltaRotation.Yaw;
+	if (DodgeDirection >= -45.f && DodgeDirection <= 45.f)
+	{
+		InvokeDodgeByDirection(EDodgeDirection::Forward);
+	}
+	else if (DodgeDirection >= -135.f && DodgeDirection < -45.f)
+	{
+		InvokeDodgeByDirection(EDodgeDirection::Right);
+	}
+	else if (DodgeDirection > 45.f && DodgeDirection <= 135.f)
+	{
+		InvokeDodgeByDirection(EDodgeDirection::Left);
+	}
+	else
+	{
+		InvokeDodgeByDirection(EDodgeDirection::Backword);
+	}
+}
+
+void ACharacterBase::InvokeDodgeByDirection(EDodgeDirection Direction)
+{
+	DodgeAnimSet->InvokeDodge(this, Direction);
+}
+
+bool ACharacterBase::CanDodge() const
+{
+	return DodgeAnimSet->CanDodge(this);
 }
 
 void ACharacterBase::MoveItem_Implementation(class UARPG_InventoryComponent* SourceInventory, class UARPG_InventoryComponent* TargetInventory, class UARPG_ItemCoreBase* ItemCore, int32 Number /*= 1*/)

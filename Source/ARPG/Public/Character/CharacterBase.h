@@ -149,6 +149,20 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "角色", AdvancedDisplay)
 	class UAimOffsetBlendSpace* AimOffsetOverride;
 
+	//闪避
+	UPROPERTY(VisibleDefaultsOnly, Category = "角色|动画配置", Instanced)
+	class UARPG_DodgeAnimSetBase* DodgeAnimSet;
+	
+	UFUNCTION(BlueprintCallable, Category = "角色|动画")
+	void InvokeDodge();
+
+	void DodgeByControlRotation(float Direction);
+
+	UFUNCTION(BlueprintCallable, Category = "角色|动画")
+	void InvokeDodgeByDirection(EDodgeDirection Direction);
+
+	UFUNCTION(BlueprintCallable, Category = "角色|动画")
+	bool CanDodge() const;
 	//背包相关
 public:
 	UFUNCTION(BlueprintCallable, Category = "角色|物品", Reliable, WithValidation, Server)

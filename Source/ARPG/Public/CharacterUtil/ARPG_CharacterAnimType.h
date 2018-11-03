@@ -114,3 +114,41 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = "动画")
 	FARPG_MontageParameter DodogeForwardRightAttack;
 };
+
+UCLASS(editinlinenew, Abstract, collapseCategories)
+class ARPG_API UARPG_DodgeAnimSetBase : public UObject
+{
+	GENERATED_BODY()
+public:
+	virtual void InvokeDodge(class ACharacterBase* Character, EDodgeDirection Direction) const
+	{
+		ReceiveInvokeDodge(Character, Direction);
+	}
+	UFUNCTION(BlueprintImplementableEvent, Category = "闪避动画", meta = (DisplayName = "InvokeDodge"))
+	void ReceiveInvokeDodge(class ACharacterBase* Character, EDodgeDirection Direction) const;
+
+	virtual bool CanDodge(const class ACharacterBase* Character) const
+	{
+		return ReceiveCanDodge(Character);
+	}
+	UFUNCTION(BlueprintImplementableEvent, Category = "闪避动画", meta = (DisplayName = "CanDodge"))
+	bool ReceiveCanDodge(const class ACharacterBase* Character) const;
+};
+
+UCLASS()
+class ARPG_API UARPG_DodgeAnimSetNormal : public UARPG_DodgeAnimSetBase
+{
+	GENERATED_BODY()
+public:
+	virtual void InvokeDodge(class ACharacterBase* Character, EDodgeDirection Direction) const override;
+	virtual bool CanDodge(const class ACharacterBase* Character) const override;
+
+	UPROPERTY(EditDefaultsOnly, Category = "动画")
+	FARPG_MontageParameter DodgeForwardAnim;
+	UPROPERTY(EditDefaultsOnly, Category = "动画")
+	FARPG_MontageParameter DodgeBackAnim;
+	UPROPERTY(EditDefaultsOnly, Category = "动画")
+	FARPG_MontageParameter DodgeLeftAnim;
+	UPROPERTY(EditDefaultsOnly, Category = "动画")
+	FARPG_MontageParameter DodgeRightAnim;
+};

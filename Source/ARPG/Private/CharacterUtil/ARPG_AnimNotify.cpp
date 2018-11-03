@@ -85,6 +85,19 @@ FString UARPG_PlayMontageByInput::GetNotifyName_Implementation() const
 	return FString::Printf(TEXT("输入_动画跳转[%s]"), Montage ? *Montage->GetName() : TEXT("None"));
 }
 
+void UARPG_DodgeAnim::NotifyTick(USkeletalMeshComponent * MeshComp, UAnimSequenceBase * Animation, float FrameDeltaTime)
+{
+	if (ACharacterBase* Character = Cast<ACharacterBase>(MeshComp->GetOwner()))
+	{
+		Character->InvokeDodge();
+	}
+}
+
+FString UARPG_DodgeAnim::GetNotifyName_Implementation() const
+{
+	return TEXT("输入_闪避");
+}
+
 void UARPG_DefenseState::NotifyBegin(USkeletalMeshComponent * MeshComp, UAnimSequenceBase * Animation, float TotalDuration)
 {
 	if (ACharacterBase* Character = Cast<ACharacterBase>(MeshComp->GetOwner()))

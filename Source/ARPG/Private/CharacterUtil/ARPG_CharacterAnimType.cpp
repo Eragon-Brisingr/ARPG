@@ -114,3 +114,30 @@ void UARPG_AttackAnimSetNormal::InvokePlayDodgeAnim_Implementation(class ACharac
 		}
 	}
 }
+
+void UARPG_DodgeAnimSetNormal::InvokeDodge(class ACharacterBase* Character, EDodgeDirection Direction) const
+{
+	if (CanDodge(Character))
+	{
+		switch (Direction)
+		{
+		case EDodgeDirection::Forward:
+			Character->TryPlayMontage(DodgeForwardAnim);
+			break;
+		case EDodgeDirection::Backword:
+			Character->TryPlayMontage(DodgeBackAnim);
+			break;
+		case EDodgeDirection::Left:
+			Character->TryPlayMontage(DodgeLeftAnim);
+			break;
+		case EDodgeDirection::Right:
+			Character->TryPlayMontage(DodgeRightAnim);
+			break;
+		}
+	}
+}
+
+bool UARPG_DodgeAnimSetNormal::CanDodge(const class ACharacterBase* Character) const
+{
+	return Character->GetCharacterMovement()->IsMovingOnGround();
+}
