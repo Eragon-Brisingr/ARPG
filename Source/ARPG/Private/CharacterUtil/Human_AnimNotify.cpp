@@ -70,6 +70,7 @@ void UARPG_Human_WeaponTrace::NotifyBegin(USkeletalMeshComponent * MeshComp, UAn
 	{
 		if (AARPG_WeaponBase* Weapon = bIsLeftWeapon ? Human->LeftWeapon : Human->RightWeapon)
 		{
+			Weapon->SetActorEnableCollision(true);
 			Weapon->ReceiveDamageAction = ReceiveDamageAction;
 			Weapon->AnimAddHitStunValue = AddHitStunValue;
 			Weapon->BeakBackDistance = BeakBackDistance;
@@ -84,6 +85,7 @@ void UARPG_Human_WeaponTrace::NotifyEnd(USkeletalMeshComponent * MeshComp, UAnim
 	{
 		if (AARPG_WeaponBase* Weapon = bIsLeftWeapon ? Human->LeftWeapon : Human->RightWeapon)
 		{
+			Weapon->SetActorEnableCollision(false);
 			Weapon->ReceiveDamageAction = nullptr;
 			Weapon->SetEnableNearAttackTrace(false);
 		}

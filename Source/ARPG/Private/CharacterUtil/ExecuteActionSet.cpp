@@ -59,7 +59,7 @@ bool FExecuteActionSet::TraceForExecuteOther(class ACharacterBase* Invoker)
 		if (UKismetSystemLibrary::SphereTraceSingleForObjects(Invoker, Invoker->GetActorLocation(), Invoker->GetActorLocation() + Invoker->GetActorForwardVector() * TraceDistance, 15.f, { FARPG_CollisionObjectType::Pawn }, false, { Invoker }, EDrawDebugTrace::None, TraceCharacterResult, false))
 		{
 			FHitResult CanExecuteCheckResult;
-			UKismetSystemLibrary::LineTraceSingle(Invoker, Invoker->GetActorLocation(), TraceCharacterResult.GetActor()->GetActorLocation(), FARPG_TraceTypeQuery::Visibility, false, { Invoker }, EDrawDebugTrace::None, CanExecuteCheckResult, false);
+			UKismetSystemLibrary::LineTraceSingle(Invoker, Invoker->GetActorLocation(), TraceCharacterResult.GetActor()->GetActorLocation(), FARPG_TraceQueryType::Visibility, false, { Invoker }, EDrawDebugTrace::None, CanExecuteCheckResult, false);
 			if (TraceCharacterResult.GetActor() == CanExecuteCheckResult.GetActor())
 			{
 				if (ACharacterBase* ExecuteTarget = Cast<ACharacterBase>(TraceCharacterResult.GetActor()))

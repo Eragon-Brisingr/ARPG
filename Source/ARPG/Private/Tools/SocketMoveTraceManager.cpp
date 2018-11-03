@@ -7,7 +7,7 @@
 
 
 FSocketMoveTracerConfig::FSocketMoveTracerConfig()
-	:TraceTypeQuery(FARPG_TraceTypeQuery::Visibility)
+	:TraceTypeQuery(FARPG_TraceQueryType::Visibility)
 {
 
 }

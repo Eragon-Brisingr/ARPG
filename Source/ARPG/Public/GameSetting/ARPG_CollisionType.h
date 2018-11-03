@@ -11,18 +11,23 @@
 /**
  * 
  */
-struct FARPG_CollisionObjectType
+namespace FARPG_CollisionObjectType
 {
-	static const EObjectTypeQuery Pawn;
+	static constexpr EObjectTypeQuery Pawn = EObjectTypeQuery::ObjectTypeQuery3;
 	static constexpr EObjectTypeQuery CharacterMesh = EObjectTypeQuery::ObjectTypeQuery7;
 	static constexpr EObjectTypeQuery Item = EObjectTypeQuery::ObjectTypeQuery8;
 };
 
-struct FARPG_TraceTypeQuery
+namespace FARPG_ECollisionChannel
 {
-	static const ETraceTypeQuery Visibility;
-	static const ETraceTypeQuery Camera;
-	static const ETraceTypeQuery AI_Sight;
+	static constexpr ECollisionChannel AI_Sight = ECollisionChannel::ECC_GameTraceChannel3;
+};
+
+namespace FARPG_TraceQueryType
+{
+	static constexpr ETraceTypeQuery Visibility = ETraceTypeQuery::TraceTypeQuery1;
+	static constexpr ETraceTypeQuery Camera = ETraceTypeQuery::TraceTypeQuery2;
+	static constexpr ETraceTypeQuery AI_Sight = ETraceTypeQuery::TraceTypeQuery3;
 };
 
 struct FARPG_CollisionProfile
