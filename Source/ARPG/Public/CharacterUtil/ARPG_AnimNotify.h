@@ -91,6 +91,16 @@ public:
 	virtual FString GetNotifyName_Implementation() const override;
 };
 
+UCLASS(meta = (DisplayName = "输入_闪避"))
+class ARPG_API UARPG_DodgeAnim : public UAnimNotifyState
+{
+	GENERATED_BODY()
+public:
+	virtual void NotifyTick(USkeletalMeshComponent * MeshComp, UAnimSequenceBase * Animation, float FrameDeltaTime) override;
+
+	virtual FString GetNotifyName_Implementation() const override;
+};
+
 UCLASS(meta = (DisplayName = "状态_防御状态"))
 class ARPG_API UARPG_DefenseState : public UAnimNotifyState
 {
