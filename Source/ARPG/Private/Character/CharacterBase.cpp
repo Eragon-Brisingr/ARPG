@@ -330,9 +330,7 @@ void ACharacterBase::DodgeByControlRotation(float Direction)
 {
 	FRotator ControllerRotation = GetControlRotation();
 	ControllerRotation.Yaw += Direction;
-	FRotator DeltaRotation = GetActorRotation() - ControllerRotation;
-	DeltaRotation.Normalize();
-	float DodgeDirection = DeltaRotation.Yaw;
+	float DodgeDirection = (GetActorRotation() - ControllerRotation).GetNormalized().Yaw;
 	if (DodgeDirection >= -45.f && DodgeDirection <= 45.f)
 	{
 		InvokeDodgeByDirection(EDodgeDirection::Forward);
