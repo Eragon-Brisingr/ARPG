@@ -232,7 +232,7 @@ class AARPG_EquipmentBase* AHumanBase::EquipEquipment_Implementation(class UARPG
 
 bool AHumanBase::IsDefenseSucceed_Implementation(const FVector& DamageFromLocation, const FHitResult& HitInfo) const
 {
-	return Super::IsDefenseSucceed_Implementation(DamageFromLocation, HitInfo) && UKismetMathLibrary::InRange_FloatFloat((UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), DamageFromLocation) - GetActorRotation()).Yaw, -90.f, 90.f);
+	return Super::IsDefenseSucceed_Implementation(DamageFromLocation, HitInfo) && UKismetMathLibrary::InRange_FloatFloat((UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), DamageFromLocation) - GetActorRotation()).GetNormalized().Yaw, -90.f, 90.f);
 }
 
 void AHumanBase::OnRep_UseWeaponState()
