@@ -484,7 +484,7 @@ void ACharacterBase::ExecuteOtherToServer_Implementation(ACharacterBase* Execute
 {
 	ExecuteTargetCharacter = ExecuteTarget;
 	ExecuteTarget->ExecuteFromCharacter = this;
-	UARPG_ActorFunctionLibrary::MoveActorTo(this, TargetLocation, TargetRotation);
+	UARPG_ActorFunctionLibrary::MoveActorTo(this, TargetLocation, TargetRotation, 0.2f, false);
 	PlayMontage(ExecuteMontage);
 	ExecuteTarget->PlayMontage(BeExecutedMontage);
 }
