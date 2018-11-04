@@ -12,38 +12,35 @@ void UARPG_ActorFunctionLibrary::MoveComponentTo(USceneComponent* Component, con
 {
 	if (Component)
 	{
-		if (Component)
+		TWeakObjectPtr<USceneComponent> _Component = Component;
+		if (FDelegateHandle* TickerHandle = MovingComponentMap.Find(_Component))
 		{
-			TWeakObjectPtr<USceneComponent> _Component = Component;
-			if (FDelegateHandle* TickerHandle = MovingComponentMap.Find(_Component))
-			{
-				FTicker::GetCoreTicker().RemoveTicker(*TickerHandle);
-			}
-
-			float _ExecuteTime = 0.f;
-			const FVector _StartRelativeLocation = Component->RelativeLocation;
-			const FRotator _StartRelativeRotation = Component->RelativeRotation;
-			MovingComponentMap.FindOrAdd(Component) = FTicker::GetCoreTicker().AddTicker(FTickerDelegate::CreateLambda([=](float DeltaSeconds) mutable
-			{
-				if (_Component.IsValid())
-				{
-					if (_ExecuteTime < OverTime)
-					{
-						_ExecuteTime += DeltaSeconds;
-						const FVector DeltaRelativeLocation = UKismetMathLibrary::VLerp(_StartRelativeLocation, TargetRelativeLocation, _ExecuteTime / OverTime);
-						const FRotator DeltaRelativeRotation = UKismetMathLibrary::RLerp(_StartRelativeRotation, TargetRelativeRotation, _ExecuteTime / OverTime, true);
-						_Component->SetRelativeLocationAndRotation(DeltaRelativeLocation, DeltaRelativeRotation, Sweep);
-						return true;
-					}
-					else
-					{
-						_Component->SetRelativeLocationAndRotation(TargetRelativeLocation, TargetRelativeRotation, Sweep);
-					}
-				}
-				MovingComponentMap.Remove(_Component);
-				return false;
-			}));
+			FTicker::GetCoreTicker().RemoveTicker(*TickerHandle);
 		}
+
+		float _ExecuteTime = 0.f;
+		const FVector _StartRelativeLocation = Component->RelativeLocation;
+		const FRotator _StartRelativeRotation = Component->RelativeRotation;
+		MovingComponentMap.FindOrAdd(Component) = FTicker::GetCoreTicker().AddTicker(FTickerDelegate::CreateLambda([=](float DeltaSeconds) mutable
+		{
+			if (_Component.IsValid())
+			{
+				if (_ExecuteTime < OverTime)
+				{
+					_ExecuteTime += DeltaSeconds;
+					const FVector DeltaRelativeLocation = UKismetMathLibrary::VLerp(_StartRelativeLocation, TargetRelativeLocation, _ExecuteTime / OverTime);
+					const FRotator DeltaRelativeRotation = UKismetMathLibrary::RLerp(_StartRelativeRotation, TargetRelativeRotation, _ExecuteTime / OverTime, true);
+					_Component->SetRelativeLocationAndRotation(DeltaRelativeLocation, DeltaRelativeRotation, Sweep);
+					return true;
+				}
+				else
+				{
+					_Component->SetRelativeLocationAndRotation(TargetRelativeLocation, TargetRelativeRotation, Sweep);
+				}
+			}
+			MovingComponentMap.Remove(_Component);
+			return false;
+		}));
 	}
 }
 
