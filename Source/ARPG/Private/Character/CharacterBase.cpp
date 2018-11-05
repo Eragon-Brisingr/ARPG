@@ -425,11 +425,15 @@ bool ACharacterBase::IsDefenseSucceed_Implementation(const FVector& DamageFromLo
 	return bIsDefense;
 }
 
-void ACharacterBase::WhenDefenseSucceed(float BaseDamage, class ACharacterBase* InstigatedBy, const FHitResult& HitResult)
+void ACharacterBase::WhenDefenseSucceed(float BaseDamage, class ACharacterBase* InstigatedBy, const FVector& HitFromDirection, float DefenseBeakBackDistance, const FHitResult& HitResult)
 {
 	Battle_Display_LOG("%s成功防御%s的攻击", *UARPG_DebugFunctionLibrary::GetDebugName(this), *UARPG_DebugFunctionLibrary::GetDebugName(InstigatedBy));
-	ReceiveWhenDefenseSucceed(BaseDamage, InstigatedBy, HitResult);
+	ReceiveWhenDefenseSucceed(BaseDamage, InstigatedBy, HitFromDirection, DefenseBeakBackDistance, HitResult);
 	OnDefenseSucceed.Broadcast(this, BaseDamage, InstigatedBy, HitResult);
+
+	//击退效果
+	FVector BeakBackOffset = HitFromDirection.GetSafeNormal2D() * DefenseBeakBackDistance;
+	UARPG_ActorFunctionLibrary::PushActorTo(this, BeakBackOffset);
 }
 
 void ACharacterBase::WhenAttackedDefenseCharacter(float BaseDamage, ACharacterBase* DefenseSucceedCharacter, const FHitResult& HitResult)
@@ -505,7 +509,7 @@ void ACharacterBase::WhenDamagedOther(ACharacterBase* WhoBeDamaged, float Damage
 	OnDamagedOther.Broadcast(this, WhoBeDamaged, DamageValue, DamageInstigator);
 }
 
-float ACharacterBase::ApplyPointDamage(float BaseDamage, float AddHitStunValue, const FVector& HitFromDirection, const FHitResult& HitInfo, class ACharacterBase* InstigatorBy, AActor* DamageCauser, TSubclassOf<class UDamageType> DamageTypeClass, TSubclassOf<class UReceiveDamageActionBase> ReceiveDamageAction)
+float ACharacterBase::ApplyPointDamage(float BaseDamage, const FVector& HitFromDirection, const FHitResult& HitInfo, class ACharacterBase* InstigatorBy, AActor* DamageCauser, TSubclassOf<class UDamageType> DamageTypeClass, const FApplyPointDamageParameter& Param)
 {
 	float FinalReduceValue = BaseDamage;
 
@@ -519,37 +523,41 @@ float ACharacterBase::ApplyPointDamage(float BaseDamage, float AddHitStunValue, 
 		if (ACharacterBase* InstigatorPawn = Cast<ACharacterBase>(InstigatorBy))
 		{
 			//闪避
-			if (bIsDodging)
+			if (Param.bCanDodge && bIsDodging)
 			{
 				WhenDodgeSucceed(FinalReduceValue, InstigatorBy, HitInfo);
 				return 0.f;
 			}
 			//防御反击
-			else if (IsDefenseSwipeSucceed(InstigatorPawn->GetActorLocation(), HitInfo))
+			else if (Param.bCanDefenseSwipe && IsDefenseSwipeSucceed(InstigatorPawn->GetActorLocation(), HitInfo))
 			{
 				return 0.f;
 			}
 			//防御
-			else if (IsDefenseSucceed(InstigatorPawn->GetActorLocation(), HitInfo))
+			else if (Param.bCanDefense && IsDefenseSucceed(InstigatorPawn->GetActorLocation(), HitInfo))
 			{
-				WhenDefenseSucceed(FinalReduceValue, InstigatorBy, HitInfo);
+				WhenDefenseSucceed(FinalReduceValue, InstigatorBy, HitFromDirection, Param.DefenseBeakBackDistance, HitInfo);
 				InstigatorPawn->WhenAttackedDefenseCharacter(FinalReduceValue, this, HitInfo);
 				return 0.f;
 			}
 		}
 	}
 
-	if (!(ReceiveDamageAction && ReceiveDamageAction.GetDefaultObject()->PlayReceiveDamageAction(HitFromDirection, this, HitInfo, InstigatorBy, DamageCauser)))
+	if (!(Param.ReceiveDamageAction && Param.ReceiveDamageAction.GetDefaultObject()->PlayReceiveDamageAction(HitFromDirection, this, HitInfo, InstigatorBy, DamageCauser)))
 	{
-		float HitStunOverflowValue = AddHitStun(AddHitStunValue);
+		float HitStunOverflowValue = AddHitStun(Param.AddHitStunValue);
 		if (HitStunOverflowValue >= 0.f)
 		{
 			ReceivePlayHitStunMontage(FinalReduceValue, HitStunOverflowValue, HitFromDirection, HitInfo, InstigatorBy, DamageCauser);
+			HitStunOverflowValue = 0.f;
 		}
 		else
 		{
 			ReceivePlayNormalDamageMontage(FinalReduceValue, HitFromDirection, HitInfo, InstigatorBy, DamageCauser);
-			HitStunOverflowValue = 0.f;
+
+			//击退效果
+			FVector BeakBackOffset = HitFromDirection.GetSafeNormal2D() * Param.NormalBeakBackDistance;
+			UARPG_ActorFunctionLibrary::PushActorTo(this, BeakBackOffset);
 		}
 	}
 
