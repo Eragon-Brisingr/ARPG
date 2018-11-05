@@ -101,13 +101,15 @@ void AARPG_WeaponBase::WhenAttackTracedActor(UPrimitiveComponent* HitComponent, 
 
 			if (ACharacterBase* ReceiveDamageCharacter = Cast<ACharacterBase>(OtherActor))
 			{
-				if (ReceiveDamageCharacter->ApplyPointDamage(GetPhysicsAttackValue(), GetHitStunValue(), (ReceiveDamageCharacter->GetActorLocation() - TraceResult.ImpactPoint).GetSafeNormal2D(), TraceResult, WeaponOnwer, this, nullptr, ReceiveDamageAction) > 0.f)
+				FApplyPointDamageParameter Param;
+				Param.AddHitStunValue = GetHitStunValue();
+				Param.ReceiveDamageAction = ReceiveDamageAction;
+				Param.NormalBeakBackDistance = BeakBackDistance;
+				Param.DefenseBeakBackDistance = BeakBackDistance;
+
+				if (ReceiveDamageCharacter->ApplyPointDamage(GetPhysicsAttackValue(), (ReceiveDamageCharacter->GetActorLocation() - TraceResult.ImpactPoint).GetSafeNormal2D(), TraceResult, WeaponOnwer, this, nullptr, Param) > 0.f)
 				{
 					WeaponOnwer->NearAttackSuccessTimeDilation(0.2f);
-
-					//击退效果
-					FVector BeakBackOffset = (ReceiveDamageCharacter->GetActorLocation() - WeaponOnwer->GetActorLocation()).GetSafeNormal2D() * BeakBackDistance;
-					UARPG_ActorFunctionLibrary::PushActorTo(ReceiveDamageCharacter, BeakBackOffset);
 				}
 			}
 		}

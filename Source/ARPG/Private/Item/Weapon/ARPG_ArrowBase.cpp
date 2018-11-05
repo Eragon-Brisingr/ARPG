@@ -51,7 +51,13 @@ void AARPG_ArrowBase::WhenHitCharacter(USceneComponent* MyComp, AActor* Other, U
 		{
 			PostArrowHitOther(FindComponentByClass<UARPG_ProjectileMovementComponent>());
 
-			Character->ApplyPointDamage(50.f, 5.f, GetVelocity().GetSafeNormal(), Hit, GetItemOwner(), this, nullptr, nullptr);
+			FApplyPointDamageParameter Param;
+			Param.AddHitStunValue = GetHitStunValue();
+			Param.ReceiveDamageAction = ReceiveDamageAction;
+			Param.bCanDefense = false;
+			Param.bCanDefenseSwipe = false;
+
+			Character->ApplyPointDamage(50.f, GetVelocity().GetSafeNormal(), Hit, GetItemOwner(), this, nullptr, Param);
 
 			SetActorLocation(Hit.Location);
 			GetRootComponent()->AttachToComponent(Hit.GetComponent(), FAttachmentTransformRules::KeepWorldTransform, Hit.BoneName);
@@ -82,7 +88,14 @@ void AARPG_ArrowBase::WhenArrowHitEnvironment(UPrimitiveComponent* HitComponent,
 					{
 						FHitResult ArrowTraceRes;
 						bool TraceSucceed = Character->ActorLineTraceSingle(ArrowTraceRes, Arrow->GetActorLocation(), Arrow->GetActorLocation() + Arrow->GetActorForwardVector() * 100.f, ECC_Visibility, FCollisionQueryParams(NAME_None, true));
-						Character->ApplyPointDamage(50.f, 5.f, GetVelocity().GetSafeNormal(), TraceSucceed ? ArrowTraceRes : Hit, GetItemOwner(), this, nullptr, nullptr);
+
+						FApplyPointDamageParameter Param;
+						Param.AddHitStunValue = GetHitStunValue();
+						Param.ReceiveDamageAction = ReceiveDamageAction;
+						Param.bCanDefense = false;
+						Param.bCanDefenseSwipe = false;
+
+						Character->ApplyPointDamage(50.f, GetVelocity().GetSafeNormal(), TraceSucceed ? ArrowTraceRes : Hit, GetItemOwner(), this, nullptr, Param);
 					}
 				}
 			}
