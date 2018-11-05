@@ -6,12 +6,12 @@
 #include "ARPG_ItemCoreBase.h"
 #include "SocketMoveTraceManager.h"
 #include "HumanBase.h"
-#include "XD_DebugFunctionLibrary.h"
 #include "ARPG_WeaponCoreBase.h"
 #include "ARPG_Item_Log.h"
 #include "ARPG_Battle_Log.h"
 #include "ARPG_CharacterAnimType.h"
 #include "ARPG_ActorFunctionLibrary.h"
+#include "ARPG_DebugFunctionLibrary.h"
 
 #define LOCTEXT_NAMESPACE "ARPG_Item"
 
@@ -97,7 +97,7 @@ void AARPG_WeaponBase::WhenAttackTracedActor(UPrimitiveComponent* HitComponent, 
 	{
 		if (ACharacterBase* WeaponOnwer = Cast<ACharacterBase>(GetItemOwner()))
 		{
-			Battle_Display_LOG("%s所持武器打击到%s", *UXD_DebugFunctionLibrary::GetDebugName(WeaponOnwer), *UXD_DebugFunctionLibrary::GetDebugName(OtherActor));
+			Battle_Display_LOG("%s所持武器%s打击到%s", *UARPG_DebugFunctionLibrary::GetDebugName(WeaponOnwer), *UARPG_DebugFunctionLibrary::GetDebugName(this), *UARPG_DebugFunctionLibrary::GetDebugName(OtherActor));
 
 			if (ACharacterBase* ReceiveDamageCharacter = Cast<ACharacterBase>(OtherActor))
 			{

@@ -269,3 +269,47 @@ void USBBDF_RightWeapon::SetBeakBackDistance(USkeletalMeshComponent* MeshComp, f
 		}
 	}
 }
+
+void UDSF_LeftWeapon::DefenseBegin(USkeletalMeshComponent * MeshComp) const
+{
+	if (AHumanBase* Human = Cast<AHumanBase>(MeshComp->GetOwner()))
+	{
+		if (Human->LeftWeapon)
+		{
+			Human->LeftWeapon->SetActorEnableCollision(true);
+		}
+	}
+}
+
+void UDSF_LeftWeapon::DefenseEnd(USkeletalMeshComponent * MeshComp) const
+{
+	if (AHumanBase* Human = Cast<AHumanBase>(MeshComp->GetOwner()))
+	{
+		if (Human->LeftWeapon)
+		{
+			Human->LeftWeapon->SetActorEnableCollision(false);
+		}
+	}
+}
+
+void UDSF_RightWeapon::DefenseBegin(USkeletalMeshComponent * MeshComp) const
+{
+	if (AHumanBase* Human = Cast<AHumanBase>(MeshComp->GetOwner()))
+	{
+		if (Human->RightWeapon)
+		{
+			Human->RightWeapon->SetActorEnableCollision(true);
+		}
+	}
+}
+
+void UDSF_RightWeapon::DefenseEnd(USkeletalMeshComponent * MeshComp) const
+{
+	if (AHumanBase* Human = Cast<AHumanBase>(MeshComp->GetOwner()))
+	{
+		if (Human->RightWeapon)
+		{
+			Human->RightWeapon->SetActorEnableCollision(false);
+		}
+	}
+}

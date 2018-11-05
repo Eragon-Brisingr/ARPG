@@ -100,6 +100,10 @@ FString UARPG_DodgeAnim::GetNotifyName_Implementation() const
 
 void UARPG_DefenseState::NotifyBegin(USkeletalMeshComponent * MeshComp, UAnimSequenceBase * Animation, float TotalDuration)
 {
+	if (DefenseStateFunctor)
+	{
+		DefenseStateFunctor.GetDefaultObject()->DefenseBegin(MeshComp);
+	}
 	if (ACharacterBase* Character = Cast<ACharacterBase>(MeshComp->GetOwner()))
 	{
 		Character->bIsDefense = true;
@@ -108,6 +112,10 @@ void UARPG_DefenseState::NotifyBegin(USkeletalMeshComponent * MeshComp, UAnimSeq
 
 void UARPG_DefenseState::NotifyEnd(USkeletalMeshComponent * MeshComp, UAnimSequenceBase * Animation)
 {
+	if (DefenseStateFunctor)
+	{
+		DefenseStateFunctor.GetDefaultObject()->DefenseEnd(MeshComp);
+	}
 	if (ACharacterBase* Character = Cast<ACharacterBase>(MeshComp->GetOwner()))
 	{
 		Character->bIsDefense = false;
