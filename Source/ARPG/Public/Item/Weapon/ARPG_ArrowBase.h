@@ -24,9 +24,13 @@ public:
 	virtual void WhenRemoveFromInventory_Implementation(class AActor* ItemOwner, class UXD_ItemCoreBase* ItemCore, int32 RemoveNumber, int32 ExistNumber) const override;
 public:
 	void WhenHitCharacter(USceneComponent* MyComp, AActor* Other, UPrimitiveComponent* OtherComp, const FHitResult& Hit);
-	
+
+	float ApplyDamamgeToCharacter(ACharacterBase* Character, const FHitResult& Hit);
+
 	UFUNCTION()
 	void WhenArrowHitEnvironment(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
+
+	float GetArrowDamage();
 
 	void PostArrowHitOther(class UARPG_ProjectileMovementComponent* ProjectileMovementComponent);
 

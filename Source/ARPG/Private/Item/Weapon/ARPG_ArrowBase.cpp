@@ -9,6 +9,8 @@
 #include "ARPG_ActorFunctionLibrary.h"
 #include "HumanBase.h"
 #include "ARPG_ProjectileMovementComponent.h"
+#include "ARPG_DebugFunctionLibrary.h"
+#include "ARPG_Battle_Log.h"
 
 
 
@@ -45,24 +47,29 @@ void AARPG_ArrowBase::WhenRemoveFromInventory_Implementation(class AActor* ItemO
 
 void AARPG_ArrowBase::WhenHitCharacter(USceneComponent* MyComp, AActor* Other, UPrimitiveComponent* OtherComp, const FHitResult& Hit)
 {
-	if (HasAuthority())
+	if (ACharacterBase* Character = Cast<ACharacterBase>(Other))
 	{
-		if (ACharacterBase* Character = Cast<ACharacterBase>(Other))
+		PostArrowHitOther(FindComponentByClass<UARPG_ProjectileMovementComponent>());
+
+		if (ApplyDamamgeToCharacter(Character, Hit) > 0.f)
 		{
-			PostArrowHitOther(FindComponentByClass<UARPG_ProjectileMovementComponent>());
-
-			FApplyPointDamageParameter Param;
-			Param.AddHitStunValue = GetHitStunValue();
-			Param.ReceiveDamageAction = ReceiveDamageAction;
-			Param.bCanDefense = false;
-			Param.bCanDefenseSwipe = false;
-
-			Character->ApplyPointDamage(50.f, GetVelocity().GetSafeNormal(), Hit, GetItemOwner(), this, nullptr, Param);
-
 			SetActorLocation(Hit.Location);
 			GetRootComponent()->AttachToComponent(Hit.GetComponent(), FAttachmentTransformRules::KeepWorldTransform, Hit.BoneName);
 		}
 	}
+}
+
+float AARPG_ArrowBase::ApplyDamamgeToCharacter(ACharacterBase* Character, const FHitResult& Hit)
+{
+	Battle_Display_LOG("%s的弓%s所射箭%s的射中%s", *UARPG_DebugFunctionLibrary::GetDebugName(GetItemOwner()), *UARPG_DebugFunctionLibrary::GetDebugName(GetOwner()), *UARPG_DebugFunctionLibrary::GetDebugName(this), *UARPG_DebugFunctionLibrary::GetDebugName(Character));
+
+	FApplyPointDamageParameter Param;
+	Param.AddHitStunValue = GetHitStunValue();
+	Param.ReceiveDamageAction = ReceiveDamageAction;
+	Param.bCanDefense = false;
+	Param.bCanDefenseSwipe = false;
+
+	return Character->ApplyPointDamage(GetArrowDamage(), GetVelocity().GetSafeNormal(), Hit, GetItemOwner(), this, nullptr, Param);
 }
 
 void AARPG_ArrowBase::WhenArrowHitEnvironment(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
@@ -89,23 +96,40 @@ void AARPG_ArrowBase::WhenArrowHitEnvironment(UPrimitiveComponent* HitComponent,
 						FHitResult ArrowTraceRes;
 						bool TraceSucceed = Character->ActorLineTraceSingle(ArrowTraceRes, Arrow->GetActorLocation(), Arrow->GetActorLocation() + Arrow->GetActorForwardVector() * 100.f, ECC_Visibility, FCollisionQueryParams(NAME_None, true));
 
-						FApplyPointDamageParameter Param;
-						Param.AddHitStunValue = GetHitStunValue();
-						Param.ReceiveDamageAction = ReceiveDamageAction;
-						Param.bCanDefense = false;
-						Param.bCanDefenseSwipe = false;
-
-						Character->ApplyPointDamage(50.f, GetVelocity().GetSafeNormal(), TraceSucceed ? ArrowTraceRes : Hit, GetItemOwner(), this, nullptr, Param);
+						ApplyDamamgeToCharacter(Character, TraceSucceed ? ArrowTraceRes : Hit);
 					}
 				}
 			}
 		}
 		else
 		{
-			SetActorLocation(Hit.Location);
-			GetRootComponent()->AttachToComponent(Hit.GetComponent(), FAttachmentTransformRules::KeepWorldTransform, Hit.BoneName);
+			//射到别的Item上的情况
+			if (AARPG_ItemBase* Item = Cast<AARPG_ItemBase>(OtherActor))
+			{
+				if (ACharacterBase* Character = Item->GetItemOwner())
+				{
+					//射中防御状态中人的持的武器
+					if (HasAuthority())
+					{
+						Battle_Display_LOG("%s的弓%s所射箭%s的射到防御中的%s的%s上", *UARPG_DebugFunctionLibrary::GetDebugName(GetItemOwner()), *UARPG_DebugFunctionLibrary::GetDebugName(GetOwner()), *UARPG_DebugFunctionLibrary::GetDebugName(this), *UARPG_DebugFunctionLibrary::GetDebugName(Character), *UARPG_DebugFunctionLibrary::GetDebugName(Item));
+						Character->WhenDefenseSucceed(GetArrowDamage(), GetItemOwner(), GetVelocity(), 20.f, Hit);
+					}
+
+					SetItemSimulatePhysics(true);
+				}
+			}
+			else
+			{
+				SetActorLocation(Hit.Location);
+				GetRootComponent()->AttachToComponent(Hit.GetComponent(), FAttachmentTransformRules::KeepWorldTransform, Hit.BoneName);
+			}
 		}
 	}
+}
+
+float AARPG_ArrowBase::GetArrowDamage()
+{
+	return 50.f;
 }
 
 void AARPG_ArrowBase::PostArrowHitOther(UARPG_ProjectileMovementComponent* ProjectileMovementComponent)
@@ -124,7 +148,11 @@ void AARPG_ArrowBase::Launch_Implementation(float ForceSize)
 		UARPG_ProjectileMovementComponent* ProjectileMovementComponent = UARPG_ActorFunctionLibrary::AddComponent<UARPG_ProjectileMovementComponent>(this, TEXT("弓箭移动组件"));
 		ProjectileMovementComponent->IgnoreActors.Add(GetItemOwner());
 		ProjectileMovementComponent->Activate(true);
-		ProjectileMovementComponent->OnTraceActorNative.BindUObject(this, &AARPG_ArrowBase::WhenHitCharacter);
+
+		if (HasAuthority())
+		{
+			ProjectileMovementComponent->OnTraceActorNative.BindUObject(this, &AARPG_ArrowBase::WhenHitCharacter);
+		}
 
 		ProjectileMovementComponent->Velocity = GetActorForwardVector() * ForceSize;
 		ArrowRootComponent->OnComponentHit.AddDynamic(this, &AARPG_ArrowBase::WhenArrowHitEnvironment);

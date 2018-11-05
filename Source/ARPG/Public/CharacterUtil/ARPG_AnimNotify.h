@@ -101,11 +101,33 @@ public:
 	virtual FString GetNotifyName_Implementation() const override;
 };
 
+UCLASS(abstract, Blueprintable, const)
+class ARPG_API UARPG_DefenseStateFunctor : public UObject
+{
+	GENERATED_BODY()
+public:
+	virtual void DefenseBegin(USkeletalMeshComponent * MeshComp) const
+	{
+		ReceiveDefenseBegin(MeshComp);
+	}
+	UFUNCTION(BlueprintImplementableEvent, Category = "防御")
+	void ReceiveDefenseBegin(USkeletalMeshComponent * MeshComp) const;
+
+	virtual void DefenseEnd(USkeletalMeshComponent * MeshComp) const
+	{
+		ReceiveDefenseEnd(MeshComp);
+	}
+	UFUNCTION(BlueprintImplementableEvent, Category = "防御")
+	void ReceiveDefenseEnd(USkeletalMeshComponent * MeshComp) const;
+};
+
 UCLASS(meta = (DisplayName = "状态_防御状态"))
 class ARPG_API UARPG_DefenseState : public UAnimNotifyState
 {
 	GENERATED_BODY()
 public:
+	UPROPERTY(EditAnywhere, Category = "防御", meta = (DisplayName = "防御起效部位"))
+	TSubclassOf<class UARPG_DefenseStateFunctor> DefenseStateFunctor;
 	virtual void NotifyBegin(USkeletalMeshComponent * MeshComp, UAnimSequenceBase * Animation, float TotalDuration) override;
 	virtual void NotifyEnd(USkeletalMeshComponent * MeshComp, UAnimSequenceBase * Animation) override;
 

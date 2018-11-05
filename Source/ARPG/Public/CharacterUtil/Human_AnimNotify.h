@@ -142,7 +142,7 @@ public:
 };
 
 UCLASS(meta = (DisplayName = "人类左手武器"))
-class USRDAF_LeftWeapon : public UARPG_SetReceiveDamageActionFunctorBase
+class ARPG_API USRDAF_LeftWeapon : public UARPG_SetReceiveDamageActionFunctorBase
 {
 	GENERATED_BODY()
 public:
@@ -150,7 +150,7 @@ public:
 };
 
 UCLASS(meta = (DisplayName = "人类右手武器"))
-class USRDAF_RightWeapon : public UARPG_SetReceiveDamageActionFunctorBase
+class ARPG_API USRDAF_RightWeapon : public UARPG_SetReceiveDamageActionFunctorBase
 {
 	GENERATED_BODY()
 public:
@@ -158,7 +158,7 @@ public:
 };
 
 UCLASS(meta = (DisplayName = "人类左手武器"))
-class USAHSVF_LeftWeapon : public UARPG_SetAddHitStunValueFunctorBase
+class ARPG_API USAHSVF_LeftWeapon : public UARPG_SetAddHitStunValueFunctorBase
 {
 	GENERATED_BODY()
 public:
@@ -168,7 +168,7 @@ public:
 };
 
 UCLASS(meta = (DisplayName = "人类右手武器"))
-class USAHSVF_RightWeapon : public UARPG_SetAddHitStunValueFunctorBase
+class ARPG_API USAHSVF_RightWeapon : public UARPG_SetAddHitStunValueFunctorBase
 {
 	GENERATED_BODY()
 public:
@@ -178,7 +178,7 @@ public:
 };
 
 UCLASS(meta = (DisplayName = "人类左手武器"))
-class USBBDF_LeftWeapon : public UARPG_SetBeakBackDistanceFunctorBase
+class ARPG_API USBBDF_LeftWeapon : public UARPG_SetBeakBackDistanceFunctorBase
 {
 	GENERATED_BODY()
 public:
@@ -186,9 +186,27 @@ public:
 };
 
 UCLASS(meta = (DisplayName = "人类右手武器"))
-class USBBDF_RightWeapon : public UARPG_SetBeakBackDistanceFunctorBase
+class ARPG_API USBBDF_RightWeapon : public UARPG_SetBeakBackDistanceFunctorBase
 {
 	GENERATED_BODY()
 public:
 	virtual void SetBeakBackDistance(USkeletalMeshComponent* MeshComp, float BeakBackDistance) const override;
+};
+
+UCLASS(meta = (DisplayName = "人类左手武器"))
+class ARPG_API UDSF_LeftWeapon : public UARPG_DefenseStateFunctor
+{
+	GENERATED_BODY()
+public:
+	virtual void DefenseBegin(USkeletalMeshComponent * MeshComp) const override;
+	virtual void DefenseEnd(USkeletalMeshComponent * MeshComp) const override;
+};
+
+UCLASS(meta = (DisplayName = "人类右手武器"))
+class ARPG_API UDSF_RightWeapon : public UARPG_DefenseStateFunctor
+{
+	GENERATED_BODY()
+public:
+	virtual void DefenseBegin(USkeletalMeshComponent * MeshComp) const override;
+	virtual void DefenseEnd(USkeletalMeshComponent * MeshComp) const override;
 };
