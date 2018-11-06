@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "UObject/NoExportTypes.h"
+#include <GameFramework/Character.h>
 #include "ExecuteActionSet.generated.h"
 
 class UAnimMontage;
@@ -54,7 +55,7 @@ struct ARPG_API FExecuteActionSet
 	GENERATED_BODY()
 public:
 	UPROPERTY(EditAnywhere, Category = "动画", meta = (DisplayName = "背刺动画集"))
-	TMap<UClass*, FBackstabAnimData> BackstabMap;
+	TMap<TSubclassOf<class ACharacter>, FBackstabAnimData> BackstabMap;
 
 	UPROPERTY(EditAnywhere, Category = "动画", meta = (DisplayName = "处决动画集"))
 	TMap<UAnimMontage*, FExecuteAnimData> ExecuteMontageMap;
