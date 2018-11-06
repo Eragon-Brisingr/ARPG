@@ -38,6 +38,16 @@ void UARPG_CharacterAnimInstance::OnMovementModeChanged(class UARPG_MovementComp
 {
 	if (MovementComponent->IsFalling())
 	{
+		if (MovementComponent->GetCharacterOwner()->IsPlayingRootMotion())
+		{
+			if (MovementComponent->Velocity.Size2D() > MovementComponent->SprintingSpeed)
+			{
+				FVector InvokeVelocity2D = MovementComponent->Velocity.GetSafeNormal2D() * MovementComponent->SprintingSpeed;
+				MovementComponent->Velocity.X = InvokeVelocity2D.X;
+				MovementComponent->Velocity.Y = InvokeVelocity2D.Y;
+			}
+		}
+
 		for (int32 InstanceIndex = MontageInstances.Num() - 1; InstanceIndex >= 0; InstanceIndex--)
 		{
 			FAnimMontageInstance* MontageInstance = MontageInstances[InstanceIndex];
@@ -46,7 +56,7 @@ void UARPG_CharacterAnimInstance::OnMovementModeChanged(class UARPG_MovementComp
 				UAnimMontage* ActiveMontage = MontageInstance->Montage;
 				if (!ActiveMontage->GetMetaData().ContainsByPredicate([](UAnimMetaData* E) {return E && E->IsA<UAMD_CanPlayWhenFalling>(); }))
 				{
-					Montage_Stop(0.5, ActiveMontage);
+					Montage_Stop(0.5f, ActiveMontage);
 				}
 			}
 		}
