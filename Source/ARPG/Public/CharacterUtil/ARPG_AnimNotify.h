@@ -8,6 +8,7 @@
 #include <SubclassOf.h>
 #include <Engine/EngineTypes.h>
 #include "SocketMoveTraceManager.h"
+#include "CharacterDamageType.h"
 #include "ARPG_AnimNotify.generated.h"
 /**
  * 
@@ -163,6 +164,9 @@ class ARPG_API UARPG_EnableAttackTracer : public UAnimNotifyState
 public:
 	UPROPERTY(EditAnywhere, Category = "攻击检测", meta = (DisplayName = "检测配置", ShowOnlyInnerProperties))
 	FSocketMoveTracerConfig SocketMoveTracerConfig;
+
+	UPROPERTY(EditAnywhere, Category = "攻击检测", meta = (DisplayName = "伤害配置", ShowOnlyInnerProperties))
+	FApplyPointDamageParameter PointDamageParameter;
 
 	virtual void NotifyBegin(USkeletalMeshComponent * MeshComp, UAnimSequenceBase * Animation, float TotalDuration) override;
 #if WITH_EDITOR
