@@ -5,15 +5,21 @@
 #include "CoreMinimal.h"
 #include "XD_ItemBase.h"
 #include "ItemTypeUtils.h"
+#include "ARPG_InteractInterface.h"
 #include "ARPG_ItemBase.generated.h"
 
 /**
  * 
  */
 UCLASS(Abstract)
-class ARPG_API AARPG_ItemBase : public AXD_ItemBase
+class ARPG_API AARPG_ItemBase : public AXD_ItemBase, public IARPG_InteractInterface
 {
 	GENERATED_BODY()
+public:
+	//Begin IARPG_InteractInterface
+	virtual void WhenExecuteInteract_Implementation(class ACharacterBase* InteractInvoker) override;
+	virtual bool CanInteract_Implementation(const class ACharacterBase* InteractInvoker) const override;
+	//End IARPG_InteractInterface
 public:
 	AARPG_ItemBase(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
