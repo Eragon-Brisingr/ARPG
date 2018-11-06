@@ -5,9 +5,21 @@
 #include "CharacterBase.h"
 #include "ARPG_ItemCoreBase.h"
 #include "ARPG_CollisionType.h"
+#include "ARPG_InventoryComponent.h"
 
 
 #define LOCTEXT_NAMESPACE "ARPG_Item"
+
+void AARPG_ItemBase::WhenExecuteInteract_Implementation(class ACharacterBase* InteractInvoker)
+{
+	InteractInvoker->Inventory->AddItemCore(GetItemCore(), GetItemCore()->Number);
+	Destroy();
+}
+
+bool AARPG_ItemBase::CanInteract_Implementation(const class ACharacterBase* InteractInvoker) const
+{
+	return GetItemOwner() == nullptr;
+}
 
 AARPG_ItemBase::AARPG_ItemBase(const FObjectInitializer& ObjectInitializer /*= FObjectInitializer::Get()*/)
 	:Super(ObjectInitializer.SetDefaultSubobjectClass<UARPG_ItemCoreBase>(GET_MEMBER_NAME_CHECKED(AARPG_ItemBase, InnerItemCore)))

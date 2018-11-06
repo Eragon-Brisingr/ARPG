@@ -565,3 +565,24 @@ float ACharacterBase::ApplyPointDamage(float BaseDamage, const FVector& HitFromD
 	return FinalReduceValue;
 }
 
+void ACharacterBase::InvokeInteract(AActor* InteractTarget)
+{
+	if (CanInteract(InteractTarget))
+	{
+		InvokeInteract_ToServer(InteractTarget);
+	}
+}
+
+void ACharacterBase::InvokeInteract_ToServer_Implementation(AActor* InteractTarget)
+{
+	if (CanInteract(InteractTarget))
+	{
+		IARPG_InteractInterface::WhenInvokeInteract(InteractTarget, this);
+	}
+}
+
+bool ACharacterBase::CanInteract(AActor* InteractTarget) const
+{
+	return InteractTarget && InteractTarget->Implements<UARPG_InteractInterface>() && IARPG_InteractInterface::CanInteract(InteractTarget, this);
+}
+

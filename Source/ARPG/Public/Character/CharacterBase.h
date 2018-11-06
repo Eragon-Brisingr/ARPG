@@ -10,6 +10,7 @@
 #include "ARPG_CharacterAnimType.h"
 #include "ItemTypeUtils.h"
 #include "CharacterDamageType.h"
+#include "ARPG_InteractInterface.h"
 #include "CharacterBase.generated.h"
 
 UCLASS()
@@ -323,6 +324,18 @@ public:
 	//普通状态下的受击动画接口，不会打断攻击行为
 	UFUNCTION(BlueprintImplementableEvent, BlueprintAuthorityOnly, Category = "角色|行为", meta = (DisplayName = "PlayNormalDamageMontage"))
 	void ReceivePlayNormalDamageMontage(float BaseDamage, const FVector& HitFromDirection, const FHitResult& HitResult, class ACharacterBase* InstigatedBy, AActor* DamageCauser);
+
+	//交互相关
+public:
+	UFUNCTION(BlueprintCallable, Category = "角色|交互")
+	void InvokeInteract(AActor* InteractTarget);
+	UFUNCTION(Reliable, WithValidation, Server)
+	void InvokeInteract_ToServer(AActor* InteractTarget);
+	void InvokeInteract_ToServer_Implementation(AActor* InteractTarget);
+	bool InvokeInteract_ToServer_Validate(AActor* InteractTarget) { return true; }
+
+	UFUNCTION(BlueprintCallable, Category = "角色|交互")
+	bool CanInteract(AActor* InteractTarget) const;
 public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Character")
 	class UARPG_MovementComponent* ARPG_MovementComponent;
