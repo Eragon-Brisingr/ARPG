@@ -30,4 +30,4 @@
 	url = https://github.com/Eragon-Brisingr/XD_MovementComponentPlugin.git
 [submodule "RawAssets"]
 	path = RawAssets
-	url = https://gitee.com/EragonCode/RawAssets
+url=https://gitlab.com/eragon.xuduo/RawAssets.git
