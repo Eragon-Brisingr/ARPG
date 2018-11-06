@@ -196,6 +196,13 @@ void UARPG_EnableAttackTracer::NotifyBegin(USkeletalMeshComponent * MeshComp, UA
 		}
 
 		ValidSocketMoveTracer->InitSocketMoveTracer(MeshComp, SocketMoveTracerConfig);
+		ValidSocketMoveTracer->OnTraceActorNative.BindLambda([=](UPrimitiveComponent* HitComponent, const FName& SocketName, AActor* OtherActor, UPrimitiveComponent* OtherComp, const FHitResult& TraceResult)
+		{
+			if (ACharacterBase* DamagedCharacter = Cast<ACharacterBase>(OtherActor))
+			{
+				DamagedCharacter->ApplyPointDamage(100.f, (DamagedCharacter->GetActorLocation() - TraceResult.ImpactPoint).GetSafeNormal(), TraceResult, Character, Character, nullptr, PointDamageParameter);
+			}
+		});
 		ValidSocketMoveTracer->EnableTrace(true);
 	}
 }
