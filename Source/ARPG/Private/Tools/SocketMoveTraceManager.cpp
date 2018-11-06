@@ -19,10 +19,7 @@ USocketMoveTracer::USocketMoveTracer()
 
 void USocketMoveTracer::Tick(float DeltaTime)
 {
-	if (TargetSocketMesh.IsValid())
-	{
-		DoTrace(DeltaTime);
-	}
+	DoTrace(DeltaTime);
 }
 
 UWorld* USocketMoveTracer::GetTickableGameObjectWorld() const
@@ -73,7 +70,7 @@ void USocketMoveTracer::DisableTrace()
 
 void USocketMoveTracer::DoTrace(float DeltaTime)
 {
-	if (!Config)
+	if (!Config || !TargetSocketMesh.IsValid())
 	{
 		return;
 	}

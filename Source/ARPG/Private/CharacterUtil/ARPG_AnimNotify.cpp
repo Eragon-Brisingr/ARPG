@@ -169,6 +169,13 @@ FString UARPG_DodgeState::GetNotifyName_Implementation() const
 	return TEXT("闪避状态");
 }
 
+UARPG_EnableAttackTracer::UARPG_EnableAttackTracer()
+{
+#if WITH_EDITOR
+	PreviewSocketMoveTracer = NewObject<USocketMoveTracer>();
+#endif
+}
+
 void UARPG_EnableAttackTracer::NotifyBegin(USkeletalMeshComponent * MeshComp, UAnimSequenceBase * Animation, float TotalDuration)
 {
 	if (ACharacterBase* Character = Cast<ACharacterBase>(MeshComp->GetOwner()))
@@ -205,12 +212,22 @@ void UARPG_EnableAttackTracer::NotifyBegin(USkeletalMeshComponent * MeshComp, UA
 		});
 		ValidSocketMoveTracer->EnableTrace(true);
 	}
+
+#if WITH_EDITOR
+	if (MeshComp->GetWorld()->IsGameWorld() == false)
+	{
+		PreviewSocketMoveTracer->InitSocketMoveTracer(MeshComp, SocketMoveTracerConfig);
+	}
+#endif
 }
 
 #if WITH_EDITOR
 void UARPG_EnableAttackTracer::NotifyTick(USkeletalMeshComponent * MeshComp, UAnimSequenceBase * Animation, float FrameDeltaTime)
 {
-
+	if (MeshComp->GetWorld()->IsGameWorld() == false)
+	{
+		PreviewSocketMoveTracer->DoTrace(FrameDeltaTime);
+	}
 }
 #endif
 

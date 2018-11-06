@@ -162,6 +162,8 @@ class ARPG_API UARPG_EnableAttackTracer : public UAnimNotifyState
 {
 	GENERATED_BODY()
 public:
+	UARPG_EnableAttackTracer();
+
 	UPROPERTY(EditAnywhere, Category = "攻击检测", meta = (DisplayName = "检测配置", ShowOnlyInnerProperties))
 	FSocketMoveTracerConfig SocketMoveTracerConfig;
 
@@ -169,7 +171,10 @@ public:
 	FApplyPointDamageParameter PointDamageParameter;
 
 	virtual void NotifyBegin(USkeletalMeshComponent * MeshComp, UAnimSequenceBase * Animation, float TotalDuration) override;
-#if WITH_EDITOR
+#if WITH_EDITORONLY_DATA
+	UPROPERTY(Transient)
+	class USocketMoveTracer* PreviewSocketMoveTracer;
+
 	virtual void NotifyTick(USkeletalMeshComponent * MeshComp, UAnimSequenceBase * Animation, float FrameDeltaTime) override;
 #endif
 	virtual void NotifyEnd(USkeletalMeshComponent * MeshComp, UAnimSequenceBase * Animation) override;
