@@ -137,6 +137,8 @@ void AARPG_ArrowBase::PostArrowHitOther(UARPG_ProjectileMovementComponent* Proje
 	ProjectileMovementComponent->DestroyComponent();
 	SetItemCollisionProfileName(FARPG_CollisionProfile::Item);
 	GetRootMeshComponent()->OnComponentHit.RemoveDynamic(this, &AARPG_ArrowBase::WhenArrowHitEnvironment);
+	SetOwner(nullptr);
+	SetItemOwner(nullptr);
 }
 
 void AARPG_ArrowBase::Launch_Implementation(float ForceSize)

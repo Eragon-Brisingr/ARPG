@@ -62,6 +62,11 @@ void ACharacterBase::EndPlay(const EEndPlayReason::Type EndPlayReason)
 	}
 }
 
+bool ACharacterBase::NeedNotSave_Implementation() const
+{
+	return IsPlayerControlled();
+}
+
 // Called every frame
 void ACharacterBase::Tick(float DeltaTime)
 {
