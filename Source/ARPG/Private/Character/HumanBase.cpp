@@ -71,9 +71,9 @@ void AHumanBase::WhenGameInit_Implementation()
 	}
 }
 
-void AHumanBase::WhenLoad_Implementation()
+void AHumanBase::WhenPostLoad_Implementation()
 {
-	Super::WhenLoad_Implementation();
+	Super::WhenPostLoad_Implementation();
 
 	if (LeftWeapon)
 	{
