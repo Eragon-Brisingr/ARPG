@@ -23,7 +23,7 @@ public:
 
 	virtual void WhenGameInit_Implementation() override;
 
-	virtual void WhenLoad_Implementation() override;
+	virtual void WhenPostLoad_Implementation() override;
 
 	virtual TArray<struct FARPG_Item> GetInitItemList() const override;
 
