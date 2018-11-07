@@ -29,7 +29,9 @@ protected:
 	virtual void BeginPlay() override;
 
 	void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
-public:	
+
+	virtual bool NeedNotSave_Implementation() const override;
+public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 

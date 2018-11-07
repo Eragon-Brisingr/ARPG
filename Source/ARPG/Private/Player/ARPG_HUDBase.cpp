@@ -48,13 +48,17 @@ AActor* AARPG_HUDBase::GetNearestInteractableActor()
 		{
 			Algo::Sort(PotentialInteractableActors, [&](AActor* LHS, AActor* RHS)
 			{
-				if (Character->CanInteract(RHS))
+				if (!Character->CanInteract(RHS))
 				{
-					return false;
+					return true;
 				}
-				return Character->GetHorizontalDistanceTo(LHS) > Character->GetHorizontalDistanceTo(RHS); 
+				return Character->GetHorizontalDistanceTo(LHS) < Character->GetHorizontalDistanceTo(RHS);
 			});
-			return PotentialInteractableActors[0];
+
+			if (Character->CanInteract(PotentialInteractableActors[0]))
+			{
+				return PotentialInteractableActors[0];
+			}
 		}
 	}
 	return nullptr;
