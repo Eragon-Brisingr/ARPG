@@ -42,4 +42,9 @@ public:
 	UFUNCTION(BlueprintNativeEvent, Category = "游戏|交互")
 	void GetHintInfo(class ACharacterBase* InteractInvoker);
 	virtual void GetHintInfo_Implementation(class ACharacterBase* InteractInvoker) {}
+
+	UFUNCTION(BlueprintNativeEvent, Category = "环境|交互")
+	bool CanShowHintInfo(const class ACharacterBase* InteractInvoker) const;
+	virtual bool CanShowHintInfo_Implementation(const class ACharacterBase* InteractInvoker) const { return CanInteract(const_cast<UObject*>(Cast<UObject>(this)), InteractInvoker); }
+	static bool CanShowHintInfo(UObject* Obj, class ACharacterBase* InteractInvoker) { return IARPG_InteractInterface::Execute_CanShowHintInfo(Obj, InteractInvoker); }
 };
