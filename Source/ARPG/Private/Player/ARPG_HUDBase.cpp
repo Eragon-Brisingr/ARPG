@@ -33,23 +33,23 @@ void AARPG_HUDBase::Tick(float DeltaSeconds)
 			OldCharacterLocation = Character->GetActorLocation();
 		}
 
-		TSet<AActor*> PreInteractableActors(InteractableActors);
-		InteractableActors.Empty();
+		TSet<AActor*> PreShowHintActors(ShowHintActors);
+		ShowHintActors.Empty();
 		for (AActor* PotentialInteractableActor : PotentialInteractableActors)
 		{
-			if (Character->CanInteract(PotentialInteractableActor))
+			if (IARPG_InteractInterface::CanShowHintInfo(PotentialInteractableActor, Character))
 			{
-				InteractableActors.Add(PotentialInteractableActor);
+				ShowHintActors.Add(PotentialInteractableActor);
 			}
 		}
 
-		for (AActor* EnableInteractActor : TSet<AActor*>(InteractableActors).Difference(PreInteractableActors))
+		for (AActor* EnableInteractActor : TSet<AActor*>(ShowHintActors).Difference(PreShowHintActors))
 		{
-			OnActorEnableInteract.Broadcast(EnableInteractActor);
+			OnActorEnableHint.Broadcast(EnableInteractActor);
 		}
-		for (AActor* DisableInteractActor : PreInteractableActors.Difference(TSet<AActor*>(InteractableActors)))
+		for (AActor* DisableInteractActor : PreShowHintActors.Difference(TSet<AActor*>(ShowHintActors)))
 		{
-			OnActorDisableInteract.Broadcast(DisableInteractActor);
+			OnActorDisableHint.Broadcast(DisableInteractActor);
 		}
 	}
 }
@@ -80,11 +80,11 @@ void AARPG_HUDBase::WhenHintInfoCollectorEndOverlap(UPrimitiveComponent* Overlap
 	}
 }
 
-AActor* AARPG_HUDBase::GetNearestInteractableActor() const
+AActor* AARPG_HUDBase::GetNearestShowHintActor() const
 {
-	if (InteractableActors.Num() > 0)
+	if (ShowHintActors.Num() > 0)
 	{
-		return InteractableActors[0];
+		return ShowHintActors[0];
 	}
 	return nullptr;
 }

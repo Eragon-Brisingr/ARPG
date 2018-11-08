@@ -38,15 +38,15 @@ public:
 	UPROPERTY()
 	TArray<AActor*> PotentialInteractableActors;
 	UPROPERTY()
-	TArray<AActor*> InteractableActors;
+	TArray<AActor*> ShowHintActors;
 
-	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnActorEnableInteract, AActor*, Actor);
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnActorEnableHint, AActor*, Actor);
 	UPROPERTY(BlueprintAssignable)
-	FOnActorEnableInteract OnActorEnableInteract;
-	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnActorDisableInteract, AActor*, Actor);
+	FOnActorEnableHint OnActorEnableHint;
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnActorDisableHint, AActor*, Actor);
 	UPROPERTY(BlueprintAssignable)
-	FOnActorDisableInteract OnActorDisableInteract;
+	FOnActorDisableHint OnActorDisableHint;
 
 	UFUNCTION(BlueprintCallable, Category = "交互提示系统")
-	AActor* GetNearestInteractableActor() const;
+	AActor* GetNearestShowHintActor() const;
 };
