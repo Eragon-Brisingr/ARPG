@@ -14,6 +14,46 @@ void AARPG_HUDBase::BeginPlay()
 	AttachToActor(GetOwningPlayerController()->GetPawn(), FAttachmentTransformRules::KeepRelativeTransform);
 }
 
+void AARPG_HUDBase::Tick(float DeltaSeconds)
+{
+	Super::Tick(DeltaSeconds);
+
+	if (ACharacterBase* Character = Cast<ACharacterBase>(GetOwningPlayerController()->GetPawn()))
+	{
+		if ((OldCharacterLocation - Character->GetActorLocation()).Size2D() >= InteractableActorsUpdateDistance)
+		{
+			Algo::Sort(PotentialInteractableActors, [&](AActor* LHS, AActor* RHS)
+			{
+				if (!Character->CanInteract(RHS))
+				{
+					return true;
+				}
+				return Character->GetHorizontalDistanceTo(LHS) < Character->GetHorizontalDistanceTo(RHS);
+			});
+			OldCharacterLocation = Character->GetActorLocation();
+		}
+
+		TSet<AActor*> PreInteractableActors(InteractableActors);
+		InteractableActors.Empty();
+		for (AActor* PotentialInteractableActor : PotentialInteractableActors)
+		{
+			if (Character->CanInteract(PotentialInteractableActor))
+			{
+				InteractableActors.Add(PotentialInteractableActor);
+			}
+		}
+
+		for (AActor* EnableInteractActor : TSet<AActor*>(InteractableActors).Difference(PreInteractableActors))
+		{
+			OnActorEnableInteract.Broadcast(EnableInteractActor);
+		}
+		for (AActor* DisableInteractActor : PreInteractableActors.Difference(TSet<AActor*>(InteractableActors)))
+		{
+			OnActorDisableInteract.Broadcast(DisableInteractActor);
+		}
+	}
+}
+
 AARPG_HUDBase::AARPG_HUDBase()
 {
 	HintInfoCollector = CreateDefaultSubobject<USphereComponent>(GET_MEMBER_NAME_CHECKED(AARPG_HUDBase, HintInfoCollector));
@@ -40,26 +80,11 @@ void AARPG_HUDBase::WhenHintInfoCollectorEndOverlap(UPrimitiveComponent* Overlap
 	}
 }
 
-AActor* AARPG_HUDBase::GetNearestInteractableActor()
+AActor* AARPG_HUDBase::GetNearestInteractableActor() const
 {
-	if (PotentialInteractableActors.Num() > 0)
+	if (InteractableActors.Num() > 0)
 	{
-		if (ACharacterBase* Character = Cast<ACharacterBase>(GetOwningPlayerController()->GetPawn()))
-		{
-			Algo::Sort(PotentialInteractableActors, [&](AActor* LHS, AActor* RHS)
-			{
-				if (!Character->CanInteract(RHS))
-				{
-					return true;
-				}
-				return Character->GetHorizontalDistanceTo(LHS) < Character->GetHorizontalDistanceTo(RHS);
-			});
-
-			if (Character->CanInteract(PotentialInteractableActors[0]))
-			{
-				return PotentialInteractableActors[0];
-			}
-		}
+		return InteractableActors[0];
 	}
 	return nullptr;
 }
