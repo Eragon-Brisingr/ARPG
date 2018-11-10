@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -12,6 +12,8 @@
 class FARPG_EditorModule : public IModuleInterface
 {
 public:
+	static uint32 ARPG_AssetCategory;
+
 	virtual void StartupModule() override;
 	virtual void ShutdownModule() override;
 };
