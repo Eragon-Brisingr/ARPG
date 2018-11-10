@@ -23,7 +23,7 @@ enum class EWeaponUseType : uint8
 };
 
 
-UCLASS(Abstract)
+UCLASS(Abstract, meta = (DisplayName = "武器"))
 class ARPG_API AARPG_WeaponBase : public AARPG_ItemBase
 {
 	GENERATED_BODY()

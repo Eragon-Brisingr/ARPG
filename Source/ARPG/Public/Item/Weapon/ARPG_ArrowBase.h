@@ -10,7 +10,7 @@
 /**
  * 
  */
-UCLASS(Abstract)
+UCLASS(Abstract, meta = (DisplayName = "箭"))
 class ARPG_API AARPG_ArrowBase : public AARPG_WeaponBase
 {
 	GENERATED_BODY()

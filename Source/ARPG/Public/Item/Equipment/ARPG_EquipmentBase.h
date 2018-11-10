@@ -22,7 +22,7 @@ enum EEquipmentType
 };
 ENUM_CLASS_FLAGS(EEquipmentType);
 
-UCLASS()
+UCLASS(abstract, meta = (DisplayName = "装备"))
 class ARPG_API AARPG_EquipmentBase : public AARPG_ItemBase
 {
 	GENERATED_BODY()

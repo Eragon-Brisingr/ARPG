@@ -11,7 +11,7 @@
 /**
  * 
  */
-UCLASS(Abstract)
+UCLASS(Abstract, BlueprintType, meta = (DisplayName = "物品"))
 class ARPG_API AARPG_ItemBase : public AXD_ItemBase, public IARPG_InteractInterface
 {
 	GENERATED_BODY()
