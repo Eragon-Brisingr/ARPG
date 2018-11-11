@@ -5,8 +5,8 @@
 #include <GameFramework/Controller.h>
 #include <Kismet/KismetMathLibrary.h>
 #include <Kismet/KismetSystemLibrary.h>
+#include <Engine/World.h>
 #include "XD_MacrosLibrary.h"
-#include <DrawDebugHelpers.h>
 
 
 FARPG_LockOnTargetSystem::FARPG_LockOnTargetSystem()
@@ -51,7 +51,7 @@ void FARPG_LockOnTargetSystem::LockOnTargetTick(class AController* Controller, f
 
 		float Distance = (CurLocation - TargetLocation).Size();
 		//摄像机角度与锁定距离的关系
-		TargetLocation.Z -= Distance / 4.f;
+		TargetLocation.Z -= Distance / 4.f + 100.f;
 
 
 		FRotator TargetRotation = UKismetMathLibrary::FindLookAtRotation(CurLocation, TargetLocation);
