@@ -39,7 +39,7 @@ ACharacterBase::ACharacterBase(const FObjectInitializer& ObjectInitializer)
 
 	DodgeAnimSet = CreateDefaultSubobject<UARPG_DodgeAnimSetNormal>(GET_MEMBER_NAME_CHECKED(ACharacterBase, DodgeAnimSet));
 
-	GetMesh()->MeshComponentUpdateFlag = EMeshComponentUpdateFlag::AlwaysTickPoseAndRefreshBones;
+	GetMesh()->VisibilityBasedAnimTickOption = EVisibilityBasedAnimTickOption::AlwaysTickPoseAndRefreshBones;
 }
 
 // Called when the game starts or when spawned
