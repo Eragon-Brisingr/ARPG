@@ -2,8 +2,9 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
-#include "UObject/Interface.h"
+#include <CoreMinimal.h>
+#include <UObject/Interface.h>
+#include <Engine/EngineTypes.h>
 #include "ARPG_LockOnTargetSystem.generated.h"
 
 USTRUCT(BlueprintType, meta = (BlueprintInternalUseOnly = "true"))
