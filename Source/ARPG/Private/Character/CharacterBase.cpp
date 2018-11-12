@@ -18,6 +18,9 @@
 #include "XD_TemplateLibrary.h"
 #include "UnrealNetwork.h"
 #include "ARPG_ActorFunctionLibrary.h"
+#include "ARPG_AIPerceptionComponent.h"
+#include "Perception/AISenseConfig_Sight.h"
+#include "Perception/AISenseConfig_Hearing.h"
 
 
 // Sets default values
@@ -38,6 +41,30 @@ ACharacterBase::ACharacterBase(const FObjectInitializer& ObjectInitializer)
 	}
 
 	DodgeAnimSet = CreateDefaultSubobject<UARPG_DodgeAnimSetNormal>(GET_MEMBER_NAME_CHECKED(ACharacterBase, DodgeAnimSet));
+
+	AIPerception = CreateDefaultSubobject<UARPG_AIPerceptionComponent>(GET_MEMBER_NAME_CHECKED(ACharacterBase, AIPerception));
+	{
+		UAISenseConfig_Sight* Sight = CreateDefaultSubobject<UAISenseConfig_Sight>(TEXT("Sight_Config"));
+		Sight->SightRadius = 4000.f;
+		Sight->LoseSightRadius = 5000.f;
+		Sight->PeripheralVisionAngleDegrees = 75.f;
+		Sight->SetMaxAge(20.f);
+		Sight->AutoSuccessRangeFromLastSeenLocation = 100.f;
+		Sight->DetectionByAffiliation.bDetectEnemies = true;
+		Sight->DetectionByAffiliation.bDetectNeutrals = true;
+		Sight->DetectionByAffiliation.bDetectFriendlies = true;
+
+		AIPerception->ConfigureSense(*Sight);
+
+		UAISenseConfig_Hearing* Hearing = CreateDefaultSubobject<UAISenseConfig_Hearing>(TEXT("Hearing_Config"));
+		Hearing->HearingRange = 2000.f;
+		Hearing->SetMaxAge(2.f);
+		Hearing->DetectionByAffiliation.bDetectEnemies = true;
+		Hearing->DetectionByAffiliation.bDetectNeutrals = true;
+		Hearing->DetectionByAffiliation.bDetectFriendlies = true;
+
+		AIPerception->ConfigureSense(*Hearing);
+	}
 
 	GetMesh()->VisibilityBasedAnimTickOption = EVisibilityBasedAnimTickOption::AlwaysTickPoseAndRefreshBones;
 }
@@ -589,5 +616,54 @@ void ACharacterBase::InvokeInteract_ToServer_Implementation(AActor* InteractTarg
 bool ACharacterBase::CanInteract(AActor* InteractTarget) const
 {
 	return InteractTarget && InteractTarget->Implements<UARPG_InteractInterface>() && IARPG_InteractInterface::CanInteract(InteractTarget, this);
+}
+
+bool ACharacterBase::CanBeSeenFrom(const FVector& ObserverLocation, FVector& OutSeenLocation, int32& NumberOfLoSChecksPerformed, float& OutSightStrength, const AActor* IgnoreActor /*= NULL*/) const
+{
+	if (const ACharacterBase* SightListener = Cast<ACharacterBase>(IgnoreActor))
+	{
+		// we need to do tests ourselves
+		FHitResult HitResult;
+		const bool bHit = GetWorld()->LineTraceSingleByChannel(HitResult, ObserverLocation, GetActorLocation()
+			, SightCollisionChannel
+			, FCollisionQueryParams(SCENE_QUERY_STAT(AILineOfSight), true, SightListener));
+
+		if (HitResult.GetActor() == this)
+		{
+			float SightVigilanceValue = SightListener->GetSightVigilanceValue(this);
+			NumberOfLoSChecksPerformed = 1;
+			OutSightStrength = SightVigilanceValue;
+			OutSeenLocation = GetActorLocation();
+			return OutSightStrength > 0.f;
+		}
+	}
+
+	return false;
+}
+
+float ACharacterBase::GetSightVigilanceValue(const class ACharacterBase* TargetCharacter) const
+{
+	if (TargetCharacter)
+	{
+		return 1.f - GetDistanceTo(TargetCharacter) / 1000.f;
+	}
+	return 0.f;
+}
+
+void ACharacterBase::SetGenericTeamId(const FGenericTeamId& TeamID)
+{
+
+}
+
+FGenericTeamId ACharacterBase::GetGenericTeamId() const
+{
+	return FGenericTeamId::NoTeam;
+}
+
+ETeamAttitude::Type ACharacterBase::GetTeamAttitudeTowards(const AActor& Other) const
+{
+	const IGenericTeamAgentInterface* OtherTeamAgent = Cast<const IGenericTeamAgentInterface>(&Other);
+	return OtherTeamAgent ? FGenericTeamId::GetAttitude(GetGenericTeamId(), OtherTeamAgent->GetGenericTeamId())
+		: ETeamAttitude::Neutral;
 }
 

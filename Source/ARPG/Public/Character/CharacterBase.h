@@ -4,6 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include <Perception/AISightTargetInterface.h>
+#include <GenericTeamAgentInterface.h>
 #include "XD_SaveGameInterface.h"
 #include "ARPG_InputBuffer.h"
 #include "ARPG_LockOnTargetSystem.h"
@@ -11,12 +13,15 @@
 #include "ItemTypeUtils.h"
 #include "CharacterDamageType.h"
 #include "ARPG_InteractInterface.h"
+#include "ARPG_CollisionType.h"
 #include "CharacterBase.generated.h"
 
 UCLASS()
 class ARPG_API ACharacterBase : public ACharacter, 
 	public IXD_SaveGameInterface,
-	public IARPG_LockOnTargetInterface
+	public IARPG_LockOnTargetInterface,
+	public IAISightTargetInterface,
+	public IGenericTeamAgentInterface
 {
 	GENERATED_BODY()
 
@@ -339,6 +344,26 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "角色|交互")
 	bool CanInteract(AActor* InteractTarget) const;
 public:
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Character")
+	UPROPERTY(BlueprintReadOnly, Category = "Character")
 	class UARPG_MovementComponent* ARPG_MovementComponent;
+
+	//AI
+public:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "角色|AI")
+	class UARPG_AIPerceptionComponent* AIPerception;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "角色|配置|AI")
+	TEnumAsByte<ECollisionChannel> SightCollisionChannel = FARPG_ECollisionChannel::AI_Sight;
+
+	//AISightTargetInterface Start
+	virtual bool CanBeSeenFrom(const FVector& ObserverLocation, FVector& OutSeenLocation, int32& NumberOfLoSChecksPerformed, float& OutSightStrength, const AActor* IgnoreActor = NULL) const override;
+	//AISightTargetInterface End
+
+	float GetSightVigilanceValue(const class ACharacterBase* TargetCharacter) const;
+
+	//GenericTeamAgentInterface Start
+	virtual void SetGenericTeamId(const FGenericTeamId& TeamID) override;
+	virtual FGenericTeamId GetGenericTeamId() const override;
+	virtual ETeamAttitude::Type GetTeamAttitudeTowards(const AActor& Other) const override;
+	//GenericTeamAgentInterface End
 };
