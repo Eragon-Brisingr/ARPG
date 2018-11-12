@@ -16,7 +16,8 @@
 				"XD_EnvironmentSystem",
 				"XD_TimeSystem",
 				"XD_ItemSystem",
-				"XD_UnrealLibraryEx"
+				"XD_UnrealLibraryEx",
+				"AIModule"
 			]
 		},
 		{
