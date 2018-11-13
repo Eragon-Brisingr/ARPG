@@ -6,6 +6,7 @@
 #include "GameFramework/GameState.h"
 #include "XD_TimeSystem_GameStateInterface.h"
 #include "XD_EnvironmentGameStateInterface.h"
+#include "XD_CampSystemInterface.h"
 #include "ARPG_GameStateBase.generated.h"
 
 /**
@@ -13,7 +14,9 @@
  */
 UCLASS()
 class ARPG_API AARPG_GameStateBase : public AGameState, 
-	public IXD_TimeSystem_GameStateInterface, public IXD_Environment_GameStateInterface
+	public IXD_TimeSystem_GameStateInterface, 
+	public IXD_Environment_GameStateInterface,
+	public IXD_CampSystem_GameStateInterface
 {
 	GENERATED_BODY()
 public:
@@ -25,7 +28,12 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "时间系统")
 	class UARPG_TimeManager* TimeManager;
 	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "阵营系统")
+	class UARPG_CampManager* CampManager;
+
 	class UXD_TimeManager* GetGameTimeManager_Implementation() const override;
 
 	class UXD_EnvironmentManager* GetEnvironmentManager_Implementation() const override;
+
+	virtual class UXD_CampManager* GetCampManager_Implementation() const override;
 };
