@@ -7,6 +7,7 @@
 #include "XD_TimeSystem_GameStateInterface.h"
 #include "XD_EnvironmentGameStateInterface.h"
 #include "XD_CampSystemInterface.h"
+#include "XD_SaveGameInterface.h"
 #include "ARPG_GameStateBase.generated.h"
 
 /**
@@ -14,6 +15,7 @@
  */
 UCLASS()
 class ARPG_API AARPG_GameStateBase : public AGameState, 
+	public IXD_SaveGameInterface,
 	public IXD_TimeSystem_GameStateInterface, 
 	public IXD_Environment_GameStateInterface,
 	public IXD_CampSystem_GameStateInterface

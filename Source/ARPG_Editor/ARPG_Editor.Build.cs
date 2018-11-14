@@ -22,6 +22,7 @@ public class ARPG_Editor : ModuleRules
 			"XD_GameEventSystem",
 			"XD_EnvironmentSystem",
 			"XD_CampSystem",
+            "XD_CampSystem_Editor",
             "XD_ItemSystem",
             "XD_ItemSystem_Editor"
         });

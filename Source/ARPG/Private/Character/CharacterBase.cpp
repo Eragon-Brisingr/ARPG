@@ -18,9 +18,10 @@
 #include "XD_TemplateLibrary.h"
 #include "UnrealNetwork.h"
 #include "ARPG_ActorFunctionLibrary.h"
-#include "ARPG_AIPerceptionComponent.h"
+#include "Perception/AIPerceptionStimuliSourceComponent.h"
 #include "Perception/AISenseConfig_Sight.h"
-#include "Perception/AISenseConfig_Hearing.h"
+#include "ARPG_CampInfo.h"
+#include "ARPG_CampRelationship.h"
 
 
 // Sets default values
@@ -41,30 +42,6 @@ ACharacterBase::ACharacterBase(const FObjectInitializer& ObjectInitializer)
 	}
 
 	DodgeAnimSet = CreateDefaultSubobject<UARPG_DodgeAnimSetNormal>(GET_MEMBER_NAME_CHECKED(ACharacterBase, DodgeAnimSet));
-
-	AIPerception = CreateDefaultSubobject<UARPG_AIPerceptionComponent>(GET_MEMBER_NAME_CHECKED(ACharacterBase, AIPerception));
-	{
-		UAISenseConfig_Sight* Sight = CreateDefaultSubobject<UAISenseConfig_Sight>(TEXT("Sight_Config"));
-		Sight->SightRadius = 4000.f;
-		Sight->LoseSightRadius = 5000.f;
-		Sight->PeripheralVisionAngleDegrees = 75.f;
-		Sight->SetMaxAge(20.f);
-		Sight->AutoSuccessRangeFromLastSeenLocation = 100.f;
-		Sight->DetectionByAffiliation.bDetectEnemies = true;
-		Sight->DetectionByAffiliation.bDetectNeutrals = true;
-		Sight->DetectionByAffiliation.bDetectFriendlies = true;
-
-		AIPerception->ConfigureSense(*Sight);
-
-		UAISenseConfig_Hearing* Hearing = CreateDefaultSubobject<UAISenseConfig_Hearing>(TEXT("Hearing_Config"));
-		Hearing->HearingRange = 2000.f;
-		Hearing->SetMaxAge(2.f);
-		Hearing->DetectionByAffiliation.bDetectEnemies = true;
-		Hearing->DetectionByAffiliation.bDetectNeutrals = true;
-		Hearing->DetectionByAffiliation.bDetectFriendlies = true;
-
-		AIPerception->ConfigureSense(*Hearing);
-	}
 
 	GetMesh()->VisibilityBasedAnimTickOption = EVisibilityBasedAnimTickOption::AlwaysTickPoseAndRefreshBones;
 }
@@ -618,6 +595,36 @@ bool ACharacterBase::CanInteract(AActor* InteractTarget) const
 	return InteractTarget && InteractTarget->Implements<UARPG_InteractInterface>() && IARPG_InteractInterface::CanInteract(InteractTarget, this);
 }
 
+class UARPG_CampInfo* ACharacterBase::GetCampInfo() const
+{
+	return Cast<UARPG_CampInfo>(CampConfig.GetCamp(this));
+}
+
+class UARPG_CampRelationship* ACharacterBase::GetCampRelationshipToward(ACharacterBase* Other) const
+{
+	return Other ? Cast<UARPG_CampRelationship>(GetCampInfo()->GetCampRelationshipRef(this, Other->GetCampInfo())) : nullptr;
+}
+
+ETeamAttitude::Type ACharacterBase::GetAttitudeTowards(const AActor* Actor) const
+{
+	if (const ACharacterBase* Character = Cast<ACharacterBase>(Actor))
+	{
+		EXD_CampRelationship CampRelationship = GetCampInfo()->GetCampRelationship(this, Character->GetCampInfo());
+		switch (CampRelationship)
+		{
+		case EXD_CampRelationship::SelfCamp:
+			return ETeamAttitude::Friendly;
+		case EXD_CampRelationship::Friend:
+			return ETeamAttitude::Friendly;
+		case EXD_CampRelationship::Neutral:
+			return ETeamAttitude::Neutral;
+		case EXD_CampRelationship::Hostile:
+			return ETeamAttitude::Hostile;
+		}
+	}
+	return ETeamAttitude::Neutral;
+}
+
 bool ACharacterBase::CanBeSeenFrom(const FVector& ObserverLocation, FVector& OutSeenLocation, int32& NumberOfLoSChecksPerformed, float& OutSightStrength, const AActor* IgnoreActor /*= NULL*/) const
 {
 	if (const ACharacterBase* SightListener = Cast<ACharacterBase>(IgnoreActor))
@@ -631,7 +638,7 @@ bool ACharacterBase::CanBeSeenFrom(const FVector& ObserverLocation, FVector& Out
 		if (HitResult.GetActor() == this)
 		{
 			float SightVigilanceValue = SightListener->GetSightVigilanceValue(this);
-			NumberOfLoSChecksPerformed = 1;
+			NumberOfLoSChecksPerformed += 1;
 			OutSightStrength = SightVigilanceValue;
 			OutSeenLocation = GetActorLocation();
 			return OutSightStrength > 0.f;
@@ -649,21 +656,3 @@ float ACharacterBase::GetSightVigilanceValue(const class ACharacterBase* TargetC
 	}
 	return 0.f;
 }
-
-void ACharacterBase::SetGenericTeamId(const FGenericTeamId& TeamID)
-{
-
-}
-
-FGenericTeamId ACharacterBase::GetGenericTeamId() const
-{
-	return FGenericTeamId::NoTeam;
-}
-
-ETeamAttitude::Type ACharacterBase::GetTeamAttitudeTowards(const AActor& Other) const
-{
-	const IGenericTeamAgentInterface* OtherTeamAgent = Cast<const IGenericTeamAgentInterface>(&Other);
-	return OtherTeamAgent ? FGenericTeamId::GetAttitude(GetGenericTeamId(), OtherTeamAgent->GetGenericTeamId())
-		: ETeamAttitude::Neutral;
-}
-
