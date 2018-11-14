@@ -71,10 +71,7 @@ void UARPG_Human_WeaponTrace::NotifyBegin(USkeletalMeshComponent * MeshComp, UAn
 		if (AARPG_WeaponBase* Weapon = bIsLeftWeapon ? Human->LeftWeapon : Human->RightWeapon)
 		{
 			Weapon->SetActorEnableCollision(true);
-			Weapon->ReceiveDamageAction = ReceiveDamageAction;
-			Weapon->AnimAddHitStunValue = AddHitStunValue;
-			Weapon->BeakBackDistance = BeakBackDistance;
-			Weapon->SetEnableNearAttackTrace(true);
+			Weapon->EnableNearAttackTrace(PointDamageParameter, bClearIgnoreList);
 		}
 	}
 }
@@ -86,8 +83,7 @@ void UARPG_Human_WeaponTrace::NotifyEnd(USkeletalMeshComponent * MeshComp, UAnim
 		if (AARPG_WeaponBase* Weapon = bIsLeftWeapon ? Human->LeftWeapon : Human->RightWeapon)
 		{
 			Weapon->SetActorEnableCollision(false);
-			Weapon->ReceiveDamageAction = nullptr;
-			Weapon->SetEnableNearAttackTrace(false);
+			Weapon->DisableNearAttackTrace();
 		}
 	}
 }
@@ -103,9 +99,7 @@ void UARPG_Human_FallingAttackTrace::NotifyBegin(USkeletalMeshComponent * MeshCo
 	{
 		if (AARPG_WeaponBase* Weapon = bIsLeftWeapon ? Human->LeftWeapon : Human->RightWeapon)
 		{
-			Weapon->ReceiveDamageAction = ReceiveDamageAction;
-			Weapon->AnimAddHitStunValue = AddHitStunValue;
-			Weapon->SetEnableFallingAttackTrace(true, bClearIgnoreList);
+			Weapon->EnableFallingAttackTrace(PointDamageParameter, bClearIgnoreList);
 		}
 	}
 }
@@ -116,7 +110,7 @@ void UARPG_Human_FallingAttackTrace::NotifyEnd(USkeletalMeshComponent * MeshComp
 	{
 		if (AARPG_WeaponBase* Weapon = bIsLeftWeapon ? Human->LeftWeapon : Human->RightWeapon)
 		{
-			Weapon->SetEnableFallingAttackTrace(false, bClearIgnoreList);
+			Weapon->DisableFallingAttackTrace();
 		}
 	}
 }
@@ -176,7 +170,7 @@ void UARPG_Human_LaunchArrow::Notify(USkeletalMeshComponent* MeshComp, UAnimSequ
 		{
 			if (AARPG_BowBase* Bow = Cast<AARPG_BowBase>(Weapon))
 			{
-				Bow->LaunchArrow(FullBowTime);
+				Bow->LaunchArrow(FullBowTime, PointDamageParameter);
 			}
 		}
 	}
@@ -188,7 +182,7 @@ void USRDAF_LeftWeapon::SetReceiveDamageAction(USkeletalMeshComponent* MeshComp,
 	{
 		if (Human->LeftWeapon)
 		{
-			Human->LeftWeapon->ReceiveDamageAction = ReceiveDamageAction;
+			Human->LeftWeapon->PointDamageParameter.ReceiveDamageAction = ReceiveDamageAction;
 		}
 	}
 }
@@ -199,7 +193,7 @@ void USRDAF_RightWeapon::SetReceiveDamageAction(USkeletalMeshComponent* MeshComp
 	{
 		if (Human->RightWeapon)
 		{
-			Human->RightWeapon->ReceiveDamageAction = ReceiveDamageAction;
+			Human->RightWeapon->PointDamageParameter.ReceiveDamageAction = ReceiveDamageAction;
 		}
 	}
 }
@@ -210,7 +204,7 @@ void USAHSVF_LeftWeapon::SetAddHitStunValue(USkeletalMeshComponent* MeshComp, fl
 	{
 		if (Human->LeftWeapon)
 		{
-			Human->LeftWeapon->AnimAddHitStunValue += AddHitStunValue;
+			Human->LeftWeapon->PointDamageParameter.AddHitStunValue += AddHitStunValue;
 		}
 	}
 }
@@ -221,7 +215,7 @@ void USAHSVF_LeftWeapon::Reset(USkeletalMeshComponent* MeshComp, float AddHitStu
 	{
 		if (Human->LeftWeapon)
 		{
-			Human->LeftWeapon->AnimAddHitStunValue -= AddHitStunValue;
+			Human->LeftWeapon->PointDamageParameter.AddHitStunValue -= AddHitStunValue;
 		}
 	}
 }
@@ -232,7 +226,7 @@ void USAHSVF_RightWeapon::SetAddHitStunValue(USkeletalMeshComponent* MeshComp, f
 	{
 		if (Human->RightWeapon)
 		{
-			Human->RightWeapon->AnimAddHitStunValue += AddHitStunValue;
+			Human->RightWeapon->PointDamageParameter.AddHitStunValue += AddHitStunValue;
 		}
 	}
 }
@@ -243,29 +237,31 @@ void USAHSVF_RightWeapon::Reset(USkeletalMeshComponent* MeshComp, float AddHitSt
 	{
 		if (Human->RightWeapon)
 		{
-			Human->RightWeapon->AnimAddHitStunValue -= AddHitStunValue;
+			Human->RightWeapon->PointDamageParameter.AddHitStunValue -= AddHitStunValue;
 		}
 	}
 }
 
-void USBBDF_LeftWeapon::SetBeakBackDistance(USkeletalMeshComponent* MeshComp, float BeakBackDistance) const
+void USBBDF_LeftWeapon::SetBeakBackDistance(USkeletalMeshComponent* MeshComp, float NormalBeakBackDistance, float DefenseBeakBackDistance) const
 {
 	if (AHumanBase* Human = Cast<AHumanBase>(MeshComp->GetOwner()))
 	{
 		if (Human->LeftWeapon)
 		{
-			Human->LeftWeapon->BeakBackDistance = BeakBackDistance;
+			Human->LeftWeapon->PointDamageParameter.NormalBeakBackDistance = NormalBeakBackDistance;
+			Human->LeftWeapon->PointDamageParameter.DefenseBeakBackDistance = DefenseBeakBackDistance;
 		}
 	}
 }
 
-void USBBDF_RightWeapon::SetBeakBackDistance(USkeletalMeshComponent* MeshComp, float BeakBackDistance) const
+void USBBDF_RightWeapon::SetBeakBackDistance(USkeletalMeshComponent* MeshComp, float NormalBeakBackDistance, float DefenseBeakBackDistance) const
 {
 	if (AHumanBase* Human = Cast<AHumanBase>(MeshComp->GetOwner()))
 	{
 		if (Human->RightWeapon)
 		{
-			Human->RightWeapon->BeakBackDistance = BeakBackDistance;
+			Human->RightWeapon->PointDamageParameter.NormalBeakBackDistance = NormalBeakBackDistance;
+			Human->RightWeapon->PointDamageParameter.DefenseBeakBackDistance = DefenseBeakBackDistance;
 		}
 	}
 }

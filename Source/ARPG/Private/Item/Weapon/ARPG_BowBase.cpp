@@ -29,7 +29,7 @@ void AARPG_BowBase::SpawnArrowInHand()
 	}
 }
 
-void AARPG_BowBase::LaunchArrow(float FullBowTime)
+void AARPG_BowBase::LaunchArrow(float FullBowTime, const FApplyPointDamageParameter& ApplyPointDamageParameter)
 {
 	if (HoldingArrow)
 	{
@@ -42,7 +42,7 @@ void AARPG_BowBase::LaunchArrow(float FullBowTime)
 		}
 
 		HoldingArrow->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
-		HoldingArrow->Launch(FMath::GetMappedRangeValueClamped({ 0.f, FullBowTime }, { 500.f, 3000.f }, HoldingTime));
+		HoldingArrow->Launch(FMath::GetMappedRangeValueClamped({ 0.f, FullBowTime }, { 500.f, 3000.f }, HoldingTime), ApplyPointDamageParameter);
 
 		HoldingArrow = nullptr;
 	}

@@ -347,12 +347,12 @@ class ARPG_API UARPG_SetBeakBackDistanceFunctorBase : public UObject
 {
 	GENERATED_BODY()
 public:
-	virtual void SetBeakBackDistance(USkeletalMeshComponent* MeshComp, float BeakBackDistance) const
+	virtual void SetBeakBackDistance(USkeletalMeshComponent* MeshComp, float NormalBeakBackDistance, float DefenseBeakBackDistance) const
 	{
-		ReceiveBeakBackDistance(MeshComp, BeakBackDistance);
+		ReceiveBeakBackDistance(MeshComp, NormalBeakBackDistance, DefenseBeakBackDistance);
 	}
 	UFUNCTION(BlueprintImplementableEvent, Category = "函数子", meta = (DisplayName = "BeakBackDistance"))
-	void ReceiveBeakBackDistance(USkeletalMeshComponent* MeshComp, float BeakBackDistance) const;
+	void ReceiveBeakBackDistance(USkeletalMeshComponent* MeshComp, float NormalBeakBackDistance, float DefenseBeakBackDistance) const;
 };
 
 UCLASS(meta = (DisplayName = "动画_设置击退距离"))
@@ -366,7 +366,10 @@ public:
 	}
 
 	UPROPERTY(EditAnywhere, Category = "动画", meta = (DisplayName = "击退距离"))
-	float BeakBackDistance = 20.f;
+	float NormalBeakBackDistance = 20.f;
+
+	UPROPERTY(EditAnywhere, Category = "动画", meta = (DisplayName = "防御击退距离"))
+	float DefenseBeakBackDistance = 20.f;
 
 	UPROPERTY(EditAnywhere, Category = "动画", meta = (DisplayName = "作用对象"))
 	TSubclassOf<class UARPG_SetBeakBackDistanceFunctorBase> SetBeakBackDistanceFunctor;

@@ -59,14 +59,8 @@ public:
 	UPROPERTY(EditAnywhere, Category = "攻击", meta = (DisplayName = "清空攻击到对象列表"))
 	uint8 bClearIgnoreList : 1;
 
-	UPROPERTY(EditAnywhere, Category = "攻击", meta = (DisplayName = "特殊受击动作"))
-	TSubclassOf<class UReceiveDamageActionBase> ReceiveDamageAction;
-
-	UPROPERTY(EditAnywhere, Category = "攻击", meta = (DisplayName = "削韧增加量"))
-	float AddHitStunValue = 0.f;
-
-	UPROPERTY(EditAnywhere, Category = "攻击", meta = (DisplayName = "击退距离"))
-	float BeakBackDistance = 20.f;
+	UPROPERTY(EditAnywhere, Category = "攻击", meta = (DisplayName = "伤害配置", ShowOnlyInnerProperties))
+	FApplyPointDamageParameter PointDamageParameter;
 
 	virtual void NotifyBegin(USkeletalMeshComponent * MeshComp, UAnimSequenceBase * Animation, float TotalDuration) override;
 	virtual void NotifyEnd(USkeletalMeshComponent * MeshComp, UAnimSequenceBase * Animation) override;
@@ -89,11 +83,8 @@ public:
 	UPROPERTY(EditAnywhere, Category = "攻击", meta = (DisplayName = "清空攻击到对象列表"))
 	uint8 bClearIgnoreList : 1;
 
-	UPROPERTY(EditAnywhere, Category = "攻击", meta = (DisplayName = "特殊受击动作"))
-	TSubclassOf<class UReceiveDamageActionBase> ReceiveDamageAction;
-
-	UPROPERTY(EditAnywhere, Category = "攻击", meta = (DisplayName = "削韧增加量"))
-	float AddHitStunValue = 0.f;
+	UPROPERTY(EditAnywhere, Category = "攻击", meta = (DisplayName = "伤害配置", ShowOnlyInnerProperties))
+	FApplyPointDamageParameter PointDamageParameter;
 
 	virtual void NotifyBegin(USkeletalMeshComponent * MeshComp, UAnimSequenceBase * Animation, float TotalDuration) override;
 	virtual void NotifyEnd(USkeletalMeshComponent * MeshComp, UAnimSequenceBase * Animation) override;
@@ -130,6 +121,8 @@ public:
 	UARPG_Human_LaunchArrow()
 	{
 		bIsNativeBranchingPoint = true;
+		PointDamageParameter.bCanDefense = false;
+		PointDamageParameter.bCanDefenseSwipe = false;
 	}
 
 	UPROPERTY(EditAnywhere, Category = "攻击", meta = (DisplayName = "为左手武器"))
@@ -137,6 +130,9 @@ public:
 
 	UPROPERTY(EditAnywhere, Category = "攻击", meta = (DisplayName = "拉满弓所需时间"))
 	float FullBowTime = 2.f;
+
+	UPROPERTY(EditAnywhere, Category = "攻击", meta = (DisplayName = "伤害配置", ShowOnlyInnerProperties))
+	FApplyPointDamageParameter PointDamageParameter;
 
 	virtual void Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation) override;
 };
@@ -182,7 +178,7 @@ class ARPG_API USBBDF_LeftWeapon : public UARPG_SetBeakBackDistanceFunctorBase
 {
 	GENERATED_BODY()
 public:
-	virtual void SetBeakBackDistance(USkeletalMeshComponent* MeshComp, float BeakBackDistance) const override;
+	virtual void SetBeakBackDistance(USkeletalMeshComponent* MeshComp, float NormalBeakBackDistance, float DefenseBeakBackDistance) const override;
 };
 
 UCLASS(meta = (DisplayName = "人类右手武器"))
@@ -190,7 +186,7 @@ class ARPG_API USBBDF_RightWeapon : public UARPG_SetBeakBackDistanceFunctorBase
 {
 	GENERATED_BODY()
 public:
-	virtual void SetBeakBackDistance(USkeletalMeshComponent* MeshComp, float BeakBackDistance) const override;
+	virtual void SetBeakBackDistance(USkeletalMeshComponent* MeshComp, float NormalBeakBackDistance, float DefenseBeakBackDistance) const override;
 };
 
 UCLASS(meta = (DisplayName = "人类左手武器"))

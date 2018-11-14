@@ -7,6 +7,7 @@
 #include "ARPG_CharacterAnimType.h"
 #include "ExecuteActionSet.h"
 #include "SocketMoveTraceManager.h"
+#include "CharacterDamageType.h"
 #include "ARPG_WeaponBase.generated.h"
 
 /**
@@ -60,13 +61,9 @@ public:
 
 	//攻击
 public:
-	void SetEnableNearAttackTrace(bool Enable, bool ClearIgnoreList = true);
-
+	void EnableNearAttackTrace(const FApplyPointDamageParameter& ApplyPointDamageParameter, bool ClearIgnoreList = true);
+	void DisableNearAttackTrace();
 	void WhenAttackTracedActor(UPrimitiveComponent* HitComponent, const FName& SocketName, AActor* OtherActor, UPrimitiveComponent* OtherComp, const FHitResult& TraceResult);
-
-	TSubclassOf<class UReceiveDamageActionBase> ReceiveDamageAction;
-
-	float BeakBackDistance = 20.f;
 
 	UPROPERTY(EditDefaultsOnly, Category = "武器", meta = (ShowOnlyInnerProperties))
 	FExecuteActionSet ExecuteActionSet;
@@ -74,15 +71,15 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "武器|行为")
 	bool TraceForExecuteOther();
 
-	void SetEnableFallingAttackTrace(bool Enable, bool ClearIgnoreList = true);
+	void EnableFallingAttackTrace(const FApplyPointDamageParameter& ApplyPointDamageParameter, bool ClearIgnoreList = true);
+	void DisableFallingAttackTrace();
 
 	void WhenFallingAttackTracedActor(UPrimitiveComponent* HitComponent, const FName& SocketName, AActor* OtherActor, UPrimitiveComponent* OtherComp, const FHitResult& TraceResult);
 
-	float GetHitStunValue() const { return BaseAddHitStunValue + AnimAddHitStunValue; }
+	float GetHitStunValue(float AnimAddHitStunValue) const { return BaseAddHitStunValue + AnimAddHitStunValue; }
 	float GetPhysicsAttackValue() const { return BasePhysicsAttack; }
-	//攻击时的额外数据
-public:
-	float AnimAddHitStunValue = 0.f;
+
+	FApplyPointDamageParameter PointDamageParameter;
 
 	//持武器方式
 public:

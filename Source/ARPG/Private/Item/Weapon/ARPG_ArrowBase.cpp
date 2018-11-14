@@ -45,13 +45,13 @@ void AARPG_ArrowBase::WhenRemoveFromInventory_Implementation(class AActor* ItemO
 	}
 }
 
-void AARPG_ArrowBase::WhenHitCharacter(USceneComponent* MyComp, AActor* Other, UPrimitiveComponent* OtherComp, const FHitResult& Hit)
+void AARPG_ArrowBase::WhenHitCharacter(USceneComponent* MyComp, AActor* Other, UPrimitiveComponent* OtherComp, const FHitResult& Hit, FApplyPointDamageParameter ApplyPointDamageParameter)
 {
 	if (ACharacterBase* Character = Cast<ACharacterBase>(Other))
 	{
 		PostArrowHitOther(FindComponentByClass<UARPG_ProjectileMovementComponent>());
 
-		if (ApplyDamamgeToCharacter(Character, Hit) > 0.f)
+		if (ApplyDamamgeToCharacter(Character, Hit, ApplyPointDamageParameter) > 0.f)
 		{
 			SetActorLocation(Hit.Location);
 			GetRootComponent()->AttachToComponent(Hit.GetComponent(), FAttachmentTransformRules::KeepWorldTransform, Hit.BoneName);
@@ -59,15 +59,12 @@ void AARPG_ArrowBase::WhenHitCharacter(USceneComponent* MyComp, AActor* Other, U
 	}
 }
 
-float AARPG_ArrowBase::ApplyDamamgeToCharacter(ACharacterBase* Character, const FHitResult& Hit)
+float AARPG_ArrowBase::ApplyDamamgeToCharacter(ACharacterBase* Character, const FHitResult& Hit, const FApplyPointDamageParameter& ApplyPointDamageParameter)
 {
 	Battle_Display_LOG("%s的弓%s所射箭%s的射中%s", *UARPG_DebugFunctionLibrary::GetDebugName(GetItemOwner()), *UARPG_DebugFunctionLibrary::GetDebugName(GetOwner()), *UARPG_DebugFunctionLibrary::GetDebugName(this), *UARPG_DebugFunctionLibrary::GetDebugName(Character));
 
-	FApplyPointDamageParameter Param;
-	Param.AddHitStunValue = GetHitStunValue();
-	Param.ReceiveDamageAction = ReceiveDamageAction;
-	Param.bCanDefense = false;
-	Param.bCanDefenseSwipe = false;
+	FApplyPointDamageParameter Param(ApplyPointDamageParameter);
+	Param.AddHitStunValue = GetHitStunValue(ApplyPointDamageParameter.AddHitStunValue);
 
 	return Character->ApplyPointDamage(GetArrowDamage(), GetVelocity().GetSafeNormal(), Hit, GetItemOwner(), this, nullptr, Param);
 }
@@ -89,16 +86,16 @@ void AARPG_ArrowBase::WhenArrowHitEnvironment(UPrimitiveComponent* HitComponent,
 				Arrow->AddActorWorldOffset(Velocity.GetSafeNormal() * FMath::GetMappedRangeValueClamped({ 0.f, 3000.f }, { 0.f, 50.f }, Velocity.Size()));
 
 				//假如扎在角色身上，则造成伤害
-				if (HasAuthority())
-				{
-					if (ACharacterBase* Character = Cast<ACharacterBase>(ParentActor))
-					{
-						FHitResult ArrowTraceRes;
-						bool TraceSucceed = Character->ActorLineTraceSingle(ArrowTraceRes, Arrow->GetActorLocation(), Arrow->GetActorLocation() + Arrow->GetActorForwardVector() * 100.f, ECC_Visibility, FCollisionQueryParams(NAME_None, true));
-
-						ApplyDamamgeToCharacter(Character, TraceSucceed ? ArrowTraceRes : Hit);
-					}
-				}
+// 				if (HasAuthority())
+// 				{
+// 					if (ACharacterBase* Character = Cast<ACharacterBase>(ParentActor))
+// 					{
+// 						FHitResult ArrowTraceRes;
+// 						bool TraceSucceed = Character->ActorLineTraceSingle(ArrowTraceRes, Arrow->GetActorLocation(), Arrow->GetActorLocation() + Arrow->GetActorForwardVector() * 100.f, ECC_Visibility, FCollisionQueryParams(NAME_None, true));
+// 
+// 						ApplyDamamgeToCharacter(Character, TraceSucceed ? ArrowTraceRes : Hit);
+// 					}
+// 				}
 			}
 		}
 		else
@@ -141,8 +138,19 @@ void AARPG_ArrowBase::PostArrowHitOther(UARPG_ProjectileMovementComponent* Proje
 	SetItemOwner(nullptr);
 }
 
-void AARPG_ArrowBase::Launch_Implementation(float ForceSize)
+void AARPG_ArrowBase::Launch(float ForceSize, const FApplyPointDamageParameter& ApplyPointDamageParameter)
 {
+	Launch_Multicast(ForceSize);
+	if (HasAuthority())
+	{
+		UARPG_ProjectileMovementComponent* ProjectileMovementComponent = FindComponentByClass<UARPG_ProjectileMovementComponent>();
+		ProjectileMovementComponent->OnTraceActorNative.BindUObject(this, &AARPG_ArrowBase::WhenHitCharacter, ApplyPointDamageParameter);
+	}
+}
+
+void AARPG_ArrowBase::Launch_Multicast_Implementation(float ForceSize)
+{
+
 	if (UPrimitiveComponent* ArrowRootComponent = GetRootMeshComponent())
 	{
 		SetItemCollisionProfileName(FARPG_CollisionProfile::ArrowReleasing);
@@ -150,12 +158,6 @@ void AARPG_ArrowBase::Launch_Implementation(float ForceSize)
 		UARPG_ProjectileMovementComponent* ProjectileMovementComponent = UARPG_ActorFunctionLibrary::AddComponent<UARPG_ProjectileMovementComponent>(this, TEXT("弓箭移动组件"));
 		ProjectileMovementComponent->IgnoreActors.Add(GetItemOwner());
 		ProjectileMovementComponent->Activate(true);
-
-		if (HasAuthority())
-		{
-			ProjectileMovementComponent->OnTraceActorNative.BindUObject(this, &AARPG_ArrowBase::WhenHitCharacter);
-		}
-
 		ProjectileMovementComponent->Velocity = GetActorForwardVector() * ForceSize;
 		ArrowRootComponent->OnComponentHit.AddDynamic(this, &AARPG_ArrowBase::WhenArrowHitEnvironment);
 	}

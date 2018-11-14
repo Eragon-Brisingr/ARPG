@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "ARPG_WeaponBase.h"
+#include "CharacterDamageType.h"
 #include "ARPG_ArrowBase.generated.h"
 
 
@@ -23,9 +24,9 @@ public:
 
 	virtual void WhenRemoveFromInventory_Implementation(class AActor* ItemOwner, class UXD_ItemCoreBase* ItemCore, int32 RemoveNumber, int32 ExistNumber) const override;
 public:
-	void WhenHitCharacter(USceneComponent* MyComp, AActor* Other, UPrimitiveComponent* OtherComp, const FHitResult& Hit);
+	void WhenHitCharacter(USceneComponent* MyComp, AActor* Other, UPrimitiveComponent* OtherComp, const FHitResult& Hit, FApplyPointDamageParameter ApplyPointDamageParameter);
 
-	float ApplyDamamgeToCharacter(ACharacterBase* Character, const FHitResult& Hit);
+	float ApplyDamamgeToCharacter(ACharacterBase* Character, const FHitResult& Hit, const FApplyPointDamageParameter& ApplyPointDamageParameter);
 
 	UFUNCTION()
 	void WhenArrowHitEnvironment(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
@@ -34,10 +35,12 @@ public:
 
 	void PostArrowHitOther(class UARPG_ProjectileMovementComponent* ProjectileMovementComponent);
 
+	void Launch(float ForceSize, const FApplyPointDamageParameter& ApplyPointDamageParameter);
+
 	UFUNCTION(Unreliable, NetMulticast, WithValidation)
-	void Launch(float ForceSize);
-	void Launch_Implementation(float ForceSize);
-	bool Launch_Validate(float ForceSize) { return true; }
+	void Launch_Multicast(float ForceSize);
+	void Launch_Multicast_Implementation(float ForceSize);
+	bool Launch_Multicast_Validate(float ForceSize) { return true; }
 
 	void ClientArrowStop();
 

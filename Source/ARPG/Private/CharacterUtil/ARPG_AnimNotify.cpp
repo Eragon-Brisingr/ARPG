@@ -379,11 +379,11 @@ void UARPG_SetBeakBackDistance::Notify(USkeletalMeshComponent* MeshComp, UAnimSe
 {
 	if (SetBeakBackDistanceFunctor)
 	{
-		SetBeakBackDistanceFunctor.GetDefaultObject()->SetBeakBackDistance(MeshComp, BeakBackDistance);
+		SetBeakBackDistanceFunctor.GetDefaultObject()->SetBeakBackDistance(MeshComp, NormalBeakBackDistance, DefenseBeakBackDistance);
 	}
 }
 
 FString UARPG_SetBeakBackDistance::GetNotifyName_Implementation() const
 {
-	return FString::Printf(TEXT("设置击退距离[%s]"), BeakBackDistance);
+	return FString::Printf(TEXT("设置击退距离[%s]"), NormalBeakBackDistance);
 }
