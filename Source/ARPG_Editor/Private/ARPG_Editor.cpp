@@ -8,6 +8,7 @@
 #include "ISettingsModule.h"
 #include "ISettingsSection.h"
 #include "ARPG_EditorSettings.h"
+#include "XD_CampConfig_Customization.h"
 
 #define LOCTEXT_NAMESPACE "ARPG_Editor"
 
@@ -19,6 +20,7 @@ void FARPG_EditorModule::StartupModule()
 		FPropertyEditorModule& PropertyModule = FModuleManager::LoadModuleChecked<FPropertyEditorModule>("PropertyEditor");
 
 		RegisterCustomProperty(struct FARPG_Item, FARPG_Item_Customization);
+		RegisterCustomProperty(struct FARPG_CampConfig, FXD_CampConfig_Customization);
 	}
 
 	{

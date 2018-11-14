@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerController.h"
 #include "ARPG_LockOnTargetSystem.h"
+#include "GenericTeamAgentInterface.h"
 #include "ARPG_PlayerControllerBase.generated.h"
 
 /**
@@ -49,4 +50,5 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "锁定系统")
 	bool InvokeSwitchLockedTarget(bool Left);
+
 };

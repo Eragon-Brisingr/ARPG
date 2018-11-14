@@ -17,7 +17,8 @@
 				"XD_TimeSystem",
 				"XD_ItemSystem",
 				"XD_UnrealLibraryEx",
-				"AIModule"
+				"AIModule",
+				"XD_CampSystem"
 			]
 		},
 		{

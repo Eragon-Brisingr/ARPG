@@ -14,14 +14,14 @@
 #include "CharacterDamageType.h"
 #include "ARPG_InteractInterface.h"
 #include "ARPG_CollisionType.h"
+#include "ARPG_CampType.h"
 #include "CharacterBase.generated.h"
 
 UCLASS()
 class ARPG_API ACharacterBase : public ACharacter, 
 	public IXD_SaveGameInterface,
 	public IARPG_LockOnTargetInterface,
-	public IAISightTargetInterface,
-	public IGenericTeamAgentInterface
+	public IAISightTargetInterface
 {
 	GENERATED_BODY()
 
@@ -347,11 +347,20 @@ public:
 	UPROPERTY(BlueprintReadOnly, Category = "Character")
 	class UARPG_MovementComponent* ARPG_MovementComponent;
 
+	//关系相关
+public:
+	UPROPERTY(EditAnywhere, Category = "角色|配置|阵营")
+	FARPG_CampConfig CampConfig;
+
+	UFUNCTION(BlueprintCallable, Category = "角色|阵营")
+	class UARPG_CampInfo* GetCampInfo() const;
+
+	UFUNCTION(BlueprintCallable, Category = "角色|阵营")
+	class UARPG_CampRelationship* GetCampRelationshipToward(ACharacterBase* Other) const;
+
+	ETeamAttitude::Type GetAttitudeTowards(const AActor* Actor) const;
 	//AI
 public:
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "角色|AI")
-	class UARPG_AIPerceptionComponent* AIPerception;
-
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "角色|配置|AI")
 	TEnumAsByte<ECollisionChannel> SightCollisionChannel = FARPG_ECollisionChannel::AI_Sight;
 
@@ -360,10 +369,4 @@ public:
 	//AISightTargetInterface End
 
 	float GetSightVigilanceValue(const class ACharacterBase* TargetCharacter) const;
-
-	//GenericTeamAgentInterface Start
-	virtual void SetGenericTeamId(const FGenericTeamId& TeamID) override;
-	virtual FGenericTeamId GetGenericTeamId() const override;
-	virtual ETeamAttitude::Type GetTeamAttitudeTowards(const AActor& Other) const override;
-	//GenericTeamAgentInterface End
 };

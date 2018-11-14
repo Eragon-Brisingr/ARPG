@@ -11,9 +11,9 @@ void AARPG_PlayerControllerBase::Tick(float DeltaSeconds)
 	if (HasAuthority() || IsLocalController())
 	{
 		LockOnTargetSystem.LockOnTargetTick(this, DeltaSeconds);
-		if (ACharacterBase* Character = Cast<ACharacterBase>(GetPawn()))
+		if (ACharacterBase* ControlledCharacter = Cast<ACharacterBase>(GetPawn()))
 		{
-			Character->SetLockedTarget(LockOnTargetSystem.LockedTarget.Get());
+			ControlledCharacter->SetLockedTarget(LockOnTargetSystem.LockedTarget.Get());
 		}
 	}
 }
