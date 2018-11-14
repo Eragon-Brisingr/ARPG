@@ -23,5 +23,5 @@ public:
 	
 	void SpawnArrowInHand();
 
-	void LaunchArrow(float FullBowTime);
+	void LaunchArrow(float FullBowTime, const struct FApplyPointDamageParameter& ApplyPointDamageParameter);
 };

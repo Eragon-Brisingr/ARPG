@@ -78,17 +78,16 @@ void AARPG_WeaponBase::PostInitializeComponents()
 	Super::PostInitializeComponents();
 }
 
-void AARPG_WeaponBase::SetEnableNearAttackTrace(bool Enable, bool ClearIgnoreList /*= true*/)
+void AARPG_WeaponBase::EnableNearAttackTrace(const FApplyPointDamageParameter& ApplyPointDamageParameter, bool ClearIgnoreList /*= true*/)
 {
-	if (Enable)
-	{
-		SocketMoveTracer->OnTraceActorNative.BindUObject(this, &AARPG_WeaponBase::WhenAttackTracedActor);
-		SocketMoveTracer->EnableTrace(ClearIgnoreList);
-	}
-	else
-	{
-		SocketMoveTracer->DisableTrace();
-	}
+	PointDamageParameter = ApplyPointDamageParameter;
+	SocketMoveTracer->OnTraceActorNative.BindUObject(this, &AARPG_WeaponBase::WhenAttackTracedActor);
+	SocketMoveTracer->EnableTrace(ClearIgnoreList);
+}
+
+void AARPG_WeaponBase::DisableNearAttackTrace()
+{
+	SocketMoveTracer->DisableTrace();
 }
 
 void AARPG_WeaponBase::WhenAttackTracedActor(UPrimitiveComponent* HitComponent, const FName& SocketName, AActor* OtherActor, UPrimitiveComponent* OtherComp, const FHitResult& TraceResult)
@@ -101,13 +100,9 @@ void AARPG_WeaponBase::WhenAttackTracedActor(UPrimitiveComponent* HitComponent, 
 
 			if (ACharacterBase* ReceiveDamageCharacter = Cast<ACharacterBase>(OtherActor))
 			{
-				FApplyPointDamageParameter Param;
-				Param.AddHitStunValue = GetHitStunValue();
-				Param.ReceiveDamageAction = ReceiveDamageAction;
-				Param.NormalBeakBackDistance = BeakBackDistance;
-				Param.DefenseBeakBackDistance = BeakBackDistance;
+				PointDamageParameter.AddHitStunValue = GetHitStunValue(PointDamageParameter.AddHitStunValue);
 
-				if (ReceiveDamageCharacter->ApplyPointDamage(GetPhysicsAttackValue(), (ReceiveDamageCharacter->GetActorLocation() - TraceResult.ImpactPoint).GetSafeNormal2D(), TraceResult, WeaponOnwer, this, nullptr, Param) > 0.f)
+				if (ReceiveDamageCharacter->ApplyPointDamage(GetPhysicsAttackValue(), (ReceiveDamageCharacter->GetActorLocation() - TraceResult.ImpactPoint).GetSafeNormal2D(), TraceResult, WeaponOnwer, this, nullptr, PointDamageParameter) > 0.f)
 				{
 					WeaponOnwer->NearAttackSuccessTimeDilation(0.2f);
 				}
@@ -121,17 +116,17 @@ bool AARPG_WeaponBase::TraceForExecuteOther()
 	return ExecuteActionSet.TraceForExecuteOther(GetItemOwner());
 }
 
-void AARPG_WeaponBase::SetEnableFallingAttackTrace(bool Enable, bool ClearIgnoreList /*= true*/)
+void AARPG_WeaponBase::EnableFallingAttackTrace(const FApplyPointDamageParameter& ApplyPointDamageParameter, bool ClearIgnoreList /*= true*/)
 {
-	if (Enable)
-	{
-		SocketMoveTracer->OnTraceActorNative.BindUObject(this, &AARPG_WeaponBase::WhenFallingAttackTracedActor);
-		SocketMoveTracer->EnableTrace(ClearIgnoreList);
-	}
-	else
-	{
-		SocketMoveTracer->DisableTrace();
-	}
+	PointDamageParameter = ApplyPointDamageParameter;
+	SocketMoveTracer->OnTraceActorNative.BindUObject(this, &AARPG_WeaponBase::WhenFallingAttackTracedActor);
+	SocketMoveTracer->EnableTrace(ClearIgnoreList);
+}
+
+
+void AARPG_WeaponBase::DisableFallingAttackTrace()
+{
+	SocketMoveTracer->DisableTrace();
 }
 
 void AARPG_WeaponBase::WhenFallingAttackTracedActor(UPrimitiveComponent* HitComponent, const FName& SocketName, AActor* OtherActor, UPrimitiveComponent* OtherComp, const FHitResult& TraceResult)
