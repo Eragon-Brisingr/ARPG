@@ -9,6 +9,7 @@
 #include <Engine/EngineTypes.h>
 #include "SocketMoveTraceManager.h"
 #include "CharacterDamageType.h"
+#include "ARPG_BattleType.h"
 #include "ARPG_AnimNotify.generated.h"
 /**
  * 
@@ -375,6 +376,22 @@ public:
 	TSubclassOf<class UARPG_SetBeakBackDistanceFunctorBase> SetBeakBackDistanceFunctor;
 
 	virtual void Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation) override;
+
+	virtual FString GetNotifyName_Implementation() const override;
+};
+
+UCLASS(meta = (DisplayName = "动画_设置攻击信息"))
+class ARPG_API UARPG_SetAttackInfo : public UAnimNotifyState
+{
+	GENERATED_BODY()
+public:
+	UARPG_SetAttackInfo();
+
+	UPROPERTY(EditAnywhere, Category = "攻击", meta = (DisplayName = "攻击信息"))
+	TArray<FARPG_AttackInfo> AttackInfos;
+
+	virtual void NotifyBegin(USkeletalMeshComponent * MeshComp, UAnimSequenceBase * Animation, float TotalDuration) override;
+	virtual void NotifyEnd(USkeletalMeshComponent * MeshComp, UAnimSequenceBase * Animation) override;
 
 	virtual FString GetNotifyName_Implementation() const override;
 };

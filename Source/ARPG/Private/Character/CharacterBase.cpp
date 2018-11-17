@@ -6,19 +6,20 @@
 #include <Components/SkeletalMeshComponent.h>
 #include <Kismet/GameplayStatics.h>
 #include <TimerManager.h>
-#include "XD_CharacterMovementComponent.h"
+#include "Navigation/NavFilter_AIControllerDefault.h"
+#include "Perception/AIPerceptionStimuliSourceComponent.h"
+#include <Kismet/KismetMathLibrary.h>
+
 #include "ARPG_MovementComponent.h"
 #include "ARPG_InventoryComponent.h"
 #include "ARPG_ItemCoreBase.h"
 #include "ARPG_Battle_Log.h"
 #include "ReceiveDamageActionBase.h"
-#include <Kismet/KismetMathLibrary.h>
 #include "ARPG_DebugFunctionLibrary.h"
 #include "ARPG_LevelFunctionLibrary.h"
 #include "XD_TemplateLibrary.h"
 #include "UnrealNetwork.h"
 #include "ARPG_ActorFunctionLibrary.h"
-#include "Perception/AIPerceptionStimuliSourceComponent.h"
 #include "Perception/AISenseConfig_Sight.h"
 #include "ARPG_CampInfo.h"
 #include "ARPG_CampRelationship.h"
@@ -44,6 +45,8 @@ ACharacterBase::ACharacterBase(const FObjectInitializer& ObjectInitializer)
 	DodgeAnimSet = CreateDefaultSubobject<UARPG_DodgeAnimSetNormal>(GET_MEMBER_NAME_CHECKED(ACharacterBase, DodgeAnimSet));
 
 	GetMesh()->VisibilityBasedAnimTickOption = EVisibilityBasedAnimTickOption::AlwaysTickPoseAndRefreshBones;
+
+	NavigationQueryFilter = UNavFilter_AIControllerDefault::StaticClass();
 }
 
 // Called when the game starts or when spawned
