@@ -15,6 +15,7 @@
 #include "ARPG_InteractInterface.h"
 #include "ARPG_CollisionType.h"
 #include "ARPG_CampType.h"
+#include "ARPG_BattleType.h"
 #include "CharacterBase.generated.h"
 
 UCLASS()
@@ -322,6 +323,14 @@ public:
 
 	float ApplyPointDamage(float BaseDamage, const FVector& HitFromDirection, const FHitResult& HitInfo, class ACharacterBase* InstigatorBy, AActor* DamageCauser, TSubclassOf<class UDamageType> DamageTypeClass, const FApplyPointDamageParameter& Param);
 
+	//AI战斗相关
+public:
+	TArray<FARPG_AttackInfo> AttackInfos;
+
+	void AddAttackInfo(const FARPG_AttackInfo& AttackInfo) { AttackInfos.Add(AttackInfo); }
+
+	void RemoveAttackInfo(const FARPG_AttackInfo& AttackInfo) { AttackInfos.RemoveSingle(AttackInfo); }
+
 	//播放动画相关
 public:
 	//硬直动画接口，会打断攻击行为
@@ -369,4 +378,7 @@ public:
 	//AISightTargetInterface End
 
 	float GetSightVigilanceValue(const class ACharacterBase* TargetCharacter) const;
+
+	UPROPERTY(EditAnywhere, Category = "角色|配置|AI")
+	TSubclassOf<class UNavigationQueryFilter> NavigationQueryFilter;
 };

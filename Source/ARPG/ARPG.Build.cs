@@ -14,6 +14,7 @@ public class ARPG : ModuleRules
 		{
             "AIModule",
             "NavigationSystem",
+            "GameplayTasks",
 
 			"XD_UnrealLibraryEx",
 			"XD_SaveGameSystem",
