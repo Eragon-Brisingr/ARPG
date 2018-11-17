@@ -22,7 +22,7 @@ FPathFollowingRequestResult UARPG_MoveUtils::ARPG_MoveToActorImpl(class ACharact
 	FAIMoveRequest MoveReq(Goal);
 	MoveReq.SetUsePathfinding(bUsePathfinding);
 	MoveReq.SetAllowPartialPath(bAllowPartialPaths);
-	MoveReq.SetNavigationFilter(FilterClass);
+	MoveReq.SetNavigationFilter(FilterClass ? FilterClass : Character->NavigationQueryFilter);
 	MoveReq.SetAcceptanceRadius(AcceptanceRadius);
 	MoveReq.SetReachTestIncludesAgentRadius(bStopOnOverlap);
 	MoveReq.SetCanStrafe(bCanStrafe);
@@ -45,7 +45,7 @@ FPathFollowingRequestResult UARPG_MoveUtils::ARPG_MoveToLocationImpl(class AChar
 	MoveReq.SetUsePathfinding(bUsePathfinding);
 	MoveReq.SetAllowPartialPath(bAllowPartialPaths);
 	MoveReq.SetProjectGoalLocation(bProjectDestinationToNavigation);
-	MoveReq.SetNavigationFilter(FilterClass);
+	MoveReq.SetNavigationFilter(FilterClass ? FilterClass : Character->NavigationQueryFilter);
 	MoveReq.SetAcceptanceRadius(AcceptanceRadius);
 	MoveReq.SetReachTestIncludesAgentRadius(bStopOnOverlap);
 	MoveReq.SetCanStrafe(bCanStrafe);
