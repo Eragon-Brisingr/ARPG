@@ -387,3 +387,35 @@ FString UARPG_SetBeakBackDistance::GetNotifyName_Implementation() const
 {
 	return FString::Printf(TEXT("设置击退距离[%s]"), NormalBeakBackDistance);
 }
+
+UARPG_SetAttackInfo::UARPG_SetAttackInfo()
+{
+	AttackInfos.AddDefaulted();
+}
+
+void UARPG_SetAttackInfo::NotifyBegin(USkeletalMeshComponent * MeshComp, UAnimSequenceBase * Animation, float TotalDuration)
+{
+	if (ACharacterBase* Character = Cast<ACharacterBase>(MeshComp->GetOwner()))
+	{
+		for (const FARPG_AttackInfo& AttackInfo : AttackInfos)
+		{
+			Character->AddAttackInfo(AttackInfo);
+		}
+	}
+}
+
+void UARPG_SetAttackInfo::NotifyEnd(USkeletalMeshComponent * MeshComp, UAnimSequenceBase * Animation)
+{
+	if (ACharacterBase* Character = Cast<ACharacterBase>(MeshComp->GetOwner()))
+	{
+		for (const FARPG_AttackInfo& AttackInfo : AttackInfos)
+		{
+			Character->RemoveAttackInfo(AttackInfo);
+		}
+	}
+}
+
+FString UARPG_SetAttackInfo::GetNotifyName_Implementation() const
+{
+	return TEXT("设置攻击信息");
+}
