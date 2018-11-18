@@ -370,7 +370,7 @@ public:
 	ETeamAttitude::Type GetAttitudeTowards(const AActor* Actor) const;
 	//AI
 public:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "角色|配置|AI")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "角色|配置|AI")
 	TEnumAsByte<ECollisionChannel> SightCollisionChannel = FARPG_ECollisionChannel::AI_Sight;
 
 	//AISightTargetInterface Start
@@ -379,6 +379,9 @@ public:
 
 	float GetSightVigilanceValue(const class ACharacterBase* TargetCharacter) const;
 
-	UPROPERTY(EditAnywhere, Category = "角色|配置|AI")
+	UPROPERTY(EditDefaultsOnly, Category = "角色|配置|AI")
 	TSubclassOf<class UNavigationQueryFilter> NavigationQueryFilter;
+
+	//接收到寻路请求时的处理
+	void WhenReceivedMoveRequest();
 };
