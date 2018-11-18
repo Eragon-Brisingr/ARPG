@@ -659,3 +659,8 @@ float ACharacterBase::GetSightVigilanceValue(const class ACharacterBase* TargetC
 	}
 	return 0.f;
 }
+
+void ACharacterBase::WhenReceivedMoveRequest()
+{
+
+}

@@ -10,6 +10,8 @@
 
 FPathFollowingRequestResult UARPG_MoveUtils::ARPG_MoveToActorImpl(class ACharacterBase* Character, AActor* Goal, float AcceptanceRadius, bool bStopOnOverlap, bool bUsePathfinding, bool bCanStrafe, TSubclassOf<class UNavigationQueryFilter> FilterClass, bool bAllowPartialPaths)
 {
+	Character->WhenReceivedMoveRequest();
+
 	AController* Controller = Character->GetController();
 	UPathFollowingComponent* PathFollowingComponent = GetPathFollowingComponent(Controller);
 
@@ -32,6 +34,8 @@ FPathFollowingRequestResult UARPG_MoveUtils::ARPG_MoveToActorImpl(class ACharact
 
 FPathFollowingRequestResult UARPG_MoveUtils::ARPG_MoveToLocationImpl(class ACharacterBase* Character, const FVector& Dest, float AcceptanceRadius, bool bStopOnOverlap, bool bUsePathfinding, bool bProjectDestinationToNavigation, bool bCanStrafe, TSubclassOf<UNavigationQueryFilter> FilterClass, bool bAllowPartialPaths)
 {
+	Character->WhenReceivedMoveRequest();
+
 	AController* Controller = Character->GetController();
 	UPathFollowingComponent* PathFollowingComponent = GetPathFollowingComponent(Controller);
 
