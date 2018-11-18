@@ -14,6 +14,14 @@
 /**
  * 
  */
+UENUM()
+enum class EARPG_AnimDebugHintType : uint8
+{
+	None,
+	OnlyPreview,
+	All
+};
+
 UCLASS(meta = (DisplayName = "条件_动画跳转"))
 class ARPG_API UARPG_PlayMontageByState : public UAnimNotify
 {
@@ -380,7 +388,7 @@ public:
 	virtual FString GetNotifyName_Implementation() const override;
 };
 
-UCLASS(meta = (DisplayName = "动画_设置攻击信息"))
+UCLASS(meta = (DisplayName = "AI_设置攻击信息"))
 class ARPG_API UARPG_SetAttackInfo : public UAnimNotifyState
 {
 	GENERATED_BODY()
@@ -394,4 +402,11 @@ public:
 	virtual void NotifyEnd(USkeletalMeshComponent * MeshComp, UAnimSequenceBase * Animation) override;
 
 	virtual FString GetNotifyName_Implementation() const override;
+
+#if WITH_EDITORONLY_DATA
+	UPROPERTY(EditAnywhere, Category = "攻击")
+	EARPG_AnimDebugHintType DebugHintType;
+
+	virtual void NotifyTick(USkeletalMeshComponent * MeshComp, UAnimSequenceBase * Animation, float FrameDeltaTime) override;
+#endif
 };

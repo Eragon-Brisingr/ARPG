@@ -390,7 +390,7 @@ FString UARPG_SetBeakBackDistance::GetNotifyName_Implementation() const
 
 UARPG_SetAttackInfo::UARPG_SetAttackInfo()
 {
-	AttackInfos.AddDefaulted();
+	AttackInfos.Add(FARPG_AttackInfo());
 }
 
 void UARPG_SetAttackInfo::NotifyBegin(USkeletalMeshComponent * MeshComp, UAnimSequenceBase * Animation, float TotalDuration)
@@ -419,3 +419,14 @@ FString UARPG_SetAttackInfo::GetNotifyName_Implementation() const
 {
 	return TEXT("设置攻击信息");
 }
+
+#if WITH_EDITORONLY_DATA
+void UARPG_SetAttackInfo::NotifyTick(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, float FrameDeltaTime)
+{
+	if ((DebugHintType == EARPG_AnimDebugHintType::OnlyPreview && MeshComp->GetWorld()->IsPreviewWorld()) || DebugHintType == EARPG_AnimDebugHintType::All)
+	for (const FARPG_AttackInfo& AttackInfo : AttackInfos)
+	{
+		UKismetSystemLibrary::DrawDebugSphere(MeshComp, MeshComp->GetSocketLocation(AttackInfo.SocketName), AttackInfo.Radius, 12, NotifyColor, FrameDeltaTime * 1.5f, 1.f);
+	}
+}
+#endif

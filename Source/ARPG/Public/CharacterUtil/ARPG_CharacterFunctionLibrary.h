@@ -15,7 +15,7 @@ class ARPG_API UARPG_CharacterFunctionLibrary : public UBlueprintFunctionLibrary
 	GENERATED_BODY()
 public:
 	UFUNCTION(BlueprintCallable, Category = "角色|感知")
-	static bool IsInDamageArea(class ACharacterBase* Asker, float TraceRadius = 500.f);
+	static bool IsInDangerousArea(class ACharacterBase* Asker, float TraceRadius = 500.f);
 	
 	
 };
