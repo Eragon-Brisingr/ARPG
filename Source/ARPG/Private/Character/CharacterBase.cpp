@@ -23,6 +23,8 @@
 #include "Perception/AISenseConfig_Sight.h"
 #include "ARPG_CampInfo.h"
 #include "ARPG_CampRelationship.h"
+#include "SubSystem/ARPG_HatredControlSystemBase.h"
+#include "SubSystem/ARPG_HatredControlSystemNormal.h"
 
 
 // Sets default values
@@ -43,6 +45,8 @@ ACharacterBase::ACharacterBase(const FObjectInitializer& ObjectInitializer)
 	}
 
 	DodgeAnimSet = CreateDefaultSubobject<UARPG_DodgeAnimSetNormal>(GET_MEMBER_NAME_CHECKED(ACharacterBase, DodgeAnimSet));
+
+	HatredControlSystem = CreateDefaultSubobject<UARPG_HatredControlSystemNormal>(GET_MEMBER_NAME_CHECKED(ACharacterBase, HatredControlSystem));
 
 	GetMesh()->VisibilityBasedAnimTickOption = EVisibilityBasedAnimTickOption::AlwaysTickPoseAndRefreshBones;
 
@@ -95,6 +99,26 @@ void ACharacterBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLi
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME(ACharacterBase, bIsLockingOther);
+}
+
+void ACharacterBase::OnConstruction(const FTransform& Transform)
+{
+	Super::OnConstruction(Transform);
+
+	if (HatredControlSystem)
+	{
+		HatredControlSystem->InitHatredControlSystem(this);
+	}
+}
+
+float ACharacterBase::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator,	AActor* DamageCauser)
+{
+	if (HatredControlSystem)
+	{
+		HatredControlSystem->TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+	}
+
+	return Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 }
 
 void ACharacterBase::WhenGameInit_Implementation()

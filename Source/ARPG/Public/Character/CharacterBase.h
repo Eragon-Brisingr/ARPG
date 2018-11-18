@@ -46,6 +46,9 @@ public:
 
 	virtual void GetLifetimeReplicatedProps(TArray< class FLifetimeProperty > & OutLifetimeProps) const override;
 
+	virtual void OnConstruction(const FTransform& Transform) override;
+
+	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser);
 public:
 	virtual void WhenGameInit_Implementation() override;
 
@@ -389,4 +392,7 @@ public:
 
 	//接收到寻路请求时的处理
 	void WhenReceivedMoveRequest();
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "角色|配置|AI", Instanced)
+	class UARPG_HatredControlSystemBase* HatredControlSystem;
 };
