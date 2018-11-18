@@ -9,7 +9,7 @@
 
 
 
-bool UARPG_CharacterFunctionLibrary::IsInDamageArea(class ACharacterBase* Asker, float TraceRadius /*= 500.f*/)
+bool UARPG_CharacterFunctionLibrary::IsInDangerousArea(class ACharacterBase* Asker, float TraceRadius /*= 500.f*/)
 {
 	if (Asker)
 	{

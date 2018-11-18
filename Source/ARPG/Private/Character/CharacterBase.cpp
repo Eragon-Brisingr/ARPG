@@ -628,6 +628,11 @@ ETeamAttitude::Type ACharacterBase::GetAttitudeTowards(const AActor* Actor) cons
 	return ETeamAttitude::Neutral;
 }
 
+void ACharacterBase::GetActorEyesViewPoint(FVector& out_Location, FRotator& out_Rotation) const
+{
+	GetMesh()->GetSocketWorldLocationAndRotation(HeadSocketName, out_Location, out_Rotation);
+}
+
 bool ACharacterBase::CanBeSeenFrom(const FVector& ObserverLocation, FVector& OutSeenLocation, int32& NumberOfLoSChecksPerformed, float& OutSightStrength, const AActor* IgnoreActor /*= NULL*/) const
 {
 	if (const ACharacterBase* SightListener = Cast<ACharacterBase>(IgnoreActor))

@@ -139,5 +139,5 @@ void UARPG_DodgeAnimSetNormal::InvokeDodge(class ACharacterBase* Character, EDod
 
 bool UARPG_DodgeAnimSetNormal::CanDodge(const class ACharacterBase* Character) const
 {
-	return Character->GetCharacterMovement()->IsMovingOnGround();
+	return Character->GetCharacterMovement()->IsMovingOnGround() && Character->CanPlayFullBodyMontage();
 }

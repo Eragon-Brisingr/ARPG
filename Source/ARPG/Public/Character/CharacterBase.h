@@ -373,6 +373,11 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "角色|配置|AI")
 	TEnumAsByte<ECollisionChannel> SightCollisionChannel = FARPG_ECollisionChannel::AI_Sight;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "角色|配置|AI")
+	FName HeadSocketName = TEXT("HeadSightSocket");
+
+	//使用头部骨骼的方向作为视线方向
+	virtual void GetActorEyesViewPoint(FVector& out_Location, FRotator& out_Rotation) const override;
 	//AISightTargetInterface Start
 	virtual bool CanBeSeenFrom(const FVector& ObserverLocation, FVector& OutSeenLocation, int32& NumberOfLoSChecksPerformed, float& OutSightStrength, const AActor* IgnoreActor = NULL) const override;
 	//AISightTargetInterface End
