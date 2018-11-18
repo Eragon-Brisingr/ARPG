@@ -150,7 +150,7 @@ class AARPG_WeaponBase* AHumanBase::EquipWaepon_Implementation(class UARPG_Weapo
 		switch (UseItemInput)
 		{
 		case EUseItemInput::LeftMouse:
-			if (RightWeapon && RightWeapon->EqualForItemCore(WeaponCore))
+			if (RightWeapon && RightWeapon->IsEqualWithItemCore(WeaponCore))
 			{
 				if (Inventory->GetItemNumber(RightWeapon) == 1)
 				{
@@ -159,7 +159,7 @@ class AARPG_WeaponBase* AHumanBase::EquipWaepon_Implementation(class UARPG_Weapo
 			}
 			return EquipSingleLeftWeapon(WeaponCore);
 		case EUseItemInput::RightMouse:
-			if (LeftWeapon && LeftWeapon->EqualForItemCore(WeaponCore))
+			if (LeftWeapon && LeftWeapon->IsEqualWithItemCore(WeaponCore))
 			{
 				if (Inventory->GetItemNumber(LeftWeapon) == 1)
 				{
@@ -177,7 +177,7 @@ class AARPG_WeaponBase* AHumanBase::EquipWaepon_Implementation(class UARPG_Weapo
 
 class AARPG_ArrowBase* AHumanBase::EquipArrow_Implementation(class UARPG_ArrowCoreBase* ArrowCore, EUseItemInput UseItemInput)
 {
-	if (Arrow && Arrow->EqualForItemCore(ArrowCore))
+	if (Arrow && Arrow->IsEqualWithItemCore(ArrowCore))
 	{
 		SetArrow(nullptr);
 		return nullptr;
@@ -200,7 +200,7 @@ class AARPG_EquipmentBase* AHumanBase::EquipEquipment_Implementation(class UARPG
 	}
 
 	AARPG_EquipmentBase* ReturnEquipment = nullptr;
-	int32 FindIndex = EquipmentList.IndexOfByPredicate([EquipmentCore](AARPG_EquipmentBase* E_Equipment) {return E_Equipment->EqualForItemCore(EquipmentCore); });
+	int32 FindIndex = EquipmentList.IndexOfByPredicate([EquipmentCore](AARPG_EquipmentBase* E_Equipment) {return E_Equipment->IsEqualWithItemCore(EquipmentCore); });
 	if (FindIndex != INDEX_NONE)
 	{
 		EquipmentList.RemoveAt(FindIndex);
@@ -288,7 +288,7 @@ class AARPG_WeaponBase* AHumanBase::EquipSingleRightWeapon(class UARPG_ItemCoreB
 {
 	if (RightWeapon)
 	{
-		if (RightWeapon->EqualForItemCore(WeaponCore))
+		if (RightWeapon->IsEqualWithItemCore(WeaponCore))
 		{
 			SetRightWeapon(nullptr);
 			if (LeftWeapon == nullptr)
@@ -327,7 +327,7 @@ class AARPG_WeaponBase* AHumanBase::EquipSingleLeftWeapon(class UARPG_ItemCoreBa
 {
 	if (LeftWeapon)
 	{
-		if (LeftWeapon->EqualForItemCore(WeaponCore))
+		if (LeftWeapon->IsEqualWithItemCore(WeaponCore))
 		{
 			SetLeftWeapon(nullptr);
 			if (RightWeapon == nullptr)
