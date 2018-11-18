@@ -106,10 +106,10 @@ void ACharacterBase::WhenGameInit_Implementation()
 		//对已存在的进行数量修改
 		for (UARPG_ItemCoreBase* ItemCore : Inventory->GetItemCoreList())
 		{
-			if (const FARPG_Item* Item = FinalInitItemList.FindByPredicate([ItemCore](const FARPG_Item& E_Item) {return ItemCore->EqualForItemCore(E_Item.ItemCore); }))
+			if (const FARPG_Item* Item = FinalInitItemList.FindByPredicate([ItemCore](const FARPG_Item& E_Item) {return ItemCore->IsEqualWithItemCore(E_Item.ItemCore); }))
 			{
 				ItemCore->Number = Item->ItemCore->Number;
-				FinalInitItemList.RemoveAll([&](const FARPG_Item& E) {return E->EqualForItemCore(ItemCore); });
+				FinalInitItemList.RemoveAll([&](const FARPG_Item& E) {return E->IsEqualWithItemCore(ItemCore); });
 			}
 			else
 			{
@@ -402,7 +402,7 @@ void ACharacterBase::UseItemImmediately(const class UARPG_ItemCoreBase* ItemCore
 		return;
 	for (UARPG_ItemCoreBase* E_ItemCore : Inventory->GetItemCoreList())
 	{
-		if (E_ItemCore->EqualForItemCore(ItemCore))
+		if (E_ItemCore->IsEqualWithItemCore(ItemCore))
 		{
 			OnUseItem.Broadcast(this, ItemCore, UseItemInput);
 			E_ItemCore->UseItem(this, UseItemInput);

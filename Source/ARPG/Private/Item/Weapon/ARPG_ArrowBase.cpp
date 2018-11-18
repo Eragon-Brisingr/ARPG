@@ -17,7 +17,7 @@
 AARPG_ArrowBase::AARPG_ArrowBase(const FObjectInitializer& ObjectInitializer /*= FObjectInitializer::Get()*/)
 	:Super(ObjectInitializer.SetDefaultSubobjectClass<UARPG_ArrowCoreBase>(GET_MEMBER_NAME_CHECKED(AARPG_ArrowBase, InnerItemCore)))
 {
-
+	bCanCompositeInInventory = true;
 }
 
 void AARPG_ArrowBase::PostInitializeComponents()

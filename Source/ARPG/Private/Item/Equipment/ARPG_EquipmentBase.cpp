@@ -53,7 +53,7 @@ void AARPG_EquipmentBase::WhenRemoveFromInventory_Implementation(class AActor* I
 	{
 		if (AHumanBase* Human = Cast<AHumanBase>(ItemOwner))
 		{
-			int32 FindIndex = Human->EquipmentList.IndexOfByPredicate([ItemCore](AARPG_EquipmentBase* E_Equipment) {return E_Equipment->EqualForItemCore(ItemCore); });
+			int32 FindIndex = Human->EquipmentList.IndexOfByPredicate([ItemCore](AARPG_EquipmentBase* E_Equipment) {return E_Equipment->IsEqualWithItemCore(ItemCore); });
 			if (FindIndex != INDEX_NONE)
 			{
 				Human->EquipmentList.RemoveAt(FindIndex);

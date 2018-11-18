@@ -52,9 +52,9 @@ void AARPG_WeaponBase::WhenRemoveFromInventory_Implementation(class AActor* Item
 {
 	if (AHumanBase* Human = Cast<AHumanBase>(ItemOwner))
 	{
-		if (Human->RightWeapon && Human->RightWeapon->EqualForItemCore(ItemCore))
+		if (Human->RightWeapon && Human->RightWeapon->IsEqualWithItemCore(ItemCore))
 		{
-			if (Human->LeftWeapon && Human->LeftWeapon->EqualForItemCore(ItemCore))
+			if (Human->LeftWeapon && Human->LeftWeapon->IsEqualWithItemCore(ItemCore))
 			{
 				if (ExistNumber == 1)
 				{
@@ -66,7 +66,7 @@ void AARPG_WeaponBase::WhenRemoveFromInventory_Implementation(class AActor* Item
 				Human->SetRightWeapon(nullptr);
 			}
 		}
-		else if (ExistNumber == 0 && Human->LeftWeapon && Human->LeftWeapon->EqualForItemCore(ItemCore))
+		else if (ExistNumber == 0 && Human->LeftWeapon && Human->LeftWeapon->IsEqualWithItemCore(ItemCore))
 		{
 			Human->SetLeftWeapon(nullptr);
 		}
