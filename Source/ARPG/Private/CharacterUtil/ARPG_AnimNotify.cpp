@@ -421,12 +421,19 @@ FString UARPG_SetAttackInfo::GetNotifyName_Implementation() const
 }
 
 #if WITH_EDITORONLY_DATA
+bool CanShowDebugHint(EARPG_AnimDebugHintType DebugHintType, USkeletalMeshComponent* MeshComp)
+{
+	return (DebugHintType == EARPG_AnimDebugHintType::OnlyPreview && MeshComp->GetWorld()->IsPreviewWorld()) || DebugHintType == EARPG_AnimDebugHintType::All;
+}
+
 void UARPG_SetAttackInfo::NotifyTick(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, float FrameDeltaTime)
 {
-	if ((DebugHintType == EARPG_AnimDebugHintType::OnlyPreview && MeshComp->GetWorld()->IsPreviewWorld()) || DebugHintType == EARPG_AnimDebugHintType::All)
-	for (const FARPG_AttackInfo& AttackInfo : AttackInfos)
+	if (CanShowDebugHint(DebugHintType, MeshComp))
 	{
-		UKismetSystemLibrary::DrawDebugSphere(MeshComp, MeshComp->GetSocketLocation(AttackInfo.SocketName), AttackInfo.Radius, 12, NotifyColor, FrameDeltaTime * 1.5f, 1.f);
+		for (const FARPG_AttackInfo& AttackInfo : AttackInfos)
+		{
+			UKismetSystemLibrary::DrawDebugSphere(MeshComp, MeshComp->GetSocketTransform(AttackInfo.SocketName).TransformPosition(AttackInfo.Offset), AttackInfo.Radius, 12, NotifyColor, FrameDeltaTime * 1.5f, 1.f);
+		}
 	}
 }
 #endif
