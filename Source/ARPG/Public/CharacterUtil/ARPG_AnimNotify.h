@@ -17,9 +17,9 @@
 UENUM()
 enum class EARPG_AnimDebugHintType : uint8
 {
-	None,
-	OnlyPreview,
-	All
+	None UMETA(DisplayName = "无"),
+	OnlyPreview UMETA(DisplayName = "仅预览"),
+	All UMETA(DisplayName = "所有情况")
 };
 
 UCLASS(meta = (DisplayName = "条件_动画跳转"))
@@ -405,7 +405,7 @@ public:
 
 #if WITH_EDITORONLY_DATA
 	UPROPERTY(EditAnywhere, Category = "攻击")
-	EARPG_AnimDebugHintType DebugHintType;
+	EARPG_AnimDebugHintType DebugHintType = EARPG_AnimDebugHintType::OnlyPreview;
 
 	virtual void NotifyTick(USkeletalMeshComponent * MeshComp, UAnimSequenceBase * Animation, float FrameDeltaTime) override;
 #endif

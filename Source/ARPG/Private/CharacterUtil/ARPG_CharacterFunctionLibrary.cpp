@@ -22,7 +22,7 @@ bool UARPG_CharacterFunctionLibrary::IsInDangerousArea(class ACharacterBase* Ask
 				{
 					for (const FARPG_AttackInfo& AttackInfo : Character->AttackInfos)
 					{
-						if ((Asker->GetActorLocation() - Character->GetMesh()->GetSocketLocation(AttackInfo.SocketName)).Size() < Asker->GetCapsuleComponent()->GetScaledCapsuleRadius())
+						if ((Asker->GetActorLocation() - Character->GetMesh()->GetSocketTransform(AttackInfo.SocketName).TransformPosition(AttackInfo.Offset)).Size() < Asker->GetCapsuleComponent()->GetScaledCapsuleRadius())
 						{
 							return true;
 						}
