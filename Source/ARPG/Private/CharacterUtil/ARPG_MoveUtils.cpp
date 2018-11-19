@@ -7,6 +7,7 @@
 #include "NavigationQueryFilter.h"
 #include "CharacterBase.h"
 #include "TimerManager.h"
+#include "ARPG_PlayerControllerBase.h"
 
 FPathFollowingRequestResult UARPG_MoveUtils::ARPG_MoveToActorImpl(class ACharacterBase* Character, AActor* Goal, float AcceptanceRadius, bool bStopOnOverlap, bool bUsePathfinding, bool bCanStrafe, TSubclassOf<class UNavigationQueryFilter> FilterClass, bool bAllowPartialPaths)
 {
@@ -215,6 +216,10 @@ class UPathFollowingComponent* UARPG_MoveUtils::GetPathFollowingComponent(const 
 	if (const AAIController* AIController = Cast<const AAIController>(Controller))
 	{
 		return AIController->GetPathFollowingComponent();
+	}
+	else if (const AARPG_PlayerControllerBase* PlayerController = Cast<const AARPG_PlayerControllerBase>(Controller))
+	{
+		return (UPathFollowingComponent*)PlayerController->PathFollowingComponent;
 	}
 	else
 	{
