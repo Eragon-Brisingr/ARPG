@@ -23,8 +23,8 @@
 #include "Perception/AISenseConfig_Sight.h"
 #include "ARPG_CampInfo.h"
 #include "ARPG_CampRelationship.h"
-#include "SubSystem/ARPG_HatredControlSystemBase.h"
 #include "SubSystem/ARPG_HatredControlSystemNormal.h"
+#include "ARPG_BattleStyleSystemNormal.h"
 
 
 // Sets default values
@@ -47,6 +47,8 @@ ACharacterBase::ACharacterBase(const FObjectInitializer& ObjectInitializer)
 	DodgeAnimSet = CreateDefaultSubobject<UARPG_DodgeAnimSetNormal>(GET_MEMBER_NAME_CHECKED(ACharacterBase, DodgeAnimSet));
 
 	HatredControlSystem = CreateDefaultSubobject<UARPG_HatredControlSystemNormal>(GET_MEMBER_NAME_CHECKED(ACharacterBase, HatredControlSystem));
+
+	BattleStyleSystem = CreateDefaultSubobject<UARPG_BattleStyleSystemNormal>(GET_MEMBER_NAME_CHECKED(ACharacterBase, HatredControlSystem));
 
 	GetMesh()->VisibilityBasedAnimTickOption = EVisibilityBasedAnimTickOption::AlwaysTickPoseAndRefreshBones;
 
@@ -108,6 +110,11 @@ void ACharacterBase::OnConstruction(const FTransform& Transform)
 	if (HatredControlSystem)
 	{
 		HatredControlSystem->InitHatredControlSystem(this);
+	}
+
+	if (BattleStyleSystem)
+	{
+		BattleStyleSystem->InitBattleStyleSystem(this);
 	}
 }
 
@@ -692,4 +699,34 @@ float ACharacterBase::GetSightVigilanceValue(const class ACharacterBase* TargetC
 void ACharacterBase::WhenReceivedMoveRequest()
 {
 
+}
+
+void ACharacterBase::AddAlertValue(float AddValue)
+{
+	if (AlertValue == 0.f)
+	{
+		BattleStyleSystem->WhenEnterAlertState();
+	}
+
+	AlertValue += AddValue;
+	if (AlertValue >= AlertEntirelyValue)
+	{
+		AlertValue = AlertEntirelyValue;
+		BattleStyleSystem->WhenEnterBattleState();
+	}
+}
+
+void ACharacterBase::ReduceAlertValue(float ReduceValue)
+{
+	if (AlertValue == AlertEntirelyValue)
+	{
+		BattleStyleSystem->WhenLeaveBattleState();
+	}
+
+	AlertValue -= ReduceValue;
+	if (AlertValue <= 0.f)
+	{
+		AlertValue = 0.f;
+		BattleStyleSystem->WhenLeaveAlertState();
+	}
 }
