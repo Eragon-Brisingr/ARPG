@@ -21,6 +21,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "AI|Perception")
 	static class UAISenseConfig* GetSenseConfig(class UAIPerceptionComponent* AIPerceptionComponent, TSubclassOf<class UAISense> AISenseType);
 
+	UFUNCTION(BlueprintCallable, Category = "AI|Perception")
 	static bool GetLastSensedStimuli(class UAIPerceptionComponent* AIPerceptionComponent, AActor* Actor, TSubclassOf<class UAISense> AISenseType, FAIStimulus& AIStimulus);
 	static const struct FAIStimulus* GetLastSensedStimuli(class UAIPerceptionComponent* AIPerceptionComponent, AActor* Actor, TSubclassOf<class UAISense> AISenseType);
 

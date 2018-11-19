@@ -2,7 +2,13 @@
 
 #include "ARPG_PlayerControllerBase.h"
 #include "CharacterBase.h"
+#include "ARPG_PathFollowingComponent.h"
 
+
+AARPG_PlayerControllerBase::AARPG_PlayerControllerBase()
+{
+	PathFollowingComponent = CreateDefaultSubobject<UARPG_PathFollowingComponent>(GET_MEMBER_NAME_CHECKED(AARPG_PlayerControllerBase, PathFollowingComponent));
+}
 
 void AARPG_PlayerControllerBase::Tick(float DeltaSeconds)
 {
