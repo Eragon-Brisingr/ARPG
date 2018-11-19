@@ -33,11 +33,19 @@ public:
 		return ArrayCast<T*>(GetKnownPerceivedActorsEx(AIPerceptionComponent, SenseToUse, T::StaticClass()));
 	}
 
-	UFUNCTION(BlueprintCallable, Category = "AI|Perception", meta = (DeterminesOutputType = "Type"))
-	static TArray<class AActor*> GetKnownPerceivedActorsByAge(class UAIPerceptionComponent* AIPerceptionComponent, TSubclassOf<class UAISense> SenseToUse, float MaxAge, TSubclassOf<class AActor> Type);
+	UFUNCTION(BlueprintCallable, Category = "AI|Perception", meta = (DeterminesOutputType = "PerceivedActors"))
+	static TArray<class AActor*> FilterPerceivedActorsByMaxAge(class UAIPerceptionComponent* AIPerceptionComponent, const TArray<AActor*>& PerceivedActors, TSubclassOf<class UAISense> SenseToUse, float MaxAge);
 	template<typename T>
-	static TArray<T*> GetKnownPerceivedActorsByAge(class UAIPerceptionComponent* AIPerceptionComponent, TSubclassOf<class UAISense> SenseToUse, float MaxAge)
+	static TArray<T*> FilterPerceivedActorsByMaxAge(class UAIPerceptionComponent* AIPerceptionComponent, const TArray<T*>& PerceivedActors, TSubclassOf<class UAISense> SenseToUse, float MaxAge)
 	{
-		return ArrayCast<T*>(GetKnownPerceivedActorsByAge(AIPerceptionComponent, SenseToUse, MaxAge, T::StaticClass()));
+		return ArrayCast<T*>(FilterPerceivedActorsByMaxAge(AIPerceptionComponent, ArrayCast<AActor*>(PerceivedActors), SenseToUse, MaxAge));
+	}
+
+	UFUNCTION(BlueprintCallable, Category = "AI|Perception", meta = (DeterminesOutputType = "PerceivedActors"))
+	static TArray<class AActor*> FilterPerceivedActorsByTag(class UAIPerceptionComponent* AIPerceptionComponent, const TArray<AActor*>& PerceivedActors, TSubclassOf<class UAISense> SenseToUse, FName Tag);
+	template<typename T>
+	static TArray<T*> FilterPerceivedActorsByTag(class UAIPerceptionComponent* AIPerceptionComponent, const TArray<T*>& PerceivedActors, TSubclassOf<class UAISense> SenseToUse, const FName& Tag)
+	{
+		return ArrayCast<T*>(FilterPerceivedActorsByTag(AIPerceptionComponent, ArrayCast<AActor*>(PerceivedActors), Tag, MaxAge, T::StaticClass()));
 	}
 };

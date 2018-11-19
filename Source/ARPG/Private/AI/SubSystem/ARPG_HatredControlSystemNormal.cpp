@@ -20,7 +20,8 @@ ACharacterBase* UARPG_HatredControlSystemNormal::GetMostHatredCharacter()
 	if (AAIController* AIController = Cast<AAIController>(Character->GetController()))
 	{
 		UAIPerceptionComponent* Perception = AIController->GetPerceptionComponent();
-		TArray<ACharacterBase*> KnownPerceivedCharacters = UAIPerceptionExLibrary::GetKnownPerceivedActorsByAge<ACharacterBase>(Perception, UAISense_Sight::StaticClass(), 5.f);
+
+		TArray<ACharacterBase*> KnownPerceivedCharacters = UAIPerceptionExLibrary::FilterPerceivedActorsByMaxAge(Perception, UAIPerceptionExLibrary::GetKnownPerceivedActorsEx<ACharacterBase>(Perception, UAISense_Sight::StaticClass()), UAISense_Sight::StaticClass(), 5.f);
 		for (ACharacterBase* KnowPreceivedCharacter : KnownPerceivedCharacters)
 		{
 			if (MostHatredCharacter)

@@ -56,25 +56,40 @@ TArray<class AActor*> UAIPerceptionExLibrary::GetKnownPerceivedActorsEx(class UA
 	return Res;
 }
 
-TArray<class AActor*> UAIPerceptionExLibrary::GetKnownPerceivedActorsByAge(class UAIPerceptionComponent* AIPerceptionComponent, TSubclassOf<class UAISense> SenseToUse, float MaxAge, TSubclassOf<class AActor> Type)
+template<typename TPredicate>
+TArray<class AActor*> FilterActorsByStimulus(const TArray<AActor*>& PerceivedActors, class UAIPerceptionComponent* AIPerceptionComponent, TSubclassOf<class UAISense> SenseToUse, const TPredicate& Predicate)
 {
 	TArray<AActor*> Res;
-	if (AIPerceptionComponent)
+	for (AActor* KnownPerceivedActor : PerceivedActors)
 	{
-		TArray<AActor*> KnownPerceivedActors = GetKnownPerceivedActorsEx(AIPerceptionComponent, SenseToUse, Type);
+		const FActorPerceptionInfo* ActorPerceptionInfo = AIPerceptionComponent->GetActorInfo(*KnownPerceivedActor);
 
-		for (AActor* KnownPerceivedActor : KnownPerceivedActors)
+		if (const FAIStimulus* AIStimulus = UAIPerceptionExLibrary::GetLastSensedStimuli(AIPerceptionComponent, KnownPerceivedActor, SenseToUse))
 		{
-			const FActorPerceptionInfo* ActorPerceptionInfo = AIPerceptionComponent->GetActorInfo(*KnownPerceivedActor);
-
-			if (const FAIStimulus* AIStimulus = GetLastSensedStimuli(AIPerceptionComponent, KnownPerceivedActor, SenseToUse))
+			if (Predicate(*AIStimulus))
 			{
-				if (AIStimulus->GetAge() < MaxAge)
-				{
-					Res.Add(KnownPerceivedActor);
-				}
+				Res.Add(KnownPerceivedActor);
 			}
 		}
 	}
+
 	return Res;
+}
+
+TArray<class AActor*> UAIPerceptionExLibrary::FilterPerceivedActorsByMaxAge(class UAIPerceptionComponent* AIPerceptionComponent, const TArray<AActor*>& PerceivedActors, TSubclassOf<class UAISense> SenseToUse, float MaxAge)
+{
+	if (AIPerceptionComponent)
+	{
+		return FilterActorsByStimulus(PerceivedActors, AIPerceptionComponent, SenseToUse, [MaxAge](const FAIStimulus& AIStimulus) {return AIStimulus.GetAge() < MaxAge; });
+	}
+	return {};
+}
+
+TArray<class AActor*> UAIPerceptionExLibrary::FilterPerceivedActorsByTag(class UAIPerceptionComponent* AIPerceptionComponent, const TArray<AActor*>& PerceivedActors, TSubclassOf<class UAISense> SenseToUse, FName Tag)
+{
+	if (AIPerceptionComponent)
+	{
+		return FilterActorsByStimulus(PerceivedActors, AIPerceptionComponent, SenseToUse, [&](const FAIStimulus& AIStimulus) {return AIStimulus.Tag == Tag; });
+	}
+	return {};
 }
