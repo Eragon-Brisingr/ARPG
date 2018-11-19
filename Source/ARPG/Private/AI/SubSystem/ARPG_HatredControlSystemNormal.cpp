@@ -6,6 +6,7 @@
 #include "AIController.h"
 #include "Perception/AIPerceptionComponent.h"
 #include "Perception/AISense_Sight.h"
+#include "AIPerceptionExLibrary.h"
 
 
 void UARPG_HatredControlSystemNormal::WhenInitHatredControlSystem()
@@ -19,37 +20,19 @@ ACharacterBase* UARPG_HatredControlSystemNormal::GetMostHatredCharacter()
 	if (AAIController* AIController = Cast<AAIController>(Character->GetController()))
 	{
 		UAIPerceptionComponent* Perception = AIController->GetPerceptionComponent();
-		TArray<AActor*> KnownPerceivedActors;
-		Perception->GetKnownPerceivedActors(UAISense_Sight::StaticClass(), KnownPerceivedActors);
-
-		FAISenseID SightSenseID = UAISense::GetSenseID(UAISense_Sight::StaticClass());
-
-		for (AActor* KnownPerceivedActor : KnownPerceivedActors)
+		TArray<ACharacterBase*> KnownPerceivedCharacters = UAIPerceptionExLibrary::GetKnownPerceivedActorsByAge<ACharacterBase>(Perception, UAISense_Sight::StaticClass(), 5.f);
+		for (ACharacterBase* KnowPreceivedCharacter : KnownPerceivedCharacters)
 		{
-			if (ACharacterBase* KnowPreceivedCharacter = Cast<ACharacterBase>(KnownPerceivedActor))
+			if (MostHatredCharacter)
 			{
-				if (Character->GetAttitudeTowards(KnowPreceivedCharacter) == ETeamAttitude::Hostile)
+				if (Character->GetDistanceTo(MostHatredCharacter) > Character->GetDistanceTo(KnowPreceivedCharacter))
 				{
-					const FActorPerceptionInfo* ActorPerceptionInfo = Perception->GetActorInfo(*KnowPreceivedCharacter);
-
-					if (const FAIStimulus* AIStimulus = ActorPerceptionInfo->LastSensedStimuli.FindByPredicate([&](const FAIStimulus& E) {return E.Type == SightSenseID; }))
-					{
-						if (AIStimulus->GetAge() < SightRemberAge)
-						{
-							if (MostHatredCharacter)
-							{
-								if (Character->GetDistanceTo(MostHatredCharacter) > Character->GetDistanceTo(KnowPreceivedCharacter))
-								{
-									MostHatredCharacter = KnowPreceivedCharacter;
-								}
-							}
-							else
-							{
-								MostHatredCharacter = KnowPreceivedCharacter;
-							}
-						}
-					}
+					MostHatredCharacter = KnowPreceivedCharacter;
 				}
+			}
+			else
+			{
+				MostHatredCharacter = KnowPreceivedCharacter;
 			}
 		}
 	}
