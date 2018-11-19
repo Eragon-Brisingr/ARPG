@@ -373,10 +373,10 @@ public:
 	ETeamAttitude::Type GetAttitudeTowards(const AActor* Actor) const;
 	//AI
 public:
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "角色|配置|AI")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "角色|AI|配置")
 	TEnumAsByte<ECollisionChannel> SightCollisionChannel = FARPG_ECollisionChannel::AI_Sight;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "角色|配置|AI")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "角色|AI|配置")
 	FName HeadSocketName = TEXT("HeadSightSocket");
 
 	//使用头部骨骼的方向作为视线方向
@@ -387,12 +387,24 @@ public:
 
 	float GetSightVigilanceValue(const class ACharacterBase* TargetCharacter) const;
 
-	UPROPERTY(EditDefaultsOnly, Category = "角色|配置|AI")
+	UPROPERTY(EditDefaultsOnly, Category = "角色|AI|配置")
 	TSubclassOf<class UNavigationQueryFilter> NavigationQueryFilter;
 
 	//接收到寻路请求时的处理
 	void WhenReceivedMoveRequest();
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "角色|配置|AI", Instanced)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "角色|AI|配置", Instanced)
 	class UARPG_HatredControlSystemBase* HatredControlSystem;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "角色|AI|配置", Instanced)
+	class UARPG_BattleStyleSystemBase* BattleStyleSystem;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "角色|AI")
+	float AlertValue;
+	UPROPERTY(EditDefaultsOnly, Category = "角色|AI")
+	float AlertEntirelyValue = 100.f;
+	UFUNCTION(BlueprintCallable, Category = "角色|AI")
+	void AddAlertValue(float AddValue);
+	UFUNCTION(BlueprintCallable, Category = "角色|AI")
+	void ReduceAlertValue(float ReduceValue);
 };
