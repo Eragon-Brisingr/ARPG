@@ -14,7 +14,7 @@ class ARPG_API AARPG_AIControllerBase : public AAIController
 {
 	GENERATED_BODY()
 public:
-	AARPG_AIControllerBase();
+	AARPG_AIControllerBase(const FObjectInitializer& ObjectInitializer);
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "角色|AI")
 	class UARPG_AIPerceptionComponent* AIPerception;

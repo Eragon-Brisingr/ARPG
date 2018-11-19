@@ -17,8 +17,11 @@ class ARPG_API AARPG_PlayerControllerBase : public APlayerController
 	GENERATED_BODY()
 	
 public:
+	AARPG_PlayerControllerBase();
+
 	virtual void Tick(float DeltaSeconds) override;
 	
+public:
 	UPROPERTY(EditAnywhere, Category = "锁定系统", meta = (ShowOnlyInnerProperties))
 	FARPG_LockOnTargetSystem LockOnTargetSystem;
 
@@ -51,4 +54,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "锁定系统")
 	bool InvokeSwitchLockedTarget(bool Left);
 
+public:
+	UPROPERTY(VisibleAnywhere, Category = "寻路")
+	class UARPG_PathFollowingComponent* PathFollowingComponent;
 };

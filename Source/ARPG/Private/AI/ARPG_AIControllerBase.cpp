@@ -5,8 +5,10 @@
 #include "Perception/AISenseConfig_Sight.h"
 #include "Perception/AISenseConfig_Hearing.h"
 #include "CharacterBase.h"
+#include "ARPG_PathFollowingComponent.h"
 
-AARPG_AIControllerBase::AARPG_AIControllerBase()
+AARPG_AIControllerBase::AARPG_AIControllerBase(const FObjectInitializer& ObjectInitializer)
+	:Super(ObjectInitializer.SetDefaultSubobjectClass<UARPG_PathFollowingComponent>(TEXT("PathFollowingComponent")))
 {
 	AIPerception = CreateDefaultSubobject<UARPG_AIPerceptionComponent>(GET_MEMBER_NAME_CHECKED(AARPG_AIControllerBase, AIPerception));
 	{
@@ -35,9 +37,9 @@ AARPG_AIControllerBase::AARPG_AIControllerBase()
 
 ETeamAttitude::Type AARPG_AIControllerBase::GetTeamAttitudeTowards(const AActor& Other) const
 {
-	if (ACharacterBase* Character = Cast<ACharacterBase>(GetPawn()))
+	if (ACharacterBase* ControlledCharacter = Cast<ACharacterBase>(GetPawn()))
 	{
-		Character->GetAttitudeTowards(&Other);
+		ControlledCharacter->GetAttitudeTowards(&Other);
 	}
 	return ETeamAttitude::Neutral;
 }
