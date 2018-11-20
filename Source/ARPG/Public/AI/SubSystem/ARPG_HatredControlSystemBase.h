@@ -30,9 +30,9 @@ public:
 	void ReceiveWhenInitHatredControlSystem();
 
 	UFUNCTION(BlueprintCallable, Category = "仇恨系统")
-	virtual class ACharacterBase* GetMostHatredCharacter() { return ReceiveGetMostHatredCharacter(); }
+	virtual class ACharacterBase* GetMostHatredCharacter(const TArray<class ACharacterBase*>& Sources) { return ReceiveGetMostHatredCharacter(Sources); }
 	UFUNCTION(BlueprintImplementableEvent, Category = "仇恨系统", meta = (DisplayName = "GetMostHatredCharacter"))
-	class ACharacterBase* ReceiveGetMostHatredCharacter();
+	class ACharacterBase* ReceiveGetMostHatredCharacter(const TArray<class ACharacterBase*>& Sources);
 
 	virtual void TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, class AController* EventInstigator, class  AActor* DamageCauser) { ReceiveTakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser); }
 	UFUNCTION(BlueprintImplementableEvent, Category = "仇恨系统", meta = (DisplayName = "TakeDamage"))

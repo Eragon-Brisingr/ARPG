@@ -16,7 +16,7 @@ class ARPG_API UARPG_HatredControlSystemNormal : public UARPG_HatredControlSyste
 public:
 	virtual void WhenInitHatredControlSystem() override;
 
-	virtual class ACharacterBase* GetMostHatredCharacter() override;
+	virtual class ACharacterBase* GetMostHatredCharacter(const TArray<class ACharacterBase*>& Sources) override;
 
 	virtual void TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, class AController* EventInstigator, class  AActor* DamageCauser) override;
 

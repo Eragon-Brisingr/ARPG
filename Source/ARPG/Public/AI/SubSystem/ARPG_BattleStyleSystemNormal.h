@@ -13,5 +13,8 @@ UCLASS()
 class ARPG_API UARPG_BattleStyleSystemNormal : public UARPG_BattleStyleSystemBase
 {
 	GENERATED_BODY()
-	
+public:
+	virtual FVector GetBestBattleLocation(class AActor* Enemy) const override;
+
+	virtual FVector GetBestSearchLocation(const FVector& PotentialLocation) const override;
 };

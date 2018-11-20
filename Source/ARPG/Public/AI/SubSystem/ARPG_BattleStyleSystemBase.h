@@ -53,14 +53,14 @@ public:
 	//意识
 public:
 	UFUNCTION(BlueprintCallable, BlueprintPure = false, Category = "战斗风格系统|意识")
-	virtual void GetBestBattleLocation(class AActor* Enemy) const { return ReceiveGetBestBattleLocation(Enemy); }
+	virtual FVector GetBestBattleLocation(class AActor* Enemy) const { return ReceiveGetBestBattleLocation(Enemy); }
 	UFUNCTION(BlueprintImplementableEvent, Category = "战斗风格系统|意识", meta = (DisplayName = "GetBestBattleLocation"))
-	void ReceiveGetBestBattleLocation(class AActor* Enemy) const;
+	FVector ReceiveGetBestBattleLocation(class AActor* Enemy) const;
 
 	UFUNCTION(BlueprintCallable, BlueprintPure = false, Category = "战斗风格系统|意识")
-	virtual void GetBestSearchLocation(const FVector& PotentialLocation) const { return ReceiveGetBestSearchLocation(PotentialLocation); }
+	virtual FVector GetBestSearchLocation(const FVector& PotentialLocation) const { return ReceiveGetBestSearchLocation(PotentialLocation); }
 	UFUNCTION(BlueprintImplementableEvent, Category = "战斗风格系统|意识", meta = (DisplayName = "GetBestSearchLocation"))
-	void ReceiveGetBestSearchLocation(const FVector& PotentialLocation) const;
+	FVector ReceiveGetBestSearchLocation(const FVector& PotentialLocation) const;
 
 	UFUNCTION(BlueprintCallable, BlueprintPure = false, Category = "战斗风格系统|意识")
 	bool CanAttack(class AActor* AttackTarget) const { return ReceiveCanAttack(AttackTarget); }
