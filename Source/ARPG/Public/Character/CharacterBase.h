@@ -399,12 +399,26 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "角色|AI|配置", Instanced)
 	class UARPG_BattleStyleSystemBase* BattleStyleSystem;
 
+	//警戒值
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "角色|AI")
 	float AlertValue;
-	UPROPERTY(EditDefaultsOnly, Category = "角色|AI")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "角色|AI|配置")
 	float AlertEntirelyValue = 100.f;
 	UFUNCTION(BlueprintCallable, Category = "角色|AI")
 	void AddAlertValue(float AddValue);
 	UFUNCTION(BlueprintCallable, Category = "角色|AI")
 	void ReduceAlertValue(float ReduceValue);
+
+	UPROPERTY(EditDefaultsOnly, Category = "角色|AI|配置")
+	float AlertSubsidedSpeed = 5.f;
+	FTimerHandle AlertSubsided_TimerHandle;
+	void AlertSubsided();
+
+	UPROPERTY(EditDefaultsOnly, Category = "角色|AI|配置")
+	float AlertNotEntirelySubsidedDelay = 5.f;
+	UPROPERTY(EditDefaultsOnly, Category = "角色|AI|配置")
+	float AlertEntirelySubsidedDelay = 10.f;
+
+	UFUNCTION(BlueprintCallable, Category = "角色|AI")
+	EAlertState GetAlertState() const;
 };

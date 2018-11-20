@@ -4,9 +4,6 @@
 #include "Kismet/KismetSystemLibrary.h"
 #include "CharacterBase.h"
 #include "AIController.h"
-#include "Perception/AIPerceptionComponent.h"
-#include "Perception/AISense_Sight.h"
-#include "AIPerceptionExLibrary.h"
 
 
 void UARPG_HatredControlSystemNormal::WhenInitHatredControlSystem()
@@ -14,27 +11,21 @@ void UARPG_HatredControlSystemNormal::WhenInitHatredControlSystem()
 	
 }
 
-ACharacterBase* UARPG_HatredControlSystemNormal::GetMostHatredCharacter()
+ACharacterBase* UARPG_HatredControlSystemNormal::GetMostHatredCharacter(const TArray<class ACharacterBase*>& Sources)
 {
 	ACharacterBase* MostHatredCharacter = nullptr;
-	if (AAIController* AIController = Cast<AAIController>(Character->GetController()))
+	for (ACharacterBase* KnowPreceivedCharacter : Sources)
 	{
-		UAIPerceptionComponent* Perception = AIController->GetPerceptionComponent();
-
-		TArray<ACharacterBase*> KnownPerceivedCharacters = UAIPerceptionExLibrary::FilterPerceivedActorsByMaxAge(Perception, UAIPerceptionExLibrary::GetKnownPerceivedActorsEx<ACharacterBase>(Perception, UAISense_Sight::StaticClass()), UAISense_Sight::StaticClass(), 5.f);
-		for (ACharacterBase* KnowPreceivedCharacter : KnownPerceivedCharacters)
+		if (MostHatredCharacter)
 		{
-			if (MostHatredCharacter)
-			{
-				if (Character->GetDistanceTo(MostHatredCharacter) > Character->GetDistanceTo(KnowPreceivedCharacter))
-				{
-					MostHatredCharacter = KnowPreceivedCharacter;
-				}
-			}
-			else
+			if (Character->GetDistanceTo(MostHatredCharacter) > Character->GetDistanceTo(KnowPreceivedCharacter))
 			{
 				MostHatredCharacter = KnowPreceivedCharacter;
 			}
+		}
+		else
+		{
+			MostHatredCharacter = KnowPreceivedCharacter;
 		}
 	}
 	return MostHatredCharacter;

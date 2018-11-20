@@ -17,3 +17,11 @@ enum class EDodgeDirection : uint8
 	Left,
 	Right
 };
+
+UENUM(BlueprintType)
+enum class EAlertState : uint8
+{
+	None,
+	Alerting,
+	AlertEntirely
+};

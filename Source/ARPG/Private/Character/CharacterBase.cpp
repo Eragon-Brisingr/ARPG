@@ -48,7 +48,7 @@ ACharacterBase::ACharacterBase(const FObjectInitializer& ObjectInitializer)
 
 	HatredControlSystem = CreateDefaultSubobject<UARPG_HatredControlSystemNormal>(GET_MEMBER_NAME_CHECKED(ACharacterBase, HatredControlSystem));
 
-	BattleStyleSystem = CreateDefaultSubobject<UARPG_BattleStyleSystemNormal>(GET_MEMBER_NAME_CHECKED(ACharacterBase, HatredControlSystem));
+	BattleStyleSystem = CreateDefaultSubobject<UARPG_BattleStyleSystemNormal>(GET_MEMBER_NAME_CHECKED(ACharacterBase, BattleStyleSystem));
 
 	GetMesh()->VisibilityBasedAnimTickOption = EVisibilityBasedAnimTickOption::AlwaysTickPoseAndRefreshBones;
 
@@ -703,30 +703,66 @@ void ACharacterBase::WhenReceivedMoveRequest()
 
 void ACharacterBase::AddAlertValue(float AddValue)
 {
-	if (AlertValue == 0.f)
+	if (AddValue > 0.f && AlertValue < AlertEntirelyValue)
 	{
-		BattleStyleSystem->WhenEnterAlertState();
-	}
+		if (AlertValue == 0.f)
+		{
+			BattleStyleSystem->WhenEnterAlertState();
+		}
 
-	AlertValue += AddValue;
-	if (AlertValue >= AlertEntirelyValue)
-	{
-		AlertValue = AlertEntirelyValue;
-		BattleStyleSystem->WhenEnterBattleState();
+		AlertValue += AddValue;
+		if (AlertValue >= AlertEntirelyValue)
+		{
+			AlertValue = AlertEntirelyValue;
+			BattleStyleSystem->WhenEnterBattleState();
+
+			GetWorld()->GetTimerManager().SetTimer(AlertSubsided_TimerHandle, this, &ACharacterBase::AlertSubsided, 1.f, true, AlertEntirelySubsidedDelay);
+		}
+		else
+		{
+			GetWorld()->GetTimerManager().SetTimer(AlertSubsided_TimerHandle, this, &ACharacterBase::AlertSubsided, 1.f, true, AlertNotEntirelySubsidedDelay);
+		}
 	}
 }
 
 void ACharacterBase::ReduceAlertValue(float ReduceValue)
 {
-	if (AlertValue == AlertEntirelyValue)
+	if (ReduceValue > 0.f && AlertValue > 0.f)
 	{
-		BattleStyleSystem->WhenLeaveBattleState();
-	}
+		FTimerManager& TimerManager = GetWorld()->GetTimerManager();
+		if (AlertValue == AlertEntirelyValue)
+		{
+			BattleStyleSystem->WhenLeaveBattleState();
+		}
 
-	AlertValue -= ReduceValue;
-	if (AlertValue <= 0.f)
+		AlertValue -= ReduceValue;
+		if (AlertValue <= 0.f)
+		{
+			AlertValue = 0.f;
+			BattleStyleSystem->WhenLeaveAlertState();
+
+			GetWorld()->GetTimerManager().ClearTimer(AlertSubsided_TimerHandle);
+		}
+	}
+}
+
+void ACharacterBase::AlertSubsided()
+{
+	ReduceAlertValue(AlertSubsidedSpeed);
+}
+
+EAlertState ACharacterBase::GetAlertState() const
+{
+	if (AlertValue == 0.f)
 	{
-		AlertValue = 0.f;
-		BattleStyleSystem->WhenLeaveAlertState();
+		return EAlertState::None;
+	}
+	else if (AlertValue == AlertEntirelyValue)
+	{
+		return EAlertState::AlertEntirely;
+	}
+	else
+	{
+		return EAlertState::Alerting;
 	}
 }
