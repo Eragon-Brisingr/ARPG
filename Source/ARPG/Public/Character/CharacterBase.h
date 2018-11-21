@@ -387,7 +387,7 @@ public:
 
 	float GetSightVigilanceValue(const class ACharacterBase* TargetCharacter) const;
 
-	UPROPERTY(EditDefaultsOnly, Category = "角色|AI|配置")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "角色|AI|配置")
 	TSubclassOf<class UNavigationQueryFilter> NavigationQueryFilter;
 
 	//接收到寻路请求时的处理

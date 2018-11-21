@@ -703,20 +703,27 @@ void ACharacterBase::WhenReceivedMoveRequest()
 
 void ACharacterBase::AddAlertValue(float AddValue)
 {
-	if (AddValue > 0.f && AlertValue < AlertEntirelyValue)
+	if (AddValue > 0.f)
 	{
-		if (AlertValue == 0.f)
+		if (AlertValue < AlertEntirelyValue)
 		{
-			BattleStyleSystem->WhenEnterAlertState();
-		}
+			if (AlertValue == 0.f)
+			{
+				BattleStyleSystem->WhenEnterAlertState();
+			}
 
-		AlertValue += AddValue;
-		if (AlertValue >= AlertEntirelyValue)
-		{
-			AlertValue = AlertEntirelyValue;
-			BattleStyleSystem->WhenEnterBattleState();
+			AlertValue += AddValue;
+			if (AlertValue >= AlertEntirelyValue)
+			{
+				AlertValue = AlertEntirelyValue;
+				BattleStyleSystem->WhenEnterBattleState();
 
-			GetWorld()->GetTimerManager().SetTimer(AlertSubsided_TimerHandle, this, &ACharacterBase::AlertSubsided, 1.f, true, AlertEntirelySubsidedDelay);
+				GetWorld()->GetTimerManager().SetTimer(AlertSubsided_TimerHandle, this, &ACharacterBase::AlertSubsided, 1.f, true, AlertEntirelySubsidedDelay);
+			}
+			else
+			{
+				GetWorld()->GetTimerManager().SetTimer(AlertSubsided_TimerHandle, this, &ACharacterBase::AlertSubsided, 1.f, true, AlertNotEntirelySubsidedDelay);
+			}
 		}
 		else
 		{

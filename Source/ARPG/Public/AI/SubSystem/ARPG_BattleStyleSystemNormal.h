@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "AI/SubSystem/ARPG_BattleStyleSystemBase.h"
+#include "AITypes.h"
 #include "ARPG_BattleStyleSystemNormal.generated.h"
 
 /**

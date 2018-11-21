@@ -19,6 +19,9 @@ public:
 	UPROPERTY(BlueprintReadWrite, Category = "战斗风格系统")
 	class ACharacterBase* Character;
 
+	UFUNCTION(BlueprintCallable, Category = "战斗风格系统")
+	class UAIPerceptionComponent* GetPerceptionComponent() const;
+
 	void InitBattleStyleSystem(class ACharacterBase* Owner)
 	{
 		Character = Owner;
@@ -57,6 +60,7 @@ public:
 	UFUNCTION(BlueprintImplementableEvent, Category = "战斗风格系统|意识", meta = (DisplayName = "GetBestBattleLocation"))
 	FVector ReceiveGetBestBattleLocation(class AActor* Enemy) const;
 
+	//PotentialLocation可为InvalidLocation
 	UFUNCTION(BlueprintCallable, BlueprintPure = false, Category = "战斗风格系统|意识")
 	virtual FVector GetBestSearchLocation(const FVector& PotentialLocation) const { return ReceiveGetBestSearchLocation(PotentialLocation); }
 	UFUNCTION(BlueprintImplementableEvent, Category = "战斗风格系统|意识", meta = (DisplayName = "GetBestSearchLocation"))
