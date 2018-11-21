@@ -10,5 +10,12 @@ FVector UARPG_BattleStyleSystemNormal::GetBestBattleLocation(class AActor* Enemy
 
 FVector UARPG_BattleStyleSystemNormal::GetBestSearchLocation(const FVector& PotentialLocation) const
 {
-	return PotentialLocation;
+	if (PotentialLocation != FAISystem::InvalidLocation)
+	{
+		return PotentialLocation;
+	}
+	else
+	{
+		return FVector::ZeroVector;
+	}
 }

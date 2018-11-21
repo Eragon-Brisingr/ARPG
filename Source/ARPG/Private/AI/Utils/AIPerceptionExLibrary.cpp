@@ -44,7 +44,6 @@ TArray<class AActor*> UAIPerceptionExLibrary::GetKnownPerceivedActorsEx(class UA
 	{
 		TArray<AActor*> KnownPerceivedActors;
 		AIPerceptionComponent->GetKnownPerceivedActors(SenseToUse, KnownPerceivedActors);
-
 		for (AActor* KnownPerceivedActor : KnownPerceivedActors)
 		{
 			if (Type == nullptr || KnownPerceivedActor->IsA(Type))
@@ -54,6 +53,37 @@ TArray<class AActor*> UAIPerceptionExLibrary::GetKnownPerceivedActorsEx(class UA
 		}
 	}
 	return Res;
+}
+
+TArray<class AActor*> UAIPerceptionExLibrary::GetCurrentlyPerceivedActorsEx(class UAIPerceptionComponent* AIPerceptionComponent, TSubclassOf<class UAISense> SenseToUse, TSubclassOf<class AActor> Type)
+{
+	TArray<AActor*> Res;
+	if (AIPerceptionComponent)
+	{
+		TArray<AActor*> KnownPerceivedActors;
+		AIPerceptionComponent->GetCurrentlyPerceivedActors(SenseToUse, KnownPerceivedActors);
+		for (AActor* KnownPerceivedActor : KnownPerceivedActors)
+		{
+			if (Type == nullptr || KnownPerceivedActor->IsA(Type))
+			{
+				Res.Add(KnownPerceivedActor);
+			}
+		}
+	}
+	return Res;
+}
+
+bool UAIPerceptionExLibrary::GetActorLastStimulusLocation(class UAIPerceptionComponent* AIPerceptionComponent, class AActor* Actor, FVector& Location, float& Age)
+{
+	if (AIPerceptionComponent && Actor)
+	{
+		if (const FActorPerceptionInfo* ActorPerceptionInfo = AIPerceptionComponent->GetActorInfo(*Actor))
+		{
+			Location = ActorPerceptionInfo->GetLastStimulusLocation(&Age);
+			return true;
+		}
+	}
+	return false;
 }
 
 template<typename TPredicate>

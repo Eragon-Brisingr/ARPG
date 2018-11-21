@@ -33,6 +33,18 @@ public:
 		return ArrayCast<T*>(GetKnownPerceivedActorsEx(AIPerceptionComponent, SenseToUse, T::StaticClass()));
 	}
 
+	UFUNCTION(BlueprintCallable, Category = "AI|Perception", meta = (DeterminesOutputType = "Type"))
+	static TArray<class AActor*> GetCurrentlyPerceivedActorsEx(class UAIPerceptionComponent* AIPerceptionComponent, TSubclassOf<class UAISense> SenseToUse, TSubclassOf<class AActor> Type);
+	template<typename T>
+	static TArray<T*> GetCurrentlyPerceivedActorsEx(class UAIPerceptionComponent* AIPerceptionComponent, TSubclassOf<class UAISense> SenseToUse)
+	{
+		return ArrayCast<T*>(GetCurrentlyPerceivedActorsEx(AIPerceptionComponent, SenseToUse, T::StaticClass()));
+	}
+
+	UFUNCTION(BlueprintCallable, Category = "AI|Perception")
+	static bool GetActorLastStimulusLocation(class UAIPerceptionComponent* AIPerceptionComponent, class AActor* Actor, FVector& Location, float& Age);
+	//过滤器
+public:
 	UFUNCTION(BlueprintCallable, Category = "AI|Perception", meta = (DeterminesOutputType = "PerceivedActors"))
 	static TArray<class AActor*> FilterPerceivedActorsByMaxAge(class UAIPerceptionComponent* AIPerceptionComponent, const TArray<AActor*>& PerceivedActors, TSubclassOf<class UAISense> SenseToUse, float MaxAge);
 	template<typename T>
