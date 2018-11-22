@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "SubclassOf.h"
+#include "GameplayTagContainer.h"
 #include "ARPG_AI_ExFunctionLibrary.generated.h"
 
 /**
@@ -15,5 +16,6 @@ class ARPG_API UARPG_AI_ExFunctionLibrary : public UBlueprintFunctionLibrary
 {
 	GENERATED_BODY()
 public:
-
+	UFUNCTION(BlueprintCallable, Category = "AI|Logic")
+	static void SetDynamicSubtree(class AAIController* AIController, FGameplayTag InjectTag, class UBehaviorTree* BehaviorAsset);
 };
