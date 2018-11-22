@@ -35,6 +35,16 @@ AARPG_AIControllerBase::AARPG_AIControllerBase(const FObjectInitializer& ObjectI
 	}
 }
 
+void AARPG_AIControllerBase::BeginPlay()
+{
+	Super::BeginPlay();
+
+	if (ACharacterBase* ControlledCharacter = Cast<ACharacterBase>(GetPawn()))
+	{
+		RunBehaviorTree(ControlledCharacter->MainBehaviorTree);
+	}
+}
+
 ETeamAttitude::Type AARPG_AIControllerBase::GetTeamAttitudeTowards(const AActor& Other) const
 {
 	if (ACharacterBase* ControlledCharacter = Cast<ACharacterBase>(GetPawn()))

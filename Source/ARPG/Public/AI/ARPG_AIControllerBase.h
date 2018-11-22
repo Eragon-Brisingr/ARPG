@@ -16,6 +16,8 @@ class ARPG_API AARPG_AIControllerBase : public AAIController
 public:
 	AARPG_AIControllerBase(const FObjectInitializer& ObjectInitializer);
 
+	virtual void BeginPlay() override;
+public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "角色|AI")
 	class UARPG_AIPerceptionComponent* AIPerception;
 

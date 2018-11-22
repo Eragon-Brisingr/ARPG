@@ -26,7 +26,8 @@ public class ARPG : ModuleRules
 			"XD_GameEventSystem",
 			"XD_EnvironmentSystem",
 			"XD_CampSystem",
-            "XD_ItemSystem"
+            "XD_ItemSystem",
+            "XD_AI_SystemEx"
         });
 
 		// Uncomment if you are using Slate UI

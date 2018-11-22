@@ -16,6 +16,7 @@
 #include "ARPG_CollisionType.h"
 #include "ARPG_CampType.h"
 #include "ARPG_BattleType.h"
+#include "BehaviorTreeEx.h"
 #include "CharacterBase.generated.h"
 
 UCLASS()
@@ -371,8 +372,11 @@ public:
 	class UARPG_CampRelationship* GetCampRelationshipToward(ACharacterBase* Other) const;
 
 	ETeamAttitude::Type GetAttitudeTowards(const AActor* Actor) const;
+
 	//AI
 public:
+	//感知
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "角色|AI|配置")
 	TEnumAsByte<ECollisionChannel> SightCollisionChannel = FARPG_ECollisionChannel::AI_Sight;
 
@@ -393,11 +397,15 @@ public:
 	//接收到寻路请求时的处理
 	void WhenReceivedMoveRequest();
 
+	//子系统
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "角色|AI|配置", Instanced)
 	class UARPG_HatredControlSystemBase* HatredControlSystem;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "角色|AI|配置", Instanced)
 	class UARPG_BattleStyleSystemBase* BattleStyleSystem;
+
+	//意识
 
 	//警戒值
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "角色|AI")
@@ -421,4 +429,9 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "角色|AI")
 	EAlertState GetAlertState() const;
+
+	//思考逻辑
+
+	UPROPERTY(EditAnywhere, Category = "角色|AI|配置")
+	FBehaviorTreeWithSubTree MainBehaviorTree;
 };
