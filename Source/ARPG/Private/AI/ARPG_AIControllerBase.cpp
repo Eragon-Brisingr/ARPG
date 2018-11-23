@@ -6,6 +6,7 @@
 #include "Perception/AISenseConfig_Hearing.h"
 #include "CharacterBase.h"
 #include "ARPG_PathFollowingComponent.h"
+#include "BehaviorTree/BehaviorTreeComponent.h"
 
 AARPG_AIControllerBase::AARPG_AIControllerBase(const FObjectInitializer& ObjectInitializer)
 	:Super(ObjectInitializer.SetDefaultSubobjectClass<UARPG_PathFollowingComponent>(TEXT("PathFollowingComponent")))
@@ -42,6 +43,17 @@ void AARPG_AIControllerBase::BeginPlay()
 	if (ACharacterBase* ControlledCharacter = Cast<ACharacterBase>(GetPawn()))
 	{
 		RunBehaviorTree(ControlledCharacter->MainBehaviorTree);
+
+		if (UBehaviorTreeComponent* BehaviorTreeComponent = Cast<UBehaviorTreeComponent>(GetBrainComponent()))
+		{
+			for (TPair<FGameplayTag, FBehaviorTreeInstantiatable>& SubTree : ControlledCharacter->MainBehaviorTree.SubTreeOverride)
+			{
+				if (SubTree.Value)
+				{
+					BehaviorTreeComponent->SetDynamicSubtree(SubTree.Key, SubTree.Value);
+				}
+			}
+		}
 	}
 }
 
