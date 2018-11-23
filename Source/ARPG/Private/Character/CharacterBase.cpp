@@ -25,6 +25,8 @@
 #include "ARPG_CampRelationship.h"
 #include "SubSystem/ARPG_HatredControlSystemNormal.h"
 #include "ARPG_BattleStyleSystemNormal.h"
+#include "ARPG_AlertSystemNormal.h"
+#include "ARPG_SneakSystemNormal.h"
 
 
 // Sets default values
@@ -49,6 +51,10 @@ ACharacterBase::ACharacterBase(const FObjectInitializer& ObjectInitializer)
 	HatredControlSystem = CreateDefaultSubobject<UARPG_HatredControlSystemNormal>(GET_MEMBER_NAME_CHECKED(ACharacterBase, HatredControlSystem));
 
 	BattleStyleSystem = CreateDefaultSubobject<UARPG_BattleStyleSystemNormal>(GET_MEMBER_NAME_CHECKED(ACharacterBase, BattleStyleSystem));
+
+	AlertSystem = CreateDefaultSubobject<UARPG_AlertSystemNormal>(GET_MEMBER_NAME_CHECKED(ACharacterBase, AlertSystem));
+
+	SneakSystem = CreateDefaultSubobject<UARPG_SneakSystemNormal>(GET_MEMBER_NAME_CHECKED(ACharacterBase, SneakSystem));
 
 	GetMesh()->VisibilityBasedAnimTickOption = EVisibilityBasedAnimTickOption::AlwaysTickPoseAndRefreshBones;
 
@@ -115,6 +121,16 @@ void ACharacterBase::OnConstruction(const FTransform& Transform)
 	if (BattleStyleSystem)
 	{
 		BattleStyleSystem->InitBattleStyleSystem(this);
+	}
+
+	if (AlertSystem)
+	{
+		AlertSystem->InitAlertSystem(this);
+	}
+
+	if (SneakSystem)
+	{
+		SneakSystem->InitSneakSystem(this);
 	}
 }
 
@@ -608,6 +624,11 @@ float ACharacterBase::ApplyPointDamage(float BaseDamage, const FVector& HitFromD
 	return FinalReduceValue;
 }
 
+bool ACharacterBase::IsSneaking() const
+{
+	return GetCharacterMovement()->IsCrouching();
+}
+
 void ACharacterBase::InvokeInteract(AActor* InteractTarget)
 {
 	if (CanInteract(InteractTarget))
@@ -676,24 +697,18 @@ bool ACharacterBase::CanBeSeenFrom(const FVector& ObserverLocation, FVector& Out
 
 		if (HitResult.GetActor() == this)
 		{
-			float SightVigilanceValue = SightListener->GetSightVigilanceValue(this);
-			NumberOfLoSChecksPerformed += 1;
-			OutSightStrength = SightVigilanceValue;
-			OutSeenLocation = GetActorLocation();
-			return OutSightStrength > 0.f;
+			float SightVigilanceValue = SightListener->AlertSystem->GetSightAddAlertValue(this);
+			if (SightVigilanceValue > 0.f)
+			{
+				NumberOfLoSChecksPerformed += 1;
+				OutSightStrength = SightVigilanceValue;
+				OutSeenLocation = GetActorLocation();
+				return true;
+			}
 		}
 	}
 
 	return false;
-}
-
-float ACharacterBase::GetSightVigilanceValue(const class ACharacterBase* TargetCharacter) const
-{
-	if (TargetCharacter)
-	{
-		return 1.f - GetDistanceTo(TargetCharacter) / 1000.f;
-	}
-	return 0.f;
 }
 
 void ACharacterBase::WhenReceivedMoveRequest()

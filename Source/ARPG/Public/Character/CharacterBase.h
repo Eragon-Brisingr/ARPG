@@ -327,6 +327,11 @@ public:
 
 	float ApplyPointDamage(float BaseDamage, const FVector& HitFromDirection, const FHitResult& HitInfo, class ACharacterBase* InstigatorBy, AActor* DamageCauser, TSubclassOf<class UDamageType> DamageTypeClass, const FApplyPointDamageParameter& Param);
 
+	//潜行相关
+public:
+	UFUNCTION(BlueprintCallable, Category = "角色|状态")
+	virtual bool IsSneaking() const;
+
 	//AI战斗相关
 public:
 	TArray<FARPG_AttackInfo> AttackInfos;
@@ -389,8 +394,6 @@ public:
 	virtual bool CanBeSeenFrom(const FVector& ObserverLocation, FVector& OutSeenLocation, int32& NumberOfLoSChecksPerformed, float& OutSightStrength, const AActor* IgnoreActor = NULL) const override;
 	//AISightTargetInterface End
 
-	float GetSightVigilanceValue(const class ACharacterBase* TargetCharacter) const;
-
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "角色|AI|配置")
 	TSubclassOf<class UNavigationQueryFilter> NavigationQueryFilter;
 
@@ -404,6 +407,12 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "角色|AI|配置", Instanced)
 	class UARPG_BattleStyleSystemBase* BattleStyleSystem;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "角色|AI|配置", Instanced)
+	class UARPG_AlertSystemBase* AlertSystem;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "角色|AI|配置", Instanced)
+	class UARPG_SneakSystemBase* SneakSystem;
 
 	//意识
 
