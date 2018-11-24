@@ -6,8 +6,6 @@
 #include <Components/SkeletalMeshComponent.h>
 #include <Kismet/GameplayStatics.h>
 #include <TimerManager.h>
-#include "Navigation/NavFilter_AIControllerDefault.h"
-#include "Perception/AIPerceptionStimuliSourceComponent.h"
 #include <Kismet/KismetMathLibrary.h>
 
 #include "ARPG_MovementComponent.h"
@@ -23,10 +21,11 @@
 #include "Perception/AISenseConfig_Sight.h"
 #include "ARPG_CampInfo.h"
 #include "ARPG_CampRelationship.h"
-#include "SubSystem/ARPG_HatredControlSystemNormal.h"
+#include "ARPG_HatredControlSystemNormal.h"
 #include "ARPG_BattleStyleSystemNormal.h"
 #include "ARPG_AlertSystemNormal.h"
 #include "ARPG_SneakSystemNormal.h"
+#include "ARPG_NavigationQueryFilter.h"
 
 
 // Sets default values
@@ -58,7 +57,7 @@ ACharacterBase::ACharacterBase(const FObjectInitializer& ObjectInitializer)
 
 	GetMesh()->VisibilityBasedAnimTickOption = EVisibilityBasedAnimTickOption::AlwaysTickPoseAndRefreshBones;
 
-	NavigationQueryFilter = UNavFilter_AIControllerDefault::StaticClass();
+	NavigationQueryFilter = UARPG_NavigationQueryFilter::StaticClass();
 }
 
 // Called when the game starts or when spawned
