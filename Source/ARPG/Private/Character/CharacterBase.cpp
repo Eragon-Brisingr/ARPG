@@ -660,7 +660,7 @@ class UARPG_CampRelationship* ACharacterBase::GetCampRelationshipToward(ACharact
 	return Other ? Cast<UARPG_CampRelationship>(GetCampInfo()->GetCampRelationshipRef(this, Other->GetCampInfo())) : nullptr;
 }
 
-ETeamAttitude::Type ACharacterBase::GetAttitudeTowards(const AActor* Actor) const
+ETeamAttitude::Type ACharacterBase::GetRelationshipTowards(const AActor* Actor) const
 {
 	if (const ACharacterBase* Character = Cast<ACharacterBase>(Actor))
 	{
@@ -678,6 +678,34 @@ ETeamAttitude::Type ACharacterBase::GetAttitudeTowards(const AActor* Actor) cons
 		}
 	}
 	return ETeamAttitude::Neutral;
+}
+
+ECharacterRelationship ACharacterBase::GetRelationshipTowards(const ACharacterBase* Towards) const
+{
+	float CampRelationShip = GetCampInfo()->GetCampRelationshipValue(this, Towards->GetCampInfo());
+
+	//TODO : 添加角色关系
+	float FinalRelationShip = CampRelationShip;
+	if (FinalRelationShip > 75.f)
+	{
+		return ECharacterRelationship::Cordial;
+	}
+	else if (FinalRelationShip > 25.f)
+	{
+		return ECharacterRelationship::Friendly;
+	}
+	else if (FinalRelationShip > -25.f)
+	{
+		return ECharacterRelationship::Neutral;
+	}
+	else if (FinalRelationShip > -75.f)
+	{
+		return ECharacterRelationship::Hate;
+	}
+	else
+	{
+		return ECharacterRelationship::Hostile;
+	}
 }
 
 void ACharacterBase::GetActorEyesViewPoint(FVector& out_Location, FRotator& out_Rotation) const

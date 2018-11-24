@@ -28,18 +28,32 @@ public:
 	UFUNCTION(BlueprintImplementableEvent, Category = "警戒系统", meta = (DisplayName = "WhenInitAlertSystem"))
 	void ReceiveWhenAlertSystem();
 
-	UFUNCTION(BlueprintCallable, Category = "警戒系统")
 	virtual float GetSightAddAlertValue(const class ACharacterBase* LookedCharacter) const { return ReceiveGetSightAddAlertValue(LookedCharacter); }
 	UFUNCTION(BlueprintImplementableEvent, Category = "警戒系统")
 	float ReceiveGetSightAddAlertValue(const class ACharacterBase* LookedCharacter) const;
 
-	UFUNCTION(BlueprintCallable, Category = "警戒系统")
 	virtual float GetHearAddAlertValue(const class ACharacterBase* HeardCharacter, const FVector& SimulusLocation, float Strength) const { return ReceiveGetHearAddAlertValue(HeardCharacter, SimulusLocation, Strength); }
 	UFUNCTION(BlueprintImplementableEvent, Category = "警戒系统")
 	float ReceiveGetHearAddAlertValue(const class ACharacterBase* HeardCharacter, const FVector& SimulusLocation, float Strength) const;
 
-	UFUNCTION(BlueprintCallable, Category = "警戒系统")
 	virtual float GetNoseAddAlertValue(const class ACharacterBase* NosedCharacter) const { return ReceiveGetNoseAddAlertValue(NosedCharacter); }
 	UFUNCTION(BlueprintImplementableEvent, Category = "警戒系统")
 	float ReceiveGetNoseAddAlertValue(const class ACharacterBase* NosedCharacter) const;
+
+	UFUNCTION(BlueprintCallable, Category = "警戒系统")
+	bool CanSee(const class ACharacterBase* LookedCharacter) const { return GetSightAddAlertValue(LookedCharacter) > 0.f; }
+	UFUNCTION(BlueprintCallable, Category = "警戒系统")
+	bool CanHear(const class ACharacterBase* HeardCharacter, const FVector& SimulusLocation, float Strength) const { return GetHearAddAlertValue(HeardCharacter, SimulusLocation, Strength); }
+	UFUNCTION(BlueprintCallable, Category = "警戒系统")
+	bool CanNose(const class ACharacterBase* NosedCharacter) const { return GetNoseAddAlertValue(NosedCharacter) > 0.f; }
+
+	UFUNCTION(BlueprintCallable, Category = "警戒系统")
+	float GetSightAddAlertValueFilterRelationship(const class ACharacterBase* LookedCharacter) const;
+
+	UFUNCTION(BlueprintCallable, Category = "警戒系统")
+	float GetHearAddAlertValueFilterRelationship(const class ACharacterBase* HeardCharacter, const FVector& SimulusLocation, float Strength) const;
+
+	UFUNCTION(BlueprintCallable, Category = "警戒系统")
+	float GetNoseAddAlertValueFilterRelationship(const class ACharacterBase* NosedCharacter) const;
+
 };
