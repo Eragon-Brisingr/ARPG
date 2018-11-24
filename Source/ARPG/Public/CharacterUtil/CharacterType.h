@@ -25,3 +25,15 @@ enum class EAlertState : uint8
 	Alerting,
 	AlertEntirely
 };
+
+//关系
+UENUM(BlueprintType)
+enum class ECharacterRelationship :uint8
+{
+	Hostile = 0 UMETA(DisplayName = "仇恨"),
+	Hate = 1 UMETA(DisplayName = "讨厌"),
+	Neutral = 2 UMETA(DisplayName = "中立"),
+	Friendly = 3 UMETA(DisplayName = "友好"),
+	Cordial = 4 UMETA(DisplayName = "热情")
+};
+

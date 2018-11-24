@@ -367,6 +367,8 @@ public:
 
 	//关系相关
 public:
+	//阵营关系
+
 	UPROPERTY(EditAnywhere, Category = "角色|配置|阵营")
 	FARPG_CampConfig CampConfig;
 
@@ -376,7 +378,13 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "角色|阵营")
 	class UARPG_CampRelationship* GetCampRelationshipToward(ACharacterBase* Other) const;
 
-	ETeamAttitude::Type GetAttitudeTowards(const AActor* Actor) const;
+	ETeamAttitude::Type GetRelationshipTowards(const AActor* Actor) const;
+
+
+	//总关系
+
+	UFUNCTION(BlueprintCallable, Category = "角色|关系")
+	ECharacterRelationship GetRelationshipTowards(const ACharacterBase* Towards) const;
 
 	//AI
 public:
@@ -438,6 +446,9 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "角色|AI")
 	EAlertState GetAlertState() const;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "角色|AI|配置")
+	ECharacterRelationship MaxAlertRelationship = ECharacterRelationship::Hostile;
 
 	//思考逻辑
 

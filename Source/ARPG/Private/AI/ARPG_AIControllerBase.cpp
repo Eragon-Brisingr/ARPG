@@ -61,7 +61,7 @@ ETeamAttitude::Type AARPG_AIControllerBase::GetTeamAttitudeTowards(const AActor&
 {
 	if (ACharacterBase* ControlledCharacter = Cast<ACharacterBase>(GetPawn()))
 	{
-		ControlledCharacter->GetAttitudeTowards(&Other);
+		ControlledCharacter->GetRelationshipTowards(&Other);
 	}
 	return ETeamAttitude::Neutral;
 }
