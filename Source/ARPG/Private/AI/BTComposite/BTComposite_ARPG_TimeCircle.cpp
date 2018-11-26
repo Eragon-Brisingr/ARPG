@@ -51,15 +51,18 @@ FString UBTComposite_ARPG_HourTimeCircle::GetStaticDescription() const
 	{
 		for (int i = 0; i < HourCircleBehaviorConfig.Num(); ++i)
 		{
-			const TCHAR Format[] = TEXT("%s 至 %s : %s");
-			Desc += FString(TEXT("\n"));
-			if (i == HourCircleBehaviorConfig.Num() - 1)
+			if (UBTNode* Node = GetChildNode(i))
 			{
-				Desc += FString::Printf(Format, *HourCircleBehaviorConfig[i].ToString(), *HourCircleBehaviorConfig[0].ToString(), *GetChildNode(i)->GetNodeName());
-			}
-			else
-			{
-				Desc += FString::Printf(Format, *HourCircleBehaviorConfig[i].ToString(), *HourCircleBehaviorConfig[i + 1].ToString(), *GetChildNode(i)->GetNodeName());
+				const TCHAR Format[] = TEXT("%s 至 %s : %s");
+				Desc += FString(TEXT("\n"));
+				if (i == HourCircleBehaviorConfig.Num() - 1)
+				{
+					Desc += FString::Printf(Format, *HourCircleBehaviorConfig[i].ToString(), *HourCircleBehaviorConfig[0].ToString(), *Node->GetNodeName());
+				}
+				else
+				{
+					Desc += FString::Printf(Format, *HourCircleBehaviorConfig[i].ToString(), *HourCircleBehaviorConfig[i + 1].ToString(), *Node->GetNodeName());
+				}
 			}
 		}
 	}
@@ -130,15 +133,18 @@ FString UBTComposite_ARPG_DayTimeCircle::GetStaticDescription() const
 	{
 		for (int i = 0; i < DayCircleBehaviorConfig.Num(); ++i)
 		{
-			const TCHAR Format[] = TEXT("%s 至 %s : %s");
-			Desc += FString(TEXT("\n"));
-			if (i == DayCircleBehaviorConfig.Num() - 1)
+			if (UBTNode* Node = GetChildNode(i))
 			{
-				Desc += FString::Printf(Format, *DayCircleBehaviorConfig[i].ToString(), *DayCircleBehaviorConfig[0].ToString(), *GetChildNode(i)->GetNodeName());
-			}
-			else
-			{
-				Desc += FString::Printf(Format, *DayCircleBehaviorConfig[i].ToString(), *DayCircleBehaviorConfig[i + 1].ToString(), *GetChildNode(i)->GetNodeName());
+				const TCHAR Format[] = TEXT("%s 至 %s : %s");
+				Desc += FString(TEXT("\n"));
+				if (i == DayCircleBehaviorConfig.Num() - 1)
+				{
+					Desc += FString::Printf(Format, *DayCircleBehaviorConfig[i].ToString(), *DayCircleBehaviorConfig[0].ToString(), *Node->GetNodeName());
+				}
+				else
+				{
+					Desc += FString::Printf(Format, *DayCircleBehaviorConfig[i].ToString(), *DayCircleBehaviorConfig[i + 1].ToString(), *Node->GetNodeName());
+				}
 			}
 		}
 	}
@@ -209,15 +215,18 @@ FString UBTComposite_ARPG_WeekTimeCircle::GetStaticDescription() const
 	{
 		for (int i = 0; i < WeekCircleBehaviorConfig.Num(); ++i)
 		{
-			const TCHAR Format[] = TEXT("%s 至 %s : %s");
-			Desc += FString(TEXT("\n"));
-			if (i == WeekCircleBehaviorConfig.Num() - 1)
+			if (UBTNode* Node = GetChildNode(i))
 			{
-				Desc += FString::Printf(Format, *WeekCircleBehaviorConfig[i].ToString(), *WeekCircleBehaviorConfig[0].ToString(), *GetChildNode(i)->GetNodeName());
-			}
-			else
-			{
-				Desc += FString::Printf(Format, *WeekCircleBehaviorConfig[i].ToString(), *WeekCircleBehaviorConfig[i + 1].ToString(), *GetChildNode(i)->GetNodeName());
+				const TCHAR Format[] = TEXT("%s 至 %s : %s");
+				Desc += FString(TEXT("\n"));
+				if (i == WeekCircleBehaviorConfig.Num() - 1)
+				{
+					Desc += FString::Printf(Format, *WeekCircleBehaviorConfig[i].ToString(), *WeekCircleBehaviorConfig[0].ToString(), *Node->GetNodeName());
+				}
+				else
+				{
+					Desc += FString::Printf(Format, *WeekCircleBehaviorConfig[i].ToString(), *WeekCircleBehaviorConfig[i + 1].ToString(), *Node->GetNodeName());
+				}
 			}
 		}
 	}
@@ -287,15 +296,18 @@ FString UBTComposite_ARPG_MonthTimeCircle::GetStaticDescription() const
 	{
 		for (int i = 0; i < MonthCircleBehaviorConfig.Num(); ++i)
 		{
-			const TCHAR Format[] = TEXT("%s 至 %s : %s");
-			Desc += FString(TEXT("\n"));
-			if (i == MonthCircleBehaviorConfig.Num() - 1)
+			if (UBTNode* Node = GetChildNode(i))
 			{
-				Desc += FString::Printf(Format, *MonthCircleBehaviorConfig[i].ToString(), *MonthCircleBehaviorConfig[0].ToString(), *GetChildNode(i)->GetNodeName());
-			}
-			else
-			{
-				Desc += FString::Printf(Format, *MonthCircleBehaviorConfig[i].ToString(), *MonthCircleBehaviorConfig[i + 1].ToString(), *GetChildNode(i)->GetNodeName());
+				const TCHAR Format[] = TEXT("%s 至 %s : %s");
+				Desc += FString(TEXT("\n"));
+				if (i == MonthCircleBehaviorConfig.Num() - 1)
+				{
+					Desc += FString::Printf(Format, *MonthCircleBehaviorConfig[i].ToString(), *MonthCircleBehaviorConfig[0].ToString(), *Node->GetNodeName());
+				}
+				else
+				{
+					Desc += FString::Printf(Format, *MonthCircleBehaviorConfig[i].ToString(), *MonthCircleBehaviorConfig[i + 1].ToString(), *Node->GetNodeName());
+				}
 			}
 		}
 	}
@@ -366,15 +378,18 @@ FString UBTComposite_ARPG_YearTimeCircle::GetStaticDescription() const
 	{
 		for (int i = 0; i < YearCircleBehaviorConfig.Num(); ++i)
 		{
-			const TCHAR Format[] = TEXT("%s 至 %s : %s");
-			Desc += FString(TEXT("\n"));
-			if (i == YearCircleBehaviorConfig.Num() - 1)
+			if (UBTNode* Node = GetChildNode(i))
 			{
-				Desc += FString::Printf(Format, *YearCircleBehaviorConfig[i].ToString(), *YearCircleBehaviorConfig[0].ToString(), *GetChildNode(i)->GetNodeName());
-			}
-			else
-			{
-				Desc += FString::Printf(Format, *YearCircleBehaviorConfig[i].ToString(), *YearCircleBehaviorConfig[i + 1].ToString(), *GetChildNode(i)->GetNodeName());
+				const TCHAR Format[] = TEXT("%s 至 %s : %s");
+				Desc += FString(TEXT("\n"));
+				if (i == YearCircleBehaviorConfig.Num() - 1)
+				{
+					Desc += FString::Printf(Format, *YearCircleBehaviorConfig[i].ToString(), *YearCircleBehaviorConfig[0].ToString(), *Node->GetNodeName());
+				}
+				else
+				{
+					Desc += FString::Printf(Format, *YearCircleBehaviorConfig[i].ToString(), *YearCircleBehaviorConfig[i + 1].ToString(), *Node->GetNodeName());
+				}
 			}
 		}
 	}
