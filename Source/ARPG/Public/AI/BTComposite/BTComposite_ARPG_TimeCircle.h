@@ -10,23 +10,48 @@
 /**
  * 
  */
+struct FTimeCircleMemory
+{
+	FXD_SpecialTimeConfig NextExecuteTimeBehaviorStartTime;
+};
+
+UCLASS(abstract)
+class ARPG_API UBTComposite_ARPG_TimeCircleBase : public UBTCompositeNode
+{
+	GENERATED_BODY()
+public:
+	UBTComposite_ARPG_TimeCircleBase();
+
+	void ExecuteNextTimeCircleEvent(FBehaviorTreeSearchData SearchData, int32 NextTimeCircleEventIndex) const;
+
+	virtual void NotifyNodeDeactivation(FBehaviorTreeSearchData& SearchData, EBTNodeResult::Type& NodeResult) const;
+	virtual uint16 GetInstanceMemorySize() const override { return sizeof(FTimeCircleMemory); }
+
+#if WITH_EDITOR
+	virtual bool CanAbortLowerPriority() const override;
+	virtual FName GetNodeIconName() const override;
+#endif
+};
+
 UCLASS(meta = (DisplayName = "每时循环"))
-class ARPG_API UBTComposite_ARPG_HourTimeCircle : public UBTCompositeNode
+class ARPG_API UBTComposite_ARPG_HourTimeCircle : public UBTComposite_ARPG_TimeCircleBase
 {
 	GENERATED_BODY()
 public:
 	UBTComposite_ARPG_HourTimeCircle();
 
-	int32 GetNextChildHandler(struct FBehaviorTreeSearchData& SearchData, int32 PrevChild, EBTNodeResult::Type LastResult) const;
+	virtual int32 GetNextChildHandler(struct FBehaviorTreeSearchData& SearchData, int32 PrevChild, EBTNodeResult::Type LastResult) const override;
+
+	void HourBehaviorCircle(FBehaviorTreeSearchData SearchData, int32 BehaviorIndex) const;
+
+	FString GetRowBehaviorDesc(int32 StartIndex) const;
+
     virtual FString GetStaticDescription() const override;
 
 	void ResetConfigSize();
 
 #if WITH_EDITOR
 	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
-
-    virtual bool CanAbortLowerPriority() const override;
-    virtual FName GetNodeIconName() const override;
 #endif
 public:
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weighted Random", meta = (EditFixedOrder), EditFixedSize)
@@ -34,22 +59,24 @@ public:
 };
 
 UCLASS(meta = (DisplayName = "每日循环"))
-class ARPG_API UBTComposite_ARPG_DayTimeCircle : public UBTCompositeNode
+class ARPG_API UBTComposite_ARPG_DayTimeCircle : public UBTComposite_ARPG_TimeCircleBase
 {
 	GENERATED_BODY()
 public:
 	UBTComposite_ARPG_DayTimeCircle();
 
-	int32 GetNextChildHandler(struct FBehaviorTreeSearchData& SearchData, int32 PrevChild, EBTNodeResult::Type LastResult) const;
-    virtual FString GetStaticDescription() const override;
+	virtual int32 GetNextChildHandler(struct FBehaviorTreeSearchData& SearchData, int32 PrevChild, EBTNodeResult::Type LastResult) const override;
+
+	void DayBehaviorCircle(FBehaviorTreeSearchData SearchData, int32 BehaviorIndex) const;
+
+	FString GetRowBehaviorDesc(int32 StartIndex) const;
+
+	virtual FString GetStaticDescription() const override;
 
 	void ResetConfigSize();
 
 #if WITH_EDITOR
 	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
-
-    virtual bool CanAbortLowerPriority() const override;
-    virtual FName GetNodeIconName() const override;
 #endif
 public:
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weighted Random", meta = (EditFixedOrder), EditFixedSize)
@@ -57,22 +84,19 @@ public:
 };
 
 UCLASS(meta = (DisplayName = "每周循环"))
-class ARPG_API UBTComposite_ARPG_WeekTimeCircle : public UBTCompositeNode
+class ARPG_API UBTComposite_ARPG_WeekTimeCircle : public UBTComposite_ARPG_TimeCircleBase
 {
 	GENERATED_BODY()
 public:
 	UBTComposite_ARPG_WeekTimeCircle();
 
-	int32 GetNextChildHandler(struct FBehaviorTreeSearchData& SearchData, int32 PrevChild, EBTNodeResult::Type LastResult) const;
+	virtual int32 GetNextChildHandler(struct FBehaviorTreeSearchData& SearchData, int32 PrevChild, EBTNodeResult::Type LastResult) const override;
     virtual FString GetStaticDescription() const override;
 
 	void ResetConfigSize();
 
 #if WITH_EDITOR
 	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
-
-    virtual bool CanAbortLowerPriority() const override;
-    virtual FName GetNodeIconName() const override;
 #endif
 public:
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weighted Random", meta = (EditFixedOrder), EditFixedSize)
@@ -80,22 +104,19 @@ public:
 };
 
 UCLASS(meta = (DisplayName = "每月循环"))
-class ARPG_API UBTComposite_ARPG_MonthTimeCircle : public UBTCompositeNode
+class ARPG_API UBTComposite_ARPG_MonthTimeCircle : public UBTComposite_ARPG_TimeCircleBase
 {
 	GENERATED_BODY()
 public:
 	UBTComposite_ARPG_MonthTimeCircle();
 
-	int32 GetNextChildHandler(struct FBehaviorTreeSearchData& SearchData, int32 PrevChild, EBTNodeResult::Type LastResult) const;
+	virtual int32 GetNextChildHandler(struct FBehaviorTreeSearchData& SearchData, int32 PrevChild, EBTNodeResult::Type LastResult) const override;
 	virtual FString GetStaticDescription() const override;
 
 	void ResetConfigSize();
 
 #if WITH_EDITOR
 	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
-
-	virtual bool CanAbortLowerPriority() const override;
-	virtual FName GetNodeIconName() const override;
 #endif
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weighted Random", meta = (EditFixedOrder), EditFixedSize)
@@ -103,22 +124,19 @@ public:
 };
 
 UCLASS(meta = (DisplayName = "每年循环"))
-class ARPG_API UBTComposite_ARPG_YearTimeCircle : public UBTCompositeNode
+class ARPG_API UBTComposite_ARPG_YearTimeCircle : public UBTComposite_ARPG_TimeCircleBase
 {
 	GENERATED_BODY()
 public:
 	UBTComposite_ARPG_YearTimeCircle();
 
-	int32 GetNextChildHandler(struct FBehaviorTreeSearchData& SearchData, int32 PrevChild, EBTNodeResult::Type LastResult) const;
+	virtual int32 GetNextChildHandler(struct FBehaviorTreeSearchData& SearchData, int32 PrevChild, EBTNodeResult::Type LastResult) const override;
 	virtual FString GetStaticDescription() const override;
 
 	void ResetConfigSize();
 
 #if WITH_EDITOR
 	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
-
-	virtual bool CanAbortLowerPriority() const override;
-	virtual FName GetNodeIconName() const override;
 #endif
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weighted Random", meta = (EditFixedOrder), EditFixedSize)
