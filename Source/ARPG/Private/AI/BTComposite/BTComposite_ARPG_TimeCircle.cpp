@@ -29,6 +29,12 @@ public:
 	{
 		static_cast<UBTC_Ex&>(BTC).ExecutionRequest.SearchEnd.ExecutionIndex = 0xffff;
 	}
+
+	static UBTCompositeNode* GetRootNode(UBehaviorTreeComponent& BTC)
+	{
+		UBTC_Ex& BTCE = static_cast<UBTC_Ex&>(BTC);
+		return BTCE.InstanceStack[BTCE.ActiveInstanceIdx].RootNode;
+	}
 };
 
 UBTComposite_ARPG_TimeCircleBase::UBTComposite_ARPG_TimeCircleBase()
@@ -38,9 +44,11 @@ UBTComposite_ARPG_TimeCircleBase::UBTComposite_ARPG_TimeCircleBase()
 
 void UBTComposite_ARPG_TimeCircleBase::ExecuteNextTimeCircleEvent(FBehaviorTreeSearchData SearchData, int32 NextTimeCircleEventIndex) const
 {
-	UBTComposite_ARPG_TimeCircleBase* TimeCircleBase = const_cast<UBTComposite_ARPG_TimeCircleBase*>(this);
-	const int32 InstanceIdx = SearchData.OwnerComp.FindInstanceContainingNode(TimeCircleBase);
-	SearchData.OwnerComp.RequestExecution(TimeCircleBase, InstanceIdx, TimeCircleBase, NextTimeCircleEventIndex, EBTNodeResult::Aborted);
+	FTimeCircleMemory* TimeCircleMemory = GetNodeMemory<FTimeCircleMemory>(SearchData);
+
+	const int32 InstanceIdx = SearchData.OwnerComp.FindInstanceContainingNode(GetParentNode());
+
+	SearchData.OwnerComp.RequestExecution(GetParentNode() ? GetParentNode() : UBTC_Ex::GetRootNode(SearchData.OwnerComp), InstanceIdx, this, NextTimeCircleEventIndex, EBTNodeResult::Succeeded);
 }
 
 void UBTComposite_ARPG_TimeCircleBase::NotifyNodeDeactivation(FBehaviorTreeSearchData& SearchData, EBTNodeResult::Type& NodeResult) const
@@ -49,8 +57,8 @@ void UBTComposite_ARPG_TimeCircleBase::NotifyNodeDeactivation(FBehaviorTreeSearc
 	{
 		FTimeCircleMemory* TimeCircleMemory = GetNodeMemory<FTimeCircleMemory>(SearchData);
 
-		TimeManager->RemoveNativeSpecialGameTimeEvent(TimeCircleMemory->NextExecuteTimeBehaviorStartTime, this);
-		AI_V_Display_LOG(SearchData.OwnerComp.GetOwner(), TEXT("[%s]时间行为循环被中断"), *GetNodeName());
+		TimeManager->RemoveNativeSpecialGameTimeEvent(TimeCircleMemory->Handle);
+		AI_V_Display_LOG(SearchData.OwnerComp, "[%s]时间行为循环被中断", *GetNodeName());
 	}
 }
 
@@ -76,92 +84,45 @@ int32 UBTComposite_ARPG_HourTimeCircle::GetNextChildHandler(struct FBehaviorTree
 {
 	if (HourCircleBehaviorConfig.Num() > 0)
 	{
+		FTimeCircleMemory* TimeCircleMemory = GetNodeMemory<FTimeCircleMemory>(SearchData);
+
 		if (UXD_TimeManager* TimeManager = UARPG_TimeManager::GetGameTimeManager(&SearchData.OwnerComp))
 		{
-			bool NotInitialized = PrevChild == BTSpecialChild::NotInitialized;
-			if (NotInitialized || LastResult == EBTNodeResult::InProgress)
+			const int32 ConfigNum = HourCircleBehaviorConfig.Num();
+			const FXD_GameTime& CurrentTime = TimeManager->CurrentTime;
+
+			int32 NextBehaviorIndex = PrevChild != BTSpecialChild::NotInitialized ? (PrevChild + (LastResult == EBTNodeResult::Failed ? 2 : 1)) % ConfigNum : 0;
+			for (; NextBehaviorIndex < ConfigNum; ++NextBehaviorIndex)
 			{
-				const FXD_GameTime& CurrentTime = TimeManager->CurrentTime;
-				bool bIsNextDayBehavior = true;
-				int32 ExecuteIndex = NotInitialized ? 0 : PrevChild + 2;
-				for (; ExecuteIndex < HourCircleBehaviorConfig.Num(); ++ExecuteIndex)
+				if (CurrentTime < HourCircleBehaviorConfig[NextBehaviorIndex])
 				{
-					if (CurrentTime < HourCircleBehaviorConfig[ExecuteIndex])
-					{
-						ExecuteIndex = ExecuteIndex != 0 ? ExecuteIndex - 1 : HourCircleBehaviorConfig.Num() - 1;
-						bIsNextDayBehavior = false;
-						break;
-					}
+					break;
 				}
-				if (bIsNextDayBehavior)
-				{
-					ExecuteIndex = HourCircleBehaviorConfig.Num() - 1;
-				}
-
-				if (NotInitialized)
-				{
-					FTimeCircleMemory* TimeCircleMemory = GetNodeMemory<FTimeCircleMemory>(SearchData);
-					FXD_SpecialTimeConfig& NextExecuteTimeBehaviorStartTime = TimeCircleMemory->NextExecuteTimeBehaviorStartTime;
-
-					int32 NextBehaviorIndex = ExecuteIndex == HourCircleBehaviorConfig.Num() - 1 ? 0 : ExecuteIndex + 1;
-					int32 Minute;
-					HourCircleBehaviorConfig[NextBehaviorIndex].GetConfig(Minute);
-					NextExecuteTimeBehaviorStartTime = FXD_GameTime(CurrentTime.GetYear(), CurrentTime.GetMonth(), CurrentTime.GetDay(), CurrentTime.GetHour(), Minute);
-					if (bIsNextDayBehavior)
-					{
-						NextExecuteTimeBehaviorStartTime = FXD_GameTime(NextExecuteTimeBehaviorStartTime.GetTicks() + FXD_GameTimeSpan(0, 1, 0).GetTicks());
-					}
-					TimeManager->AddNativeSpecialGameTimeEvent(NextExecuteTimeBehaviorStartTime, UXD_TimeManager::FXD_GameTimeNativeDelegate::CreateUObject(this, &UBTComposite_ARPG_HourTimeCircle::HourBehaviorCircle, SearchData, NextBehaviorIndex));
-				}
-
-				//将ExecutionRequest.SearchEnd值设置为最大即可跳转下一个子节点
-				if (NotInitialized)
-				{
-					UBTC_Ex::SetExecutionRequestSearchEnd(SearchData.OwnerComp);
-					AI_V_Display_LOG(SearchData.OwnerComp.GetOwner(), TEXT("执行时间行为循环[%s]"), *GetRowBehaviorDesc(ExecuteIndex));
-				}
-				else
-				{
-					AI_V_Display_LOG(SearchData.OwnerComp.GetOwner(), TEXT("开始时间行为循环[%s]"), *GetRowBehaviorDesc(ExecuteIndex));
-				}
-
-				return ExecuteIndex;
 			}
-			//若子节点执行失败则继续向下搜索
-			else if (LastResult == EBTNodeResult::Failed)
+
+			bool bIsNextCircle = NextBehaviorIndex == ConfigNum;
+			NextBehaviorIndex %= ConfigNum;
+
+			int32 BehaviorIndex = ((NextBehaviorIndex - 1) + ConfigNum) % ConfigNum;
+			if (BehaviorIndex != PrevChild)
 			{
-				int32 ExecuteIndex = PrevChild + 1 < GetChildrenNum() ? PrevChild + 1 : 0;
-				AI_V_Display_LOG(SearchData.OwnerComp.GetOwner(), TEXT("[%s]无法执行，执行下一个时间行为循环[%s]"), *GetChildNode(PrevChild)->GetNodeName(), *GetRowBehaviorDesc(ExecuteIndex));
-				return ExecuteIndex;
+				int32 Minute;
+				HourCircleBehaviorConfig[NextBehaviorIndex].GetConfig(Minute);
+				FXD_SpecialTimeConfig NextExecuteTimeBehaviorStartTime = FXD_GameTimeSpan(CurrentTime.GetTotalDays(), CurrentTime.GetHour(), Minute);
+				if (bIsNextCircle)
+				{
+					NextExecuteTimeBehaviorStartTime = FXD_GameTime(NextExecuteTimeBehaviorStartTime.GetTicks() + FXD_GameTimeSpan(0, 1, 0).GetTicks());
+				}
+				TimeCircleMemory->Handle = TimeManager->AddNativeSpecialGameTimeEvent(NextExecuteTimeBehaviorStartTime, UXD_TimeManager::FXD_GameTimeNativeDelegate::CreateUObject(this, &UBTComposite_ARPG_HourTimeCircle::ExecuteNextTimeCircleEvent, SearchData, NextBehaviorIndex));
+
+				AI_V_Display_LOG(SearchData.OwnerComp, "[%s]", *GetRowBehaviorDesc(BehaviorIndex));
+
+				return BehaviorIndex;
 			}
 		}
 	}
 
 	return BTSpecialChild::ReturnToParent;
-}
-
-void UBTComposite_ARPG_HourTimeCircle::HourBehaviorCircle(FBehaviorTreeSearchData SearchData, int32 BehaviorIndex) const
-{
-	FTimeCircleMemory* TimeCircleMemory = GetNodeMemory<FTimeCircleMemory>(SearchData);
-	FXD_SpecialTimeConfig& NextExecuteTimeBehaviorStartTime = TimeCircleMemory->NextExecuteTimeBehaviorStartTime;
-
-	ExecuteNextTimeCircleEvent(SearchData, BehaviorIndex);
-	AI_V_Display_LOG(SearchData.OwnerComp.GetOwner(), TEXT("执行时间行为循环[%s]"), *GetRowBehaviorDesc(BehaviorIndex));
-
-	int32 NextBehaviorIndex = BehaviorIndex == HourCircleBehaviorConfig.Num() - 1 ? 0 : BehaviorIndex + 1;
-
-	UXD_TimeManager* TimeManager = UARPG_TimeManager::GetGameTimeManager(&SearchData.OwnerComp);
-	const FXD_GameTime& CurrentTime = TimeManager->CurrentTime;
-
-	int32 Minute;
-	HourCircleBehaviorConfig[NextBehaviorIndex].GetConfig(Minute);
-	NextExecuteTimeBehaviorStartTime = FXD_GameTime(CurrentTime.GetYear(), CurrentTime.GetMonth(), CurrentTime.GetDay(), CurrentTime.GetHour(), Minute);
-	if (BehaviorIndex == HourCircleBehaviorConfig.Num() - 1)
-	{
-		NextExecuteTimeBehaviorStartTime = FXD_GameTime(NextExecuteTimeBehaviorStartTime.GetTicks() + FXD_GameTimeSpan(0, 1, 0).GetTicks());
-	}
-
-	TimeManager->AddNativeSpecialGameTimeEvent(NextExecuteTimeBehaviorStartTime, UXD_TimeManager::FXD_GameTimeNativeDelegate::CreateUObject(this, &UBTComposite_ARPG_HourTimeCircle::HourBehaviorCircle, SearchData, NextBehaviorIndex));
 }
 
 FString UBTComposite_ARPG_HourTimeCircle::GetRowBehaviorDesc(int32 StartIndex) const
@@ -187,16 +148,7 @@ FString UBTComposite_ARPG_HourTimeCircle::GetStaticDescription() const
 		{
 			if (UBTNode* Node = GetChildNode(i))
 			{
-				const TCHAR Format[] = TEXT("%s 至 %s : %s");
-				Desc += FString(TEXT("\n"));
-				if (i == HourCircleBehaviorConfig.Num() - 1)
-				{
-					Desc += FString::Printf(Format, *HourCircleBehaviorConfig[i].ToString(), *HourCircleBehaviorConfig[0].ToString(), *Node->GetNodeName());
-				}
-				else
-				{
-					Desc += FString::Printf(Format, *HourCircleBehaviorConfig[i].ToString(), *HourCircleBehaviorConfig[i + 1].ToString(), *Node->GetNodeName());
-				}
+				Desc += FString(TEXT("\n")) + GetRowBehaviorDesc(i);
 			}
 		}
 	}
@@ -232,92 +184,45 @@ int32 UBTComposite_ARPG_DayTimeCircle::GetNextChildHandler(struct FBehaviorTreeS
 {
 	if (DayCircleBehaviorConfig.Num() > 0)
 	{
+		FTimeCircleMemory* TimeCircleMemory = GetNodeMemory<FTimeCircleMemory>(SearchData);
+
 		if (UXD_TimeManager* TimeManager = UARPG_TimeManager::GetGameTimeManager(&SearchData.OwnerComp))
 		{
-			bool NotInitialized = PrevChild == BTSpecialChild::NotInitialized;
-			if (NotInitialized || LastResult == EBTNodeResult::InProgress)
+			const int32 ConfigNum = DayCircleBehaviorConfig.Num();
+			const FXD_GameTime& CurrentTime = TimeManager->CurrentTime;
+
+			int32 NextBehaviorIndex = PrevChild != BTSpecialChild::NotInitialized ? (PrevChild + (LastResult == EBTNodeResult::Failed ? 2 : 1)) % ConfigNum : 0;
+			for (; NextBehaviorIndex < ConfigNum; ++NextBehaviorIndex)
 			{
-				const FXD_GameTime& CurrentTime = TimeManager->CurrentTime;
-				bool bIsNextDayBehavior = true;
-				int32 ExecuteIndex = NotInitialized ? 0 : PrevChild + 2;
-				for (; ExecuteIndex < DayCircleBehaviorConfig.Num(); ++ExecuteIndex)
+				if (CurrentTime < DayCircleBehaviorConfig[NextBehaviorIndex])
 				{
-					if (CurrentTime < DayCircleBehaviorConfig[ExecuteIndex])
-					{
-						ExecuteIndex = ExecuteIndex != 0 ? ExecuteIndex - 1 : DayCircleBehaviorConfig.Num() - 1;
-						bIsNextDayBehavior = false;
-						break;
-					}
+					break;
 				}
-				if (bIsNextDayBehavior)
-				{
-					ExecuteIndex = DayCircleBehaviorConfig.Num() - 1;
-				}
-
-				if (NotInitialized)
-				{
-					FTimeCircleMemory* TimeCircleMemory = GetNodeMemory<FTimeCircleMemory>(SearchData);
-					FXD_SpecialTimeConfig& NextExecuteTimeBehaviorStartTime = TimeCircleMemory->NextExecuteTimeBehaviorStartTime;
-
-					int32 NextBehaviorIndex = ExecuteIndex == DayCircleBehaviorConfig.Num() - 1 ? 0 : ExecuteIndex + 1;
-					int32 Hour, Minute;
-					DayCircleBehaviorConfig[NextBehaviorIndex].GetConfig(Hour, Minute);
-					NextExecuteTimeBehaviorStartTime = FXD_GameTime(CurrentTime.GetYear(), CurrentTime.GetMonth(), CurrentTime.GetDay(), Hour, Minute);
-					if (bIsNextDayBehavior)
-					{
-						NextExecuteTimeBehaviorStartTime = FXD_GameTime(NextExecuteTimeBehaviorStartTime.GetTicks() + FXD_GameTimeSpan(1, 0, 0).GetTicks());
-					}
-					TimeManager->AddNativeSpecialGameTimeEvent(NextExecuteTimeBehaviorStartTime, UXD_TimeManager::FXD_GameTimeNativeDelegate::CreateUObject(this, &UBTComposite_ARPG_DayTimeCircle::DayBehaviorCircle, SearchData, NextBehaviorIndex));
-				}
-
-				//将ExecutionRequest.SearchEnd值设置为最大即可跳转下一个子节点
-				if (NotInitialized)
-				{
-					UBTC_Ex::SetExecutionRequestSearchEnd(SearchData.OwnerComp);
-					AI_V_Display_LOG(SearchData.OwnerComp.GetOwner(), TEXT("执行时间行为循环[%s]"), *GetRowBehaviorDesc(ExecuteIndex));
-				}
-				else
-				{
-					AI_V_Display_LOG(SearchData.OwnerComp.GetOwner(), TEXT("开始时间行为循环[%s]"), *GetRowBehaviorDesc(ExecuteIndex));
-				}
-
-				return ExecuteIndex;
 			}
-			//若子节点执行失败则继续向下搜索
-			else if (LastResult == EBTNodeResult::Failed)
+
+			bool bIsNextCircle = NextBehaviorIndex == ConfigNum;
+			NextBehaviorIndex %= ConfigNum;
+
+			int32 BehaviorIndex = ((NextBehaviorIndex - 1) + ConfigNum) % ConfigNum;
+			if (BehaviorIndex != PrevChild)
 			{
-				int32 ExecuteIndex = PrevChild + 1 < GetChildrenNum() ? PrevChild + 1 : 0;
-				AI_V_Display_LOG(SearchData.OwnerComp.GetOwner(), TEXT("[%s]无法执行，执行下一个时间行为循环[%s]"), *GetChildNode(PrevChild)->GetNodeName(), *GetRowBehaviorDesc(ExecuteIndex));
-				return ExecuteIndex;
+				int32 Hour, Minute;
+				DayCircleBehaviorConfig[NextBehaviorIndex].GetConfig(Hour, Minute);
+				FXD_SpecialTimeConfig NextExecuteTimeBehaviorStartTime = FXD_GameTimeSpan(CurrentTime.GetTotalDays(), Hour, Minute);
+				if (bIsNextCircle)
+				{
+					NextExecuteTimeBehaviorStartTime = FXD_GameTime(NextExecuteTimeBehaviorStartTime.GetTicks() + FXD_GameTimeSpan(1, 0, 0).GetTicks());
+				}
+				TimeCircleMemory->Handle = TimeManager->AddNativeSpecialGameTimeEvent(NextExecuteTimeBehaviorStartTime, UXD_TimeManager::FXD_GameTimeNativeDelegate::CreateUObject(this, &UBTComposite_ARPG_HourTimeCircle::ExecuteNextTimeCircleEvent, SearchData, NextBehaviorIndex));
+
+				AI_V_Display_LOG(SearchData.OwnerComp, "[%s][%s]", *CurrentTime.ToString(), *GetRowBehaviorDesc(BehaviorIndex));
+
+				return BehaviorIndex;
 			}
 		}
 	}
 
 	return BTSpecialChild::ReturnToParent;
-}
-
-void UBTComposite_ARPG_DayTimeCircle::DayBehaviorCircle(FBehaviorTreeSearchData SearchData, int32 BehaviorIndex) const
-{
-	FTimeCircleMemory* TimeCircleMemory = GetNodeMemory<FTimeCircleMemory>(SearchData);
-	FXD_SpecialTimeConfig& NextExecuteTimeBehaviorStartTime = TimeCircleMemory->NextExecuteTimeBehaviorStartTime;
-
-	ExecuteNextTimeCircleEvent(SearchData, BehaviorIndex);
-	AI_V_Display_LOG(SearchData.OwnerComp.GetOwner(), TEXT("执行时间行为循环[%s]"), *GetRowBehaviorDesc(BehaviorIndex));
-
-	int32 NextBehaviorIndex = BehaviorIndex == DayCircleBehaviorConfig.Num() - 1 ? 0 : BehaviorIndex + 1;
-
-	UXD_TimeManager* TimeManager = UARPG_TimeManager::GetGameTimeManager(&SearchData.OwnerComp);
-	const FXD_GameTime& CurrentTime = TimeManager->CurrentTime;
-
-	int32 Hour, Minute;
-	DayCircleBehaviorConfig[NextBehaviorIndex].GetConfig(Hour, Minute);
-	NextExecuteTimeBehaviorStartTime = FXD_GameTime(CurrentTime.GetYear(), CurrentTime.GetMonth(), CurrentTime.GetDay(), Hour, Minute);
-	if (BehaviorIndex == DayCircleBehaviorConfig.Num() - 1)
-	{
-		NextExecuteTimeBehaviorStartTime = FXD_GameTime(NextExecuteTimeBehaviorStartTime.GetTicks() + FXD_GameTimeSpan(1, 0, 0).GetTicks());
-	}
-
-	TimeManager->AddNativeSpecialGameTimeEvent(NextExecuteTimeBehaviorStartTime, UXD_TimeManager::FXD_GameTimeNativeDelegate::CreateUObject(this, &UBTComposite_ARPG_DayTimeCircle::DayBehaviorCircle, SearchData, NextBehaviorIndex));
 }
 
 FString UBTComposite_ARPG_DayTimeCircle::GetRowBehaviorDesc(int32 StartIndex) const
@@ -377,18 +282,43 @@ UBTComposite_ARPG_WeekTimeCircle::UBTComposite_ARPG_WeekTimeCircle()
 
 int32 UBTComposite_ARPG_WeekTimeCircle::GetNextChildHandler(struct FBehaviorTreeSearchData& SearchData, int32 PrevChild, EBTNodeResult::Type LastResult) const
 {
-	if (WeekCircleBehaviorConfig.Num() > 0 && PrevChild == BTSpecialChild::NotInitialized)
+	if (WeekCircleBehaviorConfig.Num() > 0)
 	{
+		FTimeCircleMemory* TimeCircleMemory = GetNodeMemory<FTimeCircleMemory>(SearchData);
+
 		if (UXD_TimeManager* TimeManager = UARPG_TimeManager::GetGameTimeManager(&SearchData.OwnerComp))
 		{
-			for (int i = 0; i < WeekCircleBehaviorConfig.Num(); ++i)
+			const int32 ConfigNum = WeekCircleBehaviorConfig.Num();
+			const FXD_GameTime& CurrentTime = TimeManager->CurrentTime;
+
+			int32 NextBehaviorIndex = PrevChild != BTSpecialChild::NotInitialized ? (PrevChild + (LastResult == EBTNodeResult::Failed ? 2 : 1)) % ConfigNum : 0;
+			for (; NextBehaviorIndex < ConfigNum; ++NextBehaviorIndex)
 			{
-				if (TimeManager->CurrentTime < WeekCircleBehaviorConfig[i])
+				if (CurrentTime < WeekCircleBehaviorConfig[NextBehaviorIndex])
 				{
-					return i != 0 ? i - 1 : WeekCircleBehaviorConfig.Num() - 1;
+					break;
 				}
 			}
-			return WeekCircleBehaviorConfig.Num() - 1;
+
+			bool bIsNextCircle = NextBehaviorIndex == ConfigNum;
+			NextBehaviorIndex %= ConfigNum;
+
+			int32 BehaviorIndex = ((NextBehaviorIndex - 1) + ConfigNum) % ConfigNum;
+			if (BehaviorIndex != PrevChild)
+			{
+				int32 WeekDay, Hour, Minute;
+				WeekCircleBehaviorConfig[NextBehaviorIndex].GetConfig(WeekDay, Hour, Minute);
+				FXD_SpecialTimeConfig NextExecuteTimeBehaviorStartTime = FXD_GameTimeSpan(CurrentTime.GetTotalDays() + WeekDay - CurrentTime.GetDayOfWeekNum(), Hour, Minute);
+				if (bIsNextCircle)
+				{
+					NextExecuteTimeBehaviorStartTime = FXD_GameTime(NextExecuteTimeBehaviorStartTime.GetTicks() + FXD_GameTimeSpan(7, 0, 0).GetTicks());
+				}
+				TimeCircleMemory->Handle = TimeManager->AddNativeSpecialGameTimeEvent(NextExecuteTimeBehaviorStartTime, UXD_TimeManager::FXD_GameTimeNativeDelegate::CreateUObject(this, &UBTComposite_ARPG_HourTimeCircle::ExecuteNextTimeCircleEvent, SearchData, NextBehaviorIndex));
+
+				AI_V_Display_LOG(SearchData.OwnerComp, "[%s]", *GetRowBehaviorDesc(BehaviorIndex));
+
+				return BehaviorIndex;
+			}
 		}
 	}
 
@@ -406,21 +336,24 @@ FString UBTComposite_ARPG_WeekTimeCircle::GetStaticDescription() const
 		{
 			if (UBTNode* Node = GetChildNode(i))
 			{
-				const TCHAR Format[] = TEXT("%s 至 %s : %s");
-				Desc += FString(TEXT("\n"));
-				if (i == WeekCircleBehaviorConfig.Num() - 1)
-				{
-					Desc += FString::Printf(Format, *WeekCircleBehaviorConfig[i].ToString(), *WeekCircleBehaviorConfig[0].ToString(), *Node->GetNodeName());
-				}
-				else
-				{
-					Desc += FString::Printf(Format, *WeekCircleBehaviorConfig[i].ToString(), *WeekCircleBehaviorConfig[i + 1].ToString(), *Node->GetNodeName());
-				}
+				Desc += FString(TEXT("\n")) + GetRowBehaviorDesc(i);
 			}
 		}
 	}
 
 	return Desc;
+}
+
+FString UBTComposite_ARPG_WeekTimeCircle::GetRowBehaviorDesc(int32 StartIndex) const
+{
+	if (StartIndex == WeekCircleBehaviorConfig.Num() - 1)
+	{
+		return FString::Printf(TEXT("%s 至下一个 %s : %s"), *WeekCircleBehaviorConfig[StartIndex].ToString(), *WeekCircleBehaviorConfig[0].ToString(), *GetChildNode(StartIndex)->GetNodeName());
+	}
+	else
+	{
+		return FString::Printf(TEXT("%s 至 %s : %s"), *WeekCircleBehaviorConfig[StartIndex].ToString(), *WeekCircleBehaviorConfig[StartIndex + 1].ToString(), *GetChildNode(StartIndex)->GetNodeName());
+	}
 }
 
 void UBTComposite_ARPG_WeekTimeCircle::ResetConfigSize()
@@ -448,18 +381,52 @@ UBTComposite_ARPG_MonthTimeCircle::UBTComposite_ARPG_MonthTimeCircle()
 
 int32 UBTComposite_ARPG_MonthTimeCircle::GetNextChildHandler(struct FBehaviorTreeSearchData& SearchData, int32 PrevChild, EBTNodeResult::Type LastResult) const
 {
-	if (MonthCircleBehaviorConfig.Num() > 0 && PrevChild == BTSpecialChild::NotInitialized)
+	if (MonthCircleBehaviorConfig.Num() > 0)
 	{
+		FTimeCircleMemory* TimeCircleMemory = GetNodeMemory<FTimeCircleMemory>(SearchData);
+
 		if (UXD_TimeManager* TimeManager = UARPG_TimeManager::GetGameTimeManager(&SearchData.OwnerComp))
 		{
-			for (int i = 0; i < MonthCircleBehaviorConfig.Num(); ++i)
+			const int32 ConfigNum = MonthCircleBehaviorConfig.Num();
+			const FXD_GameTime& CurrentTime = TimeManager->CurrentTime;
+
+			int32 NextBehaviorIndex = PrevChild != BTSpecialChild::NotInitialized ? (PrevChild + (LastResult == EBTNodeResult::Failed ? 2 : 1)) % ConfigNum : 0;
+			for (; NextBehaviorIndex < ConfigNum; ++NextBehaviorIndex)
 			{
-				if (TimeManager->CurrentTime < MonthCircleBehaviorConfig[i])
+				if (CurrentTime < MonthCircleBehaviorConfig[NextBehaviorIndex])
 				{
-					return i != 0 ? i - 1 : MonthCircleBehaviorConfig.Num() - 1;
+					break;
 				}
 			}
-			return MonthCircleBehaviorConfig.Num() - 1;
+
+			bool bIsNextCircle = NextBehaviorIndex == ConfigNum;
+			NextBehaviorIndex %= ConfigNum;
+
+			int32 BehaviorIndex = ((NextBehaviorIndex - 1) + ConfigNum) % ConfigNum;
+			if (BehaviorIndex != PrevChild)
+			{
+				int32 Year, Month, Day;
+				CurrentTime.GetDate(Year, Month, Day);
+				if (bIsNextCircle)
+				{
+					Month += 1;
+					if (Month >= 12)
+					{
+						Month = 1;
+						Year += 1;
+					}
+				}
+
+				int32 DayOfMonth, Hour, Minute;
+				MonthCircleBehaviorConfig[NextBehaviorIndex].GetConfigSafe(Year, Month, DayOfMonth, Hour, Minute);
+
+				FXD_SpecialTimeConfig NextExecuteTimeBehaviorStartTime = FXD_SpecialTimeConfig(Year, Month, DayOfMonth, Hour, Minute);
+				TimeCircleMemory->Handle = TimeManager->AddNativeSpecialGameTimeEvent(NextExecuteTimeBehaviorStartTime, UXD_TimeManager::FXD_GameTimeNativeDelegate::CreateUObject(this, &UBTComposite_ARPG_HourTimeCircle::ExecuteNextTimeCircleEvent, SearchData, NextBehaviorIndex));
+
+				AI_V_Display_LOG(SearchData.OwnerComp, "[%s][%s]", *CurrentTime.ToString(), *GetRowBehaviorDesc(BehaviorIndex));
+
+				return BehaviorIndex;
+			}
 		}
 	}
 
@@ -477,21 +444,24 @@ FString UBTComposite_ARPG_MonthTimeCircle::GetStaticDescription() const
 		{
 			if (UBTNode* Node = GetChildNode(i))
 			{
-				const TCHAR Format[] = TEXT("%s 至 %s : %s");
-				Desc += FString(TEXT("\n"));
-				if (i == MonthCircleBehaviorConfig.Num() - 1)
-				{
-					Desc += FString::Printf(Format, *MonthCircleBehaviorConfig[i].ToString(), *MonthCircleBehaviorConfig[0].ToString(), *Node->GetNodeName());
-				}
-				else
-				{
-					Desc += FString::Printf(Format, *MonthCircleBehaviorConfig[i].ToString(), *MonthCircleBehaviorConfig[i + 1].ToString(), *Node->GetNodeName());
-				}
+				Desc += FString(TEXT("\n")) + GetRowBehaviorDesc(i);
 			}
 		}
 	}
 
 	return Desc;
+}
+
+FString UBTComposite_ARPG_MonthTimeCircle::GetRowBehaviorDesc(int32 StartIndex) const
+{
+	if (StartIndex == MonthCircleBehaviorConfig.Num() - 1)
+	{
+		return FString::Printf(TEXT("%s 至下一个 %s : %s"), *MonthCircleBehaviorConfig[StartIndex].ToString(), *MonthCircleBehaviorConfig[0].ToString(), *GetChildNode(StartIndex)->GetNodeName());
+	}
+	else
+	{
+		return FString::Printf(TEXT("%s 至 %s : %s"), *MonthCircleBehaviorConfig[StartIndex].ToString(), *MonthCircleBehaviorConfig[StartIndex + 1].ToString(), *GetChildNode(StartIndex)->GetNodeName());
+	}
 }
 
 void UBTComposite_ARPG_MonthTimeCircle::ResetConfigSize()
@@ -520,18 +490,46 @@ UBTComposite_ARPG_YearTimeCircle::UBTComposite_ARPG_YearTimeCircle()
 
 int32 UBTComposite_ARPG_YearTimeCircle::GetNextChildHandler(struct FBehaviorTreeSearchData& SearchData, int32 PrevChild, EBTNodeResult::Type LastResult) const
 {
-	if (YearCircleBehaviorConfig.Num() > 0 && PrevChild == BTSpecialChild::NotInitialized)
+	if (YearCircleBehaviorConfig.Num() > 0)
 	{
+		FTimeCircleMemory* TimeCircleMemory = GetNodeMemory<FTimeCircleMemory>(SearchData);
+
 		if (UXD_TimeManager* TimeManager = UARPG_TimeManager::GetGameTimeManager(&SearchData.OwnerComp))
 		{
-			for (int i = 0; i < YearCircleBehaviorConfig.Num(); ++i)
+			const int32 ConfigNum = YearCircleBehaviorConfig.Num();
+			const FXD_GameTime& CurrentTime = TimeManager->CurrentTime;
+
+			int32 NextBehaviorIndex = PrevChild != BTSpecialChild::NotInitialized ? (PrevChild + (LastResult == EBTNodeResult::Failed ? 2 : 1)) % ConfigNum : 0;
+			for (; NextBehaviorIndex < ConfigNum; ++NextBehaviorIndex)
 			{
-				if (TimeManager->CurrentTime < YearCircleBehaviorConfig[i])
+				if (CurrentTime < YearCircleBehaviorConfig[NextBehaviorIndex])
 				{
-					return i != 0 ? i - 1 : YearCircleBehaviorConfig.Num() - 1;
+					break;
 				}
 			}
-			return YearCircleBehaviorConfig.Num() - 1;
+
+			bool bIsNextCircle = NextBehaviorIndex == ConfigNum;
+			NextBehaviorIndex %= ConfigNum;
+
+			int32 BehaviorIndex = ((NextBehaviorIndex - 1) + ConfigNum) % ConfigNum;
+			if (BehaviorIndex != PrevChild)
+			{
+				int32 Year = CurrentTime.GetYear();
+				if (bIsNextCircle)
+				{
+					Year += 1;
+				}
+
+				int32 Month, DayOfMonth, Hour, Minute;
+				YearCircleBehaviorConfig[NextBehaviorIndex].GetConfigSafe(Year, Month, DayOfMonth, Hour, Minute);
+
+				FXD_SpecialTimeConfig NextExecuteTimeBehaviorStartTime = FXD_SpecialTimeConfig(Year, Month, DayOfMonth, Hour, Minute);
+				TimeCircleMemory->Handle = TimeManager->AddNativeSpecialGameTimeEvent(NextExecuteTimeBehaviorStartTime, UXD_TimeManager::FXD_GameTimeNativeDelegate::CreateUObject(this, &UBTComposite_ARPG_HourTimeCircle::ExecuteNextTimeCircleEvent, SearchData, NextBehaviorIndex));
+
+				AI_V_Display_LOG(SearchData.OwnerComp, "[%s][%s]", *CurrentTime.ToString(), *GetRowBehaviorDesc(BehaviorIndex));
+
+				return BehaviorIndex;
+			}
 		}
 	}
 
@@ -549,21 +547,24 @@ FString UBTComposite_ARPG_YearTimeCircle::GetStaticDescription() const
 		{
 			if (UBTNode* Node = GetChildNode(i))
 			{
-				const TCHAR Format[] = TEXT("%s 至 %s : %s");
-				Desc += FString(TEXT("\n"));
-				if (i == YearCircleBehaviorConfig.Num() - 1)
-				{
-					Desc += FString::Printf(Format, *YearCircleBehaviorConfig[i].ToString(), *YearCircleBehaviorConfig[0].ToString(), *Node->GetNodeName());
-				}
-				else
-				{
-					Desc += FString::Printf(Format, *YearCircleBehaviorConfig[i].ToString(), *YearCircleBehaviorConfig[i + 1].ToString(), *Node->GetNodeName());
-				}
+				Desc += FString(TEXT("\n")) + GetRowBehaviorDesc(i);
 			}
 		}
 	}
 
 	return Desc;
+}
+
+FString UBTComposite_ARPG_YearTimeCircle::GetRowBehaviorDesc(int32 StartIndex) const
+{
+	if (StartIndex == YearCircleBehaviorConfig.Num() - 1)
+	{
+		return FString::Printf(TEXT("%s 至下一个 %s : %s"), *YearCircleBehaviorConfig[StartIndex].ToString(), *YearCircleBehaviorConfig[0].ToString(), *GetChildNode(StartIndex)->GetNodeName());
+	}
+	else
+	{
+		return FString::Printf(TEXT("%s 至 %s : %s"), *YearCircleBehaviorConfig[StartIndex].ToString(), *YearCircleBehaviorConfig[StartIndex + 1].ToString(), *GetChildNode(StartIndex)->GetNodeName());
+	}
 }
 
 void UBTComposite_ARPG_YearTimeCircle::ResetConfigSize()

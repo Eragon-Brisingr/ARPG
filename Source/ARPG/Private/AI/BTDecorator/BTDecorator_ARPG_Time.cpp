@@ -4,6 +4,8 @@
 #include "ARPG_TimeManager.h"
 #include "BlueprintNodeHelpers.h"
 
+const TCHAR TimeDescFormat[] = TEXT("[%s]至[%s]");
+
 FString UBTDecorator_ARPG_TimeBase::GetStaticDescription() const
 {
 	FString ReturnDesc = Super::GetStaticDescription();
@@ -33,6 +35,11 @@ bool UBTDecorator_ARPG_Time_InHourRange::CalculateRawConditionValue(UBehaviorTre
 	return false;
 }
 
+FString UBTDecorator_ARPG_Time_InHourRange::GetStaticDescription() const
+{
+	return FString::Printf(TimeDescFormat, *StartTime.ToString(), *EndTime.ToString());
+}
+
 bool UBTDecorator_ARPG_Time_InDayRange::CalculateRawConditionValue(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) const
 {
 	if (UXD_TimeManager* TimeManager = UARPG_TimeManager::GetGameTimeManager(&OwnerComp))
@@ -40,6 +47,11 @@ bool UBTDecorator_ARPG_Time_InDayRange::CalculateRawConditionValue(UBehaviorTree
 		return TimeManager->CurrentTime.InDayRange(StartTime, EndTime);
 	}
 	return false;
+}
+
+FString UBTDecorator_ARPG_Time_InDayRange::GetStaticDescription() const
+{
+	return FString::Printf(TimeDescFormat, *StartTime.ToString(), *EndTime.ToString());
 }
 
 bool UBTDecorator_ARPG_Time_InWeekRange::CalculateRawConditionValue(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) const
@@ -51,6 +63,11 @@ bool UBTDecorator_ARPG_Time_InWeekRange::CalculateRawConditionValue(UBehaviorTre
 	return false;
 }
 
+FString UBTDecorator_ARPG_Time_InWeekRange::GetStaticDescription() const
+{
+	return FString::Printf(TimeDescFormat, *StartTime.ToString(), *EndTime.ToString());
+}
+
 bool UBTDecorator_ARPG_Time_InMonthRange::CalculateRawConditionValue(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) const
 {
 	if (UXD_TimeManager* TimeManager = UARPG_TimeManager::GetGameTimeManager(&OwnerComp))
@@ -58,6 +75,11 @@ bool UBTDecorator_ARPG_Time_InMonthRange::CalculateRawConditionValue(UBehaviorTr
 		return TimeManager->CurrentTime.InMonthRange(StartTime, EndTime);
 	}
 	return false;
+}
+
+FString UBTDecorator_ARPG_Time_InMonthRange::GetStaticDescription() const
+{
+	return FString::Printf(TimeDescFormat, *StartTime.ToString(), *EndTime.ToString());
 }
 
 bool UBTDecorator_ARPG_Time_InYearRange::CalculateRawConditionValue(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) const
@@ -69,6 +91,11 @@ bool UBTDecorator_ARPG_Time_InYearRange::CalculateRawConditionValue(UBehaviorTre
 	return false;
 }
 
+FString UBTDecorator_ARPG_Time_InYearRange::GetStaticDescription() const
+{
+	return FString::Printf(TimeDescFormat, *StartTime.ToString(), *EndTime.ToString());
+}
+
 bool UBTDecorator_ARPG_Time_InSpecialRange::CalculateRawConditionValue(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) const
 {
 	if (UXD_TimeManager* TimeManager = UARPG_TimeManager::GetGameTimeManager(&OwnerComp))
@@ -76,4 +103,9 @@ bool UBTDecorator_ARPG_Time_InSpecialRange::CalculateRawConditionValue(UBehavior
 		return TimeManager->CurrentTime.InSpecialTimeRange(StartTime, EndTime);
 	}
 	return false;
+}
+
+FString UBTDecorator_ARPG_Time_InSpecialRange::GetStaticDescription() const
+{
+	return FString::Printf(TimeDescFormat, *StartTime.ToString(), *EndTime.ToString());
 }

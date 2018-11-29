@@ -10,9 +10,9 @@
 /**
  * 
  */
-struct FTimeCircleMemory
+struct FTimeCircleMemory : public FBTCompositeMemory
 {
-	FXD_SpecialTimeConfig NextExecuteTimeBehaviorStartTime;
+	FXD_NativeSpecialGameTimeHandle Handle;
 };
 
 UCLASS(abstract)
@@ -41,12 +41,9 @@ public:
 	UBTComposite_ARPG_HourTimeCircle();
 
 	virtual int32 GetNextChildHandler(struct FBehaviorTreeSearchData& SearchData, int32 PrevChild, EBTNodeResult::Type LastResult) const override;
-
-	void HourBehaviorCircle(FBehaviorTreeSearchData SearchData, int32 BehaviorIndex) const;
+    virtual FString GetStaticDescription() const override;
 
 	FString GetRowBehaviorDesc(int32 StartIndex) const;
-
-    virtual FString GetStaticDescription() const override;
 
 	void ResetConfigSize();
 
@@ -66,12 +63,9 @@ public:
 	UBTComposite_ARPG_DayTimeCircle();
 
 	virtual int32 GetNextChildHandler(struct FBehaviorTreeSearchData& SearchData, int32 PrevChild, EBTNodeResult::Type LastResult) const override;
-
-	void DayBehaviorCircle(FBehaviorTreeSearchData SearchData, int32 BehaviorIndex) const;
+	virtual FString GetStaticDescription() const override;
 
 	FString GetRowBehaviorDesc(int32 StartIndex) const;
-
-	virtual FString GetStaticDescription() const override;
 
 	void ResetConfigSize();
 
@@ -93,6 +87,8 @@ public:
 	virtual int32 GetNextChildHandler(struct FBehaviorTreeSearchData& SearchData, int32 PrevChild, EBTNodeResult::Type LastResult) const override;
     virtual FString GetStaticDescription() const override;
 
+	FString GetRowBehaviorDesc(int32 StartIndex) const;
+
 	void ResetConfigSize();
 
 #if WITH_EDITOR
@@ -113,6 +109,7 @@ public:
 	virtual int32 GetNextChildHandler(struct FBehaviorTreeSearchData& SearchData, int32 PrevChild, EBTNodeResult::Type LastResult) const override;
 	virtual FString GetStaticDescription() const override;
 
+	FString GetRowBehaviorDesc(int32 StartIndex) const;
 	void ResetConfigSize();
 
 #if WITH_EDITOR
@@ -133,6 +130,7 @@ public:
 	virtual int32 GetNextChildHandler(struct FBehaviorTreeSearchData& SearchData, int32 PrevChild, EBTNodeResult::Type LastResult) const override;
 	virtual FString GetStaticDescription() const override;
 
+	FString GetRowBehaviorDesc(int32 StartIndex) const;
 	void ResetConfigSize();
 
 #if WITH_EDITOR

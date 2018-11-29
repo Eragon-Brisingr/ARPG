@@ -20,13 +20,14 @@ private:
 	virtual FString GetStaticDescription() const override;
 };
 
-UCLASS()
+UCLASS(meta = (DisplayName = "时间_在每时"))
 class ARPG_API UBTDecorator_ARPG_Time_InHourRange : public UBTDecorator_ARPG_TimeBase
 {
 	GENERATED_BODY()
 public:
 	virtual bool CalculateRawConditionValue(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) const override;
 
+	virtual FString GetStaticDescription() const override;
 public:
 	UPROPERTY(EditAnywhere, Category = "时间")
 	FXD_EveryHourConfig StartTime;
@@ -35,13 +36,14 @@ public:
 	FXD_EveryHourConfig EndTime;
 };
 
-UCLASS()
+UCLASS(meta = (DisplayName = "时间_在每日"))
 class ARPG_API UBTDecorator_ARPG_Time_InDayRange : public UBTDecorator_ARPG_TimeBase
 {
 	GENERATED_BODY()
 public:
 	virtual bool CalculateRawConditionValue(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) const override;
 
+	virtual FString GetStaticDescription() const override;
 public:
 	UPROPERTY(EditAnywhere, Category = "时间")
 	FXD_EveryDayConfig StartTime;
@@ -50,13 +52,14 @@ public:
 	FXD_EveryDayConfig EndTime;
 };
 
-UCLASS()
+UCLASS(meta = (DisplayName = "时间_在每周"))
 class ARPG_API UBTDecorator_ARPG_Time_InWeekRange : public UBTDecorator_ARPG_TimeBase
 {
 	GENERATED_BODY()
 public:
 	virtual bool CalculateRawConditionValue(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) const override;
 
+	virtual FString GetStaticDescription() const override;
 public:
 	UPROPERTY(EditAnywhere, Category = "时间")
 	FXD_EveryWeekConfig StartTime;
@@ -65,13 +68,14 @@ public:
 	FXD_EveryWeekConfig EndTime;
 };
 
-UCLASS()
+UCLASS(meta = (DisplayName = "时间_在每月"))
 class ARPG_API UBTDecorator_ARPG_Time_InMonthRange : public UBTDecorator_ARPG_TimeBase
 {
 	GENERATED_BODY()
 public:
 	virtual bool CalculateRawConditionValue(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) const override;
 
+	virtual FString GetStaticDescription() const override;
 public:
 	UPROPERTY(EditAnywhere, Category = "时间")
 	FXD_EveryMonthConfig StartTime;
@@ -80,13 +84,14 @@ public:
 	FXD_EveryMonthConfig EndTime;
 };
 
-UCLASS()
+UCLASS(meta = (DisplayName = "时间_在每年"))
 class ARPG_API UBTDecorator_ARPG_Time_InYearRange : public UBTDecorator_ARPG_TimeBase
 {
 	GENERATED_BODY()
 public:
 	virtual bool CalculateRawConditionValue(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) const override;
 
+	virtual FString GetStaticDescription() const override;
 public:
 	UPROPERTY(EditAnywhere, Category = "时间")
 	FXD_EveryYearConfig StartTime;
@@ -95,13 +100,14 @@ public:
 	FXD_EveryYearConfig EndTime;
 };
 
-UCLASS()
+UCLASS(meta = (DisplayName = "时间_在特殊时间"))
 class ARPG_API UBTDecorator_ARPG_Time_InSpecialRange : public UBTDecorator_ARPG_TimeBase
 {
 	GENERATED_BODY()
 public:
 	virtual bool CalculateRawConditionValue(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) const override;
 
+	virtual FString GetStaticDescription() const override;
 public:
 	UPROPERTY(EditAnywhere, Category = "时间")
 	FXD_SpecialTimeConfig StartTime;
