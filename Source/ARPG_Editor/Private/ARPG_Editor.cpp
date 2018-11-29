@@ -9,6 +9,8 @@
 #include "ISettingsSection.h"
 #include "ARPG_EditorSettings.h"
 #include "XD_CampConfig_Customization.h"
+#include "ARPG_NavPath.h"
+#include "NavPathVisualizer.h"
 
 #define LOCTEXT_NAMESPACE "ARPG_Editor"
 
@@ -40,12 +42,21 @@ void FARPG_EditorModule::StartupModule()
 			);
 		}
 	}
+
+	{
+		TSharedPtr<FNavPathVisualizer> NavPathVisualizer = MakeShareable(new FNavPathVisualizer);
+		GUnrealEd->RegisterComponentVisualizer(UARPG_NavPathVisualHelper::StaticClass()->GetFName(), NavPathVisualizer);
+		NavPathVisualizer->OnRegister();
+	}
 }
 
 
 void FARPG_EditorModule::ShutdownModule()
 {
-
+	if (GUnrealEd)
+	{
+		GUnrealEd->UnregisterComponentVisualizer(UARPG_NavPathVisualHelper::StaticClass()->GetFName());
+	}
 }
 
 IMPLEMENT_MODULE(FARPG_EditorModule, ARPG_Editor);

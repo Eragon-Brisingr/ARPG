@@ -12,6 +12,9 @@ public class ARPG_Editor : ModuleRules
 
 		PrivateDependencyModuleNames.AddRange(new string[]
 		{
+            "NavigationSystem",
+            "ComponentVisualizers",
+
             "ARPG",
 			"XD_UnrealLibraryEx",
             "XD_UnrealLibraryEx_Editor",
