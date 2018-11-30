@@ -338,9 +338,9 @@ void ACharacterBase::MulticastPlayMontageSkipOwner_Implementation(UAnimMontage *
 	}
 }
 
-void ACharacterBase::StopMontage_Implementation()
+void ACharacterBase::StopMontage_Implementation(UAnimMontage* MontageToStop)
 {
-	StopAnimMontage();
+	StopAnimMontage(MontageToStop);
 }
 
 void ACharacterBase::PlayMontageToServer_Implementation(UAnimMontage * MontageToPlay, float InPlayRate /*= 1.f*/, FName StartSectionName /*= NAME_None*/)
