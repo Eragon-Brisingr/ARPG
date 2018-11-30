@@ -14,6 +14,9 @@ struct FARPG_NavPathPoint
 public:
 	UPROPERTY(EditAnywhere, Category = "路径")
 	FVector Location;
+
+	UPROPERTY(EditAnywhere, Category = "路径")
+	FRotator Rotation;
 };
 
 UCLASS()
@@ -32,6 +35,9 @@ class ARPG_API AARPG_NavPath : public AActor
 public:	
 	// Sets default values for this actor's properties
 	AARPG_NavPath();
+
+	UPROPERTY(EditAnywhere, Category = "路径")
+	uint8 bIsClosedLoop : 1;
 
 	UPROPERTY(EditAnywhere, Category = "路径")
 	TArray<FARPG_NavPathPoint> NavPathPoints;
