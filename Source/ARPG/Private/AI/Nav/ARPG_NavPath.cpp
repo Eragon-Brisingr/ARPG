@@ -10,6 +10,7 @@ AARPG_NavPath::AARPG_NavPath()
 
 #if WITH_EDITORONLY_DATA
 	VisualControl = CreateEditorOnlyDefaultSubobject<UARPG_NavPathVisualHelper>(GET_MEMBER_NAME_CHECKED(AARPG_NavPath, VisualControl));
+	VisualControl->bIsEditorOnly = true;
 	SetRootComponent(VisualControl);
 #endif
 }
@@ -21,6 +22,9 @@ void AARPG_NavPath::OnConstruction(const FTransform& Transform)
 	for (int32 i = 0; i < NavPathPoints.Num(); ++i)
 	{
 		NavPathPoints[i].Location = VisualControl->GetLocationAtSplinePoint(i, ESplineCoordinateSpace::World);
+		NavPathPoints[i].Rotation = VisualControl->GetRotationAtSplinePoint(i, ESplineCoordinateSpace::World);
 	}
+
+	VisualControl->SetClosedLoop(bIsClosedLoop);
 }
 #endif

@@ -22,9 +22,9 @@ EBTNodeResult::Type UBTTask_ARPG_FollowPathMove::ExecuteTask(UBehaviorTreeCompon
 		{
 			FARPG_FollowPathMoveMemory* FollowPathMoveMemory = reinterpret_cast<FARPG_FollowPathMoveMemory*>(NodeMemory);
 
-			FollowPathMoveMemory->CurrentPointIndex = FollowPathMoveConfig.GetDefaultObject()->GetStartFollowPathMoveIndex(Character, Path.Get(), FollowPathMoveMemory->CurrentPointIndex);
-			FollowPathMoveMemory->CurrentPointIndex %= Path->NavPathPoints.Num();
-			UARPG_MoveUtils::ARPG_MoveToLocation(Character, Path->NavPathPoints[FollowPathMoveMemory->CurrentPointIndex].Location, FOnARPG_MoveFinished::CreateUObject(this, &UBTTask_ARPG_FollowPathMove::WhenMoveFinished, &OwnerComp, NodeMemory), AcceptableRadius, false, true, true, true, FilterClass, false);
+			FollowPathMoveMemory->TargetPointIndex = FollowPathMoveConfig.GetDefaultObject()->GetStartFollowPathMoveIndex(Character, Path.Get(), FollowPathMoveMemory->TargetPointIndex);
+			FollowPathMoveMemory->TargetPointIndex %= Path->NavPathPoints.Num();
+			UARPG_MoveUtils::ARPG_MoveToLocation(Character, Path->NavPathPoints[FollowPathMoveMemory->TargetPointIndex].Location, FOnARPG_MoveFinished::CreateUObject(this, &UBTTask_ARPG_FollowPathMove::WhenMoveFinished, &OwnerComp, NodeMemory), AcceptableRadius, false, true, true, true, FilterClass, false);
 			return EBTNodeResult::InProgress;
 		}
 	}
@@ -41,23 +41,45 @@ EBTNodeResult::Type UBTTask_ARPG_FollowPathMove::AbortTask(UBehaviorTreeComponen
 
 void UBTTask_ARPG_FollowPathMove::WhenMoveFinished(const FPathFollowingResult& Result, UBehaviorTreeComponent* OwnerComp, uint8* NodeMemory)
 {
-	switch (Result.Code)
+	if (Path)
 	{
-	case EPathFollowingResult::Aborted:
-	case EPathFollowingResult::Invalid:
-		return;
-		
-	case EPathFollowingResult::Success:
-	case EPathFollowingResult::OffPath:
-	default:
-		AAIController* MyController = OwnerComp->GetAIOwner();
-		if (ACharacterBase* Character = Cast<ACharacterBase>(MyController->GetPawn()))
+		switch (Result.Code)
 		{
-			FARPG_FollowPathMoveMemory* FollowPathMoveMemory = reinterpret_cast<FARPG_FollowPathMoveMemory*>(NodeMemory);
-			FollowPathMoveMemory->CurrentPointIndex = FollowPathMoveMemory->CurrentPointIndex + 1;
-			FollowPathMoveMemory->CurrentPointIndex %= Path->NavPathPoints.Num();
-			UARPG_MoveUtils::ARPG_MoveToLocation(Character, Path->NavPathPoints[FollowPathMoveMemory->CurrentPointIndex].Location, FOnARPG_MoveFinished::CreateUObject(this, &UBTTask_ARPG_FollowPathMove::WhenMoveFinished, OwnerComp, NodeMemory), AcceptableRadius, false, true, true, true, FilterClass, false);
+		case EPathFollowingResult::Aborted:
+		case EPathFollowingResult::Invalid:
+			return;
+
+		case EPathFollowingResult::Success:
+		case EPathFollowingResult::OffPath:
+		default:
+			AAIController * MyController = OwnerComp->GetAIOwner();
+			if (ACharacterBase* Character = Cast<ACharacterBase>(MyController->GetPawn()))
+			{
+				FARPG_FollowPathMoveMemory* FollowPathMoveMemory = reinterpret_cast<FARPG_FollowPathMoveMemory*>(NodeMemory);
+				if (Path->bIsClosedLoop)
+				{
+					FollowPathMoveMemory->TargetPointIndex += 1;
+					FollowPathMoveMemory->TargetPointIndex %= Path->NavPathPoints.Num();
+				}
+				else
+				{
+					if (FollowPathMoveMemory->TargetPointIndex == 0)
+					{
+						FollowPathMoveMemory->bMoveReverse = false;
+					}
+					else if (FollowPathMoveMemory->TargetPointIndex == Path->NavPathPoints.Num() - 1)
+					{
+						FollowPathMoveMemory->bMoveReverse = true;
+					}
+					FollowPathMoveMemory->TargetPointIndex += FollowPathMoveMemory->bMoveReverse ? -1 : 1;
+				}
+				UARPG_MoveUtils::ARPG_MoveToLocation(Character, Path->NavPathPoints[FollowPathMoveMemory->TargetPointIndex].Location, FOnARPG_MoveFinished::CreateUObject(this, &UBTTask_ARPG_FollowPathMove::WhenMoveFinished, OwnerComp, NodeMemory), AcceptableRadius, false, true, true, true, FilterClass, false);
+			}
 		}
+	}
+	else
+	{
+		FinishLatentTask(*OwnerComp, EBTNodeResult::Failed);
 	}
 }
 

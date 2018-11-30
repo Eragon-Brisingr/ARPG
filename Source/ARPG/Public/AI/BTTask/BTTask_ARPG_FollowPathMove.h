@@ -12,7 +12,8 @@
  */
 struct FARPG_FollowPathMoveMemory
 {
-	int32 CurrentPointIndex = -1;
+	int32 TargetPointIndex = -1;
+	uint8 bMoveReverse : 1;
 };
 
 UCLASS(meta = (DisplayName = "沿路径移动"))
