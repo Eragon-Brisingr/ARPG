@@ -142,9 +142,9 @@ public:
 	bool MulticastPlayMontageSkipOwner_Validate(UAnimMontage * MontageToPlay, float InPlayRate = 1.f, FName StartSectionName = NAME_None) { return true; }
 
 	UFUNCTION(BlueprintCallable, Category = "角色|行为", Reliable, WithValidation, NetMulticast)
-	void StopMontage();
-	virtual void StopMontage_Implementation();
-	bool StopMontage_Validate() { return true; }
+	void StopMontage(UAnimMontage* MontageToStop = nullptr);
+	virtual void StopMontage_Implementation(UAnimMontage* MontageToStop = nullptr);
+	bool StopMontage_Validate(UAnimMontage* MontageToStop = nullptr) { return true; }
 
 	UFUNCTION(Reliable, WithValidation, Server)
 	void PlayMontageToServer(UAnimMontage * MontageToPlay, float InPlayRate = 1.f, FName StartSectionName = NAME_None);

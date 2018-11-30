@@ -14,6 +14,7 @@ struct FARPG_FollowPathMoveMemory
 {
 	int32 TargetPointIndex = -1;
 	uint8 bMoveReverse : 1;
+	class UARPG_CharacterBehaviorConfigBase* CurBehavior;
 };
 
 UCLASS(meta = (DisplayName = "沿路径移动"))
@@ -40,6 +41,8 @@ public:
 	virtual uint16 GetInstanceMemorySize() const override { return sizeof(FARPG_FollowPathMoveMemory); }
 
 	void WhenMoveFinished(const FPathFollowingResult& Result, UBehaviorTreeComponent* OwnerComp, uint8* NodeMemory);
+
+	void ExecuteBehavior(UBehaviorTreeComponent* OwnerComp, uint8* NodeMemory);
 };
 
 UCLASS()

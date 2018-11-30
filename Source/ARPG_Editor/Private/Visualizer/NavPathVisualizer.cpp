@@ -4,6 +4,9 @@
 #include "ARPG_NavPath.h"
 #include "NavigationSystem.h"
 #include "NavigationPath.h"
+#include "Behavior/ARPG_CharacterBehaviorBase.h"
+#include "DrawDebugHelpers.h"
+#include "MultiBoxBuilder.h"
 
 
 void DrawArrow(FPrimitiveDrawInterface* PDI, const FVector& StartLocation, const FVector& EndLocation, const FLinearColor& Color)
@@ -59,4 +62,9 @@ void FNavPathVisualizer::DrawVisualization(const UActorComponent* Component, con
 			}
 		}
 	}
+}
+
+TSharedPtr<SWidget> FNavPathVisualizer::GenerateContextMenu() const
+{
+	return nullptr;
 }

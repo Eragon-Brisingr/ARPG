@@ -17,6 +17,9 @@ public:
 
 	UPROPERTY(EditAnywhere, Category = "路径")
 	FRotator Rotation;
+
+	UPROPERTY(EditAnywhere, Category = "路径", Instanced)
+	class UARPG_CharacterBehaviorConfigBase* Behavior;
 };
 
 UCLASS()
