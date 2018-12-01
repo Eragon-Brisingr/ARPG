@@ -7,6 +7,8 @@
 #include "Engine/EngineTypes.h"
 #include "ARPG_CharacterBehaviorBase.generated.h"
 
+class UARPG_CharacterBehaviorConfigBase;
+
 /**
  * 
  */
@@ -22,8 +24,9 @@ public:
 	class ACharacterBase* Character;
 
 	UPROPERTY(BlueprintReadOnly, Category = "行为")
-	const class UARPG_CharacterBehaviorConfigBase* Config;
+	const UARPG_CharacterBehaviorConfigBase* Config;
 
+public:
 	virtual void ExecuteBehavior(class ACharacterBase* Executer, const FVector& Location, const FRotator& Rotation) { ReceiveExecuteBehavior(Executer, Location, Rotation); }
 	UFUNCTION(BlueprintImplementableEvent, Category = "行为", meta = (DisplayName = "ExecuteBehavior"))
 	void ReceiveExecuteBehavior(class ACharacterBase* Executer, const FVector& Location, const FRotator& Rotation);
@@ -33,6 +36,7 @@ public:
 	void ReceiveAbortBehavior(class ACharacterBase* Executer);
 	void ReceiveAbortBehavior_Implementation(class ACharacterBase* Executer) { OnBehaviorAbortFinished.ExecuteIfBound(); }
 
+public:
 	UFUNCTION(BlueprintCallable, Category = "行为")
 	void FinishExecute(bool Succeed);
 
@@ -44,6 +48,13 @@ public:
 
 	DECLARE_DELEGATE(FOnBehaviorAbortFinished);
 	FOnBehaviorAbortFinished OnBehaviorAbortFinished;
+
+public:
+	template<typename T>
+	const T* GetConfig() const { return Cast<T>(Config); }
+
+	UFUNCTION(BlueprintCallable, Category = "行为", meta = (DeterminesOutputType = "ConfigType"))
+	UARPG_CharacterBehaviorConfigBase* GetConfig(TSubclassOf<UARPG_CharacterBehaviorConfigBase> ConfigType) const { return const_cast<UARPG_CharacterBehaviorConfigBase*>(Config); }
 };
 
 UCLASS(abstract, EditInlineNew, collapsecategories, Blueprintable)
@@ -52,7 +63,7 @@ class ARPG_API UARPG_CharacterBehaviorConfigBase : public UObject
 	GENERATED_BODY()
 public:
 	UPROPERTY(EditDefaultsOnly, Category = "配置")
-	UClass* BehaviorType;
+	TSubclassOf<UARPG_CharacterBehaviorBase> BehaviorType;
 
 	UPROPERTY()
 	mutable TMap<class ACharacterBase*, class UARPG_CharacterBehaviorBase*> BehaviorMap;
