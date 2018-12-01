@@ -33,7 +33,7 @@ const class UCBC_PlayMontage* UCB_PlayMontage::GetConfig() const
 
 void UCB_PlayMontage::WhenMontageEnd()
 {
-	FinishBehavior(true);
+	FinishExecute(true);
 }
 
 UCBC_Wait::UCBC_Wait()
@@ -50,11 +50,11 @@ void UCB_Wait::ExecuteBehavior(class ACharacterBase* Executer, const FVector& Lo
 	float duration = GetConfig()->WaitTime + FMath::FRand() * RandomRange - RandomRange / 2.f;
 	if (duration > 0.f)
 	{
-		GetWorld()->GetTimerManager().SetTimer(TimerHandle, FTimerDelegate::CreateUObject(this, &UCB_Wait::FinishBehavior, true), duration, false);
+		GetWorld()->GetTimerManager().SetTimer(TimerHandle, FTimerDelegate::CreateUObject(this, &UCB_Wait::FinishExecute, true), duration, false);
 	}
 	else
 	{
-		FinishBehavior(true);
+		FinishExecute(true);
 	}
 }
 

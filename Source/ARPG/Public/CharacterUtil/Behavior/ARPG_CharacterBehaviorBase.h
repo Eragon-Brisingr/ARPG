@@ -29,14 +29,21 @@ public:
 	void ReceiveExecuteBehavior(class ACharacterBase* Executer, const FVector& Location, const FRotator& Rotation);
 
 	virtual void AbortBehavior(class ACharacterBase* Executer) { ReceiveAbortBehavior(Executer); }
-	UFUNCTION(BlueprintImplementableEvent, Category = "行为", meta = (DisplayName = "AbortBehavior"))
+	UFUNCTION(BlueprintNativeEvent, Category = "行为", meta = (DisplayName = "AbortBehavior"))
 	void ReceiveAbortBehavior(class ACharacterBase* Executer);
+	void ReceiveAbortBehavior_Implementation(class ACharacterBase* Executer) { OnBehaviorAbortFinished.ExecuteIfBound(); }
 
 	UFUNCTION(BlueprintCallable, Category = "行为")
-	void FinishBehavior(bool Succeed);
+	void FinishExecute(bool Succeed);
 
 	DECLARE_DELEGATE_OneParam(FOnBehaviorFinished, bool /*Succeed*/)
 	FOnBehaviorFinished OnBehaviorFinished;
+
+	UFUNCTION(BlueprintCallable, Category = "行为")
+	void FinishAbort();
+
+	DECLARE_DELEGATE(FOnBehaviorAbortFinished);
+	FOnBehaviorAbortFinished OnBehaviorAbortFinished;
 };
 
 UCLASS(abstract, EditInlineNew, collapsecategories, Blueprintable)
@@ -52,7 +59,7 @@ public:
 
 	void ExecuteBehavior(class ACharacterBase* Character, const FVector& Location, const FRotator& Rotation, const UARPG_CharacterBehaviorBase::FOnBehaviorFinished& OnBehaviorFinished) const;
 
-	void AbortBehavior(class ACharacterBase* Character);
+	void AbortBehavior(class ACharacterBase* Character, const UARPG_CharacterBehaviorBase::FOnBehaviorAbortFinished& OnBehaviorAbortFinished);
 
 	virtual FString GetDescribe() const;
 };
