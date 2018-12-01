@@ -20,11 +20,17 @@ AARPG_NavPath::AARPG_NavPath()
 #if WITH_EDITORONLY_DATA
 void AARPG_NavPath::OnConstruction(const FTransform& Transform)
 {
+	int32 PreNum = NavPathPoints.Num();
+
 	NavPathPoints.SetNum(VisualControl->GetNumberOfSplinePoints());
 	for (int32 i = 0; i < NavPathPoints.Num(); ++i)
 	{
 		NavPathPoints[i].Location = VisualControl->GetLocationAtSplinePoint(i, ESplineCoordinateSpace::World);
 		NavPathPoints[i].Rotation = VisualControl->GetRotationAtSplinePoint(i, ESplineCoordinateSpace::World);
+	}
+
+	for (int32 i = PreNum; i < NavPathPoints.Num(); ++i)
+	{
 		NavPathPoints[i].Behavior = NewObject<UCBC_Wait>(this);
 	}
 

@@ -33,9 +33,10 @@ public:
 	void ReceiveAbortBehavior(class ACharacterBase* Executer);
 
 	UFUNCTION(BlueprintCallable, Category = "行为")
-	void FinishBehavior();
+	void FinishBehavior(bool Succeed);
 
-	FSimpleDelegate OnFinishBehavior;
+	DECLARE_DELEGATE_OneParam(FOnBehaviorFinished, bool /*Succeed*/)
+	FOnBehaviorFinished OnBehaviorFinished;
 };
 
 UCLASS(abstract, EditInlineNew, collapsecategories, Blueprintable)
@@ -49,7 +50,7 @@ public:
 	UPROPERTY()
 	mutable TMap<class ACharacterBase*, class UARPG_CharacterBehaviorBase*> BehaviorMap;
 
-	void ExecuteBehavior(class ACharacterBase* Character, const FVector& Location, const FRotator& Rotation, const FSimpleDelegate& OnFinishBehavior) const;
+	void ExecuteBehavior(class ACharacterBase* Character, const FVector& Location, const FRotator& Rotation, const UARPG_CharacterBehaviorBase::FOnBehaviorFinished& OnBehaviorFinished) const;
 
 	void AbortBehavior(class ACharacterBase* Character);
 

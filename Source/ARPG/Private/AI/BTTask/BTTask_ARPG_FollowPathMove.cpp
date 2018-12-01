@@ -92,7 +92,7 @@ void UBTTask_ARPG_FollowPathMove::WhenMoveFinished(const FPathFollowingResult& R
 				FollowPathMoveMemory->CurBehavior = CurPoint.Behavior;
 				if (FollowPathMoveMemory->CurBehavior)
 				{
-					FollowPathMoveMemory->CurBehavior->ExecuteBehavior(Character, CurPoint.Location, CurPoint.Rotation, FSimpleDelegate::CreateUObject(this, &UBTTask_ARPG_FollowPathMove::ExecuteBehavior, OwnerComp, NodeMemory));
+					FollowPathMoveMemory->CurBehavior->ExecuteBehavior(Character, CurPoint.Location, CurPoint.Rotation, UARPG_CharacterBehaviorBase::FOnBehaviorFinished::CreateUObject(this, &UBTTask_ARPG_FollowPathMove::WhenBehaviorFinished, OwnerComp, NodeMemory));
 				}
 				else
 				{
@@ -107,7 +107,7 @@ void UBTTask_ARPG_FollowPathMove::WhenMoveFinished(const FPathFollowingResult& R
 	}
 }
 
-void UBTTask_ARPG_FollowPathMove::ExecuteBehavior(UBehaviorTreeComponent* OwnerComp, uint8* NodeMemory)
+void UBTTask_ARPG_FollowPathMove::WhenBehaviorFinished(bool Succeed, UBehaviorTreeComponent* OwnerComp, uint8* NodeMemory)
 {
 	FARPG_FollowPathMoveMemory* FollowPathMoveMemory = reinterpret_cast<FARPG_FollowPathMoveMemory*>(NodeMemory);
 	AAIController * MyController = OwnerComp->GetAIOwner();
@@ -117,6 +117,10 @@ void UBTTask_ARPG_FollowPathMove::ExecuteBehavior(UBehaviorTreeComponent* OwnerC
 		{
 			FollowPathMoveMemory->CurBehavior = nullptr;
 			UARPG_MoveUtils::ARPG_MoveToLocation(Character, Path->NavPathPoints[FollowPathMoveMemory->TargetPointIndex].Location, FOnARPG_MoveFinished::CreateUObject(this, &UBTTask_ARPG_FollowPathMove::WhenMoveFinished, OwnerComp, NodeMemory), AcceptableRadius, false, true, true, true, FilterClass, false);
+		}
+		else
+		{
+			FinishLatentTask(*OwnerComp, EBTNodeResult::Failed);
 		}
 	}
 }

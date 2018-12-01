@@ -3,18 +3,20 @@
 #include "ARPG_CharacterBehaviorBase.h"
 #include "CharacterBase.h"
 #include "XD_ObjectFunctionLibrary.h"
+#include "ARPG_AI_Log.h"
 
 UWorld* UARPG_CharacterBehaviorBase::GetWorld() const
 {
 	return Character->GetWorld();
 }
 
-void UARPG_CharacterBehaviorBase::FinishBehavior()
+void UARPG_CharacterBehaviorBase::FinishBehavior(bool Succeed)
 {
-	OnFinishBehavior.ExecuteIfBound();
+	OnBehaviorFinished.ExecuteIfBound(Succeed);
+	AI_V_Display_Log(Character, "行为[%s]结束，结果为", *UXD_ObjectFunctionLibrary::GetObjectClassName(this), Succeed ? TEXT("成功") : TEXT("失败"));
 }
 
-void UARPG_CharacterBehaviorConfigBase::ExecuteBehavior(class ACharacterBase* Character, const FVector& Location, const FRotator& Rotation, const FSimpleDelegate& OnFinishBehavior) const
+void UARPG_CharacterBehaviorConfigBase::ExecuteBehavior(class ACharacterBase* Character, const FVector& Location, const FRotator& Rotation, const UARPG_CharacterBehaviorBase::FOnBehaviorFinished& OnBehaviorFinished) const
 {
 	if (BehaviorType)
 	{
@@ -25,12 +27,15 @@ void UARPG_CharacterBehaviorConfigBase::ExecuteBehavior(class ACharacterBase* Ch
 			Behavior->Character = Character;
 			Behavior->Config = this;
 		}
-		Behavior->OnFinishBehavior = OnFinishBehavior;
+		Behavior->OnBehaviorFinished = OnBehaviorFinished;
 		Behavior->ExecuteBehavior(Character, Location, Rotation);
+
+		AI_V_Display_Log(Character, "执行行为[%s]", *UXD_ObjectFunctionLibrary::GetObjectClassName(this));
 	}
 	else
 	{
-		OnFinishBehavior.ExecuteIfBound();
+		AI_V_Error_Log(Character, "行为配置[%s]中未填写行为类型", *UXD_ObjectFunctionLibrary::GetObjectClassName(this));
+		OnBehaviorFinished.ExecuteIfBound(false);
 	}
 }
 
@@ -39,6 +44,7 @@ void UARPG_CharacterBehaviorConfigBase::AbortBehavior(class ACharacterBase* Char
 	if (UARPG_CharacterBehaviorBase** P_Behavior = BehaviorMap.Find(Character))
 	{
 		(*P_Behavior)->AbortBehavior(Character);
+		AI_V_Display_Log(Character, "行为[%s]中断", *UXD_ObjectFunctionLibrary::GetObjectClassName(this));
 	}
 }
 
