@@ -1,6 +1,7 @@
 ﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 #include "ARPG_NavPath.h"
+#include "ARPG_CharacterBehaviorImpl.h"
 
 // Sets default values
 AARPG_NavPath::AARPG_NavPath()
@@ -24,6 +25,7 @@ void AARPG_NavPath::OnConstruction(const FTransform& Transform)
 	{
 		NavPathPoints[i].Location = VisualControl->GetLocationAtSplinePoint(i, ESplineCoordinateSpace::World);
 		NavPathPoints[i].Rotation = VisualControl->GetRotationAtSplinePoint(i, ESplineCoordinateSpace::World);
+		NavPathPoints[i].Behavior = NewObject<UCBC_Wait>(this);
 	}
 
 	VisualControl->SetClosedLoop(bIsClosedLoop);
