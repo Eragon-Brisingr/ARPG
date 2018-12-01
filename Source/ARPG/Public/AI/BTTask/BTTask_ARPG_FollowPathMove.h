@@ -42,7 +42,7 @@ public:
 
 	void WhenMoveFinished(const FPathFollowingResult& Result, UBehaviorTreeComponent* OwnerComp, uint8* NodeMemory);
 
-	void ExecuteBehavior(UBehaviorTreeComponent* OwnerComp, uint8* NodeMemory);
+	void WhenBehaviorFinished(bool Succeed, UBehaviorTreeComponent* OwnerComp, uint8* NodeMemory);
 };
 
 UCLASS()
