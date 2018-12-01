@@ -9,6 +9,18 @@
 /**
  * 
  */
+USTRUCT()
+struct FRandomSelectBehaviorElement
+{
+	GENERATED_BODY()
+public:
+	UPROPERTY(EditAnywhere, Category = "容器")
+	float Weight = 1.f;
+
+	UPROPERTY(EditAnywhere, Category = "容器", Instanced)
+	UARPG_CharacterBehaviorConfigBase* Behavior;
+};
+
 UCLASS(meta = (DisplayName = "行为容器_随机选择"))
 class ARPG_API UCBC_RandomSelect : public UARPG_CharacterBehaviorConfigBase
 {
@@ -17,7 +29,7 @@ public:
 	UCBC_RandomSelect();
 
 	UPROPERTY(EditAnywhere, Category = "容器")
-	TMap<class UARPG_CharacterBehaviorConfigBase*, float> RandomMap;
+	TArray<FRandomSelectBehaviorElement> RandomBehaviors;
 };
 
 UCLASS()
@@ -30,4 +42,6 @@ public:
 	void AbortBehavior(class ACharacterBase* Executer) override;
 public:
 	const UCBC_RandomSelect* GetConfig() const;
+
+	UARPG_CharacterBehaviorConfigBase* CurrentBehavior;
 };
