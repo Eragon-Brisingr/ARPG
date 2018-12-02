@@ -10,7 +10,7 @@
  * 
  */
 
-UCLASS(meta = (DisplayName = "播放蒙太奇"))
+UCLASS(meta = (DisplayName = "行为_播放蒙太奇"))
 class ARPG_API UCBC_PlayMontage : public UARPG_CharacterBehaviorConfigBase
 {
 	GENERATED_BODY()
@@ -37,7 +37,7 @@ public:
 	void WhenMontageEnd();
 };
 
-UCLASS(meta = (DisplayName = "原地等待"))
+UCLASS(meta = (DisplayName = "行为_原地等待"))
 class ARPG_API UCBC_Wait : public UARPG_CharacterBehaviorConfigBase
 {
 	GENERATED_BODY()
@@ -63,5 +63,40 @@ public:
 	const UCBC_Wait* GetConfig() const;
 
 	FTimerHandle TimerHandle;
+};
+
+UCLASS(meta = (DisplayName = "行为_播放蒙太奇[状态]"))
+class ARPG_API UCBC_PlayStateMontage : public UARPG_CharacterBehaviorConfigBase
+{
+	GENERATED_BODY()
+public:
+	UCBC_PlayStateMontage();
+
+	UPROPERTY(EditAnywhere, Category = "行为")
+	UAnimMontage* StartMontage;
+
+	UPROPERTY(EditAnywhere, Category = "行为")
+	UAnimMontage* LoopMontage;
+
+	UPROPERTY(EditAnywhere, Category = "行为")
+	UAnimMontage* EndMontage;
+};
+
+UCLASS()
+class ARPG_API UCB_PlayStateMontage : public UARPG_CharacterBehaviorBase
+{
+	GENERATED_BODY()
+public:
+	void ExecuteBehavior(class ACharacterBase* Executer, const FVector& Location, const FRotator& Rotation) override;
+
+	void AbortBehavior(class ACharacterBase* Executer) override;
+
+	void WhenStartMontageEnd(UAnimMontage* Montage, bool bInterrupted, class ACharacterBase* Executer);
+
+	void WhenLoopMontageEnd(UAnimMontage* Montage, bool bInterrupted, class ACharacterBase* Executer);
+
+	void WhenEndMontageEnd(UAnimMontage* Montage, bool bInterrupted, class ACharacterBase* Executer);
+public:
+	const UCBC_PlayStateMontage* GetConfig() const;
 };
 
