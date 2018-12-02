@@ -51,7 +51,7 @@ public:
 
 public:
 	template<typename T>
-	const T* GetConfig() const { return Cast<T>(Config); }
+	const T* GetConfig() const { return Cast<const T>(Config); }
 
 	UFUNCTION(BlueprintCallable, Category = "行为", meta = (DeterminesOutputType = "ConfigType"))
 	UARPG_CharacterBehaviorConfigBase* GetConfig(TSubclassOf<UARPG_CharacterBehaviorConfigBase> ConfigType) const { return const_cast<UARPG_CharacterBehaviorConfigBase*>(Config); }
