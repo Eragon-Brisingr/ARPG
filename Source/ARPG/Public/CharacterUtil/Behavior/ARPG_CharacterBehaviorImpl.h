@@ -63,13 +63,25 @@ public:
 	FTimerHandle TimerHandle;
 };
 
-UCLASS(meta = (DisplayName = "行为_播放蒙太奇[状态]"))
-class ARPG_API UCBC_PlayStateMontage : public UARPG_CharacterBehaviorConfigBase
+UCLASS(abstract)
+class ARPG_API UCBC_PlayStateMontageBase : public UARPG_CharacterBehaviorConfigBase
 {
 	GENERATED_BODY()
 public:
-	UCBC_PlayStateMontage();
+	UCBC_PlayStateMontageBase();
 
+	virtual UAnimMontage* GetStartMontage() const { return nullptr; }
+
+	virtual UAnimMontage* GetLoopMontage() const { return nullptr; }
+
+	virtual UAnimMontage* GetEndMontage() const { return nullptr; }
+};
+
+UCLASS(meta = (DisplayName = "行为_播放蒙太奇[状态]简单"))
+class ARPG_API UCBC_PlayStateMontageSimple : public UCBC_PlayStateMontageBase
+{
+	GENERATED_BODY()
+public:
 	UPROPERTY(EditAnywhere, Category = "行为")
 	UAnimMontage* StartMontage;
 
@@ -78,6 +90,36 @@ public:
 
 	UPROPERTY(EditAnywhere, Category = "行为")
 	UAnimMontage* EndMontage;
+
+public:
+	virtual UAnimMontage* GetStartMontage() const { return StartMontage; }
+
+	virtual UAnimMontage* GetLoopMontage() const { return LoopMontage; }
+
+	virtual UAnimMontage* GetEndMontage() const { return EndMontage; }
+};
+
+UCLASS(meta = (DisplayName = "行为_播放蒙太奇[状态]简单随机"))
+class ARPG_API UCBC_PlayStateMontageRandom : public UCBC_PlayStateMontageBase
+{
+	GENERATED_BODY()
+public:
+	UCBC_PlayStateMontageRandom();
+
+	virtual UAnimMontage* GetStartMontage() const;
+
+	virtual UAnimMontage* GetLoopMontage() const;
+
+	virtual UAnimMontage* GetEndMontage() const;
+public:
+	UPROPERTY(EditAnywhere, Category = "行为")
+	TArray<UAnimMontage*> StartMontages;
+
+	UPROPERTY(EditAnywhere, Category = "行为")
+	TArray<UAnimMontage*> LoopMontages;
+
+	UPROPERTY(EditAnywhere, Category = "行为")
+	TArray<UAnimMontage*> EndMontages;
 };
 
 UCLASS()
@@ -89,13 +131,13 @@ public:
 
 	void AbortBehavior(class ACharacterBase* Executer) override;
 
-	void WhenStartMontageEnd(UAnimMontage* Montage, bool bInterrupted, class ACharacterBase* Executer);
+	void WhenStartMontageBlendingOutStarted(UAnimMontage* Montage, bool bInterrupted, class ACharacterBase* Executer);
 
-	void WhenLoopMontageEnd(UAnimMontage* Montage, bool bInterrupted, class ACharacterBase* Executer);
+	void WhenLoopMontageBlendingOutStarted(UAnimMontage* Montage, bool bInterrupted, class ACharacterBase* Executer);
 
-	void WhenEndMontageEnd(UAnimMontage* Montage, bool bInterrupted, class ACharacterBase* Executer);
+	void WhenEndMontageBlendingOutStarted(UAnimMontage* Montage, bool bInterrupted, class ACharacterBase* Executer);
 public:
-	const UCBC_PlayStateMontage* GetConfig() const;
+	const UCBC_PlayStateMontageBase* GetConfig() const;
 
 	UAnimMontage* CurrentMontage;
 };
