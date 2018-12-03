@@ -32,9 +32,7 @@ public:
 
 	const class UCBC_PlayMontage* GetConfig() const;
 public:
-	FTimerHandle TimerHandle;
-
-	void WhenMontageEnd();
+	void WhenMontageEnd(UAnimMontage* Montage, bool bInterrupted);
 };
 
 UCLASS(meta = (DisplayName = "行为_原地等待"))
@@ -98,5 +96,7 @@ public:
 	void WhenEndMontageEnd(UAnimMontage* Montage, bool bInterrupted, class ACharacterBase* Executer);
 public:
 	const UCBC_PlayStateMontage* GetConfig() const;
+
+	UAnimMontage* CurrentMontage;
 };
 
