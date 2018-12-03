@@ -64,11 +64,11 @@ public:
 };
 
 UCLASS(abstract)
-class ARPG_API UCBC_PlayStateMontageBase : public UARPG_CharacterBehaviorConfigBase
+class ARPG_API UCBC_PlayStateMontageSimpleBase : public UARPG_CharacterBehaviorConfigBase
 {
 	GENERATED_BODY()
 public:
-	UCBC_PlayStateMontageBase();
+	UCBC_PlayStateMontageSimpleBase();
 
 	virtual UAnimMontage* GetStartMontage() const { return nullptr; }
 
@@ -78,7 +78,7 @@ public:
 };
 
 UCLASS(meta = (DisplayName = "行为_播放蒙太奇[状态]简单"))
-class ARPG_API UCBC_PlayStateMontageSimple : public UCBC_PlayStateMontageBase
+class ARPG_API UCBC_PlayStateMontageSimple : public UCBC_PlayStateMontageSimpleBase
 {
 	GENERATED_BODY()
 public:
@@ -92,25 +92,25 @@ public:
 	UAnimMontage* EndMontage;
 
 public:
-	virtual UAnimMontage* GetStartMontage() const { return StartMontage; }
+	UAnimMontage* GetStartMontage() const override { return StartMontage; }
 
-	virtual UAnimMontage* GetLoopMontage() const { return LoopMontage; }
+	UAnimMontage* GetLoopMontage() const override { return LoopMontage; }
 
-	virtual UAnimMontage* GetEndMontage() const { return EndMontage; }
+	UAnimMontage* GetEndMontage() const override { return EndMontage; }
 };
 
 UCLASS(meta = (DisplayName = "行为_播放蒙太奇[状态]简单随机"))
-class ARPG_API UCBC_PlayStateMontageRandom : public UCBC_PlayStateMontageBase
+class ARPG_API UCBC_PlayStateMontageSimpleRandom : public UCBC_PlayStateMontageSimpleBase
 {
 	GENERATED_BODY()
 public:
-	UCBC_PlayStateMontageRandom();
+	UCBC_PlayStateMontageSimpleRandom();
 
-	virtual UAnimMontage* GetStartMontage() const;
+	UAnimMontage* GetStartMontage() const override;
 
-	virtual UAnimMontage* GetLoopMontage() const;
+	UAnimMontage* GetLoopMontage() const override;
 
-	virtual UAnimMontage* GetEndMontage() const;
+	UAnimMontage* GetEndMontage() const override;
 public:
 	UPROPERTY(EditAnywhere, Category = "行为")
 	TArray<UAnimMontage*> StartMontages;
@@ -122,8 +122,8 @@ public:
 	TArray<UAnimMontage*> EndMontages;
 };
 
-UCLASS()
-class ARPG_API UCB_PlayStateMontage : public UARPG_CharacterBehaviorBase
+UCLASS(abstract)
+class ARPG_API UCB_PlayStateMontageBase : public UARPG_CharacterBehaviorBase
 {
 	GENERATED_BODY()
 public:
@@ -137,8 +137,25 @@ public:
 
 	void WhenEndMontageBlendingOutStarted(UAnimMontage* Montage, bool bInterrupted, class ACharacterBase* Executer);
 public:
-	const UCBC_PlayStateMontageBase* GetConfig() const;
-
 	UAnimMontage* CurrentMontage;
+
+	virtual UAnimMontage* GetStartMontage() const { return nullptr; }
+
+	virtual UAnimMontage* GetLoopMontage() const { return nullptr; }
+
+	virtual UAnimMontage* GetEndMontage() const { return nullptr; }
 };
 
+UCLASS()
+class ARPG_API UCB_PlayStateMontageSimple : public UCB_PlayStateMontageBase
+{
+	GENERATED_BODY()
+public:
+	const UCBC_PlayStateMontageSimpleBase* GetConfig() const;
+
+	virtual UAnimMontage* GetStartMontage() const;
+
+	virtual UAnimMontage* GetLoopMontage() const;
+
+	virtual UAnimMontage* GetEndMontage() const;
+};
