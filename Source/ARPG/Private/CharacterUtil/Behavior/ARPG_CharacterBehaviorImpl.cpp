@@ -230,3 +230,47 @@ UAnimMontage* UCB_PlayStateMontageSimple::GetEndMontage() const
 {
 	return GetConfig()->GetEndMontage();
 }
+
+UCBC_PlayStateMontageStandard::UCBC_PlayStateMontageStandard()
+{
+	BehaviorType = UCB_PlayStateMontageStandard::StaticClass();
+
+	LoopConfig.Add(FPlayStateMontageStandardConfig());
+}
+
+const UCBC_PlayStateMontageStandard* UCB_PlayStateMontageStandard::GetConfig() const
+{
+	return UARPG_CharacterBehaviorBase::GetConfig<UCBC_PlayStateMontageStandard>();
+}
+
+UAnimMontage* UCB_PlayStateMontageStandard::GetStartMontage() const
+{
+	const TArray<UAnimMontage*>& StartMontages = GetConfig()->StartMontages;
+	if (StartMontages.Num() > 0)
+	{
+		return StartMontages[FMath::RandHelper(StartMontages.Num())];
+	}
+	return nullptr;
+}
+
+UAnimMontage* UCB_PlayStateMontageStandard::GetLoopMontage() const
+{
+	const TArray<FPlayStateMontageStandardConfig>& LoopConfig = GetConfig()->LoopConfig;
+	if (LoopConfig.Num() > 0)
+	{
+		CurLoopRandomIndex = FMath::RandHelper(LoopConfig.Num());
+		return LoopConfig[CurLoopRandomIndex].LoopMontage;
+	}
+	return nullptr;
+}
+
+UAnimMontage* UCB_PlayStateMontageStandard::GetEndMontage() const
+{
+	const TArray<FPlayStateMontageStandardConfig>& LoopConfig = GetConfig()->LoopConfig;
+	if (CurLoopRandomIndex < LoopConfig.Num())
+	{
+		const TArray<UAnimMontage*>& EndMontages = LoopConfig[CurLoopRandomIndex].EndMontages;
+		return EndMontages[FMath::RandHelper(EndMontages.Num())];
+	}
+	return nullptr;
+}

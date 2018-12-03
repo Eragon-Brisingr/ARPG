@@ -62,7 +62,7 @@ class ARPG_API UARPG_CharacterBehaviorConfigBase : public UObject
 {
 	GENERATED_BODY()
 public:
-	UPROPERTY(EditDefaultsOnly, Category = "配置")
+	UPROPERTY(EditDefaultsOnly, Category = "配置", Transient)
 	TSubclassOf<UARPG_CharacterBehaviorBase> BehaviorType;
 
 	UPROPERTY()
