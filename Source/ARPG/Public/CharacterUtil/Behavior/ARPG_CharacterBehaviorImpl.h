@@ -159,3 +159,45 @@ public:
 
 	virtual UAnimMontage* GetEndMontage() const;
 };
+
+USTRUCT()
+struct FPlayStateMontageStandardConfig
+{
+	GENERATED_BODY()
+public:
+	UPROPERTY(EditAnywhere, Category = "行为")
+	UAnimMontage* LoopMontage;
+
+	UPROPERTY(EditAnywhere, Category = "行为")
+	TArray<UAnimMontage*> EndMontages{nullptr};
+};
+
+UCLASS(meta = (DisplayName = "行为_播放蒙太奇[状态]标准"))
+class ARPG_API UCBC_PlayStateMontageStandard : public UARPG_CharacterBehaviorConfigBase
+{
+	GENERATED_BODY()
+public:
+	UCBC_PlayStateMontageStandard();
+
+	UPROPERTY(EditAnywhere, Category = "行为")
+	TArray<UAnimMontage*> StartMontages;
+
+	UPROPERTY(EditAnywhere, Category = "行为")
+	TArray<FPlayStateMontageStandardConfig> LoopConfig;
+};
+
+UCLASS()
+class ARPG_API UCB_PlayStateMontageStandard : public UCB_PlayStateMontageBase
+{
+	GENERATED_BODY()
+public:
+	const UCBC_PlayStateMontageStandard* GetConfig() const;
+
+	UAnimMontage* GetStartMontage() const override;
+
+	UAnimMontage* GetLoopMontage() const override;
+
+	UAnimMontage* GetEndMontage() const override;
+
+	mutable int32 CurLoopRandomIndex;
+};
