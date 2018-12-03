@@ -6,6 +6,8 @@
 #include "ARPG_CharacterBehaviorBase.h"
 #include "ARPG_CharacterBehaviorContainer.generated.h"
 
+class ACharacterBase;
+
 /**
  * 
  */
@@ -37,11 +39,43 @@ class ARPG_API UCB_RandomSelect : public UARPG_CharacterBehaviorBase
 {
 	GENERATED_BODY()
 public:
-	void ExecuteBehavior(class ACharacterBase* Executer, const FVector& Location, const FRotator& Rotation) override;
+	void ExecuteBehavior(ACharacterBase* Executer, const FVector& Location, const FRotator& Rotation) override;
 
-	void AbortBehavior(class ACharacterBase* Executer) override;
+	void AbortBehavior(ACharacterBase* Executer) override;
 public:
 	const UCBC_RandomSelect* GetConfig() const;
 
 	UARPG_CharacterBehaviorConfigBase* CurrentBehavior;
+};
+
+UCLASS(meta = (DisplayName = "行为容器_顺序执行"))
+class ARPG_API UCBC_Sequence : public UARPG_CharacterBehaviorConfigBase
+{
+	GENERATED_BODY()
+public:
+	UCBC_Sequence();
+
+	UPROPERTY(EditAnywhere, Category = "容器", Instanced)
+	TArray<UARPG_CharacterBehaviorConfigBase*> Behaviors;
+};
+
+UCLASS()
+class ARPG_API UCB_Sequence : public UARPG_CharacterBehaviorBase
+{
+	GENERATED_BODY()
+public:
+	void ExecuteBehavior(ACharacterBase* Executer, const FVector& Location, const FRotator& Rotation) override;
+
+	void AbortBehavior(ACharacterBase* Executer) override;
+
+	const UCBC_Sequence* GetConfig() const;
+
+	void WhenElementBehaviorFinished(bool Succeed, ACharacterBase* Executer, FVector Location, FRotator Rotation);
+
+	void WhenElementBehaviorAbortFinished();
+
+	void ExecuteElement(ACharacterBase* Executer, const FVector& Location, const FRotator& Rotation);
+
+public:
+	int32 ExecuteIndex;
 };
