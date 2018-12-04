@@ -339,16 +339,3 @@ UARPG_CharacterMove_AsyncAction* UARPG_CharacterMove_AsyncAction::SettingRequest
 	}
 	return CharacterMove_AsyncAction;
 }
-
-UARPG_Test_AsyncAction* UARPG_Test_AsyncAction::AsyncActionTest(UObject* WorldContextObject, float Duration)
-{
-	UARPG_Test_AsyncAction* ARPG_Test_AsyncAction = NewObject<UARPG_Test_AsyncAction>(WorldContextObject);
-	FTimerHandle Handle;
-	WorldContextObject->GetWorld()->GetTimerManager().SetTimer(Handle, ARPG_Test_AsyncAction, &UARPG_Test_AsyncAction::Do, Duration);
-	return ARPG_Test_AsyncAction;
-}
-
-void UARPG_Test_AsyncAction::Do()
-{
-	Test_AsyncAction.Broadcast();
-}
