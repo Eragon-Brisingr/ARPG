@@ -6,6 +6,12 @@
 #include "ARPG_CharacterBehaviorBase.h"
 
 #if WITH_EDITOR
+
+UBTTask_CharacterBehavior::UBTTask_CharacterBehavior()
+{
+	NodeName = TEXT("角色行为");
+}
+
 void UBTTask_CharacterBehavior::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
 {
 	Super::PostEditChangeProperty(PropertyChangedEvent);

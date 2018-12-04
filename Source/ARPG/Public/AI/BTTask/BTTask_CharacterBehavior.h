@@ -11,11 +11,13 @@ class AActor;
 /**
  * 
  */
-UCLASS()
+UCLASS(meta = (DisplayName = "角色行为"))
 class ARPG_API UBTTask_CharacterBehavior : public UBTTaskNode
 {
 	GENERATED_BODY()
 public:
+	UBTTask_CharacterBehavior();
+
 	UPROPERTY(EditAnywhere, Category = "行为", Instanced)
 	class UARPG_CharacterBehaviorConfigBase* Behavior;
 
