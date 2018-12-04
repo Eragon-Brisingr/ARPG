@@ -32,9 +32,9 @@ private:
 public:
 	static class UPathFollowingComponent* GetPathFollowingComponent(const class AController* Controller);
 
-	static void ARPG_MoveToActor(class ACharacterBase* Character, AActor* Goal, const FOnARPG_MoveFinished& OnARPG_MoveFinished, float AcceptanceRadius, bool bStopOnOverlap, bool bUsePathfinding, bool bCanStrafe, TSubclassOf<class UNavigationQueryFilter> FilterClass, bool bAllowPartialPaths);
+	static void ARPG_MoveToActor(class ACharacterBase* Character, AActor* Goal, const FOnARPG_MoveFinished& OnARPG_MoveFinished, float AcceptanceRadius = 5.f, bool bStopOnOverlap = true, bool bUsePathfinding = true, bool bCanStrafe = true, TSubclassOf<class UNavigationQueryFilter> FilterClass = nullptr, bool bAllowPartialPaths = true);
 
-	static void ARPG_MoveToLocation(class ACharacterBase* Character, const FVector& Dest, const FOnARPG_MoveFinished& OnARPG_MoveFinished, float AcceptanceRadius, bool bStopOnOverlap, bool bUsePathfinding, bool bProjectDestinationToNavigation, bool bCanStrafe, TSubclassOf<UNavigationQueryFilter> FilterClass, bool bAllowPartialPaths);
+	static void ARPG_MoveToLocation(class ACharacterBase* Character, const FVector& Dest, const FOnARPG_MoveFinished& OnARPG_MoveFinished, float AcceptanceRadius = 5.f, bool bStopOnOverlap = true, bool bUsePathfinding = true, bool bProjectDestinationToNavigation = false, bool bCanStrafe = true, TSubclassOf<UNavigationQueryFilter> FilterClass = nullptr, bool bAllowPartialPaths = true);
 
 	static void SettingRequest(FPathFollowingRequestResult &ResultData, class ACharacterBase* Character, const FOnARPG_MoveFinished &OnARPG_MoveFinished);
 
@@ -64,19 +64,4 @@ public:
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnMoveFinishedSignature, TEnumAsByte<EPathFollowingResult::Type>, MoveResult, class ACharacterBase*, Mover);
 	UPROPERTY(BlueprintAssignable)
 	FOnMoveFinishedSignature OnMoveFinished;
-};
-
-UCLASS()
-class ARPG_API UARPG_Test_AsyncAction : public UBlueprintAsyncActionBase
-{
-	GENERATED_BODY()
-public:
-	UFUNCTION(BlueprintCallable, Category = "Test", meta = (BlueprintInternalUseOnly = "true", WorldContext = "WorldContextObject", DisplayName = "Test"))
-	static UARPG_Test_AsyncAction* AsyncActionTest(UObject* WorldContextObject, float Duration);
-
-	void Do();
-
-	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FTest_AsyncAction);
-	UPROPERTY(BlueprintAssignable)
-	FTest_AsyncAction Test_AsyncAction;
 };
