@@ -5,7 +5,7 @@
 
 AARPG_InteractableActorBase::AARPG_InteractableActorBase()
 {
-	InteractableActorManager = CreateDefaultSubobject<UARPG_InteractableActorManagerSample>(GET_MEMBER_NAME_CHECKED(AARPG_InteractableActorBase, InteractableActorManager));
+	InteractableActorManager = CreateDefaultSubobject<UInteractableActorManager_Simple>(GET_MEMBER_NAME_CHECKED(AARPG_InteractableActorBase, InteractableActorManager));
 }
 
 void AARPG_InteractableActorBase::StartInteract(ACharacterBase* Invoker, const FOnInteractFinished& OnInteractFinished)

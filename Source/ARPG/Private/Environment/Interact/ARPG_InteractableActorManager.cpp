@@ -82,14 +82,14 @@ void UARPG_InteractableActorManagerBase::WhenBehaviorAbortFinished(ACharacterBas
 	OnInteractAbortFinished.ExecuteIfBound();
 }
 
-void UARPG_InteractableActorManagerBase::GetInteractableLocationAndRotation(ACharacterBase* Invoker, FVector& Location, FRotator& Rotation) const
+void UARPG_InteractableActorManagerBase::GetInteractableLocationAndRotation(ACharacterBase* Invoker, FVector& InteractableLocation, FRotator& InteractableRotation) const
 {
-	Location = GetOwner()->GetActorLocation();
-	Rotation = GetOwner()->GetActorRotation();
+	InteractableLocation = GetOwner()->GetActorLocation();
+	InteractableRotation = GetOwner()->GetActorRotation();
 }
 
-void UARPG_InteractableActorManagerSample::GetInteractableLocationAndRotation(ACharacterBase* Invoker, FVector& Location, FRotator& Rotation) const
+void UInteractableActorManager_Simple::GetInteractableLocationAndRotation(ACharacterBase* Invoker, FVector& InteractableLocation, FRotator& InteractableRotation) const
 {
-	Location = GetOwner()->GetActorTransform().TransformPosition(Position.GetLocation());
-	Rotation = GetOwner()->GetActorTransform().TransformRotation(Position.GetRotation()).Rotator();
+	InteractableLocation = GetOwner()->GetActorTransform().TransformPosition(Location);
+	InteractableRotation = GetOwner()->GetActorTransform().TransformRotation(Rotation.Quaternion()).Rotator();
 }
