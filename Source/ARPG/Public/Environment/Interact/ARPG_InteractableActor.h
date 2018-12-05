@@ -11,14 +11,12 @@
 class ACharacterBase;
 class UARPG_InteractableActorManagerBase;
 
-UCLASS()
+UCLASS(abstract, NotBlueprintable)
 class ARPG_API AARPG_InteractableActorBase : public AActor,
 	public IARPG_InteractInterface
 {
 	GENERATED_BODY()
 public:
-	AARPG_InteractableActorBase();
-
 	UPROPERTY(VisibleAnywhere, Category = "行为")
 	UARPG_InteractableActorManagerBase* InteractableActorManager;
 
@@ -29,4 +27,12 @@ public:
 	virtual bool CanInteract_Implementation(const class ACharacterBase* InteractInvoker) const;
 
 	virtual void WhenInvokeInteract_Implementation(class ACharacterBase* InteractInvoker);
+};
+
+UCLASS(meta = (DisplayName = "单人交互Actor"), Blueprintable)
+class ARPG_API AARPG_InteractableActorSingle : public AARPG_InteractableActorBase
+{
+	GENERATED_BODY()
+public:
+	AARPG_InteractableActorSingle();
 };

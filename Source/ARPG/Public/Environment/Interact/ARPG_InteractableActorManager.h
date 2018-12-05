@@ -29,8 +29,6 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 public:
-	virtual bool CanInteract(const ACharacterBase* Invoker) const { return false; }
-
 	void StartInteract(ACharacterBase* Invoker, const FOnInteractFinished& OnInteractFinished);
 
 	void WhenMoveFinished(const FPathFollowingResult& Result, ACharacterBase* Invoker, FVector Location, FRotator Rotation, FOnInteractFinished OnInteractFinished);
@@ -39,7 +37,10 @@ public:
 
 	void WhenBehaviorAbortFinished(ACharacterBase* Invoker, FOnInteractAbortFinished OnInteractAbortFinished);
 
-	virtual class UARPG_CharacterBehaviorConfigBase* GetBehavior() const { return nullptr; }
+public:
+	virtual class UARPG_CharacterBehaviorConfigBase* GetBehavior(ACharacterBase* Invoker, const FVector& InteractableLocation) const { return nullptr; }
+	virtual bool CanInteract(const ACharacterBase* Invoker) const { return false; }
+	virtual void PostMoveFinished(ACharacterBase* Invoker) {}
 public:
 	virtual void WhenBeginInteract(ACharacterBase* Invoker) {}
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnBeginInteract, AActor*, Which, class UARPG_InteractableActorManagerBase*, Manager, class ACharacterBase*, Who);
@@ -51,17 +52,37 @@ public:
 	UPROPERTY(BlueprintAssignable, Category = "交互")
 	FOnEndInteract OnEndInteract;
 private:
+	UPROPERTY()
+	TMap<ACharacterBase*, UARPG_CharacterBehaviorConfigBase*> CurBehaviorMap;
+
 	virtual void GetInteractableLocationAndRotation(ACharacterBase* Invoker, FVector& InteractableLocation, FRotator& InteractableRotation) const;
 };
 
-UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent, DisplayName = "交互管理器_单人使用"))
-class ARPG_API UInteractableActorManager_Simple : public UARPG_InteractableActorManagerBase
+USTRUCT()
+struct ARPG_API FPositionWithBehavior
 {
 	GENERATED_BODY()
 public:
+	UPROPERTY(EditAnywhere, Category = "行为", Instanced)
+	UARPG_CharacterBehaviorConfigBase* Behavior;
+
+	UPROPERTY(EditAnywhere, Category = "行为")
+	FVector Location;
+
+	UPROPERTY(EditAnywhere, Category = "行为")
+	FRotator Rotation;
+};
+
+UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent, DisplayName = "交互管理器_单人使用"))
+class ARPG_API UInteractableActorManagerSingle : public UARPG_InteractableActorManagerBase
+{
+	GENERATED_BODY()
+public:
+	UInteractableActorManagerSingle();
+
 	virtual bool CanInteract(const ACharacterBase* Invoker) const { return User == nullptr; }
 
-	virtual class UARPG_CharacterBehaviorConfigBase* GetBehavior() const { return Behavior; }
+	virtual class UARPG_CharacterBehaviorConfigBase* GetBehavior(ACharacterBase* Invoker, const FVector& InteractableLocation) const;
 
 	virtual void WhenBeginInteract(ACharacterBase* Invoker) { User = Invoker; }
 
@@ -72,12 +93,6 @@ public:
 	UPROPERTY()
 	ACharacterBase* User;
 
-	UPROPERTY(EditAnywhere, Category = "行为", Instanced)
-	UARPG_CharacterBehaviorConfigBase* Behavior;
-
-	UPROPERTY(EditAnywhere, Category = "行为", meta = (MakeEditWidget = true))
-	FVector Location;
-
 	UPROPERTY(EditAnywhere, Category = "行为")
-	FRotator Rotation;
+	TArray<FPositionWithBehavior> Behaviors;
 };

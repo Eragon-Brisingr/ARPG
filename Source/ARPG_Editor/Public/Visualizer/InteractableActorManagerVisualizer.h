@@ -5,21 +5,23 @@
 #include "CoreMinimal.h"
 #include "ComponentVisualizer.h"
 
-class UInteractableActorManager_Simple;
+class UInteractableActorManagerSingle;
 
 /**
  * 
  */
-struct HInteractableActorManagerSimpleVisProxy : public HComponentVisProxy
+struct HInteractableActorManagerSingleVisProxy : public HComponentVisProxy
 {
 	DECLARE_HIT_PROXY();
 
-	HInteractableActorManagerSimpleVisProxy(const UActorComponent* InComponent)
-		: HComponentVisProxy(InComponent, HPP_Wireframe)
+	HInteractableActorManagerSingleVisProxy(const UActorComponent* InComponent, int32 Index)
+		: HComponentVisProxy(InComponent, HPP_Wireframe), Index(Index)
 	{}
+
+	int32 Index;
 };
 
-class ARPG_EDITOR_API FInteractableActorManagerSimpleVisualizer : public FComponentVisualizer
+class ARPG_EDITOR_API FInteractableActorManagerSingleVisualizer : public FComponentVisualizer
 {
 public:
 	void DrawVisualization(const UActorComponent* Component, const FSceneView* View, FPrimitiveDrawInterface* PDI) override;
@@ -28,7 +30,8 @@ public:
 	bool HandleInputDelta(FEditorViewportClient* ViewportClient, FViewport* Viewport, FVector& DeltaTranslate, FRotator& DeltalRotate, FVector& DeltaScale) override;
 	void EndEditing() override;
 
+	int32 EditIndex = 0;
 	uint8 bIsEditing : 1;
 
-	TWeakObjectPtr<UInteractableActorManager_Simple> InteractableActorManager_Simple;
+	TWeakObjectPtr<UInteractableActorManagerSingle> InteractableActorManager_Simple;
 };

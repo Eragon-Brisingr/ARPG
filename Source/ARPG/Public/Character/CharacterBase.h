@@ -19,6 +19,8 @@
 #include "BehaviorTreeEx.h"
 #include "CharacterBase.generated.h"
 
+class UARPG_InteractableActorManagerBase;
+
 UCLASS()
 class ARPG_API ACharacterBase : public ACharacter, 
 	public IXD_SaveGameInterface,
@@ -361,6 +363,12 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "角色|交互")
 	bool CanInteract(AActor* InteractTarget) const;
+
+	UFUNCTION(BlueprintCallable, Category = "角色|交互")
+	void InvokeFinishInteract();
+
+	UPROPERTY(VisibleAnywhere, Category = "角色|交互")
+	UARPG_InteractableActorManagerBase* InteractableActorManager;
 public:
 	UPROPERTY(BlueprintReadOnly, Category = "Character")
 	class UARPG_MovementComponent* ARPG_MovementComponent;
