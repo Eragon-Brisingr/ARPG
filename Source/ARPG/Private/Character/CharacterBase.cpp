@@ -26,6 +26,7 @@
 #include "ARPG_AlertSystemNormal.h"
 #include "ARPG_SneakSystemNormal.h"
 #include "ARPG_NavigationQueryFilter.h"
+#include "ARPG_InteractableActorManager.h"
 
 
 // Sets default values
@@ -647,6 +648,14 @@ void ACharacterBase::InvokeInteract_ToServer_Implementation(AActor* InteractTarg
 bool ACharacterBase::CanInteract(AActor* InteractTarget) const
 {
 	return InteractTarget && InteractTarget->Implements<UARPG_InteractInterface>() && IARPG_InteractInterface::CanInteract(InteractTarget, this);
+}
+
+void ACharacterBase::InvokeFinishInteract()
+{
+	if (InteractableActorManager)
+	{
+		InteractableActorManager->EndInteract(this, {});
+	}
 }
 
 class UARPG_CampInfo* ACharacterBase::GetCampInfo() const

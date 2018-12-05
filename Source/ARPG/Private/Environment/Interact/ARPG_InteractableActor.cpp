@@ -3,11 +3,6 @@
 #include "ARPG_InteractableActor.h"
 #include "ARPG_InteractableActorManager.h"
 
-AARPG_InteractableActorBase::AARPG_InteractableActorBase()
-{
-	InteractableActorManager = CreateDefaultSubobject<UInteractableActorManager_Simple>(GET_MEMBER_NAME_CHECKED(AARPG_InteractableActorBase, InteractableActorManager));
-}
-
 void AARPG_InteractableActorBase::StartInteract(ACharacterBase* Invoker, const FOnInteractFinished& OnInteractFinished)
 {
 	InteractableActorManager->StartInteract(Invoker, OnInteractFinished);
@@ -26,4 +21,9 @@ bool AARPG_InteractableActorBase::CanInteract_Implementation(const class ACharac
 void AARPG_InteractableActorBase::WhenInvokeInteract_Implementation(class ACharacterBase* InteractInvoker)
 {
 	StartInteract(InteractInvoker, {});
+}
+
+AARPG_InteractableActorSingle::AARPG_InteractableActorSingle()
+{
+	InteractableActorManager = CreateDefaultSubobject<UInteractableActorManagerSingle>(GET_MEMBER_NAME_CHECKED(AARPG_InteractableActorBase, InteractableActorManager));
 }

@@ -27,7 +27,7 @@ void FVisualizerRegister::RegisterVisualizer()
 	if (GUnrealEd)
 	{
 		RegisterComponentVisualizer<UARPG_NavPathVisualHelper, FNavPathVisualizer>();
-		RegisterComponentVisualizer<UInteractableActorManager_Simple, FInteractableActorManagerSimpleVisualizer>();
+		RegisterComponentVisualizer<UInteractableActorManagerSingle, FInteractableActorManagerSingleVisualizer>();
 	}
 }
 
