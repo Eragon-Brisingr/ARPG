@@ -51,11 +51,11 @@ public:
 	UPROPERTY(BlueprintAssignable, Category = "交互")
 	FOnEndInteract OnEndInteract;
 private:
-	virtual void GetInteractableLocationAndRotation(ACharacterBase* Invoker, FVector& Location, FRotator& Rotation) const;
+	virtual void GetInteractableLocationAndRotation(ACharacterBase* Invoker, FVector& InteractableLocation, FRotator& InteractableRotation) const;
 };
 
 UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent, DisplayName = "交互管理器_单人使用"))
-class ARPG_API UARPG_InteractableActorManagerSample : public UARPG_InteractableActorManagerBase
+class ARPG_API UInteractableActorManager_Simple : public UARPG_InteractableActorManagerBase
 {
 	GENERATED_BODY()
 public:
@@ -67,7 +67,7 @@ public:
 
 	virtual void WhenEndInteract(ACharacterBase* Invoker) { User = nullptr; }
 
-	virtual void GetInteractableLocationAndRotation(ACharacterBase* Invoker, FVector& Location, FRotator& Rotation) const;
+	virtual void GetInteractableLocationAndRotation(ACharacterBase* Invoker, FVector& InteractableLocation, FRotator& InteractableRotation) const;
 public:
 	UPROPERTY()
 	ACharacterBase* User;
@@ -75,6 +75,9 @@ public:
 	UPROPERTY(EditAnywhere, Category = "行为", Instanced)
 	UARPG_CharacterBehaviorConfigBase* Behavior;
 
-	UPROPERTY(EditAnywhere, Category = "行为", meta = (MakeEditWidget = "true"))
-	FTransform Position;
+	UPROPERTY(EditAnywhere, Category = "行为", meta = (MakeEditWidget = true))
+	FVector Location;
+
+	UPROPERTY(EditAnywhere, Category = "行为")
+	FRotator Rotation;
 };

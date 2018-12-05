@@ -12,6 +12,7 @@ public class ARPG_Editor : ModuleRules
 
 		PrivateDependencyModuleNames.AddRange(new string[]
 		{
+            "UnrealEd",
             "NavigationSystem",
             "ComponentVisualizers",
 
