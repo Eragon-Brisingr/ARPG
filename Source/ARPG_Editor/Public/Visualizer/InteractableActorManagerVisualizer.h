@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -29,8 +29,9 @@ public:
 	bool GetWidgetLocation(const FEditorViewportClient* ViewportClient, FVector& OutLocation) const override;
 	bool HandleInputDelta(FEditorViewportClient* ViewportClient, FViewport* Viewport, FVector& DeltaTranslate, FRotator& DeltalRotate, FVector& DeltaScale) override;
 	void EndEditing() override;
+	TSharedPtr<SWidget> GenerateContextMenu() const override;
 
-	int32 EditIndex = 0;
+	static int32 EditIndex;
 	uint8 bIsEditing : 1;
 
 	TWeakObjectPtr<UInteractableActorManagerSingle> InteractableActorManager_Simple;

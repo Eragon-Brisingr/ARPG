@@ -1,8 +1,17 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 #include "InteractableActorManagerVisualizer.h"
 #include "SceneManagement.h"
 #include "ARPG_InteractableActorManager.h"
+#include "SCompoundWidget.h"
+#include "ModuleManager.h"
+#include "PropertyEditorModule.h"
+#include "IDetailRootObjectCustomization.h"
+#include "SScrollBox.h"
+#include "IDetailCustomization.h"
+#include "DetailLayoutBuilder.h"
+#include "DetailCategoryBuilder.h"
+#include "DetailWidgetRow.h"
 
 IMPLEMENT_HIT_PROXY(HInteractableActorManagerSingleVisProxy, HComponentVisProxy)
 
@@ -14,6 +23,8 @@ namespace PDIHelper
 		DrawDirectionalArrow(PDI, FTransform(Vector.Rotation(), StartLocation).ToMatrixNoScale(), Color, Vector.Size(), 5.f, SDPG_Foreground, 3.f);
 	}
 }
+
+int32 FInteractableActorManagerSingleVisualizer::EditIndex = 0;
 
 void FInteractableActorManagerSingleVisualizer::DrawVisualization(const UActorComponent* Component, const FSceneView* View, FPrimitiveDrawInterface* PDI)
 {
@@ -84,4 +95,96 @@ void FInteractableActorManagerSingleVisualizer::EndEditing()
 	bIsEditing = false;
 	EditIndex = 0;
 	InteractableActorManager_Simple = nullptr;
+}
+
+class SInteractableActorManagerWidget : public SCompoundWidget
+{
+	class FRootObjectCustomization : public IDetailRootObjectCustomization
+	{
+		TSharedPtr<SWidget> CustomizeObjectHeader(const UObject* InRootObject) override
+		{
+			return SNullWidget::NullWidget;
+		}
+		bool IsObjectVisible(const UObject* InRootObject) const override 
+		{ 
+			return true; 
+		}
+		bool ShouldDisplayHeader(const UObject* InRootObject) const override 
+		{ 
+			return false; 
+		}
+	};
+
+	class FMyCustomization : public IDetailCustomization
+	{
+	public:
+		// IDetailCustomization interface
+		virtual void CustomizeDetails(IDetailLayoutBuilder& DetailBuilder) override
+		{
+			DetailBuilder.HideCategory(TEXT("Tags"));
+			DetailBuilder.HideCategory(TEXT("ComponentReplication"));
+			DetailBuilder.HideCategory(TEXT("Activation"));
+			DetailBuilder.HideCategory(TEXT("Variable"));
+			DetailBuilder.HideCategory(TEXT("Cooking"));
+			DetailBuilder.HideCategory(TEXT("AssetUserData"));
+			DetailBuilder.HideCategory(TEXT("Collision"));
+
+			TSharedRef<IPropertyHandle> Behaviors = DetailBuilder.GetProperty(GET_MEMBER_NAME_CHECKED(UInteractableActorManagerSingle, Behaviors));
+			TSharedPtr<IPropertyHandle> ActivedElement = Behaviors->GetChildHandle(FInteractableActorManagerSingleVisualizer::EditIndex);
+			IDetailCategoryBuilder& ActiveBehaviorRow = DetailBuilder.EditCategory(TEXT("选中的行为"));
+
+			uint32 ChildNum;
+			if (ActivedElement->GetNumChildren(ChildNum) == FPropertyAccess::Success)
+			{
+				for (uint32 i = 0; i < ChildNum; ++i)
+				{
+					ActiveBehaviorRow.AddProperty(ActivedElement->GetChildHandle(i));
+				}
+			}
+		}
+	};
+public:
+	SLATE_BEGIN_ARGS(SInteractableActorManagerWidget)
+		:_InObject(nullptr)
+	{}
+		SLATE_ARGUMENT(UObject*, InObject)
+	SLATE_END_ARGS()
+
+	void Construct(const FArguments& InArgs)
+	{
+		auto& PropertyModule = FModuleManager::LoadModuleChecked<FPropertyEditorModule>("PropertyEditor");
+		FDetailsViewArgs DetailsViewArgs(false, false, true, FDetailsViewArgs::HideNameArea, true);
+		PropertyWidget = PropertyModule.CreateDetailView(DetailsViewArgs);
+		PropertyWidget->SetRootObjectCustomizationInstance(MakeShareable(new FRootObjectCustomization));
+		PropertyWidget->RegisterInstancedCustomPropertyLayout(UInteractableActorManagerSingle::StaticClass(), FOnGetDetailCustomizationInstance::CreateLambda([] {return MakeShareable(new FMyCustomization); }));
+		ChildSlot
+		[
+			SNew(SVerticalBox)
+			+ SVerticalBox::Slot()
+			.AutoHeight()
+			[
+				SNew(SBox)
+				.WidthOverride(300)
+				.MinDesiredWidth(300)
+				.MaxDesiredWidth(300)
+				[
+					SNew(SScrollBox)
+					+SScrollBox::Slot()
+					[
+						PropertyWidget.ToSharedRef()
+					]
+				]
+			]
+		];
+
+		PropertyWidget->SetObject(InArgs._InObject);
+	}
+
+	TSharedPtr<IDetailsView> PropertyWidget;
+};
+
+TSharedPtr<SWidget> FInteractableActorManagerSingleVisualizer::GenerateContextMenu() const
+{
+	TSharedPtr<SInteractableActorManagerWidget> InteractableActorManagerWidget = SNew(SInteractableActorManagerWidget).InObject(InteractableActorManager_Simple.Get());
+	return InteractableActorManagerWidget;
 }
