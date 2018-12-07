@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "UObject/NoExportTypes.h"
 #include "Engine/EngineTypes.h"
+#include "ARPG_CharacterBehaviorType.h"
 #include "ARPG_CharacterBehaviorBase.generated.h"
 
 class UARPG_CharacterBehaviorConfigBase;
@@ -27,9 +28,9 @@ public:
 	const UARPG_CharacterBehaviorConfigBase* Config;
 
 public:
-	virtual void ExecuteBehavior(class ACharacterBase* Executer, const FVector& Location, const FRotator& Rotation) { ReceiveExecuteBehavior(Executer, Location, Rotation); }
+	virtual void ExecuteBehavior(class ACharacterBase* Executer) { ReceiveExecuteBehavior(Executer); }
 	UFUNCTION(BlueprintImplementableEvent, Category = "行为", meta = (DisplayName = "ExecuteBehavior"))
-	void ReceiveExecuteBehavior(class ACharacterBase* Executer, const FVector& Location, const FRotator& Rotation);
+	void ReceiveExecuteBehavior(class ACharacterBase* Executer);
 
 	virtual void AbortBehavior(class ACharacterBase* Executer) { ReceiveAbortBehavior(Executer); }
 	UFUNCTION(BlueprintNativeEvent, Category = "行为", meta = (DisplayName = "AbortBehavior"))
@@ -40,14 +41,12 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "行为")
 	void FinishExecute(bool Succeed);
 
-	DECLARE_DELEGATE_OneParam(FOnBehaviorFinished, bool /*Succeed*/)
-	FOnBehaviorFinished OnBehaviorFinished;
+	FOnCharacterBehaviorFinished OnBehaviorFinished;
 
 	UFUNCTION(BlueprintCallable, Category = "行为")
 	void FinishAbort();
 
-	DECLARE_DELEGATE(FOnBehaviorAbortFinished);
-	FOnBehaviorAbortFinished OnBehaviorAbortFinished;
+	FOnCharacterBehaviorAbortFinished OnBehaviorAbortFinished;
 
 public:
 	template<typename T>
@@ -68,9 +67,9 @@ public:
 	UPROPERTY()
 	mutable TMap<class ACharacterBase*, class UARPG_CharacterBehaviorBase*> BehaviorMap;
 
-	void ExecuteBehavior(class ACharacterBase* Character, const FVector& Location, const FRotator& Rotation, const UARPG_CharacterBehaviorBase::FOnBehaviorFinished& OnBehaviorFinished) const;
+	void ExecuteBehavior(class ACharacterBase* Character, const FOnCharacterBehaviorFinished& OnBehaviorFinished) const;
 
-	void AbortBehavior(class ACharacterBase* Character, const UARPG_CharacterBehaviorBase::FOnBehaviorAbortFinished& OnBehaviorAbortFinished);
+	void AbortBehavior(class ACharacterBase* Character, const FOnCharacterBehaviorAbortFinished& OnBehaviorAbortFinished);
 
 	virtual FString GetDescribe() const;
 };

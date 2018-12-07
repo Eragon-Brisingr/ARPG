@@ -26,7 +26,7 @@ class ARPG_API UCB_PlayMontage : public UARPG_CharacterBehaviorBase
 {
 	GENERATED_BODY()
 public:
-	void ExecuteBehavior(class ACharacterBase* Executer, const FVector& Location, const FRotator& Rotation) override;
+	void ExecuteBehavior(class ACharacterBase* Executer) override;
 
 	void AbortBehavior(class ACharacterBase* Executer) override;
 
@@ -54,7 +54,7 @@ class ARPG_API UCB_Wait : public UARPG_CharacterBehaviorBase
 {
 	GENERATED_BODY()
 public:
-	void ExecuteBehavior(class ACharacterBase* Executer, const FVector& Location, const FRotator& Rotation) override;
+	void ExecuteBehavior(class ACharacterBase* Executer) override;
 
 	void AbortBehavior(class ACharacterBase* Executer) override;
 public:
@@ -127,7 +127,7 @@ class ARPG_API UCB_PlayStateMontageBase : public UARPG_CharacterBehaviorBase
 {
 	GENERATED_BODY()
 public:
-	void ExecuteBehavior(class ACharacterBase* Executer, const FVector& Location, const FRotator& Rotation) override;
+	void ExecuteBehavior(class ACharacterBase* Executer) override;
 
 	void AbortBehavior(class ACharacterBase* Executer) override;
 
@@ -200,4 +200,41 @@ public:
 	UAnimMontage* GetEndMontage() const override;
 
 	mutable int32 CurLoopRandomIndex;
+};
+
+UCLASS(meta = (DisplayName = "行为_转向"))
+class ARPG_API UCBC_TurnTo : public UARPG_CharacterBehaviorConfigBase
+{
+	GENERATED_BODY()
+public:
+	UCBC_TurnTo();
+};
+
+UCLASS()
+class ARPG_API UCB_TurnTo : public UARPG_CharacterBehaviorBase
+{
+	GENERATED_BODY()
+public:
+	void ExecuteBehavior(class ACharacterBase* Executer) override;
+
+	void AbortBehavior(class ACharacterBase* Executer) override;
+};
+
+//e.g. 人类收回武器
+UCLASS(meta = (DisplayName = "行为_进入放松状态"))
+class ARPG_API UCBC_EnterReleaseState : public UARPG_CharacterBehaviorConfigBase
+{
+	GENERATED_BODY()
+public:
+	UCBC_EnterReleaseState();
+};
+
+UCLASS()
+class ARPG_API UCB_EnterReleaseState : public UARPG_CharacterBehaviorBase
+{
+	GENERATED_BODY()
+public:
+	void ExecuteBehavior(class ACharacterBase* Executer) override;
+
+	void AbortBehavior(class ACharacterBase* Executer) override;
 };

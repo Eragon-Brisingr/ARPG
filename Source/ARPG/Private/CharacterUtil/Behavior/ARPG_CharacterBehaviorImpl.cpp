@@ -14,10 +14,8 @@ UCBC_PlayMontage::UCBC_PlayMontage()
 	BehaviorType = UCB_PlayMontage::StaticClass();
 }
 
-void UCB_PlayMontage::ExecuteBehavior(class ACharacterBase* Executer, const FVector& Location, const FRotator& Rotation)
+void UCB_PlayMontage::ExecuteBehavior(class ACharacterBase* Executer)
 {
-	UARPG_ActorFunctionLibrary::MoveActorTo(Executer, FVector(Location.X, Location.Y, Executer->GetActorLocation().Z), Rotation);
-
 	UAnimMontage* Montage = GetConfig()->Montage;
 	Executer->PlayMontage(Montage);
 	FOnMontageEnded OnMontageEnded = FOnMontageEnded::CreateUObject(this, &UCB_PlayMontage::WhenMontageEnd);
@@ -49,10 +47,8 @@ UCBC_Wait::UCBC_Wait()
 	BehaviorType = UCB_Wait::StaticClass();
 }
 
-void UCB_Wait::ExecuteBehavior(class ACharacterBase* Executer, const FVector& Location, const FRotator& Rotation)
+void UCB_Wait::ExecuteBehavior(class ACharacterBase* Executer)
 {
-	UARPG_ActorFunctionLibrary::MoveActorTo(Executer, FVector(Location.X, Location.Y, Executer->GetActorLocation().Z), Rotation);
-	
 	float WaitTime = GetConfig()->WaitTime;
 	float RandomRange = GetConfig()->RandomRange;
 	float duration = GetConfig()->WaitTime + FMath::FRand() * RandomRange - RandomRange / 2.f;
@@ -115,10 +111,8 @@ UAnimMontage* UCBC_PlayStateMontageSimpleRandom::GetEndMontage() const
 	return nullptr;
 }
 
-void UCB_PlayStateMontageBase::ExecuteBehavior(class ACharacterBase* Executer, const FVector& Location, const FRotator& Rotation)
+void UCB_PlayStateMontageBase::ExecuteBehavior(class ACharacterBase* Executer)
 {
-	UARPG_ActorFunctionLibrary::MoveActorTo(Executer, FVector(Location.X, Location.Y, Executer->GetActorLocation().Z), Rotation);
-
 	if (UAnimMontage* StartMontage = GetStartMontage())
 	{
 		CurrentMontage = StartMontage;
@@ -273,4 +267,41 @@ UAnimMontage* UCB_PlayStateMontageStandard::GetEndMontage() const
 		return EndMontages[FMath::RandHelper(EndMontages.Num())];
 	}
 	return nullptr;
+}
+
+UCBC_TurnTo::UCBC_TurnTo()
+{
+	BehaviorType = UCB_TurnTo::StaticClass();
+}
+
+void UCB_TurnTo::ExecuteBehavior(class ACharacterBase* Executer)
+{
+// 	if (AAIController* AIController = Cast<AAIController>(Executer->GetController()))
+// 	{
+// 		AIController->SetFocalPoint(Location + Rotation.Vector() * 10000.f, EAIFocusPriority::Gameplay);
+// 
+// 		FTimerHandle TimeHandle;
+// 		GetWorld()->GetTimerManager().SetTimer(TimeHandle, FTimerDelegate::CreateLambda([this] {FinishExecute(true); }), 1.f, false);
+// 	}
+// 	FinishExecute(false);
+}
+
+void UCB_TurnTo::AbortBehavior(class ACharacterBase* Executer)
+{
+	
+}
+
+UCBC_EnterReleaseState::UCBC_EnterReleaseState()
+{
+	BehaviorType = UCB_EnterReleaseState::StaticClass();
+}
+
+void UCB_EnterReleaseState::ExecuteBehavior(class ACharacterBase* Executer)
+{
+
+}
+
+void UCB_EnterReleaseState::AbortBehavior(class ACharacterBase* Executer)
+{
+
 }

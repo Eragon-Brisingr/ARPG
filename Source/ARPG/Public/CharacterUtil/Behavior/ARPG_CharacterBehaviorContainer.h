@@ -39,7 +39,7 @@ class ARPG_API UCB_RandomSelect : public UARPG_CharacterBehaviorBase
 {
 	GENERATED_BODY()
 public:
-	void ExecuteBehavior(ACharacterBase* Executer, const FVector& Location, const FRotator& Rotation) override;
+	void ExecuteBehavior(class ACharacterBase* Executer) override;
 
 	void AbortBehavior(ACharacterBase* Executer) override;
 public:
@@ -64,17 +64,17 @@ class ARPG_API UCB_Sequence : public UARPG_CharacterBehaviorBase
 {
 	GENERATED_BODY()
 public:
-	void ExecuteBehavior(ACharacterBase* Executer, const FVector& Location, const FRotator& Rotation) override;
+	void ExecuteBehavior(class ACharacterBase* Executer) override;
 
 	void AbortBehavior(ACharacterBase* Executer) override;
 
 	const UCBC_Sequence* GetConfig() const;
 
-	void WhenElementBehaviorFinished(bool Succeed, ACharacterBase* Executer, FVector Location, FRotator Rotation);
+	void WhenElementBehaviorFinished(bool Succeed, ACharacterBase* Executer);
 
 	void WhenElementBehaviorAbortFinished();
 
-	void ExecuteElement(ACharacterBase* Executer, const FVector& Location, const FRotator& Rotation);
+	void ExecuteElement(ACharacterBase* Executer);
 
 public:
 	int32 ExecuteIndex;

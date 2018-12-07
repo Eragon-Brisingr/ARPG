@@ -5,6 +5,7 @@
 #include <Kismet/KismetMathLibrary.h>
 #include <Ticker.h>
 #include <GameFramework/Actor.h>
+#include "CharacterBase.h"
 
 TMap<TWeakObjectPtr<USceneComponent>, FDelegateHandle> UARPG_ActorFunctionLibrary::MovingComponentMap;
 
@@ -86,5 +87,31 @@ void UARPG_ActorFunctionLibrary::PushActorTo(AActor* Actor, const FVector& Dista
 	if (Actor)
 	{
 		PushComponentTo(Actor->GetRootComponent(), Distance, OverTime, Sweep);
+	}
+}
+
+void UARPG_ActorFunctionLibrary::MoveCharacterToFitGround(ACharacterBase* Character, const FVector& Location, const FRotator& Rotator, float OverTime /*= 0.2f*/, bool Sweep /*= false*/)
+{
+	if (Character)
+	{
+		FVector MoveLocation = Location;
+		MoveLocation.Z = Character->GetActorLocation().Z;
+		MoveActorTo(Character, MoveLocation, Rotator, OverTime, Sweep);
+	}
+}
+
+void UARPG_ActorFunctionLibrary::MoveCharacterToLocationFitGround(ACharacterBase* Character, const FVector& Location, float OverTime /*= 0.2f*/, bool Sweep /*= false*/)
+{
+	if (Character)
+	{
+		MoveCharacterToFitGround(Character, Location, Character->GetActorRotation(), OverTime, Sweep);
+	}
+}
+
+void UARPG_ActorFunctionLibrary::MoveCharacterToRotationFitGround(ACharacterBase* Character, const FRotator& Rotator, float OverTime /*= 0.2f*/, bool Sweep /*= false*/)
+{
+	if (Character)
+	{
+		MoveCharacterToFitGround(Character, Character->GetActorLocation(), Rotator, OverTime, Sweep);
 	}
 }

@@ -5,21 +5,14 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "Components/SplineComponent.h"
+#include "ARPG_CharacterBehaviorType.h"
 #include "ARPG_NavPath.generated.h"
 
 USTRUCT(BlueprintType)
-struct FARPG_NavPathPoint
+struct FARPG_NavPathPoint : public FBehaviorWithPosition
 {
 	GENERATED_BODY()
 public:
-	UPROPERTY(EditAnywhere, Category = "路径")
-	FVector Location;
-
-	UPROPERTY(EditAnywhere, Category = "路径")
-	FRotator Rotation;
-
- 	UPROPERTY(EditAnywhere, Category = "路径", Instanced)
- 	class UARPG_CharacterBehaviorConfigBase* Behavior = nullptr;
 };
 
 UCLASS()
