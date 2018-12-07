@@ -12,6 +12,7 @@
 #include "DetailLayoutBuilder.h"
 #include "DetailCategoryBuilder.h"
 #include "DetailWidgetRow.h"
+#include "ARPG_CharacterBehaviorType.h"
 
 IMPLEMENT_HIT_PROXY(HInteractableActorManagerSingleVisProxy, HComponentVisProxy)
 
@@ -35,7 +36,7 @@ void FInteractableActorManagerSingleVisualizer::DrawVisualization(const UActorCo
 
 		for (int32 i = 0; i < InteractableActorManager_Simple->Behaviors.Num(); ++i)
 		{
-			const FPositionWithBehavior& Behavior = InteractableActorManager_Simple->Behaviors[i];
+			const FBehaviorWithPosition& Behavior = InteractableActorManager_Simple->Behaviors[i];
 			FVector WorldLocation = Transform.TransformPosition(Behavior.Location);
 			FRotator WorldRotation = Transform.TransformRotation(Behavior.Rotation.Quaternion()).Rotator();
 			FTransform WorldWidgetTransform(WorldRotation, WorldLocation);

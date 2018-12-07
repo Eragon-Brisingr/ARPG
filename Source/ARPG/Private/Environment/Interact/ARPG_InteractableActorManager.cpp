@@ -41,7 +41,7 @@ void UARPG_InteractableActorManagerBase::StartInteract(ACharacterBase* Invoker, 
 		FVector InteractableLocation;
 		FRotator InteractableRotation;
 		GetInteractableLocationAndRotation(Invoker, InteractableLocation, InteractableRotation);
-		UARPG_MoveUtils::ARPG_MoveToLocation(Invoker, InteractableLocation, FOnARPG_MoveFinished::CreateUObject(this, &UARPG_InteractableActorManagerBase::WhenMoveFinished, Invoker, InteractableLocation, InteractableRotation, OnInteractFinished));
+		UARPG_MoveUtils::ARPG_MoveToLocation(Invoker, InteractableLocation, FOnARPG_MoveFinished::CreateUObject(this, &UARPG_InteractableActorManagerBase::WhenMoveFinished, Invoker, InteractableLocation, InteractableRotation, OnInteractFinished), 1.f);
 	}
 	else
 	{
@@ -55,10 +55,11 @@ void UARPG_InteractableActorManagerBase::WhenMoveFinished(const FPathFollowingRe
 	{
 		if (CanInteract(Invoker))
 		{
-			if (UARPG_CharacterBehaviorConfigBase* Behavior = GetBehavior(Invoker, Location))
+			FBehaviorWithPosition Behavior = GetBehavior(Invoker, Location);
+			if (Behavior.Behavior)
 			{
-				Behavior->ExecuteBehavior(Invoker, Location, Rotation, OnInteractFinished);
-				CurBehaviorMap.FindOrAdd(Invoker) = Behavior;
+				Behavior.RelativePositionExecuteBehavior(Invoker, OnInteractFinished, GetOwner()->GetActorTransform());
+				CurBehaviorMap.FindOrAdd(Invoker) = Behavior.Behavior;
 				Invoker->InteractableActorManager = this;
 				WhenBeginInteract(Invoker);
 				OnBeginInteract.Broadcast(GetOwner(), this, Invoker);
@@ -74,7 +75,7 @@ void UARPG_InteractableActorManagerBase::EndInteract(ACharacterBase* Invoker, co
 {
 	if (UARPG_CharacterBehaviorConfigBase** P_Behavior = CurBehaviorMap.Find(Invoker))
 	{
-		(*P_Behavior)->AbortBehavior(Invoker, UARPG_CharacterBehaviorBase::FOnBehaviorAbortFinished::CreateUObject(this, &UARPG_InteractableActorManagerBase::WhenBehaviorAbortFinished, Invoker, OnInteractAbortFinished));
+		(*P_Behavior)->AbortBehavior(Invoker, FOnCharacterBehaviorAbortFinished::CreateUObject(this, &UARPG_InteractableActorManagerBase::WhenBehaviorAbortFinished, Invoker, OnInteractAbortFinished));
 	}
 	else
 	{
@@ -99,13 +100,13 @@ void UARPG_InteractableActorManagerBase::GetInteractableLocationAndRotation(ACha
 
 UInteractableActorManagerSingle::UInteractableActorManagerSingle()
 {
-	Behaviors.Add(FPositionWithBehavior());
+	Behaviors.Add(FBehaviorWithPosition());
 }
 
-class UARPG_CharacterBehaviorConfigBase* UInteractableActorManagerSingle::GetBehavior(ACharacterBase* Invoker, const FVector& InteractableLocation) const
+FBehaviorWithPosition UInteractableActorManagerSingle::GetBehavior(ACharacterBase* Invoker, const FVector& InteractableLocation) const
 {
-	const FPositionWithBehavior* Behavior = Behaviors.FindByPredicate([&](const FPositionWithBehavior& Behavior) {return GetOwner()->GetActorTransform().TransformPosition(Behavior.Location).Equals(InteractableLocation); });
-	return Behavior ? Behavior->Behavior : nullptr;
+	const FBehaviorWithPosition* Behavior = Behaviors.FindByPredicate([&](const FBehaviorWithPosition& Behavior) {return GetOwner()->GetActorTransform().TransformPosition(Behavior.Location).Equals(InteractableLocation); });
+	return Behavior ? *Behavior : FBehaviorWithPosition();
 }
 
 void UInteractableActorManagerSingle::GetInteractableLocationAndRotation(ACharacterBase* Invoker, FVector& InteractableLocation, FRotator& InteractableRotation) const
@@ -113,7 +114,7 @@ void UInteractableActorManagerSingle::GetInteractableLocationAndRotation(ACharac
 	if (Behaviors.Num() > 0)
 	{
 		FTransform Transform = GetOwner()->GetActorTransform();
-		const FPositionWithBehavior* NearestBehavior = &Behaviors[0];
+		const FBehaviorWithPosition* NearestBehavior = &Behaviors[0];
 		float Distance = (Invoker->GetActorLocation() - Transform.TransformPosition(NearestBehavior->Location)).Size();
 		for (int i = 1; i < Behaviors.Num(); ++i)
 		{

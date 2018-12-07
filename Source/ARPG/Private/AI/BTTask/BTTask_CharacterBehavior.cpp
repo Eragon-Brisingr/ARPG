@@ -35,7 +35,7 @@ EBTNodeResult::Type UBTTask_CharacterBehavior::ExecuteTask(UBehaviorTreeComponen
 		AAIController* MyController = OwnerComp.GetAIOwner();
 		if (ACharacterBase* Character = Cast<ACharacterBase>(MyController->GetPawn()))
 		{
-			Behavior->ExecuteBehavior(Character, Location, Rotation, UARPG_CharacterBehaviorBase::FOnBehaviorFinished::CreateUObject(this, &UBTTask_CharacterBehavior::WhenBehaviorFinished, &OwnerComp));
+			Behavior->ExecuteBehavior(Character, FOnCharacterBehaviorFinished::CreateUObject(this, &UBTTask_CharacterBehavior::WhenBehaviorFinished, &OwnerComp));
 			return EBTNodeResult::InProgress;
 		}
 	}
@@ -49,7 +49,7 @@ EBTNodeResult::Type UBTTask_CharacterBehavior::AbortTask(UBehaviorTreeComponent&
 		AAIController* MyController = OwnerComp.GetAIOwner();
 		if (ACharacterBase* Character = Cast<ACharacterBase>(MyController->GetPawn()))
 		{
-			Behavior->AbortBehavior(Character, UARPG_CharacterBehaviorBase::FOnBehaviorAbortFinished::CreateUObject(this, &UBTTask_CharacterBehavior::WhenBehaviorAbortFinished, &OwnerComp));
+			Behavior->AbortBehavior(Character, FOnCharacterBehaviorAbortFinished::CreateUObject(this, &UBTTask_CharacterBehavior::WhenBehaviorAbortFinished, &OwnerComp));
 			return EBTNodeResult::InProgress;
 		}
 	}

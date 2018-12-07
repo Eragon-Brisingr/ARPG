@@ -6,6 +6,7 @@
 #include "Components/ActorComponent.h"
 #include "Navigation/PathFollowingComponent.h"
 #include "ARPG_InteractType.h"
+#include "ARPG_CharacterBehaviorType.h"
 #include "ARPG_InteractableActorManager.generated.h"
 
 class UARPG_CharacterBehaviorConfigBase;
@@ -38,7 +39,7 @@ public:
 	void WhenBehaviorAbortFinished(ACharacterBase* Invoker, FOnInteractAbortFinished OnInteractAbortFinished);
 
 public:
-	virtual class UARPG_CharacterBehaviorConfigBase* GetBehavior(ACharacterBase* Invoker, const FVector& InteractableLocation) const { return nullptr; }
+	virtual FBehaviorWithPosition GetBehavior(ACharacterBase* Invoker, const FVector& InteractableLocation) const { return {}; }
 	virtual bool CanInteract(const ACharacterBase* Invoker) const { return false; }
 	virtual void PostMoveFinished(ACharacterBase* Invoker) {}
 public:
@@ -58,21 +59,6 @@ private:
 	virtual void GetInteractableLocationAndRotation(ACharacterBase* Invoker, FVector& InteractableLocation, FRotator& InteractableRotation) const;
 };
 
-USTRUCT()
-struct ARPG_API FPositionWithBehavior
-{
-	GENERATED_BODY()
-public:
-	UPROPERTY(EditAnywhere, Category = "行为", Instanced)
-	UARPG_CharacterBehaviorConfigBase* Behavior;
-
-	UPROPERTY(EditAnywhere, Category = "行为")
-	FVector Location;
-
-	UPROPERTY(EditAnywhere, Category = "行为")
-	FRotator Rotation;
-};
-
 UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent, DisplayName = "交互管理器_单人使用"))
 class ARPG_API UInteractableActorManagerSingle : public UARPG_InteractableActorManagerBase
 {
@@ -82,7 +68,7 @@ public:
 
 	virtual bool CanInteract(const ACharacterBase* Invoker) const { return User == nullptr; }
 
-	virtual class UARPG_CharacterBehaviorConfigBase* GetBehavior(ACharacterBase* Invoker, const FVector& InteractableLocation) const;
+	virtual FBehaviorWithPosition GetBehavior(ACharacterBase* Invoker, const FVector& InteractableLocation) const;
 
 	virtual void WhenBeginInteract(ACharacterBase* Invoker) { User = Invoker; }
 
@@ -94,5 +80,5 @@ public:
 	ACharacterBase* User;
 
 	UPROPERTY(EditAnywhere, Category = "行为")
-	TArray<FPositionWithBehavior> Behaviors;
+	TArray<FBehaviorWithPosition> Behaviors;
 };

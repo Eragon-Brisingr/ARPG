@@ -22,7 +22,7 @@ void UARPG_CharacterBehaviorBase::FinishAbort()
 	AI_V_Display_Log(Character, "行为中止状态[%s]结束", *UXD_ObjectFunctionLibrary::GetObjectClassName(this));
 }
 
-void UARPG_CharacterBehaviorConfigBase::ExecuteBehavior(class ACharacterBase* Character, const FVector& Location, const FRotator& Rotation, const UARPG_CharacterBehaviorBase::FOnBehaviorFinished& OnBehaviorFinished) const
+void UARPG_CharacterBehaviorConfigBase::ExecuteBehavior(class ACharacterBase* Character, const FOnCharacterBehaviorFinished& OnBehaviorFinished) const
 {
 	if (BehaviorType)
 	{
@@ -34,7 +34,7 @@ void UARPG_CharacterBehaviorConfigBase::ExecuteBehavior(class ACharacterBase* Ch
 			Behavior->Config = this;
 		}
 		Behavior->OnBehaviorFinished = OnBehaviorFinished;
-		Behavior->ExecuteBehavior(Character, Location, Rotation);
+		Behavior->ExecuteBehavior(Character);
 
 		AI_V_Display_Log(Character, "执行行为[%s]", *UXD_ObjectFunctionLibrary::GetObjectClassName(this));
 	}
@@ -45,7 +45,7 @@ void UARPG_CharacterBehaviorConfigBase::ExecuteBehavior(class ACharacterBase* Ch
 	}
 }
 
-void UARPG_CharacterBehaviorConfigBase::AbortBehavior(class ACharacterBase* Character, const UARPG_CharacterBehaviorBase::FOnBehaviorAbortFinished& OnBehaviorAbortFinished)
+void UARPG_CharacterBehaviorConfigBase::AbortBehavior(class ACharacterBase* Character, const FOnCharacterBehaviorAbortFinished& OnBehaviorAbortFinished)
 {
 	if (UARPG_CharacterBehaviorBase** P_Behavior = BehaviorMap.Find(Character))
 	{

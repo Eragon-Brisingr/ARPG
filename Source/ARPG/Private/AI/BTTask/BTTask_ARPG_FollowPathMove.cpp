@@ -6,6 +6,7 @@
 #include "ARPG_MoveUtils.h"
 #include "ARPG_NavPath.h"
 #include "ARPG_CharacterBehaviorBase.h"
+#include "ARPG_ActorFunctionLibrary.h"
 
 UBTTask_ARPG_FollowPathMove::UBTTask_ARPG_FollowPathMove()
 {
@@ -44,7 +45,7 @@ EBTNodeResult::Type UBTTask_ARPG_FollowPathMove::AbortTask(UBehaviorTreeComponen
 		UARPG_CharacterBehaviorConfigBase*& CurBehavior = FollowPathMoveMemory->CurBehavior;
 		if (CurBehavior)
 		{
-			CurBehavior->AbortBehavior(Character, UARPG_CharacterBehaviorBase::FOnBehaviorAbortFinished::CreateUObject(this, &UBTTask_ARPG_FollowPathMove::WhenBehaviorAborted, &OwnerComp, NodeMemory));
+			CurBehavior->AbortBehavior(Character, FOnCharacterBehaviorAbortFinished::CreateUObject(this, &UBTTask_ARPG_FollowPathMove::WhenBehaviorAborted, &OwnerComp, NodeMemory));
 		}
 	}
 	return EBTNodeResult::Aborted;
@@ -92,7 +93,7 @@ void UBTTask_ARPG_FollowPathMove::WhenMoveFinished(const FPathFollowingResult& R
 				FollowPathMoveMemory->CurBehavior = CurPoint.Behavior;
 				if (FollowPathMoveMemory->CurBehavior)
 				{
-					FollowPathMoveMemory->CurBehavior->ExecuteBehavior(Character, CurPoint.Location, CurPoint.Rotation, UARPG_CharacterBehaviorBase::FOnBehaviorFinished::CreateUObject(this, &UBTTask_ARPG_FollowPathMove::WhenBehaviorFinished, OwnerComp, NodeMemory));
+					CurPoint.WorldPositionExecuteBehavior(Character, FOnCharacterBehaviorFinished::CreateUObject(this, &UBTTask_ARPG_FollowPathMove::WhenBehaviorFinished, OwnerComp, NodeMemory));
 				}
 				else
 				{
