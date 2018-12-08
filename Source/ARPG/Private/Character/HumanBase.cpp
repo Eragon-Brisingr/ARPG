@@ -13,6 +13,7 @@
 #include "ARPG_ArrowBase.h"
 #include "ARPG_ArrowCoreBase.h"
 #include <Kismet/KismetMathLibrary.h>
+#include "Animation/AnimInstance.h"
 
 AHumanBase::AHumanBase(const FObjectInitializer& PCIP)
 	:Super(PCIP)
@@ -233,6 +234,25 @@ class AARPG_EquipmentBase* AHumanBase::EquipEquipment_Implementation(class UARPG
 bool AHumanBase::IsDefenseSucceed_Implementation(const FVector& DamageFromLocation, const FHitResult& HitInfo) const
 {
 	return Super::IsDefenseSucceed_Implementation(DamageFromLocation, HitInfo) && UKismetMathLibrary::InRange_FloatFloat((UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), DamageFromLocation) - GetActorRotation()).GetNormalized().Yaw, -90.f, 90.f);
+}
+
+void AHumanBase::EnterReleaseState(const FOnCharacterBehaviorFinished& OnBehaviorFinished)
+{
+	if (UseWeaponState != EUseWeaponState::NoneWeapon_Default)
+	{
+		PlayMontage(TakeBackWeaponMontage);
+		FOnMontageBlendingOutStarted OnMontageBlendingOutStarted = FOnMontageBlendingOutStarted::CreateUObject(this, &AHumanBase::WhenTakeBackWeaponFinished, OnBehaviorFinished);
+		GetMesh()->GetAnimInstance()->Montage_SetBlendingOutDelegate(OnMontageBlendingOutStarted, TakeBackWeaponMontage);
+	}
+	else
+	{
+		OnBehaviorFinished.ExecuteIfBound(true);
+	}
+}
+
+void AHumanBase::WhenTakeBackWeaponFinished(UAnimMontage* AnimMontage, bool bInterrupted, FOnCharacterBehaviorFinished OnBehaviorFinished)
+{
+	OnBehaviorFinished.ExecuteIfBound(bInterrupted == false);
 }
 
 void AHumanBase::OnRep_UseWeaponState()

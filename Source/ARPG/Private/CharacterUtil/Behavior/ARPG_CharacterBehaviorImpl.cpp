@@ -298,10 +298,5 @@ UCBC_EnterReleaseState::UCBC_EnterReleaseState()
 
 void UCB_EnterReleaseState::ExecuteBehavior(class ACharacterBase* Executer)
 {
-
-}
-
-void UCB_EnterReleaseState::AbortBehavior(class ACharacterBase* Executer)
-{
-
+	Executer->EnterReleaseState(OnBehaviorFinished);
 }

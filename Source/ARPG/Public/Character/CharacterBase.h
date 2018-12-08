@@ -17,6 +17,7 @@
 #include "ARPG_CampType.h"
 #include "ARPG_BattleType.h"
 #include "BehaviorTreeEx.h"
+#include "ARPG_CharacterBehaviorType.h"
 #include "CharacterBase.generated.h"
 
 class UARPG_InteractableActorManagerBase;
@@ -462,4 +463,8 @@ public:
 
 	UPROPERTY(EditAnywhere, Category = "角色|AI|配置")
 	FBehaviorTreeWithSubTree MainBehaviorTree;
+
+	//CharacterBehavior接口
+public:
+	virtual void EnterReleaseState(const FOnCharacterBehaviorFinished& OnBehaviorFinished) { OnBehaviorFinished.ExecuteIfBound(true); }
 };
