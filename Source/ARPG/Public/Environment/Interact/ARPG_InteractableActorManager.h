@@ -32,12 +32,13 @@ public:
 public:
 	void StartInteract(ACharacterBase* Invoker, const FOnInteractFinished& OnInteractFinished);
 
+	void EndInteract(ACharacterBase* Invoker, const FOnInteractAbortFinished& OnInteractAbortFinished);
+private:
+	void WhenInteractFinished(bool Succeed, ACharacterBase* Invoker, FOnInteractFinished OnInteractFinished);
+
 	void WhenMoveFinished(const FPathFollowingResult& Result, ACharacterBase* Invoker, FVector Location, FRotator Rotation, FOnInteractFinished OnInteractFinished);
 
-	void EndInteract(ACharacterBase* Invoker, const FOnInteractAbortFinished& OnInteractAbortFinished);
-
 	void WhenBehaviorAbortFinished(ACharacterBase* Invoker, FOnInteractAbortFinished OnInteractAbortFinished);
-
 public:
 	virtual FBehaviorWithPosition GetBehavior(ACharacterBase* Invoker, const FVector& InteractableLocation) const { return {}; }
 	virtual bool CanInteract(const ACharacterBase* Invoker) const { return false; }
@@ -70,9 +71,9 @@ public:
 
 	virtual FBehaviorWithPosition GetBehavior(ACharacterBase* Invoker, const FVector& InteractableLocation) const;
 
-	virtual void WhenBeginInteract(ACharacterBase* Invoker) { User = Invoker; }
+	virtual void WhenBeginInteract(ACharacterBase* Invoker);
 
-	virtual void WhenEndInteract(ACharacterBase* Invoker) { User = nullptr; }
+	virtual void WhenEndInteract(ACharacterBase* Invoker);
 
 	virtual void GetInteractableLocationAndRotation(ACharacterBase* Invoker, FVector& InteractableLocation, FRotator& InteractableRotation) const;
 public:

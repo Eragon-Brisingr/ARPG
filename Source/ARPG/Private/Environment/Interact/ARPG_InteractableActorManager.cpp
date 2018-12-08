@@ -41,7 +41,8 @@ void UARPG_InteractableActorManagerBase::StartInteract(ACharacterBase* Invoker, 
 		FVector InteractableLocation;
 		FRotator InteractableRotation;
 		GetInteractableLocationAndRotation(Invoker, InteractableLocation, InteractableRotation);
-		UARPG_MoveUtils::ARPG_MoveToLocation(Invoker, InteractableLocation, FOnARPG_MoveFinished::CreateUObject(this, &UARPG_InteractableActorManagerBase::WhenMoveFinished, Invoker, InteractableLocation, InteractableRotation, OnInteractFinished), 1.f);
+		UARPG_MoveUtils::ARPG_MoveToLocation(Invoker, InteractableLocation, FOnARPG_MoveFinished::CreateUObject(this, &UARPG_InteractableActorManagerBase::WhenMoveFinished, Invoker, InteractableLocation, InteractableRotation, 
+			FOnInteractFinished::CreateUObject(this, &UARPG_InteractableActorManagerBase::WhenInteractFinished, Invoker, OnInteractFinished)), 1.f);
 	}
 	else
 	{
@@ -60,7 +61,6 @@ void UARPG_InteractableActorManagerBase::WhenMoveFinished(const FPathFollowingRe
 			{
 				Behavior.RelativePositionExecuteBehavior(Invoker, OnInteractFinished, GetOwner()->GetActorTransform());
 				CurBehaviorMap.FindOrAdd(Invoker) = Behavior.Behavior;
-				Invoker->InteractableActorManager = this;
 				WhenBeginInteract(Invoker);
 				OnBeginInteract.Broadcast(GetOwner(), this, Invoker);
 				return;
@@ -69,6 +69,12 @@ void UARPG_InteractableActorManagerBase::WhenMoveFinished(const FPathFollowingRe
 	}
 
 	OnInteractFinished.ExecuteIfBound(false);
+}
+
+void UARPG_InteractableActorManagerBase::WhenInteractFinished(bool Succeed, ACharacterBase* Invoker, FOnInteractFinished OnInteractFinished)
+{
+	WhenEndInteract(Invoker);
+	OnInteractFinished.ExecuteIfBound(Succeed);
 }
 
 void UARPG_InteractableActorManagerBase::EndInteract(ACharacterBase* Invoker, const FOnInteractAbortFinished& OnInteractAbortFinished)
@@ -87,7 +93,6 @@ void UARPG_InteractableActorManagerBase::WhenBehaviorAbortFinished(ACharacterBas
 {
 	CurBehaviorMap.Remove(Invoker);
 	WhenEndInteract(Invoker);
-	Invoker->InteractableActorManager = nullptr;
 	OnEndInteract.Broadcast(GetOwner(), this, Invoker);
 	OnInteractAbortFinished.ExecuteIfBound();
 }
@@ -107,6 +112,21 @@ FBehaviorWithPosition UInteractableActorManagerSingle::GetBehavior(ACharacterBas
 {
 	const FBehaviorWithPosition* Behavior = Behaviors.FindByPredicate([&](const FBehaviorWithPosition& Behavior) {return GetOwner()->GetActorTransform().TransformPosition(Behavior.Location).Equals(InteractableLocation); });
 	return Behavior ? *Behavior : FBehaviorWithPosition();
+}
+
+void UInteractableActorManagerSingle::WhenBeginInteract(ACharacterBase* Invoker)
+{
+	Invoker->InteractableActorManager = this;
+	User = Invoker;
+}
+
+void UInteractableActorManagerSingle::WhenEndInteract(ACharacterBase* Invoker)
+{
+	if (Invoker->InteractableActorManager == this)
+	{
+		Invoker->InteractableActorManager = nullptr;
+		User = nullptr;
+	}
 }
 
 void UInteractableActorManagerSingle::GetInteractableLocationAndRotation(ACharacterBase* Invoker, FVector& InteractableLocation, FRotator& InteractableRotation) const

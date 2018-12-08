@@ -19,21 +19,23 @@ public:
 	AHumanBase(const FObjectInitializer& PCIP);
 	
 public:
-	virtual void GetLifetimeReplicatedProps(TArray< class FLifetimeProperty > & OutLifetimeProps) const override;
+	void GetLifetimeReplicatedProps(TArray< class FLifetimeProperty > & OutLifetimeProps) const override;
 
-	virtual void WhenGameInit_Implementation() override;
+	void WhenGameInit_Implementation() override;
 
-	virtual void WhenPostLoad_Implementation() override;
+	void WhenPostLoad_Implementation() override;
 
-	virtual TArray<struct FARPG_Item> GetInitItemList() const override;
+	TArray<struct FARPG_Item> GetInitItemList() const override;
 
-	virtual class AARPG_WeaponBase* EquipWaepon_Implementation(class UARPG_WeaponCoreBase* WeaponCore, EUseItemInput UseItemInput) override;
+	class AARPG_WeaponBase* EquipWaepon_Implementation(class UARPG_WeaponCoreBase* WeaponCore, EUseItemInput UseItemInput) override;
 
-	virtual class AARPG_ArrowBase* EquipArrow_Implementation(class UARPG_ArrowCoreBase* ArrowCore, EUseItemInput UseItemInput) override;
+	class AARPG_ArrowBase* EquipArrow_Implementation(class UARPG_ArrowCoreBase* ArrowCore, EUseItemInput UseItemInput) override;
 
-	virtual class AARPG_EquipmentBase* EquipEquipment_Implementation(class UARPG_EquipmentCoreBase* EquipmentCore, EUseItemInput UseItemInput) override;
+	class AARPG_EquipmentBase* EquipEquipment_Implementation(class UARPG_EquipmentCoreBase* EquipmentCore, EUseItemInput UseItemInput) override;
 
-	virtual bool IsDefenseSucceed_Implementation(const FVector& DamageFromLocation, const FHitResult& HitInfo) const;
+	bool IsDefenseSucceed_Implementation(const FVector& DamageFromLocation, const FHitResult& HitInfo) const override;
+
+	void EnterReleaseState(const FOnCharacterBehaviorFinished& OnBehaviorFinished) override;
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "角色|配置|常用", meta = (DisplayName = "默认左手武器", ExposeOnSpawn = "True"), SaveGame)
 	FARPG_Item DefaultLeftWeapon;
@@ -119,6 +121,9 @@ public:
 	TArray<class AARPG_EquipmentBase*> EquipmentList;
 	UFUNCTION()
 	void OnRep_EquipmentList();
+
+private:
+	void WhenTakeBackWeaponFinished(UAnimMontage* AnimMontage, bool bInterrupted, FOnCharacterBehaviorFinished OnBehaviorFinished);
 };
 
 template<typename EquipType>

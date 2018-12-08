@@ -235,6 +235,4 @@ class ARPG_API UCB_EnterReleaseState : public UARPG_CharacterBehaviorBase
 	GENERATED_BODY()
 public:
 	void ExecuteBehavior(class ACharacterBase* Executer) override;
-
-	void AbortBehavior(class ACharacterBase* Executer) override;
 };
