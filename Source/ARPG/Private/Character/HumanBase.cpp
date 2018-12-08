@@ -252,6 +252,10 @@ void AHumanBase::EnterReleaseState(const FOnCharacterBehaviorFinished& OnBehavio
 
 void AHumanBase::WhenTakeBackWeaponFinished(UAnimMontage* AnimMontage, bool bInterrupted, FOnCharacterBehaviorFinished OnBehaviorFinished)
 {
+	if (FOnMontageBlendingOutStarted* OnMontageBlendingOutStarted = GetMesh()->GetAnimInstance()->Montage_GetBlendingOutDelegate(AnimMontage))
+	{
+		OnMontageBlendingOutStarted->Unbind();
+	}
 	OnBehaviorFinished.ExecuteIfBound(bInterrupted == false);
 }
 
