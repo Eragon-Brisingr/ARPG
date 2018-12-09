@@ -28,9 +28,9 @@ public:
 	UFUNCTION(BlueprintImplementableEvent, Category = "警戒系统", meta = (DisplayName = "WhenInitAlertSystem"))
 	void ReceiveWhenAlertSystem();
 
-	virtual float GetSightAddAlertValue(const class ACharacterBase* LookedCharacter) const { return ReceiveGetSightAddAlertValue(LookedCharacter); }
+	virtual float GetSightAddAlertValue(const FVector& ObserverLocation, const FVector& SeenLocation, const class ACharacterBase* LookedCharacter) const { return ReceiveGetSightAddAlertValue(ObserverLocation, SeenLocation, LookedCharacter); }
 	UFUNCTION(BlueprintImplementableEvent, Category = "警戒系统")
-	float ReceiveGetSightAddAlertValue(const class ACharacterBase* LookedCharacter) const;
+	float ReceiveGetSightAddAlertValue(const FVector& ObserverLocation, const FVector& SeenLocation, const class ACharacterBase* LookedCharacter) const;
 
 	virtual float GetHearAddAlertValue(const class ACharacterBase* HeardCharacter, const FVector& SimulusLocation, float Strength) const { return ReceiveGetHearAddAlertValue(HeardCharacter, SimulusLocation, Strength); }
 	UFUNCTION(BlueprintImplementableEvent, Category = "警戒系统")
@@ -41,14 +41,14 @@ public:
 	float ReceiveGetNoseAddAlertValue(const class ACharacterBase* NosedCharacter) const;
 
 	UFUNCTION(BlueprintCallable, Category = "警戒系统")
-	bool CanSee(const class ACharacterBase* LookedCharacter) const { return GetSightAddAlertValue(LookedCharacter) > 0.f; }
+	bool CanSee(const FVector& ObserverLocation, const FVector& SeenLocation, const class ACharacterBase* LookedCharacter) const;
 	UFUNCTION(BlueprintCallable, Category = "警戒系统")
 	bool CanHear(const class ACharacterBase* HeardCharacter, const FVector& SimulusLocation, float Strength) const { return GetHearAddAlertValue(HeardCharacter, SimulusLocation, Strength); }
 	UFUNCTION(BlueprintCallable, Category = "警戒系统")
 	bool CanNose(const class ACharacterBase* NosedCharacter) const { return GetNoseAddAlertValue(NosedCharacter) > 0.f; }
 
 	UFUNCTION(BlueprintCallable, Category = "警戒系统")
-	float GetSightAddAlertValueFilterRelationship(const class ACharacterBase* LookedCharacter) const;
+	float GetSightAddAlertValueFilterRelationship(const FVector& ObserverLocation, const FVector& SeenLocation, const class ACharacterBase* LookedCharacter) const;
 
 	UFUNCTION(BlueprintCallable, Category = "警戒系统")
 	float GetHearAddAlertValueFilterRelationship(const class ACharacterBase* HeardCharacter, const FVector& SimulusLocation, float Strength) const;

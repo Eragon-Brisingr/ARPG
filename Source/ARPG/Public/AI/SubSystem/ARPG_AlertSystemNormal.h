@@ -15,7 +15,7 @@ class ARPG_API UARPG_AlertSystemNormal : public UARPG_AlertSystemBase
 {
 	GENERATED_BODY()
 public:
-	virtual float GetSightAddAlertValue(const class ACharacterBase* LookedCharacter) const override;
+	virtual float GetSightAddAlertValue(const FVector& ObserverLocation, const FVector& SeenLocation, const class ACharacterBase* LookedCharacter) const override;
 
 	virtual float GetHearAddAlertValue(const class ACharacterBase* HeardCharacter, const FVector& SimulusLocation, float Strength) const override;
 

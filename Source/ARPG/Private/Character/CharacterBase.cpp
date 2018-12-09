@@ -736,12 +736,12 @@ bool ACharacterBase::CanBeSeenFrom(const FVector& ObserverLocation, FVector& Out
 
 		if (HitResult.GetActor() == this)
 		{
-			float SightVigilanceValue = SightListener->AlertSystem->GetSightAddAlertValue(this);
+			float SightVigilanceValue = SightListener->AlertSystem->GetSightAddAlertValue(ObserverLocation, HitResult.ImpactPoint, this);
 			if (SightVigilanceValue > 0.f)
 			{
 				NumberOfLoSChecksPerformed += 1;
 				OutSightStrength = SightVigilanceValue;
-				OutSeenLocation = GetActorLocation();
+				OutSeenLocation = HitResult.ImpactPoint;
 				return true;
 			}
 		}
