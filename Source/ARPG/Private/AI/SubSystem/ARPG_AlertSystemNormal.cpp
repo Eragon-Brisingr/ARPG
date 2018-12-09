@@ -4,12 +4,12 @@
 #include "CharacterBase.h"
 #include "ARPG_SneakSystemBase.h"
 
-float UARPG_AlertSystemNormal::GetSightAddAlertValue(const class ACharacterBase* LookedCharacter) const
+float UARPG_AlertSystemNormal::GetSightAddAlertValue(const FVector& ObserverLocation, const FVector& SeenLocation, const class ACharacterBase* LookedCharacter) const
 {
 	if (LookedCharacter)
 	{
 		//估计距离 = Distance * TargetHideLevel / VigilanceRate
-		return SightAlertCurve.GetRichCurveConst()->Eval(Character->GetDistanceTo(LookedCharacter) * LookedCharacter->SneakSystem->GetSightHideValue() / AlertRate);
+		return SightAlertCurve.GetRichCurveConst()->Eval((ObserverLocation - SeenLocation).Size() * LookedCharacter->SneakSystem->GetSightHideValue() / AlertRate);
 	}
 	return 0.f;
 }

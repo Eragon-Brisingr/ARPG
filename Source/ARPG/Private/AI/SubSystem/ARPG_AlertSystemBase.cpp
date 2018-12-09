@@ -8,11 +8,16 @@ class UWorld* UARPG_AlertSystemBase::GetWorld() const
 	return Character->GetWorld();
 }
 
-float UARPG_AlertSystemBase::GetSightAddAlertValueFilterRelationship(const class ACharacterBase* LookedCharacter) const
+bool UARPG_AlertSystemBase::CanSee(const FVector& ObserverLocation, const FVector& SeenLocation, const class ACharacterBase* LookedCharacter) const
+{
+	return GetSightAddAlertValue(ObserverLocation, SeenLocation, LookedCharacter) > 0.f;
+}
+
+float UARPG_AlertSystemBase::GetSightAddAlertValueFilterRelationship(const FVector& ObserverLocation, const FVector& SeenLocation, const class ACharacterBase* LookedCharacter) const
 {
 	if (Character->GetRelationshipTowards(LookedCharacter) <= Character->MaxAlertRelationship)
 	{
-		return GetSightAddAlertValue(LookedCharacter);
+		return GetSightAddAlertValue(ObserverLocation, SeenLocation, LookedCharacter);
 	}
 	return 0.f;
 }

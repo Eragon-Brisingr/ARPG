@@ -18,7 +18,7 @@ public:
 
 	virtual void BeginPlay() override;
 public:
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "角色|AI")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AI")
 	class UARPG_AIPerceptionComponent* AIPerception;
 
 	virtual ETeamAttitude::Type GetTeamAttitudeTowards(const AActor& Other) const override;
