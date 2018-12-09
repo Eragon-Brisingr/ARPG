@@ -120,3 +120,80 @@ void UCB_Sequence::ExecuteElement(ACharacterBase* Executer)
 		FinishExecute(true);
 	}
 }
+
+UCBC_StateBehavior::UCBC_StateBehavior()
+{
+	BehaviorType = UCB_StateBehavior::StaticClass();
+}
+
+void UCB_StateBehavior::ExecuteBehavior(class ACharacterBase* Executer)
+{
+	if (CurrentBehavior = GetConfig()->StartBehavior, CurrentBehavior)
+	{
+		CurrentBehavior->ExecuteBehavior(Executer, FOnCharacterBehaviorFinished::CreateUObject(this, &UCB_StateBehavior::WhenStartBehaviorEnd, Executer));
+	}
+	else
+	{
+		FinishExecute(false);
+	}
+}
+
+void UCB_StateBehavior::AbortBehavior(ACharacterBase* Executer)
+{
+	if (CurrentBehavior)
+	{
+		CurrentBehavior->AbortBehavior(Executer, FOnCharacterBehaviorAbortFinished::CreateUObject(this, &UCB_StateBehavior::WhenAbortBehaviorEnd, Executer));
+	}
+	else
+	{
+		FinishAbort();
+	}
+}
+
+const UCBC_StateBehavior* UCB_StateBehavior::GetConfig() const
+{
+	return UARPG_CharacterBehaviorBase::GetConfig<UCBC_StateBehavior>();
+}
+
+void UCB_StateBehavior::WhenStartBehaviorEnd(bool Succeed, ACharacterBase* Executer)
+{
+	if (CurrentBehavior = GetConfig()->LoopBehavior, CurrentBehavior)
+	{
+		CurrentBehavior->ExecuteBehavior(Executer, FOnCharacterBehaviorFinished::CreateUObject(this, &UCB_StateBehavior::WhenLoopBehaviorEnd, Executer));
+	}
+	else
+	{
+		FinishExecute(false);
+	}
+}
+
+void UCB_StateBehavior::WhenLoopBehaviorEnd(bool Succeed, ACharacterBase* Executer)
+{
+	if (CurrentBehavior)
+	{
+		CurrentBehavior->ExecuteBehavior(Executer, FOnCharacterBehaviorFinished::CreateUObject(this, &UCB_StateBehavior::WhenLoopBehaviorEnd, Executer));
+	}
+	else
+	{
+		FinishExecute(false);
+	}
+}
+
+void UCB_StateBehavior::WhenEndBehaviorEnd(bool Succeed, ACharacterBase* Executer)
+{
+	CurrentBehavior = nullptr;
+	FinishAbort();
+}
+
+void UCB_StateBehavior::WhenAbortBehaviorEnd(ACharacterBase* Executer)
+{
+	CurrentBehavior = GetConfig()->EndBehavior;
+	if (CurrentBehavior)
+	{
+		CurrentBehavior->ExecuteBehavior(Executer, FOnCharacterBehaviorFinished::CreateUObject(this, &UCB_StateBehavior::WhenEndBehaviorEnd, Executer));
+	}
+	else
+	{
+		FinishAbort();
+	}
+}
