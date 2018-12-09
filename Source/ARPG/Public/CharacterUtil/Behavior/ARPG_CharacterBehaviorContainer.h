@@ -79,3 +79,43 @@ public:
 public:
 	int32 ExecuteIndex;
 };
+
+UCLASS(meta = (DisplayName = "行为容器_状态行为"))
+class ARPG_API UCBC_StateBehavior : public UARPG_CharacterBehaviorConfigBase
+{
+	GENERATED_BODY()
+public:
+	UCBC_StateBehavior();
+
+	UPROPERTY(EditAnywhere, Category = "行为", Instanced)
+	UARPG_CharacterBehaviorConfigBase* StartBehavior;
+
+	UPROPERTY(EditAnywhere, Category = "行为", Instanced)
+	UARPG_CharacterBehaviorConfigBase* LoopBehavior;
+
+	UPROPERTY(EditAnywhere, Category = "行为", Instanced)
+	UARPG_CharacterBehaviorConfigBase* EndBehavior;
+};
+
+UCLASS()
+class ARPG_API UCB_StateBehavior : public UARPG_CharacterBehaviorBase
+{
+	GENERATED_BODY()
+public:
+	void ExecuteBehavior(ACharacterBase* Executer) override;
+
+	void AbortBehavior(ACharacterBase* Executer) override;
+private:
+	UPROPERTY()
+	UARPG_CharacterBehaviorConfigBase* CurrentBehavior;
+
+	const UCBC_StateBehavior* GetConfig() const;
+
+	void WhenStartBehaviorEnd(bool Succeed, ACharacterBase* Executer);
+
+	void WhenLoopBehaviorEnd(bool Succeed, ACharacterBase* Executer);
+
+	void WhenEndBehaviorEnd(bool Succeed, ACharacterBase* Executer);
+
+	void WhenAbortBehaviorEnd(ACharacterBase* Executer);
+};

@@ -18,18 +18,19 @@ void UCB_PlayMontage::ExecuteBehavior(class ACharacterBase* Executer)
 {
 	UAnimMontage* Montage = GetConfig()->Montage;
 	Executer->PlayMontage(Montage);
-	FOnMontageEnded OnMontageEnded = FOnMontageEnded::CreateUObject(this, &UCB_PlayMontage::WhenMontageEnd);
-	Executer->GetMesh()->GetAnimInstance()->Montage_SetEndDelegate(OnMontageEnded, Montage);
+	FOnMontageBlendingOutStarted OnMontageEnded = FOnMontageBlendingOutStarted::CreateUObject(this, &UCB_PlayMontage::WhenMontageEnd, Executer);
+	Executer->GetMesh()->GetAnimInstance()->Montage_SetBlendingOutDelegate(OnMontageEnded, Montage);
 }
 
 void UCB_PlayMontage::AbortBehavior(class ACharacterBase* Executer)
 {
 	UAnimMontage* Montage = GetConfig()->Montage;
-	if (FAnimMontageInstance* MontageInstance = Executer->GetMesh()->GetAnimInstance()->GetActiveInstanceForMontage(Montage))
+	if (FOnMontageBlendingOutStarted* OnMontageBlendingOutStarted = Executer->GetMesh()->GetAnimInstance()->Montage_GetBlendingOutDelegate(Montage))
 	{
-		MontageInstance->OnMontageEnded.Unbind();
+		OnMontageBlendingOutStarted->Unbind();
 	}
 	Executer->StopMontage(Montage);
+	FinishAbort();
 }
 
 const class UCBC_PlayMontage* UCB_PlayMontage::GetConfig() const
@@ -37,9 +38,13 @@ const class UCBC_PlayMontage* UCB_PlayMontage::GetConfig() const
 	return UARPG_CharacterBehaviorBase::GetConfig<UCBC_PlayMontage>();
 }
 
-void UCB_PlayMontage::WhenMontageEnd(UAnimMontage* Montage, bool bInterrupted)
+void UCB_PlayMontage::WhenMontageEnd(UAnimMontage* Montage, bool bInterrupted, class ACharacterBase* Executer)
 {
-	FinishExecute(bInterrupted);
+	if (FOnMontageBlendingOutStarted* OnMontageBlendingOutStarted = Executer->GetMesh()->GetAnimInstance()->Montage_GetBlendingOutDelegate(Montage))
+	{
+		OnMontageBlendingOutStarted->Unbind();
+	}
+	FinishExecute(bInterrupted == false);
 }
 
 UCBC_Wait::UCBC_Wait()
