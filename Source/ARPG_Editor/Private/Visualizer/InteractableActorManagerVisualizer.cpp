@@ -116,7 +116,7 @@ class SInteractableActorManagerWidget : public SCompoundWidget
 		}
 	};
 
-	class FMyCustomization : public IDetailCustomization
+	class FNavPathCustomization : public IDetailCustomization
 	{
 	public:
 		// IDetailCustomization interface
@@ -155,25 +155,21 @@ public:
 	{
 		auto& PropertyModule = FModuleManager::LoadModuleChecked<FPropertyEditorModule>("PropertyEditor");
 		FDetailsViewArgs DetailsViewArgs(false, false, true, FDetailsViewArgs::HideNameArea, true);
+		DetailsViewArgs.DefaultsOnlyVisibility = EEditDefaultsOnlyNodeVisibility::Hide;
 		PropertyWidget = PropertyModule.CreateDetailView(DetailsViewArgs);
 		PropertyWidget->SetRootObjectCustomizationInstance(MakeShareable(new FRootObjectCustomization));
-		PropertyWidget->RegisterInstancedCustomPropertyLayout(UInteractableActorManagerSingle::StaticClass(), FOnGetDetailCustomizationInstance::CreateLambda([] {return MakeShareable(new FMyCustomization); }));
+		PropertyWidget->RegisterInstancedCustomPropertyLayout(UInteractableActorManagerSingle::StaticClass(), FOnGetDetailCustomizationInstance::CreateLambda([] {return MakeShareable(new FNavPathCustomization); }));
 		ChildSlot
 		[
-			SNew(SVerticalBox)
-			+ SVerticalBox::Slot()
-			.AutoHeight()
+			SNew(SBox)
+			.WidthOverride(400.f)
+			.MaxDesiredHeight(400.f)
 			[
-				SNew(SBox)
-				.WidthOverride(300)
-				.MinDesiredWidth(300)
-				.MaxDesiredWidth(300)
+				SNew(SScrollBox)
+				+SScrollBox::Slot()
+				.HAlign(HAlign_Fill)
 				[
-					SNew(SScrollBox)
-					+SScrollBox::Slot()
-					[
-						PropertyWidget.ToSharedRef()
-					]
+					PropertyWidget.ToSharedRef()
 				]
 			]
 		];
