@@ -27,6 +27,8 @@
 #include "ARPG_SneakSystemNormal.h"
 #include "ARPG_NavigationQueryFilter.h"
 #include "ARPG_InteractableActorManager.h"
+#include "Action/ARPG_CharacterTurnBase.h"
+#include "Engine/Engine.h"
 
 
 // Sets default values
@@ -55,6 +57,8 @@ ACharacterBase::ACharacterBase(const FObjectInitializer& ObjectInitializer)
 	AlertSystem = CreateDefaultSubobject<UARPG_AlertSystemNormal>(GET_MEMBER_NAME_CHECKED(ACharacterBase, AlertSystem));
 
 	SneakSystem = CreateDefaultSubobject<UARPG_SneakSystemNormal>(GET_MEMBER_NAME_CHECKED(ACharacterBase, SneakSystem));
+
+	CharacterTurnAction = CreateDefaultSubobject<UARPG_CharacterTurnNormal>(GET_MEMBER_NAME_CHECKED(ACharacterBase, CharacterTurnAction));
 
 	GetMesh()->VisibilityBasedAnimTickOption = EVisibilityBasedAnimTickOption::AlwaysTickPoseAndRefreshBones;
 
@@ -419,6 +423,38 @@ void ACharacterBase::InvokeDodgeByDirection(EDodgeDirection Direction)
 bool ACharacterBase::CanDodge() const
 {
 	return DodgeAnimSet->CanDodge(this);
+}
+
+bool ACharacterBase::CanPlayTurnMontage() const
+{
+	return GetMesh()->GetAnimInstance()->GetSlotMontageGlobalWeight(TurnSlotName) == 0.f && IsPlayingRootMotion() == false;
+}
+
+void ACharacterBase::TurnTo(const FRotator& TargetWorldRotation, const FOnCharacterActionFinished& OnCharacterTurnFinished)
+{
+	if (CanPlayTurnMontage())
+	{
+		if (CharacterTurnAction)
+		{
+			CharacterTurnAction->TurnTo(this, TargetWorldRotation, OnCharacterTurnFinished);
+		}
+		else
+		{
+			UARPG_ActorFunctionLibrary::MoveCharacterToRotationFitGround(this, TargetWorldRotation);
+			OnCharacterTurnFinished.ExecuteIfBound();
+		}
+	}
+}
+
+void ACharacterBase::TurnTo(const FRotator& TargetWorldRotation)
+{
+	TurnTo(TargetWorldRotation, {});
+}
+
+void ACharacterBase::PlayMontageWithBlendingOutDelegate(UAnimMontage* Montage, const FOnMontageBlendingOutStarted& OnMontageBlendingOutStarted, float InPlayRate /*= 1.f*/, FName StartSectionName /*= NAME_None*/)
+{
+	PlayMontage(Montage, InPlayRate, StartSectionName);
+	GetMesh()->GetAnimInstance()->Montage_SetBlendingOutDelegate(const_cast<FOnMontageBlendingOutStarted&>(OnMontageBlendingOutStarted), Montage);
 }
 
 void ACharacterBase::MoveItem_Implementation(class UARPG_InventoryComponent* SourceInventory, class UARPG_InventoryComponent* TargetInventory, class UARPG_ItemCoreBase* ItemCore, int32 Number /*= 1*/)

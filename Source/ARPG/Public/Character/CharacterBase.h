@@ -18,6 +18,8 @@
 #include "ARPG_BattleType.h"
 #include "BehaviorTreeEx.h"
 #include "ARPG_CharacterBehaviorType.h"
+#include "ARPG_CharacterActionType.h"
+#include "Animation/AnimInstance.h"
 #include "CharacterBase.generated.h"
 
 class UARPG_InteractableActorManagerBase;
@@ -129,7 +131,7 @@ public:
 	}
 	//动画
 public:
-	UFUNCTION(BlueprintCallable, Category = "角色|行为")
+	UFUNCTION(BlueprintCallable, Category = "角色|动作")
 	float PlayMontage(UAnimMontage * MontageToPlay, float InPlayRate = 1.f, FName StartSectionName = NAME_None, bool ClientMaster = true);
 
 	float PlayMontageImpl(UAnimMontage * MontageToPlay, float InPlayRate = 1.f, FName StartSectionName = NAME_None);
@@ -144,7 +146,7 @@ public:
 	virtual void MulticastPlayMontageSkipOwner_Implementation(UAnimMontage * MontageToPlay, float InPlayRate = 1.f, FName StartSectionName = NAME_None);
 	bool MulticastPlayMontageSkipOwner_Validate(UAnimMontage * MontageToPlay, float InPlayRate = 1.f, FName StartSectionName = NAME_None) { return true; }
 
-	UFUNCTION(BlueprintCallable, Category = "角色|行为", Reliable, WithValidation, NetMulticast)
+	UFUNCTION(BlueprintCallable, Category = "角色|动作", Reliable, WithValidation, NetMulticast)
 	void StopMontage(UAnimMontage* MontageToStop = nullptr);
 	virtual void StopMontage_Implementation(UAnimMontage* MontageToStop = nullptr);
 	bool StopMontage_Validate(UAnimMontage* MontageToStop = nullptr) { return true; }
@@ -154,13 +156,13 @@ public:
 	virtual void PlayMontageToServer_Implementation(UAnimMontage * MontageToPlay, float InPlayRate = 1.f, FName StartSectionName = NAME_None);
 	bool PlayMontageToServer_Validate(UAnimMontage * MontageToPlay, float InPlayRate = 1.f, FName StartSectionName = NAME_None) { return true; }
 	
-	UFUNCTION(BlueprintCallable, Category = "角色|行为")
+	UFUNCTION(BlueprintCallable, Category = "角色|动作")
 	void TryPlayMontage(const FARPG_MontageParameter& Montage);
 
-	UPROPERTY(EditDefaultsOnly, Category = "角色|行为")
+	UPROPERTY(EditDefaultsOnly, Category = "角色|动作")
 	FName FullBodySlotName = TEXT("FullBody");
 
-	UFUNCTION(BlueprintCallable, Category = "角色|行为")
+	UFUNCTION(BlueprintCallable, Category = "角色|动作")
 	bool CanPlayFullBodyMontage() const;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "角色", AdvancedDisplay)
@@ -170,16 +172,33 @@ public:
 	UPROPERTY(VisibleDefaultsOnly, Category = "角色|动画配置", Instanced)
 	class UARPG_DodgeAnimSetBase* DodgeAnimSet;
 	
-	UFUNCTION(BlueprintCallable, Category = "角色|动画")
+	UFUNCTION(BlueprintCallable, Category = "角色|动作")
 	void InvokeDodge();
 
 	void DodgeByControlRotation(float Direction);
 
-	UFUNCTION(BlueprintCallable, Category = "角色|动画")
+	UFUNCTION(BlueprintCallable, Category = "角色|动作")
 	void InvokeDodgeByDirection(EDodgeDirection Direction);
 
-	UFUNCTION(BlueprintCallable, Category = "角色|动画")
+	UFUNCTION(BlueprintCallable, Category = "角色|动作")
 	bool CanDodge() const;
+
+	//转身
+	UPROPERTY(EditDefaultsOnly, Category = "角色|动画配置", Instanced)
+	class UARPG_CharacterTurnBase* CharacterTurnAction;
+
+	UPROPERTY(EditDefaultsOnly, Category = "角色|动作")
+	FName TurnSlotName = TEXT("TurnInPlace");
+
+	UFUNCTION(BlueprintCallable, Category = "角色|动作")
+	bool CanPlayTurnMontage() const;
+
+	void TurnTo(const FRotator& TargetWorldRotation, const FOnCharacterActionFinished& OnCharacterTurnFinished);
+	UFUNCTION(BlueprintCallable, Category = "角色|动作")
+	void TurnTo(const FRotator& TargetWorldRotation);
+
+	void PlayMontageWithBlendingOutDelegate(UAnimMontage* Montage, const FOnMontageBlendingOutStarted& OnMontageBlendingOutStarted, float InPlayRate = 1.f, FName StartSectionName = NAME_None);
+
 	//背包相关
 public:
 	UFUNCTION(BlueprintCallable, Category = "角色|物品", Reliable, WithValidation, Server)
