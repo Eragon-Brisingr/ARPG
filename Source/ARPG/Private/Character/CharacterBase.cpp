@@ -441,7 +441,7 @@ void ACharacterBase::TurnTo(const FRotator& TargetWorldRotation, const FOnCharac
 		else
 		{
 			UARPG_ActorFunctionLibrary::MoveCharacterToRotationFitGround(this, TargetWorldRotation);
-			OnCharacterTurnFinished.ExecuteIfBound();
+			OnCharacterTurnFinished.ExecuteIfBound(true);
 		}
 	}
 }

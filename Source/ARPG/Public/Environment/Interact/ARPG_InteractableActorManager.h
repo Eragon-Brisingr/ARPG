@@ -38,6 +38,8 @@ private:
 
 	void WhenMoveFinished(const FPathFollowingResult& Result, ACharacterBase* Invoker, FVector Location, FRotator Rotation, FOnInteractFinished OnInteractFinished);
 
+	void WhenTurnFinished(bool Succeed, ACharacterBase* Invoker, FBehaviorWithPosition Behavior, FOnInteractFinished OnInteractFinished);
+
 	void WhenBehaviorAbortFinished(ACharacterBase* Invoker, FOnInteractAbortFinished OnInteractAbortFinished);
 public:
 	virtual FBehaviorWithPosition GetBehavior(ACharacterBase* Invoker, const FVector& InteractableLocation) const { return {}; }

@@ -93,7 +93,14 @@ void UBTTask_ARPG_FollowPathMove::WhenMoveFinished(const FPathFollowingResult& R
 				FollowPathMoveMemory->CurBehavior = CurPoint.Behavior;
 				if (FollowPathMoveMemory->CurBehavior)
 				{
-					CurPoint.WorldPositionExecuteBehavior(Character, FOnCharacterBehaviorFinished::CreateUObject(this, &UBTTask_ARPG_FollowPathMove::WhenBehaviorFinished, OwnerComp, NodeMemory));
+					if (CurPoint.bAttachToRotation && Character->CharacterTurnAction)
+					{
+						Character->TurnTo(CurPoint.Rotation, FOnCharacterActionFinished::CreateUObject(this, &UBTTask_ARPG_FollowPathMove::WhenTurnFinished, Character, CurPoint, OwnerComp, NodeMemory));
+					}
+					else
+					{
+						WhenTurnFinished(true, Character, CurPoint, OwnerComp, NodeMemory);
+					}
 				}
 				else
 				{
@@ -106,6 +113,11 @@ void UBTTask_ARPG_FollowPathMove::WhenMoveFinished(const FPathFollowingResult& R
 	{
 		FinishLatentTask(*OwnerComp, EBTNodeResult::Failed);
 	}
+}
+
+void UBTTask_ARPG_FollowPathMove::WhenTurnFinished(bool Succeed, ACharacterBase* Character, FARPG_NavPathPoint CurPoint, UBehaviorTreeComponent* OwnerComp, uint8* NodeMemory)
+{
+	CurPoint.WorldPositionExecuteBehavior(Character, FOnCharacterBehaviorFinished::CreateUObject(this, &UBTTask_ARPG_FollowPathMove::WhenBehaviorFinished, OwnerComp, NodeMemory));
 }
 
 void UBTTask_ARPG_FollowPathMove::WhenBehaviorFinished(bool Succeed, UBehaviorTreeComponent* OwnerComp, uint8* NodeMemory)

@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "BehaviorTree/BTTaskNode.h"
 #include "Navigation/PathFollowingComponent.h"
+#include "ARPG_NavPath.h"
 #include "BTTask_ARPG_FollowPathMove.generated.h"
 
 /**
@@ -41,6 +42,8 @@ public:
 	virtual uint16 GetInstanceMemorySize() const override { return sizeof(FARPG_FollowPathMoveMemory); }
 
 	void WhenMoveFinished(const FPathFollowingResult& Result, UBehaviorTreeComponent* OwnerComp, uint8* NodeMemory);
+
+	void WhenTurnFinished(bool Succeed, ACharacterBase* Character, FARPG_NavPathPoint CurPoint, UBehaviorTreeComponent* OwnerComp, uint8* NodeMemory);
 
 	void WhenBehaviorFinished(bool Succeed, UBehaviorTreeComponent* OwnerComp, uint8* NodeMemory);
 

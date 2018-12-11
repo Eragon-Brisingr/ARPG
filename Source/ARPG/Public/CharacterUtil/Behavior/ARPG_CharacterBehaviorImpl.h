@@ -32,7 +32,7 @@ public:
 
 	const class UCBC_PlayMontage* GetConfig() const;
 public:
-	void WhenMontageEnd(UAnimMontage* Montage, bool bInterrupted, class ACharacterBase* Executer);
+	void WhenMontageBlendingOutStart(UAnimMontage* Montage, bool bInterrupted, class ACharacterBase* Executer);
 };
 
 UCLASS(meta = (DisplayName = "行为_原地等待"))
@@ -208,6 +208,9 @@ class ARPG_API UCBC_TurnTo : public UARPG_CharacterBehaviorConfigBase
 	GENERATED_BODY()
 public:
 	UCBC_TurnTo();
+
+	UPROPERTY(EditAnywhere, Category = "行为")
+	FRotator TargetWorldRotation;
 };
 
 UCLASS()
@@ -216,8 +219,6 @@ class ARPG_API UCB_TurnTo : public UARPG_CharacterBehaviorBase
 	GENERATED_BODY()
 public:
 	void ExecuteBehavior(class ACharacterBase* Executer) override;
-
-	void AbortBehavior(class ACharacterBase* Executer) override;
 };
 
 //e.g. 人类收回武器
