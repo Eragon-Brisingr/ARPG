@@ -59,16 +59,31 @@ void UARPG_InteractableActorManagerBase::WhenMoveFinished(const FPathFollowingRe
 			FBehaviorWithPosition Behavior = GetBehavior(Invoker, Location);
 			if (Behavior.Behavior)
 			{
-				Behavior.RelativePositionExecuteBehavior(Invoker, OnInteractFinished, GetOwner()->GetActorTransform());
-				CurBehaviorMap.FindOrAdd(Invoker) = Behavior.Behavior;
-				WhenBeginInteract(Invoker);
-				OnBeginInteract.Broadcast(GetOwner(), this, Invoker);
+				if (Behavior.bAttachToRotation && Invoker->CharacterTurnAction)
+				{
+					Invoker->TurnTo(Behavior.Rotation, FOnCharacterActionFinished::CreateUObject(this, &UARPG_InteractableActorManagerBase::WhenTurnFinished, Invoker, Behavior, OnInteractFinished));
+				}
+				else
+				{
+					WhenTurnFinished(true, Invoker, Behavior, OnInteractFinished);
+				}
 				return;
 			}
 		}
 	}
 
 	OnInteractFinished.ExecuteIfBound(false);
+}
+
+void UARPG_InteractableActorManagerBase::WhenTurnFinished(bool Succeed, ACharacterBase* Invoker, FBehaviorWithPosition Behavior, FOnInteractFinished OnInteractFinished)
+{
+	if (Succeed)
+	{
+		Behavior.RelativePositionExecuteBehavior(Invoker, OnInteractFinished, GetOwner()->GetActorTransform());
+		CurBehaviorMap.FindOrAdd(Invoker) = Behavior.Behavior;
+		WhenBeginInteract(Invoker);
+		OnBeginInteract.Broadcast(GetOwner(), this, Invoker);
+	}
 }
 
 void UARPG_InteractableActorManagerBase::WhenInteractFinished(bool Succeed, ACharacterBase* Invoker, FOnInteractFinished OnInteractFinished)

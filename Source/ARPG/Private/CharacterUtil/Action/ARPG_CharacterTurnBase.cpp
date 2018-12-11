@@ -47,10 +47,7 @@ UAnimMontage* UARPG_CharacterTurnBase::GetTurnMontage(const FRotator& CurrentWor
 
 void UARPG_CharacterTurnBase::WhenMontageBlendOut(UAnimMontage* Montage, bool bInterrupted, FOnCharacterActionFinished OnCharacterTurnFinished)
 {
-	if (bInterrupted == false)
-	{
-		OnCharacterTurnFinished.ExecuteIfBound();
-	}
+	OnCharacterTurnFinished.ExecuteIfBound(bInterrupted == false);
 }
 
 void UARPG_CharacterTurnNormal::TurnTo(ACharacterBase* Character, const FRotator& TargetWorldRotation, const FOnCharacterActionFinished& OnCharacterTurnFinished) const

@@ -8,4 +8,4 @@
 /**
  * 
  */
-DECLARE_DELEGATE_OneParam(FOnCharacterActionFinished, bool, Succeed);
+DECLARE_DELEGATE_OneParam(FOnCharacterActionFinished, bool /*Succeed*/);

@@ -18,7 +18,7 @@ void UCB_PlayMontage::ExecuteBehavior(class ACharacterBase* Executer)
 {
 	UAnimMontage* Montage = GetConfig()->Montage;
 	Executer->PlayMontage(Montage);
-	FOnMontageBlendingOutStarted OnMontageEnded = FOnMontageBlendingOutStarted::CreateUObject(this, &UCB_PlayMontage::WhenMontageEnd, Executer);
+	FOnMontageBlendingOutStarted OnMontageEnded = FOnMontageBlendingOutStarted::CreateUObject(this, &UCB_PlayMontage::WhenMontageBlendingOutStart, Executer);
 	Executer->GetMesh()->GetAnimInstance()->Montage_SetBlendingOutDelegate(OnMontageEnded, Montage);
 }
 
@@ -38,12 +38,8 @@ const class UCBC_PlayMontage* UCB_PlayMontage::GetConfig() const
 	return UARPG_CharacterBehaviorBase::GetConfig<UCBC_PlayMontage>();
 }
 
-void UCB_PlayMontage::WhenMontageEnd(UAnimMontage* Montage, bool bInterrupted, class ACharacterBase* Executer)
+void UCB_PlayMontage::WhenMontageBlendingOutStart(UAnimMontage* Montage, bool bInterrupted, class ACharacterBase* Executer)
 {
-	if (FOnMontageBlendingOutStarted* OnMontageBlendingOutStarted = Executer->GetMesh()->GetAnimInstance()->Montage_GetBlendingOutDelegate(Montage))
-	{
-		OnMontageBlendingOutStarted->Unbind();
-	}
 	FinishExecute(bInterrupted == false);
 }
 
@@ -151,10 +147,6 @@ void UCB_PlayStateMontageBase::AbortBehavior(class ACharacterBase* Executer)
 
 void UCB_PlayStateMontageBase::WhenStartMontageBlendingOutStarted(UAnimMontage* Montage, bool bInterrupted, class ACharacterBase* Executer)
 {
-	if (FOnMontageBlendingOutStarted* OnMontageBlendingOutStarted = Executer->GetMesh()->GetAnimInstance()->Montage_GetBlendingOutDelegate(Montage))
-	{
-		OnMontageBlendingOutStarted->Unbind();
-	}
 	if (bInterrupted)
 	{
 		FinishExecute(false);
@@ -177,10 +169,6 @@ void UCB_PlayStateMontageBase::WhenStartMontageBlendingOutStarted(UAnimMontage* 
 
 void UCB_PlayStateMontageBase::WhenLoopMontageBlendingOutStarted(UAnimMontage* Montage, bool bInterrupted, class ACharacterBase* Executer)
 {
-	if (FOnMontageBlendingOutStarted* OnMontageBlendingOutStarted = Executer->GetMesh()->GetAnimInstance()->Montage_GetBlendingOutDelegate(Montage))
-	{
-		OnMontageBlendingOutStarted->Unbind();
-	}
 	if (bInterrupted)
 	{
 		FinishExecute(false);
@@ -203,10 +191,6 @@ void UCB_PlayStateMontageBase::WhenLoopMontageBlendingOutStarted(UAnimMontage* M
 
 void UCB_PlayStateMontageBase::WhenEndMontageBlendingOutStarted(UAnimMontage* Montage, bool bInterrupted, class ACharacterBase* Executer)
 {
-	if (FOnMontageBlendingOutStarted* OnMontageBlendingOutStarted = Executer->GetMesh()->GetAnimInstance()->Montage_GetBlendingOutDelegate(Montage))
-	{
-		OnMontageBlendingOutStarted->Unbind();
-	}
 	FinishAbort();
 }
 
@@ -281,19 +265,7 @@ UCBC_TurnTo::UCBC_TurnTo()
 
 void UCB_TurnTo::ExecuteBehavior(class ACharacterBase* Executer)
 {
-// 	if (AAIController* AIController = Cast<AAIController>(Executer->GetController()))
-// 	{
-// 		AIController->SetFocalPoint(Location + Rotation.Vector() * 10000.f, EAIFocusPriority::Gameplay);
-// 
-// 		FTimerHandle TimeHandle;
-// 		GetWorld()->GetTimerManager().SetTimer(TimeHandle, FTimerDelegate::CreateLambda([this] {FinishExecute(true); }), 1.f, false);
-// 	}
-// 	FinishExecute(false);
-}
-
-void UCB_TurnTo::AbortBehavior(class ACharacterBase* Executer)
-{
-	
+	Executer->TurnTo(GetConfig<UCBC_TurnTo>()->TargetWorldRotation);
 }
 
 UCBC_EnterReleaseState::UCBC_EnterReleaseState()
