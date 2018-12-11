@@ -95,6 +95,10 @@ void UBTTask_ARPG_FollowPathMove::WhenMoveFinished(const FPathFollowingResult& R
 				{
 					if (CurPoint.bAttachToRotation && Character->CharacterTurnAction)
 					{
+						if (CurPoint.bAttachToLocation)
+						{
+							UARPG_ActorFunctionLibrary::MoveCharacterToLocationFitGround(Character, CurPoint.Location, 1.f);
+						}
 						Character->TurnTo(CurPoint.Rotation, FOnCharacterActionFinished::CreateUObject(this, &UBTTask_ARPG_FollowPathMove::WhenTurnFinished, Character, CurPoint, OwnerComp, NodeMemory));
 					}
 					else
