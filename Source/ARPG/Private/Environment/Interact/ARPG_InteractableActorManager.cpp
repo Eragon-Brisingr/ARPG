@@ -4,6 +4,7 @@
 #include "CharacterBase.h"
 #include "ARPG_MoveUtils.h"
 #include "ARPG_CharacterBehaviorBase.h"
+#include "ARPG_ActorFunctionLibrary.h"
 
 // Sets default values for this component's properties
 UARPG_InteractableActorManagerBase::UARPG_InteractableActorManagerBase()
@@ -61,7 +62,12 @@ void UARPG_InteractableActorManagerBase::WhenMoveFinished(const FPathFollowingRe
 			{
 				if (Behavior.bAttachToRotation && Invoker->CharacterTurnAction)
 				{
-					Invoker->TurnTo(Behavior.Rotation, FOnCharacterActionFinished::CreateUObject(this, &UARPG_InteractableActorManagerBase::WhenTurnFinished, Invoker, Behavior, OnInteractFinished));
+					FTransform Transfrom = GetOwner()->GetActorTransform();
+					if (Behavior.bAttachToLocation)
+					{
+						UARPG_ActorFunctionLibrary::MoveCharacterToLocationFitGround(Invoker, Transfrom.TransformPosition(Behavior.Location), 1.f);
+					}
+					Invoker->TurnTo(Transfrom.TransformRotation(Behavior.Rotation.Quaternion()).Rotator(), FOnCharacterActionFinished::CreateUObject(this, &UARPG_InteractableActorManagerBase::WhenTurnFinished, Invoker, Behavior, OnInteractFinished));
 				}
 				else
 				{
