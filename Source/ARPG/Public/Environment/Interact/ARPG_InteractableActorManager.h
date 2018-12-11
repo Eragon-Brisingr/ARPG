@@ -41,6 +41,9 @@ private:
 	void WhenTurnFinished(bool Succeed, ACharacterBase* Invoker, FBehaviorWithPosition Behavior, FOnInteractFinished OnInteractFinished);
 
 	void WhenBehaviorAbortFinished(ACharacterBase* Invoker, FOnInteractAbortFinished OnInteractAbortFinished);
+
+	void InteractActorBeginSetCollision(ACharacterBase* Invoker);
+	void InteractActorEndSetCollision(ACharacterBase* Invoker);
 public:
 	virtual FBehaviorWithPosition GetBehavior(ACharacterBase* Invoker, const FVector& InteractableLocation) const { return {}; }
 	virtual bool CanInteract(const ACharacterBase* Invoker) const { return false; }
@@ -55,6 +58,9 @@ public:
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnEndInteract, AActor*, Which, class UARPG_InteractableActorManagerBase*, Manager, class ACharacterBase*, Who);
 	UPROPERTY(BlueprintAssignable, Category = "交互")
 	FOnEndInteract OnEndInteract;
+
+	UPROPERTY(EditAnywhere, Category = "交互")
+	uint8 bCancelCapsuleCollision : 1;
 private:
 	UPROPERTY()
 	TMap<ACharacterBase*, UARPG_CharacterBehaviorConfigBase*> CurBehaviorMap;

@@ -5,6 +5,7 @@
 #include "ARPG_MoveUtils.h"
 #include "ARPG_CharacterBehaviorBase.h"
 #include "ARPG_ActorFunctionLibrary.h"
+#include "Components/CapsuleComponent.h"
 
 // Sets default values for this component's properties
 UARPG_InteractableActorManagerBase::UARPG_InteractableActorManagerBase()
@@ -60,6 +61,7 @@ void UARPG_InteractableActorManagerBase::WhenMoveFinished(const FPathFollowingRe
 			FBehaviorWithPosition Behavior = GetBehavior(Invoker, Location);
 			if (Behavior.Behavior)
 			{
+				InteractActorBeginSetCollision(Invoker);
 				if (Behavior.bAttachToRotation && Invoker->CharacterTurnAction)
 				{
 					FTransform Transfrom = GetOwner()->GetActorTransform();
@@ -83,18 +85,17 @@ void UARPG_InteractableActorManagerBase::WhenMoveFinished(const FPathFollowingRe
 
 void UARPG_InteractableActorManagerBase::WhenTurnFinished(bool Succeed, ACharacterBase* Invoker, FBehaviorWithPosition Behavior, FOnInteractFinished OnInteractFinished)
 {
-	if (Succeed)
-	{
-		Behavior.RelativePositionExecuteBehavior(Invoker, OnInteractFinished, GetOwner()->GetActorTransform());
-		CurBehaviorMap.FindOrAdd(Invoker) = Behavior.Behavior;
-		WhenBeginInteract(Invoker);
-		OnBeginInteract.Broadcast(GetOwner(), this, Invoker);
-	}
+	Behavior.RelativePositionExecuteBehavior(Invoker, OnInteractFinished, GetOwner()->GetActorTransform());
+	CurBehaviorMap.FindOrAdd(Invoker) = Behavior.Behavior;
+	WhenBeginInteract(Invoker);
+	OnBeginInteract.Broadcast(GetOwner(), this, Invoker);
 }
 
 void UARPG_InteractableActorManagerBase::WhenInteractFinished(bool Succeed, ACharacterBase* Invoker, FOnInteractFinished OnInteractFinished)
 {
+	InteractActorEndSetCollision(Invoker);
 	WhenEndInteract(Invoker);
+	OnEndInteract.Broadcast(GetOwner(), this, Invoker);
 	OnInteractFinished.ExecuteIfBound(Succeed);
 }
 
@@ -113,9 +114,26 @@ void UARPG_InteractableActorManagerBase::EndInteract(ACharacterBase* Invoker, co
 void UARPG_InteractableActorManagerBase::WhenBehaviorAbortFinished(ACharacterBase* Invoker, FOnInteractAbortFinished OnInteractAbortFinished)
 {
 	CurBehaviorMap.Remove(Invoker);
+	InteractActorEndSetCollision(Invoker);
 	WhenEndInteract(Invoker);
 	OnEndInteract.Broadcast(GetOwner(), this, Invoker);
 	OnInteractAbortFinished.ExecuteIfBound();
+}
+
+void UARPG_InteractableActorManagerBase::InteractActorBeginSetCollision(ACharacterBase* Invoker)
+{
+	if (bCancelCapsuleCollision)
+	{
+		Invoker->GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	}
+}
+
+void UARPG_InteractableActorManagerBase::InteractActorEndSetCollision(ACharacterBase* Invoker)
+{
+	if (bCancelCapsuleCollision)
+	{
+		Invoker->GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+	}
 }
 
 void UARPG_InteractableActorManagerBase::GetInteractableLocationAndRotation(ACharacterBase* Invoker, FVector& InteractableLocation, FRotator& InteractableRotation) const
