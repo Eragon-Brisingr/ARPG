@@ -58,7 +58,7 @@ ACharacterBase::ACharacterBase(const FObjectInitializer& ObjectInitializer)
 
 	SneakSystem = CreateDefaultSubobject<UARPG_SneakSystemNormal>(GET_MEMBER_NAME_CHECKED(ACharacterBase, SneakSystem));
 
-	CharacterTurnAction = CreateDefaultSubobject<UARPG_CharacterTurnNormal>(GET_MEMBER_NAME_CHECKED(ACharacterBase, CharacterTurnAction));
+	CharacterTurnAction = CreateDefaultSubobject<UCA_TurnNormal>(GET_MEMBER_NAME_CHECKED(ACharacterBase, CharacterTurnAction));
 
 	GetMesh()->VisibilityBasedAnimTickOption = EVisibilityBasedAnimTickOption::AlwaysTickPoseAndRefreshBones;
 

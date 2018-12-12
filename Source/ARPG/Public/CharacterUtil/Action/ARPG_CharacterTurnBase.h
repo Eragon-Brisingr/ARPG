@@ -14,7 +14,7 @@ class ACharacterBase;
  * 
  */
 UCLASS(abstract, EditInlineNew, collapsecategories, Blueprintable)
-class ARPG_API UCB_CharacterTurnBase : public UARPG_CharacterBehaviorBase
+class ARPG_API UCA_CharacterTurnBase : public UARPG_CharacterBehaviorBase
 {
 	GENERATED_BODY()
 public:
@@ -38,7 +38,7 @@ public:
 };
 
 UCLASS(meta = (DisplayName = "转身_普通"))
-class ARPG_API UARPG_CharacterTurnNormal : public UCB_CharacterTurnBase
+class ARPG_API UCA_TurnNormal : public UCA_CharacterTurnBase
 {
 	GENERATED_BODY()
 public:
