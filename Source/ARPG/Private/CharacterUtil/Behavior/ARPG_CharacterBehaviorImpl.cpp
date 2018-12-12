@@ -18,8 +18,8 @@ void UCB_PlayMontage::ExecuteBehavior(class ACharacterBase* Executer)
 {
 	UAnimMontage* Montage = GetConfig()->Montage;
 	Executer->PlayMontage(Montage);
-	FOnMontageBlendingOutStarted OnMontageEnded = FOnMontageBlendingOutStarted::CreateUObject(this, &UCB_PlayMontage::WhenMontageBlendingOutStart, Executer);
-	Executer->GetMesh()->GetAnimInstance()->Montage_SetBlendingOutDelegate(OnMontageEnded, Montage);
+	FOnMontageBlendingOutStarted OnMontageBlendingOutStarted = FOnMontageBlendingOutStarted::CreateUObject(this, &UCB_PlayMontage::WhenMontageBlendingOutStart, Executer);
+	Executer->GetMesh()->GetAnimInstance()->Montage_SetBlendingOutDelegate(OnMontageBlendingOutStarted, Montage);
 }
 
 void UCB_PlayMontage::AbortBehavior(class ACharacterBase* Executer)
