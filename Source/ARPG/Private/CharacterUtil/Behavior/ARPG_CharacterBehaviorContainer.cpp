@@ -169,7 +169,7 @@ void UCB_StateBehavior::WhenStartBehaviorEnd(bool Succeed, ACharacterBase* Execu
 
 void UCB_StateBehavior::WhenLoopBehaviorEnd(bool Succeed, ACharacterBase* Executer)
 {
-	if (CurrentBehavior)
+	if (Succeed && CurrentBehavior)
 	{
 		CurrentBehavior->ExecuteBehavior(Executer, FOnCharacterBehaviorFinished::CreateUObject(this, &UCB_StateBehavior::WhenLoopBehaviorEnd, Executer));
 	}
