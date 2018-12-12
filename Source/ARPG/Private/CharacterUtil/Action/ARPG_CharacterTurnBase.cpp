@@ -5,7 +5,7 @@
 #include "Components/SkeletalMeshComponent.h"
 #include "Animation/AnimInstance.h"
 
-void UCB_CharacterTurnBase::TurnTo(ACharacterBase* Executer, const FRotator& TargetWorldRotation, const FOnCharacterBehaviorFinished& OnCharacterTurnFinished)
+void UCA_CharacterTurnBase::TurnTo(ACharacterBase* Executer, const FRotator& TargetWorldRotation, const FOnCharacterBehaviorFinished& OnCharacterTurnFinished)
 {
 	CurrentTurnMontage = GetTurnMontage(Executer, TargetWorldRotation);
 	if (CurrentTurnMontage)
@@ -13,7 +13,7 @@ void UCB_CharacterTurnBase::TurnTo(ACharacterBase* Executer, const FRotator& Tar
 		Executer->PlayMontage(CurrentTurnMontage);
 		if (OnCharacterTurnFinished.IsBound())
 		{
-			FOnMontageBlendingOutStarted OnMontageBlendingOutStarted = FOnMontageBlendingOutStarted::CreateUObject(this, &UCB_CharacterTurnBase::WhenMontageBlendOutStart, OnCharacterTurnFinished);
+			FOnMontageBlendingOutStarted OnMontageBlendingOutStarted = FOnMontageBlendingOutStarted::CreateUObject(this, &UCA_CharacterTurnBase::WhenMontageBlendOutStart, OnCharacterTurnFinished);
 			Executer->GetMesh()->GetAnimInstance()->Montage_SetBlendingOutDelegate(OnMontageBlendingOutStarted, CurrentTurnMontage);
 		}
 	}
@@ -23,17 +23,17 @@ void UCB_CharacterTurnBase::TurnTo(ACharacterBase* Executer, const FRotator& Tar
 	}
 }
 
-void UCB_CharacterTurnBase::AbortTurnTo(ACharacterBase* Executer, const FOnCharacterBehaviorAbortFinished& OnCharacterBehaviorAbortFinished)
+void UCA_CharacterTurnBase::AbortTurnTo(ACharacterBase* Executer, const FOnCharacterBehaviorAbortFinished& OnCharacterBehaviorAbortFinished)
 {
 	UARPG_CharacterBehaviorBase::AbortBehavior(Executer, OnCharacterBehaviorAbortFinished);
 }
 
-void UCB_CharacterTurnBase::WhenMontageBlendOutStart(UAnimMontage* Montage, bool bInterrupted, FOnCharacterBehaviorFinished OnCharacterTurnFinished)
+void UCA_CharacterTurnBase::WhenMontageBlendOutStart(UAnimMontage* Montage, bool bInterrupted, FOnCharacterBehaviorFinished OnCharacterTurnFinished)
 {
 	OnCharacterTurnFinished.ExecuteIfBound(bInterrupted == false);
 }
 
-UAnimMontage* UCB_CharacterTurnBase::GetTurnMontageFourDirection(const FRotator& CurrentWorldRotation, const FRotator& TargetWorldRotation, UAnimMontage* TurnLeft90, UAnimMontage* TurnRight90, UAnimMontage* TurnLeft180, UAnimMontage* TurnRight180)
+UAnimMontage* UCA_CharacterTurnBase::GetTurnMontageFourDirection(const FRotator& CurrentWorldRotation, const FRotator& TargetWorldRotation, UAnimMontage* TurnLeft90, UAnimMontage* TurnRight90, UAnimMontage* TurnLeft180, UAnimMontage* TurnRight180)
 {
 	float Yaw = (CurrentWorldRotation - TargetWorldRotation).GetNormalized().Yaw;
 	UAnimMontage* MontageToPlay = nullptr;
@@ -56,7 +56,7 @@ UAnimMontage* UCB_CharacterTurnBase::GetTurnMontageFourDirection(const FRotator&
 	return MontageToPlay;
 }
 
-void UCB_CharacterTurnBase::AbortBehavior(ACharacterBase* Executer)
+void UCA_CharacterTurnBase::AbortBehavior(ACharacterBase* Executer)
 {
 	if (FOnMontageBlendingOutStarted* OnMontageBlendingOutStarted = Executer->GetMesh()->GetAnimInstance()->Montage_GetBlendingOutDelegate(CurrentTurnMontage))
 	{
@@ -66,7 +66,7 @@ void UCB_CharacterTurnBase::AbortBehavior(ACharacterBase* Executer)
 	FinishAbort();
 }
 
-UAnimMontage* UARPG_CharacterTurnNormal::GetTurnMontage(ACharacterBase* Executer, const FRotator& TargetWorldRotation)
+UAnimMontage* UCA_TurnNormal::GetTurnMontage(ACharacterBase* Executer, const FRotator& TargetWorldRotation)
 {
 	return GetTurnMontageFourDirection(Executer->GetActorRotation(), TargetWorldRotation, TurnLeft90, TurnRight90, TurnLeft180, TurnRight180);
 }

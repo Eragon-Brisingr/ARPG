@@ -184,7 +184,7 @@ public:
 
 	//转身
 	UPROPERTY(EditDefaultsOnly, Category = "角色|动画配置", Instanced)
-	class UCB_CharacterTurnBase* CharacterTurnAction;
+	class UCA_CharacterTurnBase* CharacterTurnAction;
 
 	UPROPERTY(EditDefaultsOnly, Category = "角色|动作")
 	FName TurnSlotName = TEXT("TurnInPlace");
