@@ -33,7 +33,7 @@ UARPG_CharacterBehaviorConfigurable* UARPG_CharacterBehaviorConfigBase::ExecuteB
 {
 	if (BehaviorType)
 	{
-		UARPG_CharacterBehaviorConfigurable* Behavior = BehaviorMap.FindOrAdd(Character);
+		UARPG_CharacterBehaviorConfigurable*& Behavior = BehaviorMap.FindOrAdd(Character);
 		if (Behavior == nullptr)
 		{
 			Behavior = NewObject<UARPG_CharacterBehaviorConfigurable>(const_cast<UARPG_CharacterBehaviorConfigBase*>(this), BehaviorType);
