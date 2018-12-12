@@ -35,7 +35,7 @@ void UCB_PlayMontage::AbortBehavior(class ACharacterBase* Executer)
 
 const class UCBC_PlayMontage* UCB_PlayMontage::GetConfig() const
 {
-	return UARPG_CharacterBehaviorBase::GetConfig<UCBC_PlayMontage>();
+	return UARPG_CharacterBehaviorConfigurable::GetConfig<UCBC_PlayMontage>();
 }
 
 void UCB_PlayMontage::WhenMontageBlendingOutStart(UAnimMontage* Montage, bool bInterrupted, class ACharacterBase* Executer)
@@ -70,7 +70,7 @@ void UCB_Wait::AbortBehavior(class ACharacterBase* Executer)
 
 const UCBC_Wait* UCB_Wait::GetConfig() const
 {
-	return UARPG_CharacterBehaviorBase::GetConfig<UCBC_Wait>();
+	return UARPG_CharacterBehaviorConfigurable::GetConfig<UCBC_Wait>();
 }
 
 UCBC_PlayStateMontageSimpleBase::UCBC_PlayStateMontageSimpleBase()
@@ -196,7 +196,7 @@ void UCB_PlayStateMontageBase::WhenEndMontageBlendingOutStarted(UAnimMontage* Mo
 
 const UCBC_PlayStateMontageSimpleBase* UCB_PlayStateMontageSimple::GetConfig() const
 {
-	return UARPG_CharacterBehaviorBase::GetConfig<UCBC_PlayStateMontageSimpleBase>();
+	return UARPG_CharacterBehaviorConfigurable::GetConfig<UCBC_PlayStateMontageSimpleBase>();
 }
 
 UAnimMontage* UCB_PlayStateMontageSimple::GetStartMontage() const
@@ -223,7 +223,7 @@ UCBC_PlayStateMontageStandard::UCBC_PlayStateMontageStandard()
 
 const UCBC_PlayStateMontageStandard* UCB_PlayStateMontageStandard::GetConfig() const
 {
-	return UARPG_CharacterBehaviorBase::GetConfig<UCBC_PlayStateMontageStandard>();
+	return UARPG_CharacterBehaviorConfigurable::GetConfig<UCBC_PlayStateMontageStandard>();
 }
 
 UAnimMontage* UCB_PlayStateMontageStandard::GetStartMontage() const

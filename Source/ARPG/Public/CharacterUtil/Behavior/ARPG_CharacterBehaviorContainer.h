@@ -35,7 +35,7 @@ public:
 };
 
 UCLASS()
-class ARPG_API UCB_RandomSelect : public UARPG_CharacterBehaviorBase
+class ARPG_API UCB_RandomSelect : public UARPG_CharacterBehaviorConfigurable
 {
 	GENERATED_BODY()
 public:
@@ -60,7 +60,7 @@ public:
 };
 
 UCLASS()
-class ARPG_API UCB_Sequence : public UARPG_CharacterBehaviorBase
+class ARPG_API UCB_Sequence : public UARPG_CharacterBehaviorConfigurable
 {
 	GENERATED_BODY()
 public:
@@ -98,7 +98,7 @@ public:
 };
 
 UCLASS()
-class ARPG_API UCB_StateBehavior : public UARPG_CharacterBehaviorBase
+class ARPG_API UCB_StateBehavior : public UARPG_CharacterBehaviorConfigurable
 {
 	GENERATED_BODY()
 public:

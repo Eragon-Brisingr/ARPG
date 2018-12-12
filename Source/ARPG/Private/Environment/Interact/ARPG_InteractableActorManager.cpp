@@ -62,14 +62,15 @@ void UARPG_InteractableActorManagerBase::WhenMoveFinished(const FPathFollowingRe
 			if (Behavior.Behavior)
 			{
 				InteractActorBeginSetCollision(Invoker);
-				if (Behavior.bAttachToRotation && Invoker->CharacterTurnAction)
+				ExecuteWhenBeginInteract(Invoker);
+				if (Behavior.bAttachToRotation && Invoker->CharacterTurnAction && Invoker->CanPlayTurnMontage())
 				{
 					FTransform Transfrom = GetOwner()->GetActorTransform();
 					if (Behavior.bAttachToLocation)
 					{
 						UARPG_ActorFunctionLibrary::MoveCharacterToLocationFitGround(Invoker, Transfrom.TransformPosition(Behavior.Location), 1.f);
 					}
-					Invoker->TurnTo(Transfrom.TransformRotation(Behavior.Rotation.Quaternion()).Rotator(), FOnCharacterActionFinished::CreateUObject(this, &UARPG_InteractableActorManagerBase::WhenTurnFinished, Invoker, Behavior, OnInteractFinished));
+					CurBehaviorMap.FindOrAdd(Invoker) = Invoker->TurnTo(Transfrom.TransformRotation(Behavior.Rotation.Quaternion()).Rotator(), FOnCharacterBehaviorFinished::CreateUObject(this, &UARPG_InteractableActorManagerBase::WhenTurnFinished, Invoker, Behavior, OnInteractFinished));
 				}
 				else
 				{
@@ -83,41 +84,35 @@ void UARPG_InteractableActorManagerBase::WhenMoveFinished(const FPathFollowingRe
 	OnInteractFinished.ExecuteIfBound(false);
 }
 
-void UARPG_InteractableActorManagerBase::WhenTurnFinished(bool Succeed, ACharacterBase* Invoker, FBehaviorWithPosition Behavior, FOnInteractFinished OnInteractFinished)
+void UARPG_InteractableActorManagerBase::WhenTurnFinished(bool Succeed, ACharacterBase* Invoker, FBehaviorWithPosition BehaviorConfig, FOnInteractFinished OnInteractFinished)
 {
-	Behavior.RelativePositionExecuteBehavior(Invoker, OnInteractFinished, GetOwner()->GetActorTransform());
-	CurBehaviorMap.FindOrAdd(Invoker) = Behavior.Behavior;
-	WhenBeginInteract(Invoker);
-	OnBeginInteract.Broadcast(GetOwner(), this, Invoker);
+	UARPG_CharacterBehaviorConfigurable* Behavior = BehaviorConfig.RelativePositionExecuteBehavior(Invoker, OnInteractFinished, GetOwner()->GetActorTransform());
+	CurBehaviorMap.FindOrAdd(Invoker) = Behavior;
 }
 
 void UARPG_InteractableActorManagerBase::WhenInteractFinished(bool Succeed, ACharacterBase* Invoker, FOnInteractFinished OnInteractFinished)
 {
-	InteractActorEndSetCollision(Invoker);
-	WhenEndInteract(Invoker);
-	OnEndInteract.Broadcast(GetOwner(), this, Invoker);
 	OnInteractFinished.ExecuteIfBound(Succeed);
+	ExecuteWhenEndInteract(Invoker);
 }
 
 void UARPG_InteractableActorManagerBase::EndInteract(ACharacterBase* Invoker, const FOnInteractAbortFinished& OnInteractAbortFinished)
 {
-	if (UARPG_CharacterBehaviorConfigBase** P_Behavior = CurBehaviorMap.Find(Invoker))
+	if (UARPG_CharacterBehaviorBase** P_Behavior = CurBehaviorMap.Find(Invoker))
 	{
 		(*P_Behavior)->AbortBehavior(Invoker, FOnCharacterBehaviorAbortFinished::CreateUObject(this, &UARPG_InteractableActorManagerBase::WhenBehaviorAbortFinished, Invoker, OnInteractAbortFinished));
 	}
 	else
 	{
 		OnInteractAbortFinished.ExecuteIfBound();
+		ExecuteWhenEndInteract(Invoker);
 	}
 }
 
 void UARPG_InteractableActorManagerBase::WhenBehaviorAbortFinished(ACharacterBase* Invoker, FOnInteractAbortFinished OnInteractAbortFinished)
 {
-	CurBehaviorMap.Remove(Invoker);
-	InteractActorEndSetCollision(Invoker);
-	WhenEndInteract(Invoker);
-	OnEndInteract.Broadcast(GetOwner(), this, Invoker);
 	OnInteractAbortFinished.ExecuteIfBound();
+	ExecuteWhenEndInteract(Invoker);
 }
 
 void UARPG_InteractableActorManagerBase::InteractActorBeginSetCollision(ACharacterBase* Invoker)
@@ -134,6 +129,20 @@ void UARPG_InteractableActorManagerBase::InteractActorEndSetCollision(ACharacter
 	{
 		Invoker->GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 	}
+}
+
+void UARPG_InteractableActorManagerBase::ExecuteWhenBeginInteract(ACharacterBase* Invoker)
+{
+	WhenBeginInteract(Invoker);
+	OnBeginInteract.Broadcast(GetOwner(), this, Invoker);
+}
+
+void UARPG_InteractableActorManagerBase::ExecuteWhenEndInteract(ACharacterBase* Invoker)
+{
+	CurBehaviorMap.Remove(Invoker);
+	InteractActorEndSetCollision(Invoker);
+	WhenEndInteract(Invoker);
+	OnEndInteract.Broadcast(GetOwner(), this, Invoker);
 }
 
 void UARPG_InteractableActorManagerBase::GetInteractableLocationAndRotation(ACharacterBase* Invoker, FVector& InteractableLocation, FRotator& InteractableRotation) const

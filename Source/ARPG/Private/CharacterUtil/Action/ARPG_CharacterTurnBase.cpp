@@ -5,15 +5,16 @@
 #include "Components/SkeletalMeshComponent.h"
 #include "Animation/AnimInstance.h"
 
-void UARPG_CharacterTurnBase::TurnTo(ACharacterBase* Character, const FRotator& TargetWorldRotation, const FOnCharacterActionFinished& OnCharacterTurnFinished) const
+void UCB_CharacterTurnBase::TurnTo(ACharacterBase* Executer, const FRotator& TargetWorldRotation, const FOnCharacterBehaviorFinished& OnCharacterTurnFinished)
 {
-	if (UAnimMontage* MontageToPlay = ReceiveGetTurnMontage(Character, TargetWorldRotation))
+	CurrentTurnMontage = GetTurnMontage(Executer, TargetWorldRotation);
+	if (CurrentTurnMontage)
 	{
-		Character->PlayMontage(MontageToPlay);
+		Executer->PlayMontage(CurrentTurnMontage);
 		if (OnCharacterTurnFinished.IsBound())
 		{
-			FOnMontageBlendingOutStarted OnMontageBlendingOutStarted = FOnMontageBlendingOutStarted::CreateUObject(this, &UARPG_CharacterTurnBase::WhenMontageBlendOut, OnCharacterTurnFinished);
-			Character->GetMesh()->GetAnimInstance()->Montage_SetBlendingOutDelegate(OnMontageBlendingOutStarted, MontageToPlay);
+			FOnMontageBlendingOutStarted OnMontageBlendingOutStarted = FOnMontageBlendingOutStarted::CreateUObject(this, &UCB_CharacterTurnBase::WhenMontageBlendOutStart, OnCharacterTurnFinished);
+			Executer->GetMesh()->GetAnimInstance()->Montage_SetBlendingOutDelegate(OnMontageBlendingOutStarted, CurrentTurnMontage);
 		}
 	}
 	else
@@ -22,7 +23,17 @@ void UARPG_CharacterTurnBase::TurnTo(ACharacterBase* Character, const FRotator& 
 	}
 }
 
-UAnimMontage* UARPG_CharacterTurnBase::GetTurnMontage(const FRotator& CurrentWorldRotation, const FRotator& TargetWorldRotation, UAnimMontage* TurnLeft90, UAnimMontage* TurnRight90, UAnimMontage* TurnLeft180, UAnimMontage* TurnRight180) const
+void UCB_CharacterTurnBase::AbortTurnTo(ACharacterBase* Executer, const FOnCharacterBehaviorAbortFinished& OnCharacterBehaviorAbortFinished)
+{
+	UARPG_CharacterBehaviorBase::AbortBehavior(Executer, OnCharacterBehaviorAbortFinished);
+}
+
+void UCB_CharacterTurnBase::WhenMontageBlendOutStart(UAnimMontage* Montage, bool bInterrupted, FOnCharacterBehaviorFinished OnCharacterTurnFinished)
+{
+	OnCharacterTurnFinished.ExecuteIfBound(bInterrupted == false);
+}
+
+UAnimMontage* UCB_CharacterTurnBase::GetTurnMontageFourDirection(const FRotator& CurrentWorldRotation, const FRotator& TargetWorldRotation, UAnimMontage* TurnLeft90, UAnimMontage* TurnRight90, UAnimMontage* TurnLeft180, UAnimMontage* TurnRight180)
 {
 	float Yaw = (CurrentWorldRotation - TargetWorldRotation).GetNormalized().Yaw;
 	UAnimMontage* MontageToPlay = nullptr;
@@ -45,24 +56,17 @@ UAnimMontage* UARPG_CharacterTurnBase::GetTurnMontage(const FRotator& CurrentWor
 	return MontageToPlay;
 }
 
-void UARPG_CharacterTurnBase::WhenMontageBlendOut(UAnimMontage* Montage, bool bInterrupted, FOnCharacterActionFinished OnCharacterTurnFinished)
+void UCB_CharacterTurnBase::AbortBehavior(ACharacterBase* Executer)
 {
-	OnCharacterTurnFinished.ExecuteIfBound(bInterrupted == false);
+	if (FOnMontageBlendingOutStarted* OnMontageBlendingOutStarted = Executer->GetMesh()->GetAnimInstance()->Montage_GetBlendingOutDelegate(CurrentTurnMontage))
+	{
+		OnMontageBlendingOutStarted->Unbind();
+	}
+	Executer->StopAnimMontage(CurrentTurnMontage);
+	FinishAbort();
 }
 
-void UARPG_CharacterTurnNormal::TurnTo(ACharacterBase* Character, const FRotator& TargetWorldRotation, const FOnCharacterActionFinished& OnCharacterTurnFinished) const
+UAnimMontage* UARPG_CharacterTurnNormal::GetTurnMontage(ACharacterBase* Executer, const FRotator& TargetWorldRotation)
 {
-	if (UAnimMontage* MontageToPlay = GetTurnMontage(Character->GetActorRotation(), TargetWorldRotation, TurnLeft90, TurnRight90, TurnLeft180, TurnRight180))
-	{
-		Character->PlayMontage(MontageToPlay);
-		if (OnCharacterTurnFinished.IsBound())
-		{
-			FOnMontageBlendingOutStarted OnMontageBlendingOutStarted = FOnMontageBlendingOutStarted::CreateUObject(this, &UARPG_CharacterTurnBase::WhenMontageBlendOut, OnCharacterTurnFinished);
-			Character->GetMesh()->GetAnimInstance()->Montage_SetBlendingOutDelegate(OnMontageBlendingOutStarted, MontageToPlay);
-		}
-	}
-	else
-	{
-		OnCharacterTurnFinished.ExecuteIfBound(false);
-	}
+	return GetTurnMontageFourDirection(Executer->GetActorRotation(), TargetWorldRotation, TurnLeft90, TurnRight90, TurnLeft180, TurnRight180);
 }

@@ -15,7 +15,7 @@ struct FARPG_FollowPathMoveMemory
 {
 	int32 TargetPointIndex = -1;
 	uint8 bMoveReverse : 1;
-	class UARPG_CharacterBehaviorConfigBase* CurBehavior;
+	class UARPG_CharacterBehaviorBase* CurBehavior;
 };
 
 UCLASS(meta = (DisplayName = "沿路径移动"))
@@ -41,11 +41,11 @@ public:
 	virtual EBTNodeResult::Type AbortTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) override;
 	virtual uint16 GetInstanceMemorySize() const override { return sizeof(FARPG_FollowPathMoveMemory); }
 
-	void WhenMoveFinished(const FPathFollowingResult& Result, UBehaviorTreeComponent* OwnerComp, uint8* NodeMemory);
+	void WhenMoveFinished(const FPathFollowingResult& Result, UBehaviorTreeComponent* OwnerComp, FARPG_FollowPathMoveMemory* FollowPathMoveMemory);
 
-	void WhenTurnFinished(bool Succeed, ACharacterBase* Character, FARPG_NavPathPoint CurPoint, UBehaviorTreeComponent* OwnerComp, uint8* NodeMemory);
+	void WhenTurnFinished(bool Succeed, ACharacterBase* Character, FARPG_NavPathPoint CurPoint, UBehaviorTreeComponent* OwnerComp, FARPG_FollowPathMoveMemory* FollowPathMoveMemory);
 
-	void WhenBehaviorFinished(bool Succeed, UBehaviorTreeComponent* OwnerComp, uint8* NodeMemory);
+	void WhenBehaviorFinished(bool Succeed, UBehaviorTreeComponent* OwnerComp, FARPG_FollowPathMoveMemory* FollowPathMoveMemory);
 
 	void WhenBehaviorAborted(UBehaviorTreeComponent* OwnerComp, uint8* NodeMemory);
 };

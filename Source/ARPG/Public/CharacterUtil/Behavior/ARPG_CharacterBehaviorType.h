@@ -6,6 +6,7 @@
 #include "ARPG_CharacterBehaviorType.generated.h"
 
 class UARPG_CharacterBehaviorConfigBase;
+class UARPG_CharacterBehaviorConfigurable;
 
 /**
  * 
@@ -33,7 +34,7 @@ public:
  	UPROPERTY(EditAnywhere, Category = "行为", Instanced)
  	UARPG_CharacterBehaviorConfigBase* Behavior = nullptr;
 	
-	void WorldPositionExecuteBehavior(class ACharacterBase* Character, const FOnCharacterBehaviorFinished& OnBehaviorFinished) const;
+	UARPG_CharacterBehaviorConfigurable* WorldPositionExecuteBehavior(class ACharacterBase* Character, const FOnCharacterBehaviorFinished& OnBehaviorFinished) const;
 
-	void RelativePositionExecuteBehavior(class ACharacterBase* Character, const FOnCharacterBehaviorFinished& OnBehaviorFinished, const FTransform& Transform) const;
+	UARPG_CharacterBehaviorConfigurable* RelativePositionExecuteBehavior(class ACharacterBase* Character, const FOnCharacterBehaviorFinished& OnBehaviorFinished, const FTransform& Transform) const;
 };

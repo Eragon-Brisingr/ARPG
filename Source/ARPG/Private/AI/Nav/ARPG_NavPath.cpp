@@ -11,7 +11,10 @@ AARPG_NavPath::AARPG_NavPath()
 
 #if WITH_EDITORONLY_DATA
 	VisualControl = CreateEditorOnlyDefaultSubobject<UARPG_NavPathVisualHelper>(GET_MEMBER_NAME_CHECKED(AARPG_NavPath, VisualControl));
-	VisualControl->bIsEditorOnly = true;
+	if (VisualControl)
+	{
+		VisualControl->bIsEditorOnly = true;
+	}
 
 	SetRootComponent(VisualControl);
 #endif
