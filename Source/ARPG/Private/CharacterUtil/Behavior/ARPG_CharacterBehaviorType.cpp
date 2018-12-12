@@ -4,7 +4,7 @@
 #include "ARPG_ActorFunctionLibrary.h"
 #include "ARPG_CharacterBehaviorBase.h"
 
-void FBehaviorWithPosition::WorldPositionExecuteBehavior(class ACharacterBase* Character, const FOnCharacterBehaviorFinished& OnBehaviorFinished) const
+UARPG_CharacterBehaviorConfigurable* FBehaviorWithPosition::WorldPositionExecuteBehavior(class ACharacterBase* Character, const FOnCharacterBehaviorFinished& OnBehaviorFinished) const
 {
 	if (bAttachToLocation && bAttachToRotation)
 	{
@@ -19,10 +19,10 @@ void FBehaviorWithPosition::WorldPositionExecuteBehavior(class ACharacterBase* C
 		UARPG_ActorFunctionLibrary::MoveCharacterToRotationFitGround(Character, Rotation);
 	}
 
-	Behavior->ExecuteBehavior(Character, OnBehaviorFinished);
+	return Behavior->ExecuteBehavior(Character, OnBehaviorFinished);
 }
 
-void FBehaviorWithPosition::RelativePositionExecuteBehavior(class ACharacterBase* Character, const FOnCharacterBehaviorFinished& OnBehaviorFinished, const FTransform& Transform) const
+UARPG_CharacterBehaviorConfigurable* FBehaviorWithPosition::RelativePositionExecuteBehavior(class ACharacterBase* Character, const FOnCharacterBehaviorFinished& OnBehaviorFinished, const FTransform& Transform) const
 {
 	if (bAttachToLocation && bAttachToRotation)
 	{
@@ -37,5 +37,5 @@ void FBehaviorWithPosition::RelativePositionExecuteBehavior(class ACharacterBase
 		UARPG_ActorFunctionLibrary::MoveCharacterToRotationFitGround(Character, Transform.TransformRotation(Rotation.Quaternion()).Rotator());
 	}
 
-	Behavior->ExecuteBehavior(Character, OnBehaviorFinished);
+	return Behavior->ExecuteBehavior(Character, OnBehaviorFinished);
 }

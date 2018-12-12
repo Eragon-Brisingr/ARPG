@@ -18,7 +18,6 @@
 #include "ARPG_BattleType.h"
 #include "BehaviorTreeEx.h"
 #include "ARPG_CharacterBehaviorType.h"
-#include "ARPG_CharacterActionType.h"
 #include "Animation/AnimInstance.h"
 #include "CharacterBase.generated.h"
 
@@ -185,7 +184,7 @@ public:
 
 	//转身
 	UPROPERTY(EditDefaultsOnly, Category = "角色|动画配置", Instanced)
-	class UARPG_CharacterTurnBase* CharacterTurnAction;
+	class UCB_CharacterTurnBase* CharacterTurnAction;
 
 	UPROPERTY(EditDefaultsOnly, Category = "角色|动作")
 	FName TurnSlotName = TEXT("TurnInPlace");
@@ -193,9 +192,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "角色|动作")
 	bool CanPlayTurnMontage() const;
 
-	void TurnTo(const FRotator& TargetWorldRotation, const FOnCharacterActionFinished& OnCharacterTurnFinished);
+	UARPG_CharacterBehaviorBase* TurnTo(const FRotator& TargetWorldRotation, const FOnCharacterBehaviorFinished& OnCharacterBehaviorFinished);
 	UFUNCTION(BlueprintCallable, Category = "角色|动作")
-	void TurnTo(const FRotator& TargetWorldRotation);
+	UARPG_CharacterBehaviorBase* TurnTo(const FRotator& TargetWorldRotation);
 
 	void PlayMontageWithBlendingOutDelegate(UAnimMontage* Montage, const FOnMontageBlendingOutStarted& OnMontageBlendingOutStarted, float InPlayRate = 1.f, FName StartSectionName = NAME_None);
 

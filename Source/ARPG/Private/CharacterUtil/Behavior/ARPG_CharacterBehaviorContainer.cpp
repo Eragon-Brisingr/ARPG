@@ -52,7 +52,7 @@ void UCB_RandomSelect::AbortBehavior(ACharacterBase* Executer)
 
 const UCBC_RandomSelect* UCB_RandomSelect::GetConfig() const
 {
-	return UARPG_CharacterBehaviorBase::GetConfig<UCBC_RandomSelect>();
+	return UARPG_CharacterBehaviorConfigurable::GetConfig<UCBC_RandomSelect>();
 }
 
 UCBC_Sequence::UCBC_Sequence()
@@ -81,7 +81,7 @@ void UCB_Sequence::AbortBehavior(ACharacterBase* Executer)
 
 const UCBC_Sequence* UCB_Sequence::GetConfig() const
 {
-	return UARPG_CharacterBehaviorBase::GetConfig<UCBC_Sequence>();
+	return UARPG_CharacterBehaviorConfigurable::GetConfig<UCBC_Sequence>();
 }
 
 void UCB_Sequence::WhenElementBehaviorFinished(bool Succeed, ACharacterBase* Executer)
@@ -152,7 +152,7 @@ void UCB_StateBehavior::AbortBehavior(ACharacterBase* Executer)
 
 const UCBC_StateBehavior* UCB_StateBehavior::GetConfig() const
 {
-	return UARPG_CharacterBehaviorBase::GetConfig<UCBC_StateBehavior>();
+	return UARPG_CharacterBehaviorConfigurable::GetConfig<UCBC_StateBehavior>();
 }
 
 void UCB_StateBehavior::WhenStartBehaviorEnd(bool Succeed, ACharacterBase* Executer)

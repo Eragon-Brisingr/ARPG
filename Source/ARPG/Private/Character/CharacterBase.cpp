@@ -430,25 +430,28 @@ bool ACharacterBase::CanPlayTurnMontage() const
 	return GetMesh()->GetAnimInstance()->GetSlotMontageGlobalWeight(TurnSlotName) == 0.f && IsPlayingRootMotion() == false;
 }
 
-void ACharacterBase::TurnTo(const FRotator& TargetWorldRotation, const FOnCharacterActionFinished& OnCharacterTurnFinished)
+UARPG_CharacterBehaviorBase* ACharacterBase::TurnTo(const FRotator& TargetWorldRotation, const FOnCharacterBehaviorFinished& OnCharacterBehaviorFinished)
 {
 	if (CanPlayTurnMontage())
 	{
 		if (CharacterTurnAction)
 		{
-			CharacterTurnAction->TurnTo(this, TargetWorldRotation, OnCharacterTurnFinished);
+			CharacterTurnAction->TurnTo(this, TargetWorldRotation, OnCharacterBehaviorFinished);
+			return CharacterTurnAction;
 		}
 		else
 		{
 			UARPG_ActorFunctionLibrary::MoveCharacterToRotationFitGround(this, TargetWorldRotation);
-			OnCharacterTurnFinished.ExecuteIfBound(true);
+			OnCharacterBehaviorFinished.ExecuteIfBound(true);
+			return nullptr;
 		}
 	}
+	return nullptr;
 }
 
-void ACharacterBase::TurnTo(const FRotator& TargetWorldRotation)
+UARPG_CharacterBehaviorBase* ACharacterBase::TurnTo(const FRotator& TargetWorldRotation)
 {
-	TurnTo(TargetWorldRotation, {});
+	return TurnTo(TargetWorldRotation, {});
 }
 
 void ACharacterBase::PlayMontageWithBlendingOutDelegate(UAnimMontage* Montage, const FOnMontageBlendingOutStarted& OnMontageBlendingOutStarted, float InPlayRate /*= 1.f*/, FName StartSectionName /*= NAME_None*/)

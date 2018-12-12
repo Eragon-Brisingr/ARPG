@@ -9,8 +9,9 @@
 #include "ARPG_CharacterBehaviorType.h"
 #include "ARPG_InteractableActorManager.generated.h"
 
-class UARPG_CharacterBehaviorConfigBase;
 class ACharacterBase;
+class UARPG_CharacterBehaviorConfigBase;
+class UARPG_CharacterBehaviorBase;
 
 UCLASS(abstract)
 class ARPG_API UARPG_InteractableActorManagerBase : public UActorComponent
@@ -38,12 +39,15 @@ private:
 
 	void WhenMoveFinished(const FPathFollowingResult& Result, ACharacterBase* Invoker, FVector Location, FRotator Rotation, FOnInteractFinished OnInteractFinished);
 
-	void WhenTurnFinished(bool Succeed, ACharacterBase* Invoker, FBehaviorWithPosition Behavior, FOnInteractFinished OnInteractFinished);
+	void WhenTurnFinished(bool Succeed, ACharacterBase* Invoker, FBehaviorWithPosition BehaviorConfig, FOnInteractFinished OnInteractFinished);
 
 	void WhenBehaviorAbortFinished(ACharacterBase* Invoker, FOnInteractAbortFinished OnInteractAbortFinished);
 
 	void InteractActorBeginSetCollision(ACharacterBase* Invoker);
 	void InteractActorEndSetCollision(ACharacterBase* Invoker);
+
+	void ExecuteWhenBeginInteract(ACharacterBase* Invoker);
+	void ExecuteWhenEndInteract(ACharacterBase* Invoker);
 public:
 	virtual FBehaviorWithPosition GetBehavior(ACharacterBase* Invoker, const FVector& InteractableLocation) const { return {}; }
 	virtual bool CanInteract(const ACharacterBase* Invoker) const { return false; }
@@ -63,7 +67,7 @@ public:
 	uint8 bCancelCapsuleCollision : 1;
 private:
 	UPROPERTY()
-	TMap<ACharacterBase*, UARPG_CharacterBehaviorConfigBase*> CurBehaviorMap;
+	TMap<ACharacterBase*, UARPG_CharacterBehaviorBase*> CurBehaviorMap;
 
 	virtual void GetInteractableLocationAndRotation(ACharacterBase* Invoker, FVector& InteractableLocation, FRotator& InteractableRotation) const;
 };

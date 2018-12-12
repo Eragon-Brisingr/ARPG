@@ -22,7 +22,7 @@ public:
 };
 
 UCLASS()
-class ARPG_API UCB_PlayMontage : public UARPG_CharacterBehaviorBase
+class ARPG_API UCB_PlayMontage : public UARPG_CharacterBehaviorConfigurable
 {
 	GENERATED_BODY()
 public:
@@ -50,7 +50,7 @@ public:
 };
 
 UCLASS()
-class ARPG_API UCB_Wait : public UARPG_CharacterBehaviorBase
+class ARPG_API UCB_Wait : public UARPG_CharacterBehaviorConfigurable
 {
 	GENERATED_BODY()
 public:
@@ -123,7 +123,7 @@ public:
 };
 
 UCLASS(abstract)
-class ARPG_API UCB_PlayStateMontageBase : public UARPG_CharacterBehaviorBase
+class ARPG_API UCB_PlayStateMontageBase : public UARPG_CharacterBehaviorConfigurable
 {
 	GENERATED_BODY()
 public:
@@ -214,7 +214,7 @@ public:
 };
 
 UCLASS()
-class ARPG_API UCB_TurnTo : public UARPG_CharacterBehaviorBase
+class ARPG_API UCB_TurnTo : public UARPG_CharacterBehaviorConfigurable
 {
 	GENERATED_BODY()
 public:
@@ -231,7 +231,7 @@ public:
 };
 
 UCLASS()
-class ARPG_API UCB_EnterReleaseState : public UARPG_CharacterBehaviorBase
+class ARPG_API UCB_EnterReleaseState : public UARPG_CharacterBehaviorConfigurable
 {
 	GENERATED_BODY()
 public:

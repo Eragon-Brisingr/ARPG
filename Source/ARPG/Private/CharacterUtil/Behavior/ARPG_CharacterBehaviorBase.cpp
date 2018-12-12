@@ -10,6 +10,13 @@ UWorld* UARPG_CharacterBehaviorBase::GetWorld() const
 	return Character->GetWorld();
 }
 
+void UARPG_CharacterBehaviorBase::AbortBehavior(class ACharacterBase* Executer, const FOnCharacterBehaviorAbortFinished& WhenBehaviorAbortFinished)
+{
+	OnBehaviorAbortFinished = WhenBehaviorAbortFinished;
+	AbortBehavior(Executer);
+	AI_V_Display_Log(Executer, "行为[%s]中断", *UXD_ObjectFunctionLibrary::GetObjectClassName(this));
+}
+
 void UARPG_CharacterBehaviorBase::FinishExecute(bool Succeed)
 {
 	OnBehaviorFinished.ExecuteIfBound(Succeed);
@@ -22,38 +29,38 @@ void UARPG_CharacterBehaviorBase::FinishAbort()
 	AI_V_Display_Log(Character, "行为中止状态[%s]结束", *UXD_ObjectFunctionLibrary::GetObjectClassName(this));
 }
 
-void UARPG_CharacterBehaviorConfigBase::ExecuteBehavior(class ACharacterBase* Character, const FOnCharacterBehaviorFinished& OnBehaviorFinished) const
+UARPG_CharacterBehaviorConfigurable* UARPG_CharacterBehaviorConfigBase::ExecuteBehavior(class ACharacterBase* Character, const FOnCharacterBehaviorFinished& OnBehaviorFinished) const
 {
 	if (BehaviorType)
 	{
-		UARPG_CharacterBehaviorBase*& Behavior = BehaviorMap.FindOrAdd(Character);
+		UARPG_CharacterBehaviorConfigurable* Behavior = BehaviorMap.FindOrAdd(Character);
 		if (Behavior == nullptr)
 		{
-			Behavior = NewObject<UARPG_CharacterBehaviorBase>(const_cast<UARPG_CharacterBehaviorConfigBase*>(this), BehaviorType);
+			Behavior = NewObject<UARPG_CharacterBehaviorConfigurable>(const_cast<UARPG_CharacterBehaviorConfigBase*>(this), BehaviorType);
 			Behavior->Character = Character;
 			Behavior->Config = this;
 		}
 		Behavior->OnBehaviorFinished = OnBehaviorFinished;
 		Behavior->ExecuteBehavior(Character);
 
-		AI_V_Display_Log(Character, "执行行为[%s]", *UXD_ObjectFunctionLibrary::GetObjectClassName(this));
+		AI_V_Display_Log(Character, "执行行为[%s]", *UXD_ObjectFunctionLibrary::GetObjectClassName(Behavior));
+		return Behavior;
 	}
 	else
 	{
 		AI_V_Error_Log(Character, "行为配置[%s]中未填写行为类型", *UXD_ObjectFunctionLibrary::GetObjectClassName(this));
 		OnBehaviorFinished.ExecuteIfBound(false);
+		return nullptr;
 	}
 }
 
 void UARPG_CharacterBehaviorConfigBase::AbortBehavior(class ACharacterBase* Character, const FOnCharacterBehaviorAbortFinished& OnBehaviorAbortFinished)
 {
-	if (UARPG_CharacterBehaviorBase** P_Behavior = BehaviorMap.Find(Character))
+	if (UARPG_CharacterBehaviorConfigurable** P_Behavior = BehaviorMap.Find(Character))
 	{
-		UARPG_CharacterBehaviorBase* Behavior = *P_Behavior;
+		UARPG_CharacterBehaviorConfigurable* Behavior = *P_Behavior;
 
-		Behavior->OnBehaviorAbortFinished = OnBehaviorAbortFinished;
-		Behavior->AbortBehavior(Character);
-		AI_V_Display_Log(Character, "行为[%s]中断", *UXD_ObjectFunctionLibrary::GetObjectClassName(this));
+		Behavior->AbortBehavior(Character, OnBehaviorAbortFinished);
 	}
 }
 

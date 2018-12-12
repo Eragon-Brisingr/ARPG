@@ -13,7 +13,7 @@ class UARPG_CharacterBehaviorConfigBase;
 /**
  * 
  */
-UCLASS(abstract, Blueprintable)
+UCLASS(abstract)
 class ARPG_API UARPG_CharacterBehaviorBase : public UObject
 {
 	GENERATED_BODY()
@@ -24,10 +24,8 @@ public:
 	UPROPERTY(BlueprintReadOnly, Category = "行为")
 	class ACharacterBase* Character;
 
-	UPROPERTY(BlueprintReadOnly, Category = "行为")
-	const UARPG_CharacterBehaviorConfigBase* Config;
-
-public:
+	void AbortBehavior(class ACharacterBase* Executer, const FOnCharacterBehaviorAbortFinished& OnBehaviorAbortFinished);
+protected:
 	virtual void ExecuteBehavior(class ACharacterBase* Executer) { ReceiveExecuteBehavior(Executer); }
 	UFUNCTION(BlueprintImplementableEvent, Category = "行为", meta = (DisplayName = "ExecuteBehavior"))
 	void ReceiveExecuteBehavior(class ACharacterBase* Executer);
@@ -47,6 +45,17 @@ public:
 	void FinishAbort();
 
 	FOnCharacterBehaviorAbortFinished OnBehaviorAbortFinished;
+};
+
+UCLASS(abstract, Blueprintable)
+class ARPG_API UARPG_CharacterBehaviorConfigurable : public UARPG_CharacterBehaviorBase
+{
+	GENERATED_BODY()
+		
+	friend class UARPG_CharacterBehaviorConfigBase;
+public:
+	UPROPERTY(BlueprintReadOnly, Category = "行为")
+	const UARPG_CharacterBehaviorConfigBase* Config;
 
 public:
 	template<typename T>
@@ -62,12 +71,12 @@ class ARPG_API UARPG_CharacterBehaviorConfigBase : public UObject
 	GENERATED_BODY()
 public:
 	UPROPERTY(EditDefaultsOnly, Category = "配置", Transient)
-	TSubclassOf<UARPG_CharacterBehaviorBase> BehaviorType;
+	TSubclassOf<UARPG_CharacterBehaviorConfigurable> BehaviorType;
 
 	UPROPERTY()
-	mutable TMap<class ACharacterBase*, class UARPG_CharacterBehaviorBase*> BehaviorMap;
+	mutable TMap<class ACharacterBase*, class UARPG_CharacterBehaviorConfigurable*> BehaviorMap;
 
-	void ExecuteBehavior(class ACharacterBase* Character, const FOnCharacterBehaviorFinished& OnBehaviorFinished) const;
+	UARPG_CharacterBehaviorConfigurable* ExecuteBehavior(class ACharacterBase* Character, const FOnCharacterBehaviorFinished& OnBehaviorFinished) const;
 
 	void AbortBehavior(class ACharacterBase* Character, const FOnCharacterBehaviorAbortFinished& OnBehaviorAbortFinished);
 
