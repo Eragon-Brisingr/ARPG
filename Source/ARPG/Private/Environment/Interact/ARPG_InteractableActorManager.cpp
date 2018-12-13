@@ -98,6 +98,7 @@ void UARPG_InteractableActorManagerBase::WhenInteractFinished(bool Succeed, ACha
 
 void UARPG_InteractableActorManagerBase::EndInteract(ACharacterBase* Invoker, const FOnInteractAbortFinished& OnInteractAbortFinished)
 {
+	Invoker->StopMovement();
 	if (UARPG_CharacterBehaviorBase** P_Behavior = CurBehaviorMap.Find(Invoker))
 	{
 		(*P_Behavior)->AbortBehavior(Invoker, FOnCharacterBehaviorAbortFinished::CreateUObject(this, &UARPG_InteractableActorManagerBase::WhenBehaviorAbortFinished, Invoker, OnInteractAbortFinished));

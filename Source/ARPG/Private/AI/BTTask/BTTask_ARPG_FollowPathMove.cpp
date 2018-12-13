@@ -46,6 +46,10 @@ EBTNodeResult::Type UBTTask_ARPG_FollowPathMove::AbortTask(UBehaviorTreeComponen
 		{
 			CurBehavior->AbortBehavior(Character, FOnCharacterBehaviorAbortFinished::CreateUObject(this, &UBTTask_ARPG_FollowPathMove::WhenBehaviorAborted, &OwnerComp, NodeMemory));
 		}
+		else
+		{
+			Character->StopMovement();
+		}
 	}
 	return EBTNodeResult::Aborted;
 }

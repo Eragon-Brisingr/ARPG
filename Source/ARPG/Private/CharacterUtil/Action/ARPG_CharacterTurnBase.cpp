@@ -36,24 +36,26 @@ void UCA_CharacterTurnBase::WhenMontageBlendOutStart(UAnimMontage* Montage, bool
 UAnimMontage* UCA_CharacterTurnBase::GetTurnMontageFourDirection(const FRotator& CurrentWorldRotation, const FRotator& TargetWorldRotation, UAnimMontage* TurnLeft90, UAnimMontage* TurnRight90, UAnimMontage* TurnLeft180, UAnimMontage* TurnRight180)
 {
 	float Yaw = (CurrentWorldRotation - TargetWorldRotation).GetNormalized().Yaw;
-	UAnimMontage* MontageToPlay = nullptr;
 	if (Yaw > 135.f)
 	{
-		MontageToPlay = TurnLeft180;
+		return TurnLeft180;
 	}
 	else if (Yaw > 45.f)
 	{
-		MontageToPlay = TurnLeft90;
+		return TurnLeft90;
 	}
 	else if (Yaw > -45.f)
 	{
-		MontageToPlay = TurnRight90;
+		return nullptr;
 	}
 	else if (Yaw > -135.f)
 	{
-		MontageToPlay = TurnRight180;
+		return TurnRight90;
 	}
-	return MontageToPlay;
+	else
+	{
+		return TurnRight180;
+	}
 }
 
 void UCA_CharacterTurnBase::AbortBehavior(ACharacterBase* Executer)
