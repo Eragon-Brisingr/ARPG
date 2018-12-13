@@ -104,7 +104,10 @@ void UARPG_InteractableActorManagerBase::WhenEnterReleaseState(bool Succeed, ACh
 				{
 					UARPG_ActorFunctionLibrary::MoveCharacterToLocationFitGround(Invoker, Transfrom.TransformPosition(Behavior.Location), 1.f);
 				}
-				CurBehaviorMap.FindOrAdd(Invoker) = Invoker->TurnTo(Transfrom.TransformRotation(Behavior.Rotation.Quaternion()).Rotator(), FOnCharacterBehaviorFinished::CreateUObject(this, &UARPG_InteractableActorManagerBase::WhenTurnFinished, Invoker, Behavior, OnInteractFinished));
+				if (UARPG_CharacterBehaviorBase* TurnBehavior = Invoker->TurnTo(Transfrom.TransformRotation(Behavior.Rotation.Quaternion()).Rotator(), FOnCharacterBehaviorFinished::CreateUObject(this, &UARPG_InteractableActorManagerBase::WhenTurnFinished, Invoker, Behavior, OnInteractFinished)))
+				{
+					CurBehaviorMap.FindOrAdd(Invoker) = TurnBehavior;
+				}
 			}
 			else
 			{
@@ -112,6 +115,10 @@ void UARPG_InteractableActorManagerBase::WhenEnterReleaseState(bool Succeed, ACh
 			}
 			return;
 		}
+	}
+	else
+	{
+		OnInteractFinished.ExecuteIfBound(false);
 	}
 }
 

@@ -459,14 +459,15 @@ UARPG_CharacterBehaviorBase* ACharacterBase::TurnTo(const FRotator& TargetWorldR
 	{
 		if (CharacterTurnAction)
 		{
-			CharacterTurnAction->TurnTo(this, TargetWorldRotation, OnCharacterBehaviorFinished);
-			return CharacterTurnAction;
+			if (CharacterTurnAction->TurnTo(this, TargetWorldRotation, OnCharacterBehaviorFinished))
+			{
+				return CharacterTurnAction;
+			}
 		}
 		else
 		{
 			UARPG_ActorFunctionLibrary::MoveCharacterToRotationFitGround(this, TargetWorldRotation);
 			OnCharacterBehaviorFinished.ExecuteIfBound(true);
-			return nullptr;
 		}
 	}
 	return nullptr;

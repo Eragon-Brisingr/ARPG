@@ -14,6 +14,7 @@ void UARPG_CharacterBehaviorBase::ExecuteInit(class ACharacterBase* Executer, co
 {
 	Character = Executer;
 	OnBehaviorFinished = WhenBehaviorFinished;
+	AI_V_Display_Log(Character, "执行行为[%s]", *UXD_ObjectFunctionLibrary::GetObjectClassName(this));
 }
 
 void UARPG_CharacterBehaviorBase::AbortBehavior(class ACharacterBase* Executer, const FOnCharacterBehaviorAbortFinished& WhenBehaviorAbortFinished)

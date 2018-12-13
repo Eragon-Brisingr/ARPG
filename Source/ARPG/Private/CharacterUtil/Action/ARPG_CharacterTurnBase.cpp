@@ -5,23 +5,20 @@
 #include "Components/SkeletalMeshComponent.h"
 #include "Animation/AnimInstance.h"
 
-void UCA_CharacterTurnBase::TurnTo(ACharacterBase* Executer, const FRotator& TargetWorldRotation, const FOnCharacterBehaviorFinished& OnCharacterTurnFinished)
+bool UCA_CharacterTurnBase::TurnTo(ACharacterBase* Executer, const FRotator& TargetWorldRotation, const FOnCharacterBehaviorFinished& OnCharacterTurnFinished)
 {
 	ExecuteInit(Executer, OnCharacterTurnFinished);
 
 	CurrentTurnMontage = GetTurnMontage(Executer, TargetWorldRotation);
 	if (CurrentTurnMontage)
 	{
-		Executer->PlayMontage(CurrentTurnMontage);
-		if (OnCharacterTurnFinished.IsBound())
-		{
-			FOnMontageBlendingOutStarted OnMontageBlendingOutStarted = FOnMontageBlendingOutStarted::CreateUObject(this, &UCA_CharacterTurnBase::WhenMontageBlendOutStart);
-			Executer->GetMesh()->GetAnimInstance()->Montage_SetBlendingOutDelegate(OnMontageBlendingOutStarted, CurrentTurnMontage);
-		}
+		Executer->PlayMontageWithBlendingOutDelegate(CurrentTurnMontage, FOnMontageBlendingOutStarted::CreateUObject(this, &UCA_CharacterTurnBase::WhenMontageBlendOutStart));
+		return true;
 	}
 	else
 	{
-		OnCharacterTurnFinished.ExecuteIfBound(false);
+		FinishExecute(true);
+		return false;
 	}
 }
 
@@ -62,10 +59,7 @@ UAnimMontage* UCA_CharacterTurnBase::GetTurnMontageFourDirection(const FRotator&
 
 void UCA_CharacterTurnBase::AbortBehavior(ACharacterBase* Executer)
 {
-	if (FOnMontageBlendingOutStarted* OnMontageBlendingOutStarted = Executer->GetMesh()->GetAnimInstance()->Montage_GetBlendingOutDelegate(CurrentTurnMontage))
-	{
-		OnMontageBlendingOutStarted->Unbind();
-	}
+	Executer->ClearMontageBlendingOutDelegate(CurrentTurnMontage);
 	Executer->StopAnimMontage(CurrentTurnMontage);
 	FinishAbort();
 }
