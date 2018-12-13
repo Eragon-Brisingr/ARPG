@@ -18,7 +18,7 @@ class ARPG_API UCA_CharacterTurnBase : public UARPG_CharacterBehaviorBase
 {
 	GENERATED_BODY()
 public:
-	void TurnTo(ACharacterBase* Executer, const FRotator& TargetWorldRotation, const FOnCharacterBehaviorFinished& OnCharacterTurnFinished);
+	bool TurnTo(ACharacterBase* Executer, const FRotator& TargetWorldRotation, const FOnCharacterBehaviorFinished& OnCharacterTurnFinished);
 
 	void AbortTurnTo(ACharacterBase* Executer, const FOnCharacterBehaviorAbortFinished& OnCharacterBehaviorAbortFinished);
 
