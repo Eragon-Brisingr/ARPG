@@ -35,7 +35,7 @@ public:
 
 	bool IsDefenseSucceed_Implementation(const FVector& DamageFromLocation, const FHitResult& HitInfo) const override;
 
-	void EnterReleaseState(const FOnCharacterBehaviorFinished& OnBehaviorFinished) override;
+	bool IsInReleaseState() const override;
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "角色|配置|常用", meta = (DisplayName = "默认左手武器", ExposeOnSpawn = "True"), SaveGame)
 	FARPG_Item DefaultLeftWeapon;

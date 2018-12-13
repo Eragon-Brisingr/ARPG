@@ -10,6 +10,12 @@ UWorld* UARPG_CharacterBehaviorBase::GetWorld() const
 	return Character->GetWorld();
 }
 
+void UARPG_CharacterBehaviorBase::ExecuteInit(class ACharacterBase* Executer, const FOnCharacterBehaviorFinished& WhenBehaviorFinished)
+{
+	Character = Executer;
+	OnBehaviorFinished = WhenBehaviorFinished;
+}
+
 void UARPG_CharacterBehaviorBase::AbortBehavior(class ACharacterBase* Executer, const FOnCharacterBehaviorAbortFinished& WhenBehaviorAbortFinished)
 {
 	OnBehaviorAbortFinished = WhenBehaviorAbortFinished;

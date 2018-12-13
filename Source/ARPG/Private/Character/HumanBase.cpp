@@ -3,6 +3,8 @@
 #include "HumanBase.h"
 #include <UnrealNetwork.h>
 #include <Components/SkeletalMeshComponent.h>
+#include <Kismet/KismetMathLibrary.h>
+#include <Animation/AnimInstance.h>
 #include "ARPG_MovementComponent.h"
 #include "ARPG_WeaponBase.h"
 #include "ARPG_ItemCoreBase.h"
@@ -12,8 +14,7 @@
 #include "ARPG_EquipmentCoreBase.h"
 #include "ARPG_ArrowBase.h"
 #include "ARPG_ArrowCoreBase.h"
-#include <Kismet/KismetMathLibrary.h>
-#include "Animation/AnimInstance.h"
+#include "Human_EnterReleaseState.h"
 
 AHumanBase::AHumanBase(const FObjectInitializer& PCIP)
 	:Super(PCIP)
@@ -31,6 +32,8 @@ AHumanBase::AHumanBase(const FObjectInitializer& PCIP)
 		DefaultArrow.ShowItemType = AARPG_ArrowBase::StaticClass();
 #endif
 	}
+
+	EnterReleaseStateAction = CreateDefaultSubobject<UHuman_EnterReleaseState>(GET_MEMBER_NAME_CHECKED(ACharacterBase, EnterReleaseStateAction));
 }
 
 void AHumanBase::GetLifetimeReplicatedProps(TArray< class FLifetimeProperty > & OutLifetimeProps) const
@@ -236,18 +239,9 @@ bool AHumanBase::IsDefenseSucceed_Implementation(const FVector& DamageFromLocati
 	return Super::IsDefenseSucceed_Implementation(DamageFromLocation, HitInfo) && UKismetMathLibrary::InRange_FloatFloat((UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), DamageFromLocation) - GetActorRotation()).GetNormalized().Yaw, -90.f, 90.f);
 }
 
-void AHumanBase::EnterReleaseState(const FOnCharacterBehaviorFinished& OnBehaviorFinished)
+bool AHumanBase::IsInReleaseState() const
 {
-	if (UseWeaponState != EUseWeaponState::NoneWeapon_Default)
-	{
-		PlayMontage(TakeBackWeaponMontage);
-		FOnMontageBlendingOutStarted OnMontageBlendingOutStarted = FOnMontageBlendingOutStarted::CreateUObject(this, &AHumanBase::WhenTakeBackWeaponFinished, OnBehaviorFinished);
-		GetMesh()->GetAnimInstance()->Montage_SetBlendingOutDelegate(OnMontageBlendingOutStarted, TakeBackWeaponMontage);
-	}
-	else
-	{
-		OnBehaviorFinished.ExecuteIfBound(true);
-	}
+	return UseWeaponState == EUseWeaponState::NoneWeapon_Default;
 }
 
 void AHumanBase::WhenTakeBackWeaponFinished(UAnimMontage* AnimMontage, bool bInterrupted, FOnCharacterBehaviorFinished OnBehaviorFinished)

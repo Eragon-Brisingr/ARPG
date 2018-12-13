@@ -9,6 +9,7 @@
 
 // Sets default values for this component's properties
 UARPG_InteractableActorManagerBase::UARPG_InteractableActorManagerBase()
+	:bForceEnterReleaseState(true)
 {
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 	// off to improve performance if you don't need them.
@@ -40,6 +41,10 @@ void UARPG_InteractableActorManagerBase::StartInteract(ACharacterBase* Invoker, 
 {
 	if (CanInteract(Invoker))
 	{
+		if (bForceEnterReleaseState && Invoker->IsInReleaseState() == false && Invoker->EnterReleaseStateAction)
+		{
+			Invoker->EnterReleaseState({});
+		}
 		FVector InteractableLocation;
 		FRotator InteractableRotation;
 		GetInteractableLocationAndRotation(Invoker, InteractableLocation, InteractableRotation);
@@ -56,32 +61,19 @@ void UARPG_InteractableActorManagerBase::WhenMoveFinished(const FPathFollowingRe
 {
 	if (Result.Code == EPathFollowingResult::Success)
 	{
-		if (CanInteract(Invoker))
+		if (bForceEnterReleaseState && Invoker->IsInReleaseState() == false && Invoker->EnterReleaseStateAction)
 		{
-			FBehaviorWithPosition Behavior = GetBehavior(Invoker, Location);
-			if (Behavior.Behavior)
-			{
-				InteractActorBeginSetCollision(Invoker);
-				ExecuteWhenBeginInteract(Invoker);
-				if (Behavior.bAttachToRotation && Invoker->CharacterTurnAction && Invoker->CanPlayTurnMontage())
-				{
-					FTransform Transfrom = GetOwner()->GetActorTransform();
-					if (Behavior.bAttachToLocation)
-					{
-						UARPG_ActorFunctionLibrary::MoveCharacterToLocationFitGround(Invoker, Transfrom.TransformPosition(Behavior.Location), 1.f);
-					}
-					CurBehaviorMap.FindOrAdd(Invoker) = Invoker->TurnTo(Transfrom.TransformRotation(Behavior.Rotation.Quaternion()).Rotator(), FOnCharacterBehaviorFinished::CreateUObject(this, &UARPG_InteractableActorManagerBase::WhenTurnFinished, Invoker, Behavior, OnInteractFinished));
-				}
-				else
-				{
-					WhenTurnFinished(true, Invoker, Behavior, OnInteractFinished);
-				}
-				return;
-			}
+			CurBehaviorMap.FindOrAdd(Invoker) = Invoker->EnterReleaseState(FOnInteractFinished::CreateUObject(this, &UARPG_InteractableActorManagerBase::WhenEnterReleaseState, Invoker, Location, OnInteractFinished));
+		}
+		else
+		{
+			WhenEnterReleaseState(true, Invoker, Location, OnInteractFinished);
 		}
 	}
-
-	OnInteractFinished.ExecuteIfBound(false);
+	else
+	{
+		OnInteractFinished.ExecuteIfBound(false);
+	}
 }
 
 void UARPG_InteractableActorManagerBase::WhenTurnFinished(bool Succeed, ACharacterBase* Invoker, FBehaviorWithPosition BehaviorConfig, FOnInteractFinished OnInteractFinished)
@@ -96,12 +88,40 @@ void UARPG_InteractableActorManagerBase::WhenInteractFinished(bool Succeed, ACha
 	ExecuteWhenEndInteract(Invoker);
 }
 
+void UARPG_InteractableActorManagerBase::WhenEnterReleaseState(bool Succeed, ACharacterBase* Invoker, FVector Location, FOnInteractFinished OnInteractFinished)
+{
+	if (Succeed && CanInteract(Invoker))
+	{
+		FBehaviorWithPosition Behavior = GetBehavior(Invoker, Location);
+		if (Behavior.Behavior)
+		{
+			InteractActorBeginSetCollision(Invoker);
+			ExecuteWhenBeginInteract(Invoker);
+			if (Behavior.bAttachToRotation && Invoker->CharacterTurnAction && Invoker->CanPlayTurnMontage())
+			{
+				FTransform Transfrom = GetOwner()->GetActorTransform();
+				if (Behavior.bAttachToLocation)
+				{
+					UARPG_ActorFunctionLibrary::MoveCharacterToLocationFitGround(Invoker, Transfrom.TransformPosition(Behavior.Location), 1.f);
+				}
+				CurBehaviorMap.FindOrAdd(Invoker) = Invoker->TurnTo(Transfrom.TransformRotation(Behavior.Rotation.Quaternion()).Rotator(), FOnCharacterBehaviorFinished::CreateUObject(this, &UARPG_InteractableActorManagerBase::WhenTurnFinished, Invoker, Behavior, OnInteractFinished));
+			}
+			else
+			{
+				WhenTurnFinished(true, Invoker, Behavior, OnInteractFinished);
+			}
+			return;
+		}
+	}
+}
+
 void UARPG_InteractableActorManagerBase::EndInteract(ACharacterBase* Invoker, const FOnInteractAbortFinished& OnInteractAbortFinished)
 {
 	Invoker->StopMovement();
 	if (UARPG_CharacterBehaviorBase** P_Behavior = CurBehaviorMap.Find(Invoker))
 	{
 		(*P_Behavior)->AbortBehavior(Invoker, FOnCharacterBehaviorAbortFinished::CreateUObject(this, &UARPG_InteractableActorManagerBase::WhenBehaviorAbortFinished, Invoker, OnInteractAbortFinished));
+		CurBehaviorMap.Remove(Invoker);
 	}
 	else
 	{
