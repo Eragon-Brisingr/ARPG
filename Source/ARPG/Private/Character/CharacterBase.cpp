@@ -250,6 +250,14 @@ void ACharacterBase::InvokeChangeMoveGaitToServer_Implementation(const ECharacte
 	ARPG_MovementComponent->SetGait(Gait);
 }
 
+void ACharacterBase::StopMovement()
+{
+	if (AController* Controller = GetController())
+	{
+		Controller->StopMovement();
+	}
+}
+
 FVector ACharacterBase::GetTargetLocation_Implementation(const FName& CurLockSocketName) const
 {
 	return GetMesh()->GetSocketLocation(CurLockSocketName);

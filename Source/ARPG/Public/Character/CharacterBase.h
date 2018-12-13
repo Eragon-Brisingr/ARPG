@@ -107,6 +107,9 @@ public:
 	virtual void InvokeChangeMoveGaitToServer_Implementation(const ECharacterGait& Gait);
 	bool InvokeChangeMoveGaitToServer_Validate(const ECharacterGait& Gait) { return true; }
 
+	UFUNCTION(BlueprintCallable, Category = "角色|行为")
+	void StopMovement();
+
 	//IARPG_LockOnTargetInterface
 public:
 	UPROPERTY(EditDefaultsOnly, Category = "角色|配置")
