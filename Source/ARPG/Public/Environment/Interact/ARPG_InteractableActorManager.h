@@ -37,6 +37,8 @@ public:
 private:
 	void WhenInteractFinished(bool Succeed, ACharacterBase* Invoker, FOnInteractFinished OnInteractFinished);
 
+	void WhenEnterReleaseState(bool Succeed, ACharacterBase* Invoker, FVector Location, FOnInteractFinished OnInteractFinished);
+
 	void WhenMoveFinished(const FPathFollowingResult& Result, ACharacterBase* Invoker, FVector Location, FRotator Rotation, FOnInteractFinished OnInteractFinished);
 
 	void WhenTurnFinished(bool Succeed, ACharacterBase* Invoker, FBehaviorWithPosition BehaviorConfig, FOnInteractFinished OnInteractFinished);
@@ -65,6 +67,9 @@ public:
 
 	UPROPERTY(EditAnywhere, Category = "交互")
 	uint8 bCancelCapsuleCollision : 1;
+
+	UPROPERTY(EditAnywhere, Category = "交互")
+	uint8 bForceEnterReleaseState : 1;
 private:
 	UPROPERTY()
 	TMap<ACharacterBase*, UARPG_CharacterBehaviorBase*> CurBehaviorMap;

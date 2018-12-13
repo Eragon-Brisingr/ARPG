@@ -29,6 +29,7 @@
 #include "ARPG_InteractableActorManager.h"
 #include "Action/ARPG_CharacterTurnBase.h"
 #include "Engine/Engine.h"
+#include "Action/ARPG_EnterReleaseStateBase.h"
 
 
 // Sets default values
@@ -252,7 +253,7 @@ void ACharacterBase::InvokeChangeMoveGaitToServer_Implementation(const ECharacte
 
 void ACharacterBase::StopMovement()
 {
-	if (AController* Controller = GetController())
+	if (Controller)
 	{
 		Controller->StopMovement();
 	}
@@ -433,6 +434,20 @@ bool ACharacterBase::CanDodge() const
 	return DodgeAnimSet->CanDodge(this);
 }
 
+UARPG_CharacterBehaviorBase* ACharacterBase::EnterReleaseState(const FOnCharacterBehaviorFinished& OnBehaviorFinished)
+{
+	if (EnterReleaseStateAction && IsInReleaseState() == false)
+	{
+		EnterReleaseStateAction->EnterReleaseState(this, OnBehaviorFinished);
+		return EnterReleaseStateAction;
+	}
+	else
+	{
+		OnBehaviorFinished.ExecuteIfBound(true);
+		return nullptr;
+	}
+}
+
 bool ACharacterBase::CanPlayTurnMontage() const
 {
 	return GetMesh()->GetAnimInstance()->GetSlotMontageGlobalWeight(TurnSlotName) == 0.f && IsPlayingRootMotion() == false;
@@ -466,6 +481,14 @@ void ACharacterBase::PlayMontageWithBlendingOutDelegate(UAnimMontage* Montage, c
 {
 	PlayMontage(Montage, InPlayRate, StartSectionName);
 	GetMesh()->GetAnimInstance()->Montage_SetBlendingOutDelegate(const_cast<FOnMontageBlendingOutStarted&>(OnMontageBlendingOutStarted), Montage);
+}
+
+void ACharacterBase::ClearMontageBlendingOutDelegate(UAnimMontage* Montage)
+{
+	if (FOnMontageBlendingOutStarted* OnMontageBlendingOutStarted = GetMesh()->GetAnimInstance()->Montage_GetBlendingOutDelegate(Montage))
+	{
+		OnMontageBlendingOutStarted->Unbind();
+	}
 }
 
 void ACharacterBase::MoveItem_Implementation(class UARPG_InventoryComponent* SourceInventory, class UARPG_InventoryComponent* TargetInventory, class UARPG_ItemCoreBase* ItemCore, int32 Number /*= 1*/)

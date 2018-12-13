@@ -22,6 +22,7 @@
 #include "CharacterBase.generated.h"
 
 class UARPG_InteractableActorManagerBase;
+class UCA_EnterReleaseStateBase;
 
 UCLASS()
 class ARPG_API ACharacterBase : public ACharacter, 
@@ -161,6 +162,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "角色|动作")
 	void TryPlayMontage(const FARPG_MontageParameter& Montage);
 
+	void PlayMontageWithBlendingOutDelegate(UAnimMontage* Montage, const FOnMontageBlendingOutStarted& OnMontageBlendingOutStarted, float InPlayRate = 1.f, FName StartSectionName = NAME_None);
+	void ClearMontageBlendingOutDelegate(UAnimMontage* Montage);
+
 	UPROPERTY(EditDefaultsOnly, Category = "角色|动作")
 	FName FullBodySlotName = TEXT("FullBody");
 
@@ -184,22 +188,6 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "角色|动作")
 	bool CanDodge() const;
-
-	//转身
-	UPROPERTY(EditDefaultsOnly, Category = "角色|动画配置", Instanced)
-	class UCA_CharacterTurnBase* CharacterTurnAction;
-
-	UPROPERTY(EditDefaultsOnly, Category = "角色|动作")
-	FName TurnSlotName = TEXT("TurnInPlace");
-
-	UFUNCTION(BlueprintCallable, Category = "角色|动作")
-	bool CanPlayTurnMontage() const;
-
-	UARPG_CharacterBehaviorBase* TurnTo(const FRotator& TargetWorldRotation, const FOnCharacterBehaviorFinished& OnCharacterBehaviorFinished);
-	UFUNCTION(BlueprintCallable, Category = "角色|动作")
-	UARPG_CharacterBehaviorBase* TurnTo(const FRotator& TargetWorldRotation);
-
-	void PlayMontageWithBlendingOutDelegate(UAnimMontage* Montage, const FOnMontageBlendingOutStarted& OnMontageBlendingOutStarted, float InPlayRate = 1.f, FName StartSectionName = NAME_None);
 
 	//背包相关
 public:
@@ -410,9 +398,7 @@ public:
 
 	ETeamAttitude::Type GetRelationshipTowards(const AActor* Actor) const;
 
-
 	//总关系
-
 	UFUNCTION(BlueprintCallable, Category = "角色|关系")
 	ECharacterRelationship GetRelationshipTowards(const ACharacterBase* Towards) const;
 
@@ -487,5 +473,26 @@ public:
 
 	//CharacterBehavior接口
 public:
-	virtual void EnterReleaseState(const FOnCharacterBehaviorFinished& OnBehaviorFinished) { OnBehaviorFinished.ExecuteIfBound(true); }
+	//进入松懈状态
+	UPROPERTY(EditDefaultsOnly, Category = "角色|动画配置", Instanced)
+	UCA_EnterReleaseStateBase* EnterReleaseStateAction;
+
+	virtual bool IsInReleaseState() const { return true; }
+
+	UARPG_CharacterBehaviorBase* EnterReleaseState(const FOnCharacterBehaviorFinished& OnBehaviorFinished);
+	
+	//转身
+	UPROPERTY(EditDefaultsOnly, Category = "角色|动画配置", Instanced)
+	class UCA_CharacterTurnBase* CharacterTurnAction;
+
+	UPROPERTY(EditDefaultsOnly, Category = "角色|动作")
+	FName TurnSlotName = TEXT("TurnInPlace");
+
+	UFUNCTION(BlueprintCallable, Category = "角色|动作")
+	bool CanPlayTurnMontage() const;
+
+	UARPG_CharacterBehaviorBase* TurnTo(const FRotator& TargetWorldRotation, const FOnCharacterBehaviorFinished& OnCharacterBehaviorFinished);
+	UFUNCTION(BlueprintCallable, Category = "角色|动作")
+	UARPG_CharacterBehaviorBase* TurnTo(const FRotator& TargetWorldRotation);
+
 };

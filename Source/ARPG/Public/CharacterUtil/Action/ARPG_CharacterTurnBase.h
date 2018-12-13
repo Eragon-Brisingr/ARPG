@@ -26,13 +26,13 @@ public:
 	UFUNCTION(BlueprintImplementableEvent, Category = "角色|动作", meta = (DisplayName = "GetTurnMontage"))
 	UAnimMontage* ReceiveGetTurnMontage(ACharacterBase* Executer, const FRotator& TargetWorldRotation);
 
-	void WhenMontageBlendOutStart(UAnimMontage* Montage, bool bInterrupted, FOnCharacterBehaviorFinished OnCharacterTurnFinished);
+	void WhenMontageBlendOutStart(UAnimMontage* Montage, bool bInterrupted);
 protected:
 	UFUNCTION(BlueprintCallable, Category = "角色|动作")
 	UAnimMontage* GetTurnMontageFourDirection(const FRotator& CurrentWorldRotation, const FRotator& TargetWorldRotation, UAnimMontage* TurnLeft90, UAnimMontage* TurnRight90, UAnimMontage* TurnLeft180, UAnimMontage* TurnRight180);
 
+	UPROPERTY()
 	UAnimMontage* CurrentTurnMontage;
-
 public:
 	void AbortBehavior(ACharacterBase* Executer) override;
 };

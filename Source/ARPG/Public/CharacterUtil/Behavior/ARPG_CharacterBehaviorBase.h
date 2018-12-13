@@ -24,12 +24,10 @@ public:
 	UPROPERTY(BlueprintReadOnly, Category = "行为")
 	class ACharacterBase* Character;
 
+	void ExecuteInit(class ACharacterBase* Executer, const FOnCharacterBehaviorFinished& OnBehaviorFinished);
+
 	void AbortBehavior(class ACharacterBase* Executer, const FOnCharacterBehaviorAbortFinished& OnBehaviorAbortFinished);
 protected:
-	virtual void ExecuteBehavior(class ACharacterBase* Executer) { ReceiveExecuteBehavior(Executer); }
-	UFUNCTION(BlueprintImplementableEvent, Category = "行为", meta = (DisplayName = "ExecuteBehavior"))
-	void ReceiveExecuteBehavior(class ACharacterBase* Executer);
-
 	virtual void AbortBehavior(class ACharacterBase* Executer) { ReceiveAbortBehavior(Executer); }
 	UFUNCTION(BlueprintNativeEvent, Category = "行为", meta = (DisplayName = "AbortBehavior"))
 	void ReceiveAbortBehavior(class ACharacterBase* Executer);
@@ -56,6 +54,11 @@ class ARPG_API UARPG_CharacterBehaviorConfigurable : public UARPG_CharacterBehav
 public:
 	UPROPERTY(BlueprintReadOnly, Category = "行为")
 	const UARPG_CharacterBehaviorConfigBase* Config;
+
+protected:
+	virtual void ExecuteBehavior(class ACharacterBase* Executer) { ReceiveExecuteBehavior(Executer); }
+	UFUNCTION(BlueprintImplementableEvent, Category = "行为", meta = (DisplayName = "ExecuteBehavior"))
+	void ReceiveExecuteBehavior(class ACharacterBase* Executer);
 
 public:
 	template<typename T>
