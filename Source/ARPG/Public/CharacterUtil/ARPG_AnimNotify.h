@@ -10,6 +10,7 @@
 #include "SocketMoveTraceManager.h"
 #include "CharacterDamageType.h"
 #include "ARPG_BattleType.h"
+#include "GameplayTagContainer.h"
 #include "ARPG_AnimNotify.generated.h"
 /**
  * 
@@ -409,4 +410,22 @@ public:
 
 	virtual void NotifyTick(USkeletalMeshComponent * MeshComp, UAnimSequenceBase * Animation, float FrameDeltaTime) override;
 #endif
+};
+
+UCLASS(meta = (DisplayName = "交互_事件通知"))
+class ARPG_API UARPG_InteractEventNotify : public UAnimNotify
+{
+	GENERATED_BODY()
+public:
+	UARPG_InteractEventNotify()
+	{
+		bIsNativeBranchingPoint = true;
+	}
+
+	UPROPERTY(EditAnywhere, Category = "交互")
+	FGameplayTag EventTag;
+
+	void Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation) override;
+
+	FString GetNotifyName_Implementation() const override;
 };

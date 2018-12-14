@@ -7,6 +7,7 @@
 #include "Navigation/PathFollowingComponent.h"
 #include "ARPG_InteractType.h"
 #include "ARPG_CharacterBehaviorType.h"
+#include "GameplayTagContainer.h"
 #include "ARPG_InteractableActorManager.generated.h"
 
 class ACharacterBase;
@@ -64,6 +65,10 @@ public:
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnEndInteract, AActor*, Which, class UARPG_InteractableActorManagerBase*, Manager, class ACharacterBase*, Who);
 	UPROPERTY(BlueprintAssignable, Category = "交互")
 	FOnEndInteract OnEndInteract;
+
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnReceiveInteractEvent, class UARPG_InteractableActorManagerBase*, Manager, class ACharacterBase*, Who, const FGameplayTag&, EventTag);
+	UPROPERTY(BlueprintAssignable, Category = "交互")
+	FOnReceiveInteractEvent OnReceiveInteractEvent;
 
 	UPROPERTY(EditAnywhere, Category = "交互")
 	uint8 bCancelCapsuleCollision : 1;

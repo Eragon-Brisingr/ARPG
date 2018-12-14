@@ -10,6 +10,7 @@
 #include "ARPG_DebugFunctionLibrary.h"
 #include "ReceiveDamageActionBase.h"
 #include "XD_MacrosLibrary.h"
+#include "ARPG_InteractableActorManager.h"
 
 
 void UARPG_PlayMontageByState::Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation)
@@ -437,3 +438,19 @@ void UARPG_SetAttackInfo::NotifyTick(USkeletalMeshComponent* MeshComp, UAnimSequ
 	}
 }
 #endif
+
+void UARPG_InteractEventNotify::Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation)
+{
+	if (ACharacterBase* Character = Cast<ACharacterBase>(MeshComp->GetOwner()))
+	{
+		if (UARPG_InteractableActorManagerBase* InteractableActorManager = Character->InteractableActorManager)
+		{
+			InteractableActorManager->OnReceiveInteractEvent.Broadcast(InteractableActorManager, Character, EventTag);
+		}
+	}
+}
+
+FString UARPG_InteractEventNotify::GetNotifyName_Implementation() const
+{
+	return FString::Printf(TEXT("交互_事件[%s]"), *EventTag.ToString());
+}
