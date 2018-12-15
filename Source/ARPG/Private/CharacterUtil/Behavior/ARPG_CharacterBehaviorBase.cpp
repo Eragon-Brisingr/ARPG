@@ -12,6 +12,8 @@ UWorld* UARPG_CharacterBehaviorBase::GetWorld() const
 
 void UARPG_CharacterBehaviorBase::ExecuteInit(class ACharacterBase* Executer, const FOnCharacterBehaviorFinished& WhenBehaviorFinished)
 {
+	bIsExecuting = true;
+
 	Character = Executer;
 	OnBehaviorFinished = WhenBehaviorFinished;
 	AI_V_Display_Log(Character, "执行行为[%s]", *UXD_ObjectFunctionLibrary::GetObjectClassName(this));
@@ -19,6 +21,8 @@ void UARPG_CharacterBehaviorBase::ExecuteInit(class ACharacterBase* Executer, co
 
 void UARPG_CharacterBehaviorBase::AbortBehavior(class ACharacterBase* Executer, const FOnCharacterBehaviorAbortFinished& WhenBehaviorAbortFinished)
 {
+	bIsExecuting = false;
+
 	OnBehaviorAbortFinished = WhenBehaviorAbortFinished;
 	AbortBehavior(Executer);
 	AI_V_Display_Log(Executer, "行为[%s]中断", *UXD_ObjectFunctionLibrary::GetObjectClassName(this));
@@ -26,6 +30,8 @@ void UARPG_CharacterBehaviorBase::AbortBehavior(class ACharacterBase* Executer, 
 
 void UARPG_CharacterBehaviorBase::FinishExecute(bool Succeed)
 {
+	bIsExecuting = false;
+
 	OnBehaviorFinished.ExecuteIfBound(Succeed);
 	AI_V_Display_Log(Character, "行为[%s]结束，结果为", *UXD_ObjectFunctionLibrary::GetObjectClassName(this), Succeed ? TEXT("成功") : TEXT("失败"));
 }
@@ -47,6 +53,7 @@ UARPG_CharacterBehaviorConfigurable* UARPG_CharacterBehaviorConfigBase::ExecuteB
 			Behavior->Character = Character;
 			Behavior->Config = this;
 		}
+		Behavior->bIsExecuting = true;
 		Behavior->OnBehaviorFinished = OnBehaviorFinished;
 		Behavior->ExecuteBehavior(Character);
 

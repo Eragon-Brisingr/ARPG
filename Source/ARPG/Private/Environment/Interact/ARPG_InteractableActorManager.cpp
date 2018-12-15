@@ -6,6 +6,7 @@
 #include "ARPG_CharacterBehaviorBase.h"
 #include "ARPG_ActorFunctionLibrary.h"
 #include "Components/CapsuleComponent.h"
+#include "Action/ARPG_EnterReleaseStateBase.h"
 
 // Sets default values for this component's properties
 UARPG_InteractableActorManagerBase::UARPG_InteractableActorManagerBase()
@@ -63,7 +64,15 @@ void UARPG_InteractableActorManagerBase::WhenMoveFinished(const FPathFollowingRe
 	{
 		if (bForceEnterReleaseState && Invoker->IsInReleaseState() == false && Invoker->EnterReleaseStateAction)
 		{
-			CurBehaviorMap.FindOrAdd(Invoker) = Invoker->EnterReleaseState(FOnInteractFinished::CreateUObject(this, &UARPG_InteractableActorManagerBase::WhenEnterReleaseState, Invoker, Location, OnInteractFinished));
+			FOnInteractFinished FOnEnterReleaseState = FOnInteractFinished::CreateUObject(this, &UARPG_InteractableActorManagerBase::WhenEnterReleaseState, Invoker, Location, OnInteractFinished);
+			if (Invoker->EnterReleaseStateAction->bIsExecuting)
+			{
+				Invoker->EnterReleaseStateAction->OnBehaviorFinished = FOnEnterReleaseState;
+			}
+			else
+			{
+				CurBehaviorMap.FindOrAdd(Invoker) = Invoker->EnterReleaseState(FOnEnterReleaseState);
+			}
 		}
 		else
 		{
