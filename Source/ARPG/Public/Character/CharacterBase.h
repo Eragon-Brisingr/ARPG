@@ -6,6 +6,8 @@
 #include "GameFramework/Character.h"
 #include <Perception/AISightTargetInterface.h>
 #include <GenericTeamAgentInterface.h>
+#include <Animation/AnimInstance.h>
+#include <ScriptInterface.h>
 #include "XD_SaveGameInterface.h"
 #include "ARPG_InputBuffer.h"
 #include "ARPG_LockOnTargetSystem.h"
@@ -18,7 +20,7 @@
 #include "ARPG_BattleType.h"
 #include "BehaviorTreeEx.h"
 #include "ARPG_CharacterBehaviorType.h"
-#include "Animation/AnimInstance.h"
+#include "Battle/ARPG_AI_BattleInterface.h"
 #include "CharacterBase.generated.h"
 
 class UARPG_InteractableActorManagerBase;
@@ -28,7 +30,8 @@ UCLASS()
 class ARPG_API ACharacterBase : public ACharacter, 
 	public IXD_SaveGameInterface,
 	public IARPG_LockOnTargetInterface,
-	public IAISightTargetInterface
+	public IAISightTargetInterface,
+	public IARPG_AI_BattleInterface
 {
 	GENERATED_BODY()
 
@@ -470,6 +473,8 @@ public:
 
 	UPROPERTY(EditAnywhere, Category = "角色|AI|配置")
 	FBehaviorTreeWithSubTree MainBehaviorTree;
+
+	TScriptInterface<IARPG_AI_BattleInterface> BattleControl;
 
 	//CharacterBehavior接口
 public:

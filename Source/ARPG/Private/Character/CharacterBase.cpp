@@ -64,6 +64,8 @@ ACharacterBase::ACharacterBase(const FObjectInitializer& ObjectInitializer)
 	GetMesh()->VisibilityBasedAnimTickOption = EVisibilityBasedAnimTickOption::AlwaysTickPoseAndRefreshBones;
 
 	NavigationQueryFilter = UARPG_NavigationQueryFilter::StaticClass();
+
+	BattleControl = this;
 }
 
 // Called when the game starts or when spawned
