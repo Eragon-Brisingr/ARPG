@@ -11,7 +11,7 @@
 class UARPG_CharacterBehaviorConfigBase;
 
 /**
- * 
+ *  执行行为时切记调用ExecuteInit
  */
 UCLASS(abstract)
 class ARPG_API UARPG_CharacterBehaviorBase : public UObject
@@ -23,6 +23,9 @@ public:
 public:
 	UPROPERTY(BlueprintReadOnly, Category = "行为")
 	class ACharacterBase* Character;
+
+	UPROPERTY(BlueprintReadOnly, Category = "行为")
+	uint8 bIsExecuting : 1;
 
 	void ExecuteInit(class ACharacterBase* Executer, const FOnCharacterBehaviorFinished& OnBehaviorFinished);
 
