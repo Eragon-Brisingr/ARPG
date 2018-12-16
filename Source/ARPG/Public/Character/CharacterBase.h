@@ -174,6 +174,10 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "角色|动作")
 	bool CanPlayFullBodyMontage() const;
 
+	UPROPERTY(BlueprintReadOnly, Category = "角色")
+	uint8 bEnableAimOffset : 1;
+
+	//动画瞄准偏移覆盖
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "角色", AdvancedDisplay)
 	class UAimOffsetBlendSpace* AimOffsetOverride;
 

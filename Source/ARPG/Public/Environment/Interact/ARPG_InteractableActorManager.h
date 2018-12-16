@@ -50,25 +50,33 @@ private:
 	void InteractActorEndSetCollision(ACharacterBase* Invoker);
 
 	void ExecuteWhenBeginInteract(ACharacterBase* Invoker);
-	void ExecuteWhenEndInteract(ACharacterBase* Invoker);
+	void ExecuteWhenEndInteract(ACharacterBase* Invoker, bool bFinishPerfectly);
 public:
 	virtual FBehaviorWithPosition GetBehavior(ACharacterBase* Invoker, const FVector& InteractableLocation) const { return {}; }
 	virtual bool CanInteract(const ACharacterBase* Invoker) const { return false; }
 	virtual void PostMoveFinished(ACharacterBase* Invoker) {}
 public:
 	virtual void WhenBeginInteract(ACharacterBase* Invoker) {}
-	DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnBeginInteract, AActor*, Which, class UARPG_InteractableActorManagerBase*, Manager, class ACharacterBase*, Who);
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnInteractBegin, AActor*, Which, class UARPG_InteractableActorManagerBase*, Manager, class ACharacterBase*, Who);
 	UPROPERTY(BlueprintAssignable, Category = "交互")
-	FOnBeginInteract OnBeginInteract;
+	FOnInteractBegin OnInteractBegin;
 
 	virtual void WhenEndInteract(ACharacterBase* Invoker) {}
-	DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnEndInteract, AActor*, Which, class UARPG_InteractableActorManagerBase*, Manager, class ACharacterBase*, Who);
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE_FourParams(FOnInteractEnd, AActor*, Which, class UARPG_InteractableActorManagerBase*, Manager, class ACharacterBase*, Who, bool, bFinishPerfectly);
 	UPROPERTY(BlueprintAssignable, Category = "交互")
-	FOnEndInteract OnEndInteract;
+	FOnInteractEnd OnInteractEnd;
 
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnReceiveInteractEvent, class UARPG_InteractableActorManagerBase*, Manager, class ACharacterBase*, Who, const FGameplayTag&, EventTag);
 	UPROPERTY(BlueprintAssignable, Category = "交互")
 	FOnReceiveInteractEvent OnReceiveInteractEvent;
+
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnReceiveInteractStateEventBegin, class UARPG_InteractableActorManagerBase*, Manager, class ACharacterBase*, Who, const FGameplayTag&, EventTag);
+	UPROPERTY(BlueprintAssignable, Category = "交互")
+	FOnReceiveInteractStateEventBegin OnReceiveInteractStateEventBegin;
+
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE_FourParams(FOnReceiveInteractStateEventEnd, class UARPG_InteractableActorManagerBase*, Manager, class ACharacterBase*, Who, const FGameplayTag&, EventTag, bool, bFinishPerfectly);
+	UPROPERTY(BlueprintAssignable, Category = "交互")
+	FOnReceiveInteractStateEventEnd OnReceiveInteractStateEventEnd;
 
 	UPROPERTY(EditAnywhere, Category = "交互")
 	uint8 bCancelCapsuleCollision : 1;

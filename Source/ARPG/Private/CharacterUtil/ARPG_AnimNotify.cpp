@@ -29,7 +29,7 @@ FString UARPG_PlayMontageByState::GetNotifyName_Implementation() const
 	return FString::Printf(TEXT("动画跳转[%s]"), Montage ? *Montage->GetName() : TEXT("None"));
 }
 
-void UARPG_PlayMontageCheckState::NotifyTick(USkeletalMeshComponent * MeshComp, UAnimSequenceBase * Animation, float FrameDeltaTime)
+void UARPG_PlayMontageCheckState::NotifyTick(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, float FrameDeltaTime)
 {
 	if (ACharacterBase* Character = Cast<ACharacterBase>(MeshComp->GetOwner()))
 	{
@@ -51,12 +51,12 @@ FString UARPG_PlayMontageCheckState::GetNotifyName_Implementation() const
 	return FString::Printf(TEXT("动画跳转[%s]"), Montage ? *Montage->GetName() : TEXT("None"));
 }
 
-void UARPG_PlayMontageByInput::NotifyBegin(USkeletalMeshComponent * MeshComp, UAnimSequenceBase * Animation, float TotalDuration)
+void UARPG_PlayMontageByInput::NotifyBegin(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, float TotalDuration)
 {
 
 }
 
-void UARPG_PlayMontageByInput::NotifyTick(USkeletalMeshComponent * MeshComp, UAnimSequenceBase * Animation, float FrameDeltaTime)
+void UARPG_PlayMontageByInput::NotifyTick(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, float FrameDeltaTime)
 {
 	if (ACharacterBase* Character = Cast<ACharacterBase>(MeshComp->GetOwner()))
 	{
@@ -76,7 +76,7 @@ void UARPG_PlayMontageByInput::NotifyTick(USkeletalMeshComponent * MeshComp, UAn
 	}
 }
 
-void UARPG_PlayMontageByInput::NotifyEnd(USkeletalMeshComponent * MeshComp, UAnimSequenceBase * Animation)
+void UARPG_PlayMontageByInput::NotifyEnd(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation)
 {
 
 }
@@ -86,7 +86,7 @@ FString UARPG_PlayMontageByInput::GetNotifyName_Implementation() const
 	return FString::Printf(TEXT("输入_动画跳转[%s]"), Montage ? *Montage->GetName() : TEXT("None"));
 }
 
-void UARPG_DodgeAnim::NotifyTick(USkeletalMeshComponent * MeshComp, UAnimSequenceBase * Animation, float FrameDeltaTime)
+void UARPG_DodgeAnim::NotifyTick(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, float FrameDeltaTime)
 {
 	if (ACharacterBase* Character = Cast<ACharacterBase>(MeshComp->GetOwner()))
 	{
@@ -99,7 +99,7 @@ FString UARPG_DodgeAnim::GetNotifyName_Implementation() const
 	return TEXT("输入_闪避");
 }
 
-void UARPG_DefenseState::NotifyBegin(USkeletalMeshComponent * MeshComp, UAnimSequenceBase * Animation, float TotalDuration)
+void UARPG_DefenseState::NotifyBegin(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, float TotalDuration)
 {
 	if (DefenseStateFunctor)
 	{
@@ -111,7 +111,7 @@ void UARPG_DefenseState::NotifyBegin(USkeletalMeshComponent * MeshComp, UAnimSeq
 	}
 }
 
-void UARPG_DefenseState::NotifyEnd(USkeletalMeshComponent * MeshComp, UAnimSequenceBase * Animation)
+void UARPG_DefenseState::NotifyEnd(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation)
 {
 	if (DefenseStateFunctor)
 	{
@@ -128,7 +128,7 @@ FString UARPG_DefenseState::GetNotifyName_Implementation() const
 	return TEXT("防御状态");
 }
 
-void UARPG_DefenseSwipeState::NotifyBegin(USkeletalMeshComponent * MeshComp, UAnimSequenceBase * Animation, float TotalDuration)
+void UARPG_DefenseSwipeState::NotifyBegin(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, float TotalDuration)
 {
 	if (ACharacterBase* Character = Cast<ACharacterBase>(MeshComp->GetOwner()))
 	{
@@ -136,7 +136,7 @@ void UARPG_DefenseSwipeState::NotifyBegin(USkeletalMeshComponent * MeshComp, UAn
 	}
 }
 
-void UARPG_DefenseSwipeState::NotifyEnd(USkeletalMeshComponent * MeshComp, UAnimSequenceBase * Animation)
+void UARPG_DefenseSwipeState::NotifyEnd(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation)
 {
 	if (ACharacterBase* Character = Cast<ACharacterBase>(MeshComp->GetOwner()))
 	{
@@ -149,7 +149,7 @@ FString UARPG_DefenseSwipeState::GetNotifyName_Implementation() const
 	return TEXT("防御反击状态");
 }
 
-void UARPG_DodgeState::NotifyBegin(USkeletalMeshComponent * MeshComp, UAnimSequenceBase * Animation, float TotalDuration)
+void UARPG_DodgeState::NotifyBegin(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, float TotalDuration)
 {
 	if (ACharacterBase* Character = Cast<ACharacterBase>(MeshComp->GetOwner()))
 	{
@@ -157,7 +157,7 @@ void UARPG_DodgeState::NotifyBegin(USkeletalMeshComponent * MeshComp, UAnimSeque
 	}
 }
 
-void UARPG_DodgeState::NotifyEnd(USkeletalMeshComponent * MeshComp, UAnimSequenceBase * Animation)
+void UARPG_DodgeState::NotifyEnd(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation)
 {
 	if (ACharacterBase* Character = Cast<ACharacterBase>(MeshComp->GetOwner()))
 	{
@@ -177,7 +177,7 @@ UARPG_EnableAttackTracer::UARPG_EnableAttackTracer()
 #endif
 }
 
-void UARPG_EnableAttackTracer::NotifyBegin(USkeletalMeshComponent * MeshComp, UAnimSequenceBase * Animation, float TotalDuration)
+void UARPG_EnableAttackTracer::NotifyBegin(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, float TotalDuration)
 {
 	if (ACharacterBase* Character = Cast<ACharacterBase>(MeshComp->GetOwner()))
 	{
@@ -223,7 +223,7 @@ void UARPG_EnableAttackTracer::NotifyBegin(USkeletalMeshComponent * MeshComp, UA
 }
 
 #if WITH_EDITOR
-void UARPG_EnableAttackTracer::NotifyTick(USkeletalMeshComponent * MeshComp, UAnimSequenceBase * Animation, float FrameDeltaTime)
+void UARPG_EnableAttackTracer::NotifyTick(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, float FrameDeltaTime)
 {
 //  	if (MeshComp->GetWorld()->IsGameWorld() == false)
 //  	{
@@ -232,7 +232,7 @@ void UARPG_EnableAttackTracer::NotifyTick(USkeletalMeshComponent * MeshComp, UAn
 }
 #endif
 
-void UARPG_EnableAttackTracer::NotifyEnd(USkeletalMeshComponent * MeshComp, UAnimSequenceBase * Animation)
+void UARPG_EnableAttackTracer::NotifyEnd(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation)
 {
 	if (ACharacterBase* Character = Cast<ACharacterBase>(MeshComp->GetOwner()))
 	{
@@ -248,7 +248,7 @@ FString UARPG_EnableAttackTracer::GetNotifyName_Implementation() const
 	return TEXT("启用攻击检测");
 }
 
-void UARPG_SetMovementMode::NotifyBegin(USkeletalMeshComponent * MeshComp, UAnimSequenceBase * Animation, float TotalDuration)
+void UARPG_SetMovementMode::NotifyBegin(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, float TotalDuration)
 {
 	if (ACharacter* Character = Cast<ACharacter>(MeshComp))
 	{
@@ -261,7 +261,7 @@ void UARPG_SetMovementMode::NotifyBegin(USkeletalMeshComponent * MeshComp, UAnim
 	}
 }
 
-void UARPG_SetMovementMode::NotifyEnd(USkeletalMeshComponent * MeshComp, UAnimSequenceBase * Animation)
+void UARPG_SetMovementMode::NotifyEnd(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation)
 {
 	if (ACharacter* Character = Cast<ACharacter>(MeshComp))
 	{
@@ -281,7 +281,7 @@ FString UARPG_SetMovementMode::GetNotifyName_Implementation() const
 	return FString();
 }
 
-void UARPG_AddToughnessValue::NotifyBegin(USkeletalMeshComponent * MeshComp, UAnimSequenceBase * Animation, float TotalDuration)
+void UARPG_AddToughnessValue::NotifyBegin(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, float TotalDuration)
 {
 	if (ACharacterBase* Character = Cast<ACharacterBase>(MeshComp->GetOwner()))
 	{
@@ -289,7 +289,7 @@ void UARPG_AddToughnessValue::NotifyBegin(USkeletalMeshComponent * MeshComp, UAn
 	}
 }
 
-void UARPG_AddToughnessValue::NotifyEnd(USkeletalMeshComponent * MeshComp, UAnimSequenceBase * Animation)
+void UARPG_AddToughnessValue::NotifyEnd(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation)
 {
 	if (ACharacterBase* Character = Cast<ACharacterBase>(MeshComp->GetOwner()))
 	{
@@ -302,18 +302,26 @@ FString UARPG_AddToughnessValue::GetNotifyName_Implementation() const
 	return FString::Printf(TEXT("增加强韧度[%s]"), *FString::SanitizeFloat(AddToughnessValue, 0));
 }
 
-void UARPG_SetAimOffsetOverride::NotifyBegin(USkeletalMeshComponent * MeshComp, UAnimSequenceBase * Animation, float TotalDuration)
+void UARPG_SetAimOffsetOverride::NotifyBegin(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, float TotalDuration)
 {
 	if (ACharacterBase* Character = Cast<ACharacterBase>(MeshComp->GetOwner()))
 	{
-		Character->AimOffsetOverride = AimOffsetOverride;
+		if (AimOffsetOverride)
+		{
+			Character->AimOffsetOverride = AimOffsetOverride;
+		}
+		else
+		{
+			Character->bEnableAimOffset = false;
+		}
 	}
 }
 
-void UARPG_SetAimOffsetOverride::NotifyEnd(USkeletalMeshComponent * MeshComp, UAnimSequenceBase * Animation)
+void UARPG_SetAimOffsetOverride::NotifyEnd(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation)
 {
 	if (ACharacterBase* Character = Cast<ACharacterBase>(MeshComp->GetOwner()))
 	{
+		Character->bEnableAimOffset = true;
 		Character->AimOffsetOverride = nullptr;
 	}
 }
@@ -355,7 +363,7 @@ FString UARPG_SetReceiveDamageAction::GetNotifyName_Implementation() const
 	return FString::Printf(TEXT("设置特殊受击动画"), *UARPG_DebugFunctionLibrary::GetDebugName(ReceiveDamageAction));
 }
 
-void UARPG_SetAddHitStunValue::NotifyBegin(USkeletalMeshComponent * MeshComp, UAnimSequenceBase * Animation, float TotalDuration)
+void UARPG_SetAddHitStunValue::NotifyBegin(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, float TotalDuration)
 {
 	if (SetAddHitStunValueFunctor)
 	{
@@ -363,7 +371,7 @@ void UARPG_SetAddHitStunValue::NotifyBegin(USkeletalMeshComponent * MeshComp, UA
 	}
 }
 
-void UARPG_SetAddHitStunValue::NotifyEnd(USkeletalMeshComponent * MeshComp, UAnimSequenceBase * Animation)
+void UARPG_SetAddHitStunValue::NotifyEnd(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation)
 {
 	if (SetAddHitStunValueFunctor)
 	{
@@ -394,7 +402,7 @@ UARPG_SetAttackInfo::UARPG_SetAttackInfo()
 	AttackInfos.Add(FARPG_AttackInfo());
 }
 
-void UARPG_SetAttackInfo::NotifyBegin(USkeletalMeshComponent * MeshComp, UAnimSequenceBase * Animation, float TotalDuration)
+void UARPG_SetAttackInfo::NotifyBegin(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, float TotalDuration)
 {
 	if (ACharacterBase* Character = Cast<ACharacterBase>(MeshComp->GetOwner()))
 	{
@@ -405,7 +413,7 @@ void UARPG_SetAttackInfo::NotifyBegin(USkeletalMeshComponent * MeshComp, UAnimSe
 	}
 }
 
-void UARPG_SetAttackInfo::NotifyEnd(USkeletalMeshComponent * MeshComp, UAnimSequenceBase * Animation)
+void UARPG_SetAttackInfo::NotifyEnd(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation)
 {
 	if (ACharacterBase* Character = Cast<ACharacterBase>(MeshComp->GetOwner()))
 	{
@@ -451,6 +459,42 @@ void UARPG_InteractEventNotify::Notify(USkeletalMeshComponent* MeshComp, UAnimSe
 }
 
 FString UARPG_InteractEventNotify::GetNotifyName_Implementation() const
+{
+	return FString::Printf(TEXT("交互_事件[%s]"), *EventTag.ToString());
+}
+
+void UARPG_InteractEventNotifyState::NotifyBegin(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, float TotalDuration)
+{
+	if (ACharacterBase* Character = Cast<ACharacterBase>(MeshComp->GetOwner()))
+	{
+		if (UARPG_InteractableActorManagerBase* InteractableActorManager = Character->InteractableActorManager)
+		{
+			InteractableActorManager->OnReceiveInteractStateEventBegin.Broadcast(InteractableActorManager, Character, EventTag);
+
+			InteractableActorManager->OnInteractEnd.AddDynamic(this, &UARPG_InteractEventNotifyState::WhenInteractEnd);
+		}
+	}
+}
+
+void UARPG_InteractEventNotifyState::NotifyEnd(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation)
+{
+	if (ACharacterBase* Character = Cast<ACharacterBase>(MeshComp->GetOwner()))
+	{
+		if (UARPG_InteractableActorManagerBase* InteractableActorManager = Character->InteractableActorManager)
+		{
+			InteractableActorManager->OnInteractEnd.RemoveDynamic(this, &UARPG_InteractEventNotifyState::WhenInteractEnd);
+			InteractableActorManager->OnReceiveInteractStateEventEnd.Broadcast(InteractableActorManager, Character, EventTag, true);
+		}
+	}
+}
+
+void UARPG_InteractEventNotifyState::WhenInteractEnd(AActor* Which, class UARPG_InteractableActorManagerBase* Manager, class ACharacterBase* Who, bool bFinishPerfectly)
+{
+	Manager->OnInteractEnd.RemoveDynamic(this, &UARPG_InteractEventNotifyState::WhenInteractEnd);
+	Manager->OnReceiveInteractStateEventEnd.Broadcast(Manager, Cast<ACharacterBase>(Which), EventTag, bFinishPerfectly);
+}
+
+FString UARPG_InteractEventNotifyState::GetNotifyName_Implementation() const
 {
 	return FString::Printf(TEXT("交互_事件[%s]"), *EventTag.ToString());
 }
