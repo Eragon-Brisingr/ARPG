@@ -451,7 +451,7 @@ void UARPG_InteractEventNotify::Notify(USkeletalMeshComponent* MeshComp, UAnimSe
 {
 	if (ACharacterBase* Character = Cast<ACharacterBase>(MeshComp->GetOwner()))
 	{
-		if (UARPG_InteractableActorManagerBase* InteractableActorManager = Character->InteractableActorManager)
+		if (UARPG_InteractableActorManagerBase* InteractableActorManager = Character->InteractingManager)
 		{
 			InteractableActorManager->OnReceiveInteractEvent.Broadcast(InteractableActorManager, Character, EventTag);
 		}
@@ -467,7 +467,7 @@ void UARPG_InteractEventNotifyState::NotifyBegin(USkeletalMeshComponent* MeshCom
 {
 	if (ACharacterBase* Character = Cast<ACharacterBase>(MeshComp->GetOwner()))
 	{
-		if (UARPG_InteractableActorManagerBase* InteractableActorManager = Character->InteractableActorManager)
+		if (UARPG_InteractableActorManagerBase* InteractableActorManager = Character->InteractingManager)
 		{
 			InteractableActorManager->OnReceiveInteractStateEventBegin.Broadcast(InteractableActorManager, Character, EventTag);
 
@@ -480,7 +480,7 @@ void UARPG_InteractEventNotifyState::NotifyEnd(USkeletalMeshComponent* MeshComp,
 {
 	if (ACharacterBase* Character = Cast<ACharacterBase>(MeshComp->GetOwner()))
 	{
-		if (UARPG_InteractableActorManagerBase* InteractableActorManager = Character->InteractableActorManager)
+		if (UARPG_InteractableActorManagerBase* InteractableActorManager = Character->InteractingManager)
 		{
 			InteractableActorManager->OnInteractEnd.RemoveDynamic(this, &UARPG_InteractEventNotifyState::WhenInteractEnd);
 			InteractableActorManager->OnReceiveInteractStateEventEnd.Broadcast(InteractableActorManager, Character, EventTag, true);

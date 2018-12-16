@@ -14,7 +14,7 @@ class UARPG_CharacterBehaviorConfigurable;
 DECLARE_DELEGATE_OneParam(FOnCharacterBehaviorFinished, bool /*Succeed*/)
 DECLARE_DELEGATE(FOnCharacterBehaviorAbortFinished);
 
-USTRUCT()
+USTRUCT(BlueprintType)
 struct ARPG_API FBehaviorWithPosition
 {
 	GENERATED_BODY()
@@ -34,7 +34,7 @@ public:
 	UPROPERTY(EditAnywhere, Category = "行为")
 	uint8 bEnableHandIK : 1;
 
- 	UPROPERTY(EditAnywhere, Category = "行为", Instanced)
+ 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "行为", Instanced)
  	UARPG_CharacterBehaviorConfigBase* Behavior = nullptr;
 	
 	UARPG_CharacterBehaviorConfigurable* WorldPositionExecuteBehavior(class ACharacterBase* Character, const FOnCharacterBehaviorFinished& OnBehaviorFinished) const;

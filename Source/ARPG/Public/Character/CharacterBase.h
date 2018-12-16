@@ -384,8 +384,8 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "角色|交互")
 	void InvokeFinishInteract();
 
-	UPROPERTY(VisibleAnywhere, Category = "角色|交互")
-	UARPG_InteractableActorManagerBase* InteractableActorManager;
+	UPROPERTY(BlueprintReadOnly, Category = "角色|交互")
+	UARPG_InteractableActorManagerBase* InteractingManager;
 public:
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "Character")
 	class UARPG_MovementComponent* ARPG_MovementComponent;

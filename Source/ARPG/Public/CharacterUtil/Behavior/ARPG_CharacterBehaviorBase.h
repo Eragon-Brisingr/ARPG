@@ -48,6 +48,15 @@ public:
 	FOnCharacterBehaviorAbortFinished OnBehaviorAbortFinished;
 };
 
+USTRUCT(BlueprintType)
+struct ARPG_API FCharacterBehavior
+{
+	GENERATED_BODY()
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "行为", Instanced)
+	class UARPG_CharacterBehaviorConfigBase* Behavior = nullptr;
+};
+
 UCLASS(abstract, Blueprintable)
 class ARPG_API UARPG_CharacterBehaviorConfigurable : public UARPG_CharacterBehaviorBase
 {

@@ -110,6 +110,6 @@ public:
 	UPROPERTY()
 	ACharacterBase* User;
 
-	UPROPERTY(EditAnywhere, Category = "行为")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "行为")
 	TArray<FBehaviorWithPosition> Behaviors;
 };

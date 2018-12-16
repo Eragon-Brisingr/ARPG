@@ -201,15 +201,15 @@ FBehaviorWithPosition UInteractableActorManagerSingle::GetBehavior(ACharacterBas
 
 void UInteractableActorManagerSingle::WhenBeginInteract(ACharacterBase* Invoker)
 {
-	Invoker->InteractableActorManager = this;
+	Invoker->InteractingManager = this;
 	User = Invoker;
 }
 
 void UInteractableActorManagerSingle::WhenEndInteract(ACharacterBase* Invoker)
 {
-	if (Invoker->InteractableActorManager == this)
+	if (Invoker->InteractingManager == this)
 	{
-		Invoker->InteractableActorManager = nullptr;
+		Invoker->InteractingManager = nullptr;
 		User = nullptr;
 	}
 }
