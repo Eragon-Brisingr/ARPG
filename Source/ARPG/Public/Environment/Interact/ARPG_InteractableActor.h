@@ -17,7 +17,7 @@ class ARPG_API AARPG_InteractableActorBase : public AActor,
 {
 	GENERATED_BODY()
 public:
-	UPROPERTY(VisibleAnywhere, Category = "行为")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "行为")
 	UARPG_InteractableActorManagerBase* InteractableActorManager;
 
 	void StartInteract(ACharacterBase* Invoker, const FOnInteractFinished& OnInteractFinished);

@@ -729,9 +729,9 @@ bool ACharacterBase::CanInteract(AActor* InteractTarget) const
 
 void ACharacterBase::InvokeFinishInteract()
 {
-	if (InteractableActorManager)
+	if (InteractingManager)
 	{
-		InteractableActorManager->EndInteract(this, {});
+		InteractingManager->EndInteract(this, {});
 	}
 }
 
