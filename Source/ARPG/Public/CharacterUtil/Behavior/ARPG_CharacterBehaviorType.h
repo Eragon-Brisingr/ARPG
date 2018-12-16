@@ -31,10 +31,17 @@ public:
 	UPROPERTY(EditAnywhere, Category = "行为")
 	uint8 bAttachToRotation : 1;
 
+	UPROPERTY(EditAnywhere, Category = "行为")
+	uint8 bEnableHandIK : 1;
+
  	UPROPERTY(EditAnywhere, Category = "行为", Instanced)
  	UARPG_CharacterBehaviorConfigBase* Behavior = nullptr;
 	
 	UARPG_CharacterBehaviorConfigurable* WorldPositionExecuteBehavior(class ACharacterBase* Character, const FOnCharacterBehaviorFinished& OnBehaviorFinished) const;
 
 	UARPG_CharacterBehaviorConfigurable* RelativePositionExecuteBehavior(class ACharacterBase* Character, const FOnCharacterBehaviorFinished& OnBehaviorFinished, const FTransform& Transform) const;
+
+	static void WhenBehaviorFinished(bool Succeed, class ACharacterBase* Character, FOnCharacterBehaviorFinished OnBehaviorFinished);
+private:
+	UARPG_CharacterBehaviorConfigurable* ExecuteBehavior(class ACharacterBase* Character, const FOnCharacterBehaviorFinished& OnBehaviorFinished, const FVector& WorldLocation) const;
 };

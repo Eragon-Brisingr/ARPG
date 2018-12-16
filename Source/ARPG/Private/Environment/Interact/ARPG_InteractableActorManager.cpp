@@ -94,7 +94,7 @@ void UARPG_InteractableActorManagerBase::WhenTurnFinished(bool Succeed, ACharact
 void UARPG_InteractableActorManagerBase::WhenInteractFinished(bool Succeed, ACharacterBase* Invoker, FOnInteractFinished OnInteractFinished)
 {
 	OnInteractFinished.ExecuteIfBound(Succeed);
-	ExecuteWhenEndInteract(Invoker);
+	ExecuteWhenEndInteract(Invoker, Succeed);
 }
 
 void UARPG_InteractableActorManagerBase::WhenEnterReleaseState(bool Succeed, ACharacterBase* Invoker, FVector Location, FOnInteractFinished OnInteractFinished)
@@ -142,14 +142,14 @@ void UARPG_InteractableActorManagerBase::EndInteract(ACharacterBase* Invoker, co
 	else
 	{
 		OnInteractAbortFinished.ExecuteIfBound();
-		ExecuteWhenEndInteract(Invoker);
+		ExecuteWhenEndInteract(Invoker, false);
 	}
 }
 
 void UARPG_InteractableActorManagerBase::WhenBehaviorAbortFinished(ACharacterBase* Invoker, FOnInteractAbortFinished OnInteractAbortFinished)
 {
 	OnInteractAbortFinished.ExecuteIfBound();
-	ExecuteWhenEndInteract(Invoker);
+	ExecuteWhenEndInteract(Invoker, false);
 }
 
 void UARPG_InteractableActorManagerBase::InteractActorBeginSetCollision(ACharacterBase* Invoker)
@@ -171,15 +171,15 @@ void UARPG_InteractableActorManagerBase::InteractActorEndSetCollision(ACharacter
 void UARPG_InteractableActorManagerBase::ExecuteWhenBeginInteract(ACharacterBase* Invoker)
 {
 	WhenBeginInteract(Invoker);
-	OnBeginInteract.Broadcast(GetOwner(), this, Invoker);
+	OnInteractBegin.Broadcast(GetOwner(), this, Invoker);
 }
 
-void UARPG_InteractableActorManagerBase::ExecuteWhenEndInteract(ACharacterBase* Invoker)
+void UARPG_InteractableActorManagerBase::ExecuteWhenEndInteract(ACharacterBase* Invoker, bool bFinishPerfectly)
 {
 	CurBehaviorMap.Remove(Invoker);
 	InteractActorEndSetCollision(Invoker);
 	WhenEndInteract(Invoker);
-	OnEndInteract.Broadcast(GetOwner(), this, Invoker);
+	OnInteractEnd.Broadcast(GetOwner(), this, Invoker, bFinishPerfectly);
 }
 
 void UARPG_InteractableActorManagerBase::GetInteractableLocationAndRotation(ACharacterBase* Invoker, FVector& InteractableLocation, FRotator& InteractableRotation) const

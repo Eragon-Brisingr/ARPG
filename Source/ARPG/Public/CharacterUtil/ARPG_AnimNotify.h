@@ -66,7 +66,7 @@ public:
 	UPROPERTY(EditAnywhere, Category = "动画", meta = (DisplayName = "客户端主导"))
 	uint8 bClientMaster : 1;
 
-	virtual void NotifyTick(USkeletalMeshComponent * MeshComp, UAnimSequenceBase * Animation, float FrameDeltaTime) override;
+	virtual void NotifyTick(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, float FrameDeltaTime) override;
 
 	virtual FString GetNotifyName_Implementation() const override;
 };
@@ -95,9 +95,9 @@ public:
 	UPROPERTY(EditAnywhere, Category = "动画", meta = (DisplayName = "客户端主导"))
 	uint8 bClientMaster : 1;
 
-	virtual void NotifyBegin(USkeletalMeshComponent * MeshComp, UAnimSequenceBase * Animation, float TotalDuration) override;
-	virtual void NotifyTick(USkeletalMeshComponent * MeshComp, UAnimSequenceBase * Animation, float FrameDeltaTime) override;
-	virtual void NotifyEnd(USkeletalMeshComponent * MeshComp, UAnimSequenceBase * Animation) override;
+	virtual void NotifyBegin(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, float TotalDuration) override;
+	virtual void NotifyTick(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, float FrameDeltaTime) override;
+	virtual void NotifyEnd(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation) override;
 
 	virtual FString GetNotifyName_Implementation() const override;
 };
@@ -107,7 +107,7 @@ class ARPG_API UARPG_DodgeAnim : public UAnimNotifyState
 {
 	GENERATED_BODY()
 public:
-	virtual void NotifyTick(USkeletalMeshComponent * MeshComp, UAnimSequenceBase * Animation, float FrameDeltaTime) override;
+	virtual void NotifyTick(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, float FrameDeltaTime) override;
 
 	virtual FString GetNotifyName_Implementation() const override;
 };
@@ -139,8 +139,8 @@ class ARPG_API UARPG_DefenseState : public UAnimNotifyState
 public:
 	UPROPERTY(EditAnywhere, Category = "防御", meta = (DisplayName = "防御起效部位"))
 	TSubclassOf<class UARPG_DefenseStateFunctor> DefenseStateFunctor;
-	virtual void NotifyBegin(USkeletalMeshComponent * MeshComp, UAnimSequenceBase * Animation, float TotalDuration) override;
-	virtual void NotifyEnd(USkeletalMeshComponent * MeshComp, UAnimSequenceBase * Animation) override;
+	virtual void NotifyBegin(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, float TotalDuration) override;
+	virtual void NotifyEnd(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation) override;
 
 	virtual FString GetNotifyName_Implementation() const override;
 };
@@ -150,8 +150,8 @@ class ARPG_API UARPG_DefenseSwipeState : public UAnimNotifyState
 {
 	GENERATED_BODY()
 public:
-	virtual void NotifyBegin(USkeletalMeshComponent * MeshComp, UAnimSequenceBase * Animation, float TotalDuration) override;
-	virtual void NotifyEnd(USkeletalMeshComponent * MeshComp, UAnimSequenceBase * Animation) override;
+	virtual void NotifyBegin(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, float TotalDuration) override;
+	virtual void NotifyEnd(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation) override;
 
 	virtual FString GetNotifyName_Implementation() const override;
 };
@@ -161,8 +161,8 @@ class ARPG_API UARPG_DodgeState : public UAnimNotifyState
 {
 	GENERATED_BODY()
 public:
-	virtual void NotifyBegin(USkeletalMeshComponent * MeshComp, UAnimSequenceBase * Animation, float TotalDuration) override;
-	virtual void NotifyEnd(USkeletalMeshComponent * MeshComp, UAnimSequenceBase * Animation) override;
+	virtual void NotifyBegin(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, float TotalDuration) override;
+	virtual void NotifyEnd(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation) override;
 
 	virtual FString GetNotifyName_Implementation() const override;
 };
@@ -180,14 +180,14 @@ public:
 	UPROPERTY(EditAnywhere, Category = "攻击检测", meta = (DisplayName = "伤害配置", ShowOnlyInnerProperties))
 	FApplyPointDamageParameter PointDamageParameter;
 
-	virtual void NotifyBegin(USkeletalMeshComponent * MeshComp, UAnimSequenceBase * Animation, float TotalDuration) override;
+	virtual void NotifyBegin(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, float TotalDuration) override;
 #if WITH_EDITORONLY_DATA
 	UPROPERTY(Transient)
 	class USocketMoveTracer* PreviewSocketMoveTracer;
 
-	virtual void NotifyTick(USkeletalMeshComponent * MeshComp, UAnimSequenceBase * Animation, float FrameDeltaTime) override;
+	virtual void NotifyTick(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, float FrameDeltaTime) override;
 #endif
-	virtual void NotifyEnd(USkeletalMeshComponent * MeshComp, UAnimSequenceBase * Animation) override;
+	virtual void NotifyEnd(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation) override;
 
 	virtual FString GetNotifyName_Implementation() const override;
 };
@@ -206,8 +206,8 @@ public:
 	UPROPERTY(EditAnywhere, Category = "移动模式")
 	ESettableMovement MovementMode = ESettableMovement::Fly;
 
-	virtual void NotifyBegin(USkeletalMeshComponent * MeshComp, UAnimSequenceBase * Animation, float TotalDuration) override;
-	virtual void NotifyEnd(USkeletalMeshComponent * MeshComp, UAnimSequenceBase * Animation) override;
+	virtual void NotifyBegin(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, float TotalDuration) override;
+	virtual void NotifyEnd(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation) override;
 
 	virtual FString GetNotifyName_Implementation() const override;
 
@@ -225,8 +225,8 @@ public:
 	UPROPERTY(EditAnywhere, Category = "属性")
 	float AddToughnessValue = 50.f;
 
-	virtual void NotifyBegin(USkeletalMeshComponent * MeshComp, UAnimSequenceBase * Animation, float TotalDuration) override;
-	virtual void NotifyEnd(USkeletalMeshComponent * MeshComp, UAnimSequenceBase * Animation) override;
+	virtual void NotifyBegin(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, float TotalDuration) override;
+	virtual void NotifyEnd(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation) override;
 
 	virtual FString GetNotifyName_Implementation() const override;
 };
@@ -239,8 +239,8 @@ public:
 	UPROPERTY(EditAnywhere, Category = "动画")
 	class UAimOffsetBlendSpace* AimOffsetOverride;
 
-	virtual void NotifyBegin(USkeletalMeshComponent * MeshComp, UAnimSequenceBase * Animation, float TotalDuration) override;
-	virtual void NotifyEnd(USkeletalMeshComponent * MeshComp, UAnimSequenceBase * Animation) override;
+	virtual void NotifyBegin(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, float TotalDuration) override;
+	virtual void NotifyEnd(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation) override;
 
 	virtual FString GetNotifyName_Implementation() const override;
 };
@@ -346,8 +346,8 @@ public:
 	UPROPERTY(EditAnywhere, Category = "动画", meta = (DisplayName = "作用对象"))
 	TSubclassOf<class UARPG_SetAddHitStunValueFunctorBase> SetAddHitStunValueFunctor;
 
-	virtual void NotifyBegin(USkeletalMeshComponent * MeshComp, UAnimSequenceBase * Animation, float TotalDuration) override;
-	virtual void NotifyEnd(USkeletalMeshComponent * MeshComp, UAnimSequenceBase * Animation) override;
+	virtual void NotifyBegin(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, float TotalDuration) override;
+	virtual void NotifyEnd(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation) override;
 
 	virtual FString GetNotifyName_Implementation() const override;
 };
@@ -399,8 +399,8 @@ public:
 	UPROPERTY(EditAnywhere, Category = "攻击", meta = (DisplayName = "攻击信息"))
 	TArray<FARPG_AttackInfo> AttackInfos;
 
-	virtual void NotifyBegin(USkeletalMeshComponent * MeshComp, UAnimSequenceBase * Animation, float TotalDuration) override;
-	virtual void NotifyEnd(USkeletalMeshComponent * MeshComp, UAnimSequenceBase * Animation) override;
+	virtual void NotifyBegin(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, float TotalDuration) override;
+	virtual void NotifyEnd(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation) override;
 
 	virtual FString GetNotifyName_Implementation() const override;
 
@@ -408,7 +408,7 @@ public:
 	UPROPERTY(EditAnywhere, Category = "攻击")
 	EARPG_AnimDebugHintType DebugHintType = EARPG_AnimDebugHintType::OnlyPreview;
 
-	virtual void NotifyTick(USkeletalMeshComponent * MeshComp, UAnimSequenceBase * Animation, float FrameDeltaTime) override;
+	virtual void NotifyTick(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, float FrameDeltaTime) override;
 #endif
 };
 
@@ -426,6 +426,28 @@ public:
 	FGameplayTag EventTag;
 
 	void Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation) override;
+
+	FString GetNotifyName_Implementation() const override;
+};
+
+UCLASS(meta = (DisplayName = "交互_状态事件通知"))
+class ARPG_API UARPG_InteractEventNotifyState : public UAnimNotifyState
+{
+	GENERATED_BODY()
+public:
+	UARPG_InteractEventNotifyState()
+	{
+		bIsNativeBranchingPoint = true;
+	}
+
+	UPROPERTY(EditAnywhere, Category = "交互")
+	FGameplayTag EventTag;
+
+	virtual void NotifyBegin(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, float TotalDuration) override;
+	virtual void NotifyEnd(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation) override;
+
+	UFUNCTION()
+	void WhenInteractEnd(AActor* Which, class UARPG_InteractableActorManagerBase* Manager, class ACharacterBase* Who, bool bFinishPerfectly);
 
 	FString GetNotifyName_Implementation() const override;
 };
