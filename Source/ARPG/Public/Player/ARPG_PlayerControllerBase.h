@@ -21,6 +21,7 @@ public:
 
 	virtual void Tick(float DeltaSeconds) override;
 	
+	void GetLifetimeReplicatedProps(TArray< class FLifetimeProperty > & OutLifetimeProps) const override;
 public:
 	UPROPERTY(EditAnywhere, Category = "锁定系统", meta = (ShowOnlyInnerProperties))
 	FARPG_LockOnTargetSystem LockOnTargetSystem;
@@ -57,4 +58,9 @@ public:
 public:
 	UPROPERTY(VisibleAnywhere, Category = "寻路")
 	class UARPG_PathFollowingComponent* PathFollowingComponent;
+
+	UPROPERTY(ReplicatedUsing = OnRep_bIsInPathFollowing)
+	uint8 bIsInPathFollowing : 1;
+	UFUNCTION()
+	void OnRep_bIsInPathFollowing();
 };

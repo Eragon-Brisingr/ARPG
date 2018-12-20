@@ -87,7 +87,7 @@ void UARPG_InteractableActorManagerBase::WhenMoveFinished(const FPathFollowingRe
 
 void UARPG_InteractableActorManagerBase::WhenTurnFinished(bool Succeed, ACharacterBase* Invoker, FBehaviorWithPosition BehaviorConfig, FOnInteractFinished OnInteractFinished)
 {
-	UARPG_CharacterBehaviorConfigurable* Behavior = BehaviorConfig.RelativePositionExecuteBehavior(Invoker, OnInteractFinished, GetOwner()->GetActorTransform());
+	UARPG_CharacterBehaviorConfigurable* Behavior = BehaviorConfig.RelativePositionExecuteBehavior(Invoker, OnInteractFinished, GetOwner());
 	CurBehaviorMap.FindOrAdd(Invoker) = Behavior;
 }
 

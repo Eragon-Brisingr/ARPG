@@ -60,6 +60,11 @@ FPathFollowingRequestResult UARPG_MoveUtils::ARPG_MoveToLocationImpl(class AChar
 
 FPathFollowingRequestResult UARPG_MoveUtils::MoveTo(class AController* Controller, class UPathFollowingComponent* PathFollowingComponent, const FAIMoveRequest& MoveRequest, FNavPathSharedPtr* OutPath)
 {
+	if (AARPG_PlayerControllerBase* PlayerController = Cast<AARPG_PlayerControllerBase>(Controller))
+	{
+		PlayerController->bIsInPathFollowing = true;
+	}
+
 	class APawn* Pawn = Controller->GetPawn();
 
 	// both MoveToActor and MoveToLocation can be called from blueprints/script and should keep only single movement request at the same time.
@@ -267,6 +272,10 @@ void UARPG_MoveUtils::OnMoveCompleted(FAIRequestID RequestID, const FPathFollowi
 {
 	if (RequestID.IsEquivalent(InvokeRequestID))
 	{
+		if (AARPG_PlayerControllerBase* PlayerController = Cast<AARPG_PlayerControllerBase>(PathFollowingComponent->GetOwner()))
+		{
+			PlayerController->bIsInPathFollowing = false;
+		}
 		PathFollowingComponent->OnRequestFinished.RemoveAll(this);
 		OnARPG_MoveFinish.ExecuteIfBound(Result);
 	}

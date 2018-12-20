@@ -375,8 +375,6 @@ public:
 	void InvokeInteract(AActor* InteractTarget);
 	UFUNCTION(Reliable, WithValidation, Server)
 	void InvokeInteract_ToServer(AActor* InteractTarget);
-	void InvokeInteract_ToServer_Implementation(AActor* InteractTarget);
-	bool InvokeInteract_ToServer_Validate(AActor* InteractTarget) { return true; }
 
 	UFUNCTION(BlueprintCallable, Category = "角色|交互")
 	bool CanInteract(AActor* InteractTarget) const;
@@ -386,8 +384,9 @@ public:
 
 	UFUNCTION(Reliable, WithValidation, Server)
 	void InvokeFinishInteract_ToServer();
-	void InvokeFinishInteract_ToServer_Implementation();
-	bool InvokeFinishInteract_ToServer_Validate() { return true; }
+
+	UFUNCTION(Reliable, WithValidation, Server)
+	void InvokeFinishPathFollowing_ToServer();
 
 	UPROPERTY(BlueprintReadOnly, Category = "角色|交互")
 	UARPG_InteractableActorManagerBase* InteractingManager;
@@ -512,4 +511,15 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "角色|动作")
 	UARPG_CharacterBehaviorBase* TurnTo(const FRotator& TargetWorldRotation);
 
+public:
+	void ForceSetClientWorldLocation(const FVector& Location);
+private:
+	UFUNCTION(Reliable, WithValidation, Client)
+	void ForceSetClientWorldLocationImpl(const FVector& Location);
+public:
+	UFUNCTION(Reliable, WithValidation, Client)
+	void ForceSetClientWorldRotation(const FRotator& Rotation);
+
+	UFUNCTION(Reliable, WithValidation, Client)
+	void ForceSetClientWorldLocationAndRotation(const FVector& Location, const FRotator& Rotation);
 };
