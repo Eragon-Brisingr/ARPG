@@ -3,6 +3,7 @@
 #include "ARPG_PlayerControllerBase.h"
 #include "CharacterBase.h"
 #include "ARPG_PathFollowingComponent.h"
+#include "UnrealNetwork.h"
 
 
 AARPG_PlayerControllerBase::AARPG_PlayerControllerBase()
@@ -22,6 +23,13 @@ void AARPG_PlayerControllerBase::Tick(float DeltaSeconds)
 			ControlledCharacter->SetLockedTarget(LockOnTargetSystem.LockedTarget.Get());
 		}
 	}
+}
+
+void AARPG_PlayerControllerBase::GetLifetimeReplicatedProps(TArray< class FLifetimeProperty > & OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(AARPG_PlayerControllerBase, bIsInPathFollowing);
 }
 
 AActor* AARPG_PlayerControllerBase::GetLockedTarget() const
@@ -79,4 +87,9 @@ bool AARPG_PlayerControllerBase::InvokeSwitchLockedTarget(bool Left)
 		SetLockedTarget_ToServer(LockOnTargetSystem.LockedTarget.Get(), LockOnTargetSystem.LockedSocketName);
 	}
 	return Succeed;
+}
+
+void AARPG_PlayerControllerBase::OnRep_bIsInPathFollowing()
+{
+
 }

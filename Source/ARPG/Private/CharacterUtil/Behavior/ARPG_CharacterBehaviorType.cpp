@@ -13,39 +13,64 @@ UARPG_CharacterBehaviorConfigurable* FBehaviorWithPosition::WorldPositionExecute
 	if (bAttachToLocation && bAttachToRotation)
 	{
 		UARPG_ActorFunctionLibrary::MoveCharacterToFitGround(Character, Location, Rotation);
+		if (Character->GetRemoteRole() == ENetRole::ROLE_AutonomousProxy)
+		{
+			Character->ForceSetClientWorldLocationAndRotation(Location, Rotation);
+		}
 	}
 	else if (bAttachToLocation)
 	{
 		UARPG_ActorFunctionLibrary::MoveCharacterToLocationFitGround(Character, Location);
+		if (Character->GetRemoteRole() == ENetRole::ROLE_AutonomousProxy)
+		{
+			Character->ForceSetClientWorldLocation(Location);
+		}
 	}
 	else if (bAttachToRotation)
 	{
 		UARPG_ActorFunctionLibrary::MoveCharacterToRotationFitGround(Character, Rotation);
-	}
-
-	if (bEnableHandIK)
-	{
-		IARPG_InteractAnimInterface::SetEnableInteractHandIK(Character, true);
-		IARPG_InteractAnimInterface::SetInteractHandIK_Location(Character, Location);
+		if (Character->GetRemoteRole() == ENetRole::ROLE_AutonomousProxy)
+		{
+			Character->ForceSetClientWorldRotation(Rotation);
+		}
 	}
 
 	return ExecuteBehavior(Character, OnBehaviorFinished, Location);
 }
 
-UARPG_CharacterBehaviorConfigurable* FBehaviorWithPosition::RelativePositionExecuteBehavior(class ACharacterBase* Character, const FOnCharacterBehaviorFinished& OnBehaviorFinished, const FTransform& Transform) const
+UARPG_CharacterBehaviorConfigurable* FBehaviorWithPosition::RelativePositionExecuteBehavior(class ACharacterBase* Character, const FOnCharacterBehaviorFinished& OnBehaviorFinished, AActor* Owner) const
 {
+	const FTransform Transform = Owner->GetActorTransform();
 	FVector WorldLocation = Transform.TransformPosition(Location);
 	if (bAttachToLocation && bAttachToRotation)
 	{
 		UARPG_ActorFunctionLibrary::MoveCharacterToFitGround(Character, WorldLocation, Transform.TransformRotation(Rotation.Quaternion()).Rotator());
+		if (Character->GetRemoteRole() == ENetRole::ROLE_AutonomousProxy)
+		{
+			Character->ForceSetClientWorldLocationAndRotation(WorldLocation, Rotation);
+		}
 	}
 	else if (bAttachToLocation)
 	{
 		UARPG_ActorFunctionLibrary::MoveCharacterToLocationFitGround(Character, WorldLocation);
+		if (Character->GetRemoteRole() == ENetRole::ROLE_AutonomousProxy)
+		{
+			Character->ForceSetClientWorldLocation(WorldLocation);
+		}
 	}
 	else if (bAttachToRotation)
 	{
-		UARPG_ActorFunctionLibrary::MoveCharacterToRotationFitGround(Character, Transform.TransformRotation(Rotation.Quaternion()).Rotator());
+		FRotator WorldRotation = Transform.TransformRotation(Rotation.Quaternion()).Rotator();
+		UARPG_ActorFunctionLibrary::MoveCharacterToRotationFitGround(Character, WorldRotation);
+		if (Character->GetRemoteRole() == ENetRole::ROLE_AutonomousProxy)
+		{
+			Character->ForceSetClientWorldRotation(WorldRotation);
+		}
+	}
+
+	if (bAttachToActor)
+	{
+		Character->AttachToActor(Owner, FAttachmentTransformRules::KeepWorldTransform);
 	}
 
 	return ExecuteBehavior(Character, OnBehaviorFinished, WorldLocation);
@@ -60,6 +85,8 @@ void FBehaviorWithPosition::WhenBehaviorFinished(bool Succeed, class ACharacterB
 			IARPG_InteractAnimInterface::SetEnableInteractHandIK(AnimInstance, false);
 		}
 	}
+
+	Character->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
 
 	OnBehaviorFinished.ExecuteIfBound(Succeed);
 }

@@ -30,6 +30,7 @@
 #include "Action/ARPG_CharacterTurnBase.h"
 #include "Engine/Engine.h"
 #include "Action/ARPG_EnterReleaseStateBase.h"
+#include "ARPG_PlayerControllerBase.h"
 
 
 // Sets default values
@@ -482,6 +483,41 @@ UARPG_CharacterBehaviorBase* ACharacterBase::TurnTo(const FRotator& TargetWorldR
 	return TurnTo(TargetWorldRotation, {});
 }
 
+void ACharacterBase::ForceSetClientWorldLocation(const FVector& Location)
+{
+	ForceSetClientWorldLocationImpl(FRepMovement::RebaseOntoZeroOrigin(Location, this));
+}
+
+void ACharacterBase::ForceSetClientWorldLocationImpl_Implementation(const FVector& Location)
+{
+	SetActorLocation(FRepMovement::RebaseOntoLocalOrigin(Location, this));
+}
+
+bool ACharacterBase::ForceSetClientWorldLocationImpl_Validate(const FVector& Location)
+{
+	return true;
+}
+
+void ACharacterBase::ForceSetClientWorldRotation_Implementation(const FRotator& Rotation)
+{
+	SetActorRotation(Rotation);
+}
+
+bool ACharacterBase::ForceSetClientWorldRotation_Validate(const FRotator& Rotation)
+{
+	return true;
+}
+
+void ACharacterBase::ForceSetClientWorldLocationAndRotation_Implementation(const FVector& Location, const FRotator& Rotation)
+{
+	SetActorLocationAndRotation(FRepMovement::RebaseOntoLocalOrigin(Location, this), Rotation);
+}
+
+bool ACharacterBase::ForceSetClientWorldLocationAndRotation_Validate(const FVector& Location, const FRotator& Rotation)
+{
+	return true;
+}
+
 void ACharacterBase::PlayMontageWithBlendingOutDelegate(UAnimMontage* Montage, const FOnMontageBlendingOutStarted& OnMontageBlendingOutStarted, float InPlayRate /*= 1.f*/, FName StartSectionName /*= NAME_None*/)
 {
 	PlayMontage(Montage, InPlayRate, StartSectionName);
@@ -723,6 +759,11 @@ void ACharacterBase::InvokeInteract_ToServer_Implementation(AActor* InteractTarg
 	}
 }
 
+bool ACharacterBase::InvokeInteract_ToServer_Validate(AActor* InteractTarget)
+{
+	return true;
+}
+
 bool ACharacterBase::CanInteract(AActor* InteractTarget) const
 {
 	return InteractTarget && InteractTarget->Implements<UARPG_InteractInterface>() && IARPG_InteractInterface::CanInteract(InteractTarget, this);
@@ -734,6 +775,24 @@ void ACharacterBase::InvokeFinishInteract()
 	{
 		InvokeFinishInteract_ToServer();
 	}
+
+	if (AARPG_PlayerControllerBase* PlayerController = Cast<AARPG_PlayerControllerBase>(GetController()))
+	{
+		if (PlayerController->bIsInPathFollowing)
+		{
+			InvokeFinishPathFollowing_ToServer();
+		}
+	}
+}
+
+void ACharacterBase::InvokeFinishPathFollowing_ToServer_Implementation()
+{
+	GetController()->StopMovement();
+}
+
+bool ACharacterBase::InvokeFinishPathFollowing_ToServer_Validate()
+{
+	return true;
 }
 
 void ACharacterBase::InvokeFinishInteract_ToServer_Implementation()
@@ -742,6 +801,11 @@ void ACharacterBase::InvokeFinishInteract_ToServer_Implementation()
 	{
 		InteractingManager->EndInteract(this, {});
 	}
+}
+
+bool ACharacterBase::InvokeFinishInteract_ToServer_Validate()
+{
+	return true;
 }
 
 class UARPG_CampInfo* ACharacterBase::GetCampInfo() const

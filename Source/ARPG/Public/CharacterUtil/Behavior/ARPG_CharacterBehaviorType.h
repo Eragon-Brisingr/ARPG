@@ -32,6 +32,9 @@ public:
 	uint8 bAttachToRotation : 1;
 
 	UPROPERTY(EditAnywhere, Category = "行为")
+	uint8 bAttachToActor : 1;
+
+	UPROPERTY(EditAnywhere, Category = "行为")
 	uint8 bEnableHandIK : 1;
 
  	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "行为", Instanced)
@@ -39,7 +42,7 @@ public:
 	
 	UARPG_CharacterBehaviorConfigurable* WorldPositionExecuteBehavior(class ACharacterBase* Character, const FOnCharacterBehaviorFinished& OnBehaviorFinished) const;
 
-	UARPG_CharacterBehaviorConfigurable* RelativePositionExecuteBehavior(class ACharacterBase* Character, const FOnCharacterBehaviorFinished& OnBehaviorFinished, const FTransform& Transform) const;
+	UARPG_CharacterBehaviorConfigurable* RelativePositionExecuteBehavior(class ACharacterBase* Character, const FOnCharacterBehaviorFinished& OnBehaviorFinished, AActor* Owner) const;
 
 	static void WhenBehaviorFinished(bool Succeed, class ACharacterBase* Character, FOnCharacterBehaviorFinished OnBehaviorFinished);
 private:
