@@ -384,8 +384,16 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "角色|交互")
 	void InvokeFinishInteract();
 
+	UFUNCTION(Reliable, WithValidation, Server)
+	void InvokeFinishInteract_ToServer();
+	void InvokeFinishInteract_ToServer_Implementation();
+	bool InvokeFinishInteract_ToServer_Validate() { return true; }
+
 	UPROPERTY(BlueprintReadOnly, Category = "角色|交互")
 	UARPG_InteractableActorManagerBase* InteractingManager;
+
+	UPROPERTY(BlueprintReadOnly, Category = "角色|交互", Replicated)
+	uint8 bIsInteractingWithActor : 1;
 public:
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "Character")
 	class UARPG_MovementComponent* ARPG_MovementComponent;

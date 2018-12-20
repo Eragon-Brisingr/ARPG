@@ -118,6 +118,7 @@ void ACharacterBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLi
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME(ACharacterBase, bIsLockingOther);
+	DOREPLIFETIME_CONDITION(ACharacterBase, bIsInteractingWithActor, COND_OwnerOnly);
 }
 
 void ACharacterBase::OnConstruction(const FTransform& Transform)
@@ -728,6 +729,14 @@ bool ACharacterBase::CanInteract(AActor* InteractTarget) const
 }
 
 void ACharacterBase::InvokeFinishInteract()
+{
+	if (bIsInteractingWithActor)
+	{
+		InvokeFinishInteract_ToServer();
+	}
+}
+
+void ACharacterBase::InvokeFinishInteract_ToServer_Implementation()
 {
 	if (InteractingManager)
 	{
