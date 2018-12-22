@@ -3,9 +3,20 @@
 #include "ARPG_AttackAreaManager.h"
 #include "CharacterBase.h"
 
-UWorld* UARPG_AttackParam::GetWorld() const
+UWorld* UARPG_AttackParamBase::GetWorld() const
 {
 	return Attacker ? Attacker->GetWorld() : nullptr;
+}
+
+FVector UARPG_AttackArea_Sphere::GetAttackMoveLocation(ACharacterBase* Attacker, AActor* AttackTarget) const
+{
+	FVector TargetLocation = AttackTarget->GetActorLocation();
+	return TargetLocation + (Attacker->GetActorLocation() - TargetLocation).GetSafeNormal2D() * Radius * 0.5f;
+}
+
+bool UARPG_AttackArea_Sphere::IsInArea(ACharacterBase* Attacker, AActor* AttackTarget) const
+{
+	return Attacker->GetDistanceTo(AttackTarget) < Radius;
 }
 
 void UAP_NormalMontage::InvokeAttack(AActor* AttackTarget, const FBP_OnAttackFinished& OnAttackFinished)
@@ -38,12 +49,13 @@ void UARPG_AttackAreaManager::BeginPlay()
 	// ...
 	if (ACharacterBase* Character = Cast<ACharacterBase>(GetOwner()))
 	{
+		Attacker = Character;
 		if (bAutoActivate)
 		{
 			Character->BattleControl = this;
 		}
 
-		for (FAttackAreaParam& AttackAreaParam : AttackArea)
+		for (FAttackAreaParam& AttackAreaParam : AttackConfigs)
 		{
 			if (AttackAreaParam.AttackParam)
 			{
@@ -65,17 +77,22 @@ void UARPG_AttackAreaManager::TickComponent(float DeltaTime, ELevelTick TickType
 
 FVector UARPG_AttackAreaManager::GetAttackMoveLocation_Implementation(class AActor* AttackTarget) const
 {
-	FVector TargetLocation = AttackTarget->GetActorLocation();
-	return TargetLocation + (GetOwner()->GetActorLocation() - TargetLocation).GetSafeNormal2D() * 300.f;
+	if (UARPG_AttackAreaBase* AttackArea = AttackConfigs[MainAttackConfig].AttackArea)
+	{
+		return AttackConfigs[MainAttackConfig].AttackArea->GetAttackMoveLocation(Attacker, AttackTarget);
+	}
+
+	return FVector::ZeroVector;
 }
 
 void UARPG_AttackAreaManager::InvokeAttack_Implementation(class AActor* AttackTarget, const FBP_OnAttackFinished& OnAttackFinished)
 {
-	for (const FAttackAreaParam& AttackAreaParam : AttackArea)
+	for (int32 i = 0; i < AttackConfigs.Num(); ++i)
 	{
+		const FAttackAreaParam& AttackAreaParam = AttackConfigs[i];
 		if (AttackAreaParam.AttackParam)
 		{
-			ActiveAttackParam = AttackAreaParam.AttackParam;
+			ActiveAttackConfigIndex = i;
 			AttackAreaParam.AttackParam->InvokeAttack(AttackTarget, FARPG_OnAttackFinished::CreateUObject(this, &UARPG_AttackAreaManager::WhenAttackFinished, OnAttackFinished));
 		}
 	}
@@ -83,19 +100,22 @@ void UARPG_AttackAreaManager::InvokeAttack_Implementation(class AActor* AttackTa
 
 void UARPG_AttackAreaManager::AbortAttack_Implementation(class AActor* AttackTarget, const FBP_OnAttackAborted& OnAttackAborted)
 {
-
+	if (UARPG_AttackParamBase* AttackParam = GetActiveAttackParam())
+	{
+		AttackParam->AbortAttack(AttackTarget, OnAttackAborted);
+	}
 }
 
 void UARPG_AttackAreaManager::AttackingTick_Implementation(class AActor* AttackTarget, float DeltaSecond)
 {
-	if (ActiveAttackParam)
+	if (UARPG_AttackParamBase* AttackParam = GetActiveAttackParam())
 	{
-		ActiveAttackParam->AttackingTick(AttackTarget, DeltaSecond);
+		AttackParam->AttackingTick(AttackTarget, DeltaSecond);
 	}
 }
 
 void UARPG_AttackAreaManager::WhenAttackFinished(bool Succeed, FBP_OnAttackFinished OnAttackFinished)
 {
-	ActiveAttackParam = nullptr;
+	ActiveAttackConfigIndex = INDEX_NONE;
 	OnAttackFinished.ExecuteIfBound(Succeed);
 }

@@ -11,7 +11,7 @@ class ACharacterBase;
 class UAnimMontage;
 
 UCLASS(abstract, EditInlineNew, collapsecategories)
-class ARPG_API UARPG_AttackParam : public UObject
+class ARPG_API UARPG_AttackParamBase : public UObject
 {
 	GENERATED_BODY()
 public:
@@ -29,20 +29,47 @@ public:
 	virtual void AbortAttack(AActor* AttackTarget, const FBP_OnAttackAborted& OnAttackAborted) {}
 };
 
+UCLASS(abstract, EditInlineNew, collapsecategories)
+class ARPG_API UARPG_AttackAreaBase : public UObject
+{
+	GENERATED_BODY()
+public:
+	virtual FVector GetAttackMoveLocation(ACharacterBase* Attacker, AActor* AttackTarget) const { return FVector::ZeroVector; }
+
+	virtual bool IsInArea(ACharacterBase* Attacker, AActor* AttackTarget) const { return false; }
+};
+
+UCLASS(meta = (DisplayName = "球形"))
+class ARPG_API UARPG_AttackArea_Sphere : public UARPG_AttackAreaBase
+{
+	GENERATED_BODY()
+public:
+	FVector GetAttackMoveLocation(ACharacterBase* Attacker, AActor* AttackTarget) const override;
+
+	bool IsInArea(ACharacterBase* Attacker, AActor* AttackTarget) const override;
+
+	UPROPERTY(EditAnywhere, Category = "配置")
+	FVector Origin;
+
+	UPROPERTY(EditAnywhere, Category = "配置")
+	float Radius = 100.f;
+};
+
+
 USTRUCT()
 struct ARPG_API FAttackAreaParam
 {
 	GENERATED_BODY()
 public:
-	UPROPERTY(EditAnywhere, Category = "配置")
-	FVector Location;
+	UPROPERTY(EditAnywhere, Category = "配置", Instanced)
+	UARPG_AttackAreaBase* AttackArea;
 
 	UPROPERTY(EditAnywhere, Category = "配置", Instanced)
-	UARPG_AttackParam* AttackParam;
+	UARPG_AttackParamBase* AttackParam;
 };
 
 UCLASS()
-class ARPG_API UAP_NormalMontage : public UARPG_AttackParam
+class ARPG_API UAP_NormalMontage : public UARPG_AttackParamBase
 {
 	GENERATED_BODY()
 public:
@@ -86,8 +113,17 @@ public:
 	void WhenAttackFinished(bool Succeed, FBP_OnAttackFinished OnAttackFinished);
 
 	UPROPERTY(EditAnywhere, Category = "配置")
-	TArray<FAttackAreaParam> AttackArea;
+	int32 MainAttackConfig;
+
+	UPROPERTY(EditAnywhere, Category = "配置")
+	TArray<FAttackAreaParam> AttackConfigs;
+
+	int32 ActiveAttackConfigIndex;
+
+	FORCEINLINE UARPG_AttackParamBase* GetActiveAttackParam() const { return ActiveAttackConfigIndex != INDEX_NONE ? AttackConfigs[ActiveAttackConfigIndex].AttackParam : nullptr; }
+
+	FORCEINLINE UARPG_AttackAreaBase* GetActiveAttackArea() const { return ActiveAttackConfigIndex != INDEX_NONE ? AttackConfigs[ActiveAttackConfigIndex].AttackArea : nullptr; }
 
 	UPROPERTY()
-	UARPG_AttackParam* ActiveAttackParam;
+	ACharacterBase* Attacker;
 };
