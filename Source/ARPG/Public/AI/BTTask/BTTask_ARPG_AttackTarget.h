@@ -19,5 +19,9 @@ public:
 	virtual EBTNodeResult::Type ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) override;
 	virtual EBTNodeResult::Type AbortTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) override;
 
-	void WhenAttackFinished();
+	void WhenAttackFinished(bool Succeed, UBehaviorTreeComponent* OwnerComp, uint8* NodeMemory);
+
+	void WhenAttackAborted(UBehaviorTreeComponent* OwnerComp, uint8* NodeMemory);
+
+	virtual void TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds);
 };

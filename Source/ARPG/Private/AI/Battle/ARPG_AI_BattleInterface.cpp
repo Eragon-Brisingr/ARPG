@@ -5,12 +5,12 @@
 
 // Add default functionality here for any IARPG_AI_BattleInterface functions that are not pure virtual.
 
-FVector IARPG_AI_BattleInterface::GetAttackLocation_Implementation(class AActor* Enemy) const
+FVector IARPG_AI_BattleInterface::GetAttackMoveLocation_Implementation(class AActor* Enemy) const
 {
 	return Enemy->GetActorLocation();
 }
 
-FRotator IARPG_AI_BattleInterface::GetAttackRotation_Implementation(class AActor* Enemy) const
+FRotator IARPG_AI_BattleInterface::GetAttackFaceRotation_Implementation(class AActor* Enemy) const
 {
 	if (const AActor* Actor = Cast<const AActor>(this))
 	{
