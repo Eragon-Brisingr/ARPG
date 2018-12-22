@@ -66,15 +66,12 @@ ACharacterBase::ACharacterBase(const FObjectInitializer& ObjectInitializer)
 	GetMesh()->VisibilityBasedAnimTickOption = EVisibilityBasedAnimTickOption::AlwaysTickPoseAndRefreshBones;
 
 	NavigationQueryFilter = UARPG_NavigationQueryFilter::StaticClass();
-
-	BattleControl = this;
 }
 
 // Called when the game starts or when spawned
 void ACharacterBase::BeginPlay()
 {
 	Super::BeginPlay();
-	
 }
 
 void ACharacterBase::EndPlay(const EEndPlayReason::Type EndPlayReason)
@@ -93,6 +90,14 @@ void ACharacterBase::EndPlay(const EEndPlayReason::Type EndPlayReason)
 bool ACharacterBase::NeedNotSave_Implementation() const
 {
 	return IsPlayerControlled();
+}
+
+void ACharacterBase::PreInitializeComponents()
+{
+	Super::PreInitializeComponents();
+
+	//先于组件的初始化注册，使得组件中可以覆盖注册
+	BattleControl = this;
 }
 
 // Called every frame

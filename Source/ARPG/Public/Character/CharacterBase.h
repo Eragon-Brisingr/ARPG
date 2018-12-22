@@ -46,6 +46,8 @@ protected:
 	void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
 	virtual bool NeedNotSave_Implementation() const override;
+
+	void PreInitializeComponents() override;
 public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -446,6 +448,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "角色|AI|配置", Instanced)
 	class UARPG_BattleStyleSystemBase* BattleStyleSystem;
 
+	UPROPERTY(BlueprintReadOnly, Category = "角色|AI")
+	TScriptInterface<IARPG_AI_BattleInterface> BattleControl;
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "角色|AI|配置", Instanced)
 	class UARPG_AlertSystemBase* AlertSystem;
 
@@ -484,8 +489,6 @@ public:
 
 	UPROPERTY(EditAnywhere, Category = "角色|AI|配置")
 	FBehaviorTreeWithSubTree MainBehaviorTree;
-
-	TScriptInterface<IARPG_AI_BattleInterface> BattleControl;
 
 	//CharacterBehavior接口
 public:
