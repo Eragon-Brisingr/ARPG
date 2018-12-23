@@ -13,6 +13,7 @@
 #include "DetailCategoryBuilder.h"
 #include "DetailWidgetRow.h"
 #include "ARPG_CharacterBehaviorType.h"
+#include "VisualizerUtils.h"
 
 IMPLEMENT_HIT_PROXY(HInteractableActorManagerSingleVisProxy, HComponentVisProxy)
 
@@ -25,7 +26,7 @@ namespace PDIHelper
 	}
 }
 
-int32 FInteractableActorManagerSingleVisualizer::EditIndex = 0;
+int32 FInteractableActorManagerSingleVisualizer::EditIndex = INDEX_NONE;
 
 void FInteractableActorManagerSingleVisualizer::DrawVisualization(const UActorComponent* Component, const FSceneView* View, FPrimitiveDrawInterface* PDI)
 {
@@ -46,7 +47,7 @@ void FInteractableActorManagerSingleVisualizer::DrawVisualization(const UActorCo
 			const float ZoomFactor = FMath::Min<float>(View->ViewMatrices.GetProjectionMatrix().M[0][0], View->ViewMatrices.GetProjectionMatrix().M[1][1]);
 			const float WidgetRadius = View->Project(WorldWidgetTransform.GetTranslation()).W * (WidgetSize / ZoomFactor);
 			PDI->SetHitProxy(new HInteractableActorManagerSingleVisProxy(Component, i));
-			DrawWireDiamond(PDI, WorldWidgetTransform.ToMatrixNoScale(), WidgetRadius, bIsEditing ? FColor::White : FColor(128, 128, 255), SDPG_Foreground);
+			DrawWireDiamond(PDI, WorldWidgetTransform.ToMatrixNoScale(), WidgetRadius, EditIndex == i ? FColor::White : FColor(128, 128, 255), SDPG_Foreground);
 			PDI->SetHitProxy(NULL);
 		}
 	}
@@ -60,7 +61,6 @@ bool FInteractableActorManagerSingleVisualizer::VisProxyHandleClick(FEditorViewp
 		{
 			HInteractableActorManagerSingleVisProxy* InteractableActorManagerSimpleVisProxy = (HInteractableActorManagerSingleVisProxy*)VisProxy;
 			EditIndex = InteractableActorManagerSimpleVisProxy->Index;
-			bIsEditing = true;
 		}
 		return true;
 	}
@@ -69,7 +69,7 @@ bool FInteractableActorManagerSingleVisualizer::VisProxyHandleClick(FEditorViewp
 
 bool FInteractableActorManagerSingleVisualizer::GetWidgetLocation(const FEditorViewportClient* ViewportClient, FVector& OutLocation) const
 {
-	if (InteractableActorManager_Simple.IsValid() && EditIndex < InteractableActorManager_Simple->Behaviors.Num())
+	if (InteractableActorManager_Simple.IsValid() && EditIndex != INDEX_NONE && EditIndex < InteractableActorManager_Simple->Behaviors.Num())
 	{
 		FTransform Transform = InteractableActorManager_Simple->GetOwner()->GetActorTransform();
 		FVector WorldLocation = Transform.TransformPosition(InteractableActorManager_Simple->Behaviors[EditIndex].Location);
@@ -81,7 +81,7 @@ bool FInteractableActorManagerSingleVisualizer::GetWidgetLocation(const FEditorV
 
 bool FInteractableActorManagerSingleVisualizer::HandleInputDelta(FEditorViewportClient* ViewportClient, FViewport* Viewport, FVector& DeltaTranslate, FRotator& DeltalRotate, FVector& DeltaScale)
 {
-	if (InteractableActorManager_Simple.IsValid() && EditIndex < InteractableActorManager_Simple->Behaviors.Num())
+	if (InteractableActorManager_Simple.IsValid() && EditIndex != INDEX_NONE && EditIndex < InteractableActorManager_Simple->Behaviors.Num())
 	{
 		InteractableActorManager_Simple->Behaviors[EditIndex].Location += DeltaTranslate;
 		InteractableActorManager_Simple->Behaviors[EditIndex].Rotation += DeltalRotate;
@@ -93,28 +93,13 @@ bool FInteractableActorManagerSingleVisualizer::HandleInputDelta(FEditorViewport
 
 void FInteractableActorManagerSingleVisualizer::EndEditing()
 {
-	bIsEditing = false;
-	EditIndex = 0;
+	EditIndex = INDEX_NONE;
 	InteractableActorManager_Simple = nullptr;
 }
 
-class SInteractableActorManagerWidget : public SCompoundWidget
+TSharedPtr<SWidget> FInteractableActorManagerSingleVisualizer::GenerateContextMenu() const
 {
-	class FRootObjectCustomization : public IDetailRootObjectCustomization
-	{
-		TSharedPtr<SWidget> CustomizeObjectHeader(const UObject* InRootObject) override
-		{
-			return SNullWidget::NullWidget;
-		}
-		bool IsObjectVisible(const UObject* InRootObject) const override 
-		{ 
-			return true; 
-		}
-		bool ShouldDisplayHeader(const UObject* InRootObject) const override 
-		{ 
-			return false; 
-		}
-	};
+	TSharedPtr<FVisualizerUtils::SRightMenuEditorObjectWidget> InteractableActorManagerWidget = SNew(FVisualizerUtils::SRightMenuEditorObjectWidget);
 
 	class FNavPathCustomization : public IDetailCustomization
 	{
@@ -122,13 +107,7 @@ class SInteractableActorManagerWidget : public SCompoundWidget
 		// IDetailCustomization interface
 		virtual void CustomizeDetails(IDetailLayoutBuilder& DetailBuilder) override
 		{
-			DetailBuilder.HideCategory(TEXT("Tags"));
-			DetailBuilder.HideCategory(TEXT("ComponentReplication"));
-			DetailBuilder.HideCategory(TEXT("Activation"));
-			DetailBuilder.HideCategory(TEXT("Variable"));
-			DetailBuilder.HideCategory(TEXT("Cooking"));
-			DetailBuilder.HideCategory(TEXT("AssetUserData"));
-			DetailBuilder.HideCategory(TEXT("Collision"));
+			FVisualizerUtils::HideActorComponentCategory(DetailBuilder);
 
 			TSharedRef<IPropertyHandle> Behaviors = DetailBuilder.GetProperty(GET_MEMBER_NAME_CHECKED(UInteractableActorManagerSingle, Behaviors));
 			TSharedPtr<IPropertyHandle> ActivedElement = Behaviors->GetChildHandle(FInteractableActorManagerSingleVisualizer::EditIndex);
@@ -144,44 +123,7 @@ class SInteractableActorManagerWidget : public SCompoundWidget
 			}
 		}
 	};
-public:
-	SLATE_BEGIN_ARGS(SInteractableActorManagerWidget)
-		:_InObject(nullptr)
-	{}
-		SLATE_ARGUMENT(UObject*, InObject)
-	SLATE_END_ARGS()
-
-	void Construct(const FArguments& InArgs)
-	{
-		auto& PropertyModule = FModuleManager::LoadModuleChecked<FPropertyEditorModule>("PropertyEditor");
-		FDetailsViewArgs DetailsViewArgs(false, false, true, FDetailsViewArgs::HideNameArea, true);
-		DetailsViewArgs.DefaultsOnlyVisibility = EEditDefaultsOnlyNodeVisibility::Hide;
-		PropertyWidget = PropertyModule.CreateDetailView(DetailsViewArgs);
-		PropertyWidget->SetRootObjectCustomizationInstance(MakeShareable(new FRootObjectCustomization));
-		PropertyWidget->RegisterInstancedCustomPropertyLayout(UInteractableActorManagerSingle::StaticClass(), FOnGetDetailCustomizationInstance::CreateLambda([] {return MakeShareable(new FNavPathCustomization); }));
-		ChildSlot
-		[
-			SNew(SBox)
-			.WidthOverride(400.f)
-			.MaxDesiredHeight(400.f)
-			[
-				SNew(SScrollBox)
-				+SScrollBox::Slot()
-				.HAlign(HAlign_Fill)
-				[
-					PropertyWidget.ToSharedRef()
-				]
-			]
-		];
-
-		PropertyWidget->SetObject(InArgs._InObject);
-	}
-
-	TSharedPtr<IDetailsView> PropertyWidget;
-};
-
-TSharedPtr<SWidget> FInteractableActorManagerSingleVisualizer::GenerateContextMenu() const
-{
-	TSharedPtr<SInteractableActorManagerWidget> InteractableActorManagerWidget = SNew(SInteractableActorManagerWidget).InObject(InteractableActorManager_Simple.Get());
+	InteractableActorManagerWidget->PropertyWidget->RegisterInstancedCustomPropertyLayout(UInteractableActorManagerSingle::StaticClass(), FOnGetDetailCustomizationInstance::CreateLambda([] {return MakeShareable(new FNavPathCustomization); }));
+	InteractableActorManagerWidget->PropertyWidget->SetObject(InteractableActorManager_Simple.Get());
 	return InteractableActorManagerWidget;
 }
