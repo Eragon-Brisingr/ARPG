@@ -225,10 +225,10 @@ void UARPG_EnableAttackTracer::NotifyBegin(USkeletalMeshComponent* MeshComp, UAn
 #if WITH_EDITOR
 void UARPG_EnableAttackTracer::NotifyTick(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, float FrameDeltaTime)
 {
-//  	if (MeshComp->GetWorld()->IsGameWorld() == false)
-//  	{
-//  		PreviewSocketMoveTracer->DoTrace(FrameDeltaTime);
-//  	}
+//   	if (MeshComp->GetWorld()->IsGameWorld() == false)
+//   	{
+//   		PreviewSocketMoveTracer->DoTrace(FrameDeltaTime);
+//   	}
 }
 #endif
 
