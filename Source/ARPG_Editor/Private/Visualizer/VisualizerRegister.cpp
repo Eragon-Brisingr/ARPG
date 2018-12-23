@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 #include "VisualizerRegister.h"
 #include "UnrealEdGlobals.h"
@@ -7,6 +7,8 @@
 #include "NavPathVisualizer.h"
 #include "ARPG_InteractableActorManager.h"
 #include "InteractableActorManagerVisualizer.h"
+#include "ARPG_AttackAreaManager.h"
+#include "AttackAreaManagerVisualizer.h"
 
 template<typename UComponent, typename FVisualizer>
 void RegisterComponentVisualizer()
@@ -28,6 +30,7 @@ void FVisualizerRegister::RegisterVisualizer()
 	{
 		RegisterComponentVisualizer<UARPG_NavPathVisualHelper, FNavPathVisualizer>();
 		RegisterComponentVisualizer<UInteractableActorManagerSingle, FInteractableActorManagerSingleVisualizer>();
+		RegisterComponentVisualizer<UARPG_AttackAreaManager, FAttackAreaManagerVisualizer>();
 	}
 }
 
@@ -36,5 +39,7 @@ void FVisualizerRegister::UnregisterVisualizer()
 	if (GUnrealEd)
 	{
 		UnregisterComponentVisualizer<UARPG_NavPathVisualHelper>();
+		UnregisterComponentVisualizer<UInteractableActorManagerSingle>();
+		UnregisterComponentVisualizer<UARPG_AttackAreaManager>();
 	}
 }

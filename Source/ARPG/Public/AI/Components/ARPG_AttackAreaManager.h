@@ -39,7 +39,7 @@ public:
 	virtual bool IsInArea(ACharacterBase* Attacker, AActor* AttackTarget) const { return false; }
 };
 
-UCLASS(meta = (DisplayName = "球形"))
+UCLASS(meta = (DisplayName = "球体"))
 class ARPG_API UARPG_AttackArea_Sphere : public UARPG_AttackAreaBase
 {
 	GENERATED_BODY()
@@ -47,16 +47,37 @@ public:
 	FVector GetAttackMoveLocation(ACharacterBase* Attacker, AActor* AttackTarget) const override;
 
 	bool IsInArea(ACharacterBase* Attacker, AActor* AttackTarget) const override;
-
+	
 	UPROPERTY(EditAnywhere, Category = "配置")
 	FVector Origin;
 
 	UPROPERTY(EditAnywhere, Category = "配置")
 	float Radius = 100.f;
+
+	float GetWorldRadius(const FVector& OwnerWorldScale) const;
+};
+
+UCLASS(meta = (DisplayName = "盒体"))
+class ARPG_API UARPG_AttackArea_Box : public UARPG_AttackAreaBase
+{
+	GENERATED_BODY()
+public:
+	FVector GetAttackMoveLocation(ACharacterBase* Attacker, AActor* AttackTarget) const override;
+
+	bool IsInArea(ACharacterBase* Attacker, AActor* AttackTarget) const override;
+	
+	UPROPERTY(EditAnywhere, Category = "配置")
+	FVector Origin;
+	
+	UPROPERTY(EditAnywhere, Category = "配置")
+	FRotator Rotation;
+
+	UPROPERTY(EditAnywhere, Category = "配置")
+	FVector Extent = FVector(100.f);
 };
 
 
-USTRUCT()
+USTRUCT(BlueprintType, meta = (BlueprintInternalUseOnly = true))
 struct ARPG_API FAttackAreaParam
 {
 	GENERATED_BODY()
@@ -115,7 +136,7 @@ public:
 	UPROPERTY(EditAnywhere, Category = "配置")
 	int32 MainAttackConfig;
 
-	UPROPERTY(EditAnywhere, Category = "配置")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "配置")
 	TArray<FAttackAreaParam> AttackConfigs;
 
 	int32 ActiveAttackConfigIndex;

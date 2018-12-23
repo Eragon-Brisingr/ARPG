@@ -11,12 +11,31 @@ UWorld* UARPG_AttackParamBase::GetWorld() const
 FVector UARPG_AttackArea_Sphere::GetAttackMoveLocation(ACharacterBase* Attacker, AActor* AttackTarget) const
 {
 	FVector TargetLocation = AttackTarget->GetActorLocation();
-	return TargetLocation + (Attacker->GetActorLocation() - TargetLocation).GetSafeNormal2D() * Radius * 0.5f;
+	return TargetLocation + (Attacker->GetActorLocation() - TargetLocation).GetSafeNormal2D() * GetWorldRadius(Attacker->GetActorScale()) * 0.5f;
 }
 
 bool UARPG_AttackArea_Sphere::IsInArea(ACharacterBase* Attacker, AActor* AttackTarget) const
 {
-	return Attacker->GetDistanceTo(AttackTarget) < Radius;
+	return Attacker->GetDistanceTo(AttackTarget) < GetWorldRadius(Attacker->GetActorScale());
+}
+
+float UARPG_AttackArea_Sphere::GetWorldRadius(const FVector& OwnerWorldScale) const
+{
+	return OwnerWorldScale.Z * Radius;
+}
+
+FVector UARPG_AttackArea_Box::GetAttackMoveLocation(ACharacterBase* Attacker, AActor* AttackTarget) const
+{
+	FTransform WorldTransform = Attacker->GetActorTransform();
+	FVector WorldExtents = WorldTransform.TransformVector(Extent);
+	return WorldTransform.GetLocation() + (Attacker->GetActorLocation() - WorldTransform.GetLocation()).GetSafeNormal2D() * WorldExtents.GetMin() * 0.5f;
+}
+
+bool UARPG_AttackArea_Box::IsInArea(ACharacterBase* Attacker, AActor* AttackTarget) const
+{
+	FTransform WorldTransform = Attacker->GetActorTransform();
+
+	return true;
 }
 
 void UAP_NormalMontage::InvokeAttack(AActor* AttackTarget, const FBP_OnAttackFinished& OnAttackFinished)
