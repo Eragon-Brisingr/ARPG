@@ -11,7 +11,7 @@ class ACharacterBase;
 class UAnimMontage;
 
 UCLASS(abstract, EditInlineNew, collapsecategories)
-class ARPG_API UARPG_AttackParamBase : public UObject
+class ARPG_API UARPG_AttackExecuterBase : public UObject
 {
 	GENERATED_BODY()
 public:
@@ -26,7 +26,8 @@ public:
 
 	virtual void AttackingTick(AActor* AttackTarget, float DeltaSecond) {}
 
-	virtual void AbortAttack(AActor* AttackTarget, const FBP_OnAttackAborted& OnAttackAborted) {}
+	virtual void AbortAttack(AActor* AttackTarget, const FBP_OnAttackAborted& OnAttackAborted) { OnAttackAborted.ExecuteIfBound(); }
+
 };
 
 UCLASS(abstract, EditInlineNew, collapsecategories)
@@ -37,6 +38,34 @@ public:
 	virtual FVector GetAttackMoveLocation(ACharacterBase* Attacker, AActor* AttackTarget) const { return FVector::ZeroVector; }
 
 	virtual bool IsInArea(ACharacterBase* Attacker, AActor* AttackTarget) const { return false; }
+};
+
+UCLASS(abstract, EditInlineNew, collapsecategories)
+class ARPG_API UARPG_AttackConditionBase : public UObject
+{
+	GENERATED_BODY()
+public:
+	virtual bool CanAttack(ACharacterBase* Attacker) const { return true; }
+
+	virtual void WhenExecuteAttack(ACharacterBase* Attacker) {}
+};
+
+UCLASS(meta = (DisplayName = "冷却"))
+class ARPG_API UAC_CoolDown : public UARPG_AttackConditionBase
+{
+	GENERATED_BODY()
+public:
+	UPROPERTY(EditAnywhere, Category = "配置")
+	float CoolDownTime = 3.f;
+
+	UPROPERTY(EditAnywhere, Category = "配置")
+	float RandomRange = 2.f;
+
+	float NextExecuteSecond = FLT_MIN;
+
+	virtual bool CanAttack(ACharacterBase* Attacker) const;
+
+	virtual void WhenExecuteAttack(ACharacterBase* Attacker);
 };
 
 UCLASS(meta = (DisplayName = "球体"))
@@ -76,8 +105,20 @@ public:
 	FVector Extent = FVector(100.f);
 };
 
+UCLASS(meta = (DisplayName = "播放蒙太奇"))
+class ARPG_API UAE_NormalMontage : public UARPG_AttackExecuterBase
+{
+	GENERATED_BODY()
+public:
+	UPROPERTY(EditAnywhere, Category = "配置")
+		UAnimMontage* Montage;
 
-USTRUCT(BlueprintType, meta = (BlueprintInternalUseOnly = true))
+	void InvokeAttack(AActor* AttackTarget, const FBP_OnAttackFinished& OnAttackFinished) override;
+
+	void WhenMontageBlendOutStart(UAnimMontage* CurMontage, bool bInterrupted, FBP_OnAttackFinished OnAttackFinished);
+};
+
+USTRUCT()
 struct ARPG_API FAttackAreaParam
 {
 	GENERATED_BODY()
@@ -86,20 +127,24 @@ public:
 	UARPG_AttackAreaBase* AttackArea;
 
 	UPROPERTY(EditAnywhere, Category = "配置", Instanced)
-	UARPG_AttackParamBase* AttackParam;
-};
+	UARPG_AttackConditionBase* Condition;
 
-UCLASS()
-class ARPG_API UAP_NormalMontage : public UARPG_AttackParamBase
-{
-	GENERATED_BODY()
-public:
-	UPROPERTY(EditAnywhere, Category = "配置")
-	UAnimMontage* Montage;
+	UPROPERTY(EditAnywhere, Category = "配置", Instanced)
+	UARPG_AttackExecuterBase* AttackExecuter;
 
-	void InvokeAttack(AActor* AttackTarget, const FBP_OnAttackFinished& OnAttackFinished) override;
-
-	void WhenMontageBlendOutStart(UAnimMontage* CurMontage, bool bInterrupted, FBP_OnAttackFinished OnAttackFinished);
+	bool CanAttack(ACharacterBase* Attacker, AActor* AttackTarget) const
+	{
+		bool Res = Condition ? Condition->CanAttack(Attacker) : true;
+		if (Res)
+		{
+			Res = AttackArea ? AttackArea->IsInArea(Attacker, AttackTarget) : false;
+			if (Res)
+			{
+				return AttackExecuter ? AttackExecuter->CanAttack() : false;
+			}
+		}
+		return false;
+	}
 };
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
@@ -125,6 +170,8 @@ public:
 
 	bool CanAttack_Implementation(class AActor* AttackTarget) const override { return false; }
 
+	bool IsAllowedAttack_Implementation(class AActor* AttackTarget) const override;
+
 	void InvokeAttack_Implementation(class AActor* AttackTarget, const FBP_OnAttackFinished& OnAttackFinished) override;
 
 	void AbortAttack_Implementation(class AActor* AttackTarget, const FBP_OnAttackAborted& OnAttackAborted) override;
@@ -136,12 +183,12 @@ public:
 	UPROPERTY(EditAnywhere, Category = "配置")
 	int32 MainAttackConfig;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "配置")
+	UPROPERTY(EditAnywhere, Category = "配置")
 	TArray<FAttackAreaParam> AttackConfigs;
 
-	int32 ActiveAttackConfigIndex;
+	mutable int32 ActiveAttackConfigIndex = INDEX_NONE;
 
-	FORCEINLINE UARPG_AttackParamBase* GetActiveAttackParam() const { return ActiveAttackConfigIndex != INDEX_NONE ? AttackConfigs[ActiveAttackConfigIndex].AttackParam : nullptr; }
+	FORCEINLINE UARPG_AttackExecuterBase* GetActiveAttackParam() const { return ActiveAttackConfigIndex != INDEX_NONE ? AttackConfigs[ActiveAttackConfigIndex].AttackExecuter : nullptr; }
 
 	FORCEINLINE UARPG_AttackAreaBase* GetActiveAttackArea() const { return ActiveAttackConfigIndex != INDEX_NONE ? AttackConfigs[ActiveAttackConfigIndex].AttackArea : nullptr; }
 

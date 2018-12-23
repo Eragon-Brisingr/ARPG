@@ -59,7 +59,7 @@ class ARPG_API IARPG_AI_BattleInterface
 public:
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "战斗")
 	bool CanAttack(class AActor* AttackTarget) const;
-	virtual bool CanAttack_Implementation(class AActor* AttackTarget) const { return false; }
+	virtual bool CanAttack_Implementation(class AActor* AttackTarget) const;
 	static bool CanAttack(const UObject* Obj, class AActor* AttackTarget) { return IARPG_AI_BattleInterface::Execute_CanAttack(Obj, AttackTarget); }
 
 	UFUNCTION(BlueprintCallable, BlueprintPure = false, BlueprintNativeEvent, Category = "战斗")
@@ -73,18 +73,23 @@ public:
 	static FRotator GetAttackFaceRotation(const UObject* Obj, class AActor* AttackTarget) { return IARPG_AI_BattleInterface::Execute_GetAttackFaceRotation(Obj, AttackTarget); }
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "战斗")
+	bool IsAllowedAttack(class AActor* AttackTarget) const;
+	virtual bool IsAllowedAttack_Implementation(class AActor* AttackTarget) const;
+	static bool IsAllowedAttack(UObject* Obj, class AActor* AttackTarget) { return IARPG_AI_BattleInterface::Execute_IsAllowedAttack(Obj, AttackTarget); }
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "战斗")
 	void InvokeAttack(class AActor* AttackTarget, const FBP_OnAttackFinished& OnAttackFinished);
-	virtual void InvokeAttack_Implementation(class AActor* AttackTarget, const FBP_OnAttackFinished& OnAttackFinished) {}
+	virtual void InvokeAttack_Implementation(class AActor* AttackTarget, const FBP_OnAttackFinished& OnAttackFinished);
 	static void InvokeAttack(UObject* Obj, class AActor* AttackTarget, const FBP_OnAttackFinished& OnAttackFinished) { IARPG_AI_BattleInterface::Execute_InvokeAttack(Obj, AttackTarget, OnAttackFinished); }
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "战斗")
 	void AbortAttack(class AActor* AttackTarget, const FBP_OnAttackAborted& OnAttackAborted);
-	virtual void AbortAttack_Implementation(class AActor* AttackTarget, const FBP_OnAttackAborted& OnAttackAborted) {}
+	virtual void AbortAttack_Implementation(class AActor* AttackTarget, const FBP_OnAttackAborted& OnAttackAborted);
 	static void AbortAttack(UObject* Obj, class AActor* AttackTarget, const FBP_OnAttackAborted& OnAttackAborted) { IARPG_AI_BattleInterface::Execute_AbortAttack(Obj, AttackTarget, OnAttackAborted); }
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "战斗")
 	void AttackingTick(class AActor* AttackTarget, float DeltaSecond);
-	virtual void AttackingTick_Implementation(class AActor* AttackTarget, float DeltaSecond){}
+	virtual void AttackingTick_Implementation(class AActor* AttackTarget, float DeltaSecond);
 	static void AttackingTick(UObject* Obj, class AActor* AttackTarget, float DeltaSecond) { IARPG_AI_BattleInterface::Execute_AttackingTick(Obj, AttackTarget, DeltaSecond); }
 };
 

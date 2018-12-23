@@ -3,9 +3,19 @@
 #include "ARPG_AttackAreaManager.h"
 #include "CharacterBase.h"
 
-UWorld* UARPG_AttackParamBase::GetWorld() const
+UWorld* UARPG_AttackExecuterBase::GetWorld() const
 {
 	return Attacker ? Attacker->GetWorld() : nullptr;
+}
+
+bool UAC_CoolDown::CanAttack(ACharacterBase* Attacker) const
+{
+	return NextExecuteSecond < Attacker->GetWorld()->GetTimeSeconds();
+}
+
+void UAC_CoolDown::WhenExecuteAttack(ACharacterBase* Attacker)
+{
+	NextExecuteSecond = Attacker->GetWorld()->GetTimeSeconds() + CoolDownTime + FMath::FRand() * RandomRange - RandomRange / 2.f;
 }
 
 FVector UARPG_AttackArea_Sphere::GetAttackMoveLocation(ACharacterBase* Attacker, AActor* AttackTarget) const
@@ -16,7 +26,9 @@ FVector UARPG_AttackArea_Sphere::GetAttackMoveLocation(ACharacterBase* Attacker,
 
 bool UARPG_AttackArea_Sphere::IsInArea(ACharacterBase* Attacker, AActor* AttackTarget) const
 {
-	return Attacker->GetDistanceTo(AttackTarget) < GetWorldRadius(Attacker->GetActorScale());
+	FTransform WorldTransform = Attacker->GetTransform();
+	float Distance = (AttackTarget->GetActorLocation() - WorldTransform.TransformPosition(Origin)).Size();
+	return Distance < GetWorldRadius(Attacker->GetActorScale());
 }
 
 float UARPG_AttackArea_Sphere::GetWorldRadius(const FVector& OwnerWorldScale) const
@@ -34,16 +46,16 @@ FVector UARPG_AttackArea_Box::GetAttackMoveLocation(ACharacterBase* Attacker, AA
 bool UARPG_AttackArea_Box::IsInArea(ACharacterBase* Attacker, AActor* AttackTarget) const
 {
 	FTransform WorldTransform = Attacker->GetActorTransform();
-
-	return true;
+	FVector RelativeLocation = WorldTransform.InverseTransformPosition(AttackTarget->GetActorLocation()) - Origin;
+	return FBox(-Extent / 2.f, Extent / 2.f).IsInside(RelativeLocation);
 }
 
-void UAP_NormalMontage::InvokeAttack(AActor* AttackTarget, const FBP_OnAttackFinished& OnAttackFinished)
+void UAE_NormalMontage::InvokeAttack(AActor* AttackTarget, const FBP_OnAttackFinished& OnAttackFinished)
 {
-	Attacker->PlayMontageWithBlendingOutDelegate(Montage, FOnMontageBlendingOutStarted::CreateUObject(this, &UAP_NormalMontage::WhenMontageBlendOutStart, OnAttackFinished));
+	Attacker->PlayMontageWithBlendingOutDelegate(Montage, FOnMontageBlendingOutStarted::CreateUObject(this, &UAE_NormalMontage::WhenMontageBlendOutStart, OnAttackFinished));
 }
 
-void UAP_NormalMontage::WhenMontageBlendOutStart(UAnimMontage* CurMontage, bool bInterrupted, FBP_OnAttackFinished OnAttackFinished)
+void UAE_NormalMontage::WhenMontageBlendOutStart(UAnimMontage* CurMontage, bool bInterrupted, FBP_OnAttackFinished OnAttackFinished)
 {
 	OnAttackFinished.ExecuteIfBound(!bInterrupted);
 }
@@ -76,9 +88,9 @@ void UARPG_AttackAreaManager::BeginPlay()
 
 		for (FAttackAreaParam& AttackAreaParam : AttackConfigs)
 		{
-			if (AttackAreaParam.AttackParam)
+			if (AttackAreaParam.AttackExecuter)
 			{
-				AttackAreaParam.AttackParam->Attacker = Character;
+				AttackAreaParam.AttackExecuter->Attacker = Character;
 			}
 		}
 	}
@@ -104,30 +116,52 @@ FVector UARPG_AttackAreaManager::GetAttackMoveLocation_Implementation(class AAct
 	return FVector::ZeroVector;
 }
 
-void UARPG_AttackAreaManager::InvokeAttack_Implementation(class AActor* AttackTarget, const FBP_OnAttackFinished& OnAttackFinished)
+bool UARPG_AttackAreaManager::IsAllowedAttack_Implementation(class AActor* AttackTarget) const
 {
 	for (int32 i = 0; i < AttackConfigs.Num(); ++i)
 	{
 		const FAttackAreaParam& AttackAreaParam = AttackConfigs[i];
-		if (AttackAreaParam.AttackParam)
+		if (AttackAreaParam.CanAttack(Attacker, AttackTarget))
 		{
 			ActiveAttackConfigIndex = i;
-			AttackAreaParam.AttackParam->InvokeAttack(AttackTarget, FARPG_OnAttackFinished::CreateUObject(this, &UARPG_AttackAreaManager::WhenAttackFinished, OnAttackFinished));
+			return true;
 		}
+	}
+	return false;
+}
+
+void UARPG_AttackAreaManager::InvokeAttack_Implementation(class AActor* AttackTarget, const FBP_OnAttackFinished& OnAttackFinished)
+{
+	if (ActiveAttackConfigIndex != INDEX_NONE)
+	{
+		const FAttackAreaParam& AttackAreaParam = AttackConfigs[ActiveAttackConfigIndex];
+		if (AttackAreaParam.Condition)
+		{
+			AttackAreaParam.Condition->WhenExecuteAttack(Attacker);
+		}
+		AttackAreaParam.AttackExecuter->InvokeAttack(AttackTarget, FARPG_OnAttackFinished::CreateUObject(this, &UARPG_AttackAreaManager::WhenAttackFinished, OnAttackFinished));
+	}
+	else
+	{
+		OnAttackFinished.ExecuteIfBound(false);
 	}
 }
 
 void UARPG_AttackAreaManager::AbortAttack_Implementation(class AActor* AttackTarget, const FBP_OnAttackAborted& OnAttackAborted)
 {
-	if (UARPG_AttackParamBase* AttackParam = GetActiveAttackParam())
+	if (UARPG_AttackExecuterBase* AttackParam = GetActiveAttackParam())
 	{
 		AttackParam->AbortAttack(AttackTarget, OnAttackAborted);
+	}
+	else
+	{
+		OnAttackAborted.ExecuteIfBound();
 	}
 }
 
 void UARPG_AttackAreaManager::AttackingTick_Implementation(class AActor* AttackTarget, float DeltaSecond)
 {
-	if (UARPG_AttackParamBase* AttackParam = GetActiveAttackParam())
+	if (UARPG_AttackExecuterBase* AttackParam = GetActiveAttackParam())
 	{
 		AttackParam->AttackingTick(AttackTarget, DeltaSecond);
 	}
