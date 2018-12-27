@@ -14,7 +14,7 @@ UARPG_InteractableActorManagerBase::UARPG_InteractableActorManagerBase()
 {
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 	// off to improve performance if you don't need them.
-	PrimaryComponentTick.bCanEverTick = true;
+	PrimaryComponentTick.bCanEverTick = false;
 
 	// ...
 }
@@ -46,25 +46,29 @@ void UARPG_InteractableActorManagerBase::StartInteract(ACharacterBase* Invoker, 
 		{
 			Invoker->EnterReleaseState({});
 		}
-		FVector InteractableLocation;
-		FRotator InteractableRotation;
-		GetInteractableLocationAndRotation(Invoker, InteractableLocation, InteractableRotation);
-		UARPG_MoveUtils::ARPG_MoveToLocation(Invoker, InteractableLocation, FOnARPG_MoveFinished::CreateUObject(this, &UARPG_InteractableActorManagerBase::WhenMoveFinished, Invoker, InteractableLocation, InteractableRotation, 
-			FOnInteractFinished::CreateUObject(this, &UARPG_InteractableActorManagerBase::WhenInteractFinished, Invoker, OnInteractFinished)), 1.f);
+
+		const FInteractBehaviorConfig* ValidConfig = nullptr;
+		const FInteractBehavior* ValidBehavior = nullptr;
+		GetBehavior(Invoker, ValidConfig, ValidBehavior);
+		if (ValidConfig && ValidBehavior)
+		{
+			FVector WorldLocation = ValidBehavior->GetWorldLocation(this);
+			UARPG_MoveUtils::ARPG_MoveToLocation(Invoker, WorldLocation, FOnARPG_MoveFinished::CreateUObject(this, &UARPG_InteractableActorManagerBase::WhenMoveFinished, Invoker, ValidConfig, ValidBehavior,
+				FOnInteractFinished::CreateUObject(this, &UARPG_InteractableActorManagerBase::WhenInteractFinished, Invoker, OnInteractFinished)), 1.f);
+			return;
+		}
 	}
-	else
-	{
-		OnInteractFinished.ExecuteIfBound(false);
-	}
+	OnInteractFinished.ExecuteIfBound(false);
 }
 
-void UARPG_InteractableActorManagerBase::WhenMoveFinished(const FPathFollowingResult& Result, ACharacterBase* Invoker, FVector Location, FRotator Rotation, FOnInteractFinished OnInteractFinished)
+void UARPG_InteractableActorManagerBase::WhenMoveFinished(const FPathFollowingResult& Result, ACharacterBase* Invoker, const FInteractBehaviorConfig* InvokeConfig, const FInteractBehavior* InvokeBehavior, FOnInteractFinished OnInteractFinished)
 {
-	if (Result.Code == EPathFollowingResult::Success)
+	//TODO 考虑动态物体 计算距离 (InvokeBehavior->GetWorldLocation(this) - Invoker->GetActorLocation())
+	if (InvokeConfig->User == nullptr && Result.Code == EPathFollowingResult::Success)
 	{
 		if (bForceEnterReleaseState && Invoker->IsInReleaseState() == false && Invoker->EnterReleaseStateAction)
 		{
-			FOnInteractFinished FOnEnterReleaseState = FOnInteractFinished::CreateUObject(this, &UARPG_InteractableActorManagerBase::WhenEnterReleaseState, Invoker, Location, OnInteractFinished);
+			FOnInteractFinished FOnEnterReleaseState = FOnInteractFinished::CreateUObject(this, &UARPG_InteractableActorManagerBase::WhenEnterReleaseState, Invoker, InvokeConfig, InvokeBehavior, OnInteractFinished);
 			if (Invoker->EnterReleaseStateAction->bIsExecuting)
 			{
 				Invoker->EnterReleaseStateAction->OnBehaviorFinished = FOnEnterReleaseState;
@@ -76,7 +80,7 @@ void UARPG_InteractableActorManagerBase::WhenMoveFinished(const FPathFollowingRe
 		}
 		else
 		{
-			WhenEnterReleaseState(true, Invoker, Location, OnInteractFinished);
+			WhenEnterReleaseState(true, Invoker, InvokeConfig, InvokeBehavior, OnInteractFinished);
 		}
 	}
 	else
@@ -85,7 +89,7 @@ void UARPG_InteractableActorManagerBase::WhenMoveFinished(const FPathFollowingRe
 	}
 }
 
-void UARPG_InteractableActorManagerBase::WhenTurnFinished(bool Succeed, ACharacterBase* Invoker, FBehaviorWithPosition BehaviorConfig, FOnInteractFinished OnInteractFinished)
+void UARPG_InteractableActorManagerBase::WhenTurnFinished(bool Succeed, ACharacterBase* Invoker, FInteractBehavior BehaviorConfig, FOnInteractFinished OnInteractFinished)
 {
 	UARPG_CharacterBehaviorConfigurable* Behavior = BehaviorConfig.RelativePositionExecuteBehavior(Invoker, OnInteractFinished, GetOwner());
 	CurBehaviorMap.FindOrAdd(Invoker) = Behavior;
@@ -97,15 +101,15 @@ void UARPG_InteractableActorManagerBase::WhenInteractFinished(bool Succeed, ACha
 	ExecuteWhenEndInteract(Invoker, Succeed);
 }
 
-void UARPG_InteractableActorManagerBase::WhenEnterReleaseState(bool Succeed, ACharacterBase* Invoker, FVector Location, FOnInteractFinished OnInteractFinished)
+void UARPG_InteractableActorManagerBase::WhenEnterReleaseState(bool Succeed, ACharacterBase* Invoker, const FInteractBehaviorConfig* InvokeConfig, const FInteractBehavior* InvokeBehavior, FOnInteractFinished OnInteractFinished)
 {
 	if (Succeed && CanInteract(Invoker))
 	{
-		FBehaviorWithPosition Behavior = GetBehavior(Invoker, Location);
+		const FInteractBehavior& Behavior = *InvokeBehavior;
 		if (Behavior.Behavior)
 		{
 			InteractActorBeginSetCollision(Invoker);
-			ExecuteWhenBeginInteract(Invoker);
+			ExecuteWhenBeginInteract(Invoker, const_cast<FInteractBehaviorConfig&>(*InvokeConfig));
 			if (Behavior.bAttachToRotation && Invoker->CharacterTurnAction && Invoker->CanPlayTurnMontage())
 			{
 				FTransform Transfrom = GetOwner()->GetActorTransform();
@@ -168,60 +172,38 @@ void UARPG_InteractableActorManagerBase::InteractActorEndSetCollision(ACharacter
 	}
 }
 
-void UARPG_InteractableActorManagerBase::ExecuteWhenBeginInteract(ACharacterBase* Invoker)
+void UARPG_InteractableActorManagerBase::ExecuteWhenBeginInteract(ACharacterBase* Invoker, FInteractBehaviorConfig& InvokeConfig)
 {
-	WhenBeginInteract(Invoker);
+	Invoker->InteractingManager = this;
+	Invoker->bIsInteractingWithActor = true;
+	InvokeConfig.User = Invoker;
+	WhenBeginInteract(Invoker, InvokeConfig);
 	OnInteractBegin.Broadcast(GetOwner(), this, Invoker);
 }
 
 void UARPG_InteractableActorManagerBase::ExecuteWhenEndInteract(ACharacterBase* Invoker, bool bFinishPerfectly)
 {
-	CurBehaviorMap.Remove(Invoker);
-	InteractActorEndSetCollision(Invoker);
-	WhenEndInteract(Invoker);
-	OnInteractEnd.Broadcast(GetOwner(), this, Invoker, bFinishPerfectly);
-}
-
-void UARPG_InteractableActorManagerBase::GetInteractableLocationAndRotation(ACharacterBase* Invoker, FVector& InteractableLocation, FRotator& InteractableRotation) const
-{
-	InteractableLocation = GetOwner()->GetActorLocation();
-	InteractableRotation = GetOwner()->GetActorRotation();
+	if (Invoker->InteractingManager == this)
+	{
+		CurBehaviorMap.Remove(Invoker);
+		InteractActorEndSetCollision(Invoker);
+		Invoker->InteractingManager = nullptr;
+		Invoker->bIsInteractingWithActor = false;
+		WhenEndInteract(Invoker);
+		OnInteractEnd.Broadcast(GetOwner(), this, Invoker, bFinishPerfectly);
+	}
 }
 
 UInteractableActorManagerSingle::UInteractableActorManagerSingle()
 {
-	Behaviors.Add(FBehaviorWithPosition());
+	
 }
 
-FBehaviorWithPosition UInteractableActorManagerSingle::GetBehavior(ACharacterBase* Invoker, const FVector& InteractableLocation) const
-{
-	const FBehaviorWithPosition* Behavior = Behaviors.FindByPredicate([&](const FBehaviorWithPosition& Behavior) {return GetOwner()->GetActorTransform().TransformPosition(Behavior.Location).Equals(InteractableLocation); });
-	return Behavior ? *Behavior : FBehaviorWithPosition();
-}
-
-void UInteractableActorManagerSingle::WhenBeginInteract(ACharacterBase* Invoker)
-{
-	Invoker->InteractingManager = this;
-	Invoker->bIsInteractingWithActor = true;
-	User = Invoker;
-}
-
-void UInteractableActorManagerSingle::WhenEndInteract(ACharacterBase* Invoker)
-{
-	if (Invoker->InteractingManager == this)
-	{
-		Invoker->InteractingManager = nullptr;
-		Invoker->bIsInteractingWithActor = false;
-		User = nullptr;
-	}
-}
-
-void UInteractableActorManagerSingle::GetInteractableLocationAndRotation(ACharacterBase* Invoker, FVector& InteractableLocation, FRotator& InteractableRotation) const
+const FInteractBehavior* GetBehaviorByNearestLocation(const TArray<FInteractBehavior>& Behaviors, const FTransform& Transform, ACharacterBase* Invoker)
 {
 	if (Behaviors.Num() > 0)
 	{
-		FTransform Transform = GetOwner()->GetActorTransform();
-		const FBehaviorWithPosition* NearestBehavior = &Behaviors[0];
+		const FInteractBehavior* NearestBehavior = &Behaviors[0];
 		float Distance = (Invoker->GetActorLocation() - Transform.TransformPosition(NearestBehavior->Location)).Size();
 		for (int i = 1; i < Behaviors.Num(); ++i)
 		{
@@ -232,7 +214,52 @@ void UInteractableActorManagerSingle::GetInteractableLocationAndRotation(ACharac
 				NearestBehavior = &Behaviors[i];
 			}
 		}
-		InteractableLocation = GetOwner()->GetActorTransform().TransformPosition(NearestBehavior->Location);
-		InteractableRotation = GetOwner()->GetActorTransform().TransformRotation(NearestBehavior->Rotation.Quaternion()).Rotator();
+		return NearestBehavior;
+	}
+	return nullptr;
+}
+
+void UInteractableActorManagerSingle::GetBehavior(ACharacterBase* Invoker, const FInteractBehaviorConfig*& ValidConfig, const FInteractBehavior*& ValidBehavior) const
+{
+	ValidBehavior = GetBehaviorByNearestLocation(GetBehaviors(), GetOwner()->GetTransform(), Invoker);
+	ValidConfig = &Config;
+}
+
+void UInteractableActorManagerSingle::WhenEndInteract(ACharacterBase* Invoker)
+{
+	Config.User = nullptr;
+}
+
+UInteractableActorManagerMulti::UInteractableActorManagerMulti()
+{
+
+}
+
+bool UInteractableActorManagerMulti::CanInteract(const ACharacterBase* Invoker) const
+{
+	return Configs.ContainsByPredicate([](const FInteractBehaviorConfig& InteractBehaviorConfig) {return !::IsValid(InteractBehaviorConfig.User); });
+}
+
+void UInteractableActorManagerMulti::GetBehavior(ACharacterBase* Invoker, const FInteractBehaviorConfig*& ValidConfig, const FInteractBehavior*& ValidBehavior) const
+{
+	for (const FInteractBehaviorConfig& InteractBehaviorConfig : Configs)
+	{
+		if (!::IsValid(InteractBehaviorConfig.User))
+		{
+			ValidBehavior = GetBehaviorByNearestLocation(InteractBehaviorConfig.Behaviors, GetOwner()->GetActorTransform(), Invoker);
+			if (ValidBehavior)
+			{
+				ValidConfig = &InteractBehaviorConfig;
+				return;
+			}
+		}
+	}
+}
+
+void UInteractableActorManagerMulti::WhenEndInteract(ACharacterBase* Invoker)
+{
+	if (FInteractBehaviorConfig* FindInteractBehaviorConfig = Configs.FindByPredicate([&](const FInteractBehaviorConfig& InteractBehaviorConfig) {return InteractBehaviorConfig.User == Invoker; }))
+	{
+		FindInteractBehaviorConfig->User = nullptr;
 	}
 }

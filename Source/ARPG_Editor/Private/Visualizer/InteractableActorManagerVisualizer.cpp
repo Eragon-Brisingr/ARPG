@@ -16,6 +16,7 @@
 #include "VisualizerUtils.h"
 
 IMPLEMENT_HIT_PROXY(HInteractableActorManagerSingleVisProxy, HComponentVisProxy)
+IMPLEMENT_HIT_PROXY(HInteractableActorManagerMultiVisProxy, HComponentVisProxy)
 
 namespace PDIHelper
 {
@@ -34,10 +35,11 @@ void FInteractableActorManagerSingleVisualizer::DrawVisualization(const UActorCo
 	if (InteractableActorManager_Simple.IsValid())
 	{
 		FTransform Transform = InteractableActorManager_Simple->GetOwner()->GetActorTransform();
+		const TArray<FInteractBehavior>& Behaviors = InteractableActorManager_Simple->GetBehaviors();
 
-		for (int32 i = 0; i < InteractableActorManager_Simple->Behaviors.Num(); ++i)
+		for (int32 i = 0; i < Behaviors.Num(); ++i)
 		{
-			const FBehaviorWithPosition& Behavior = InteractableActorManager_Simple->Behaviors[i];
+			const FBehaviorWithPosition& Behavior = Behaviors[i];
 			FVector WorldLocation = Transform.TransformPosition(Behavior.Location);
 			FRotator WorldRotation = Transform.TransformRotation(Behavior.Rotation.Quaternion()).Rotator();
 			FTransform WorldWidgetTransform(WorldRotation, WorldLocation);
@@ -69,10 +71,12 @@ bool FInteractableActorManagerSingleVisualizer::VisProxyHandleClick(FEditorViewp
 
 bool FInteractableActorManagerSingleVisualizer::GetWidgetLocation(const FEditorViewportClient* ViewportClient, FVector& OutLocation) const
 {
-	if (InteractableActorManager_Simple.IsValid() && EditIndex != INDEX_NONE && EditIndex < InteractableActorManager_Simple->Behaviors.Num())
+	if (InteractableActorManager_Simple.IsValid() && EditIndex != INDEX_NONE && EditIndex < InteractableActorManager_Simple->GetBehaviors().Num())
 	{
 		FTransform Transform = InteractableActorManager_Simple->GetOwner()->GetActorTransform();
-		FVector WorldLocation = Transform.TransformPosition(InteractableActorManager_Simple->Behaviors[EditIndex].Location);
+		const TArray<FInteractBehavior>& Behaviors = InteractableActorManager_Simple->GetBehaviors();
+
+		FVector WorldLocation = Transform.TransformPosition(Behaviors[EditIndex].Location);
 		OutLocation = WorldLocation;
 		return true;
 	}
@@ -81,10 +85,12 @@ bool FInteractableActorManagerSingleVisualizer::GetWidgetLocation(const FEditorV
 
 bool FInteractableActorManagerSingleVisualizer::HandleInputDelta(FEditorViewportClient* ViewportClient, FViewport* Viewport, FVector& DeltaTranslate, FRotator& DeltalRotate, FVector& DeltaScale)
 {
-	if (InteractableActorManager_Simple.IsValid() && EditIndex != INDEX_NONE && EditIndex < InteractableActorManager_Simple->Behaviors.Num())
+	if (InteractableActorManager_Simple.IsValid() && EditIndex != INDEX_NONE && EditIndex < InteractableActorManager_Simple->GetBehaviors().Num())
 	{
-		InteractableActorManager_Simple->Behaviors[EditIndex].Location += DeltaTranslate;
-		InteractableActorManager_Simple->Behaviors[EditIndex].Rotation += DeltalRotate;
+		TArray<FInteractBehavior>& Behaviors = InteractableActorManager_Simple->Config.Behaviors;
+
+		Behaviors[EditIndex].Location += DeltaTranslate;
+		Behaviors[EditIndex].Rotation += DeltalRotate;
 
 		return true;
 	}
@@ -109,7 +115,7 @@ TSharedPtr<SWidget> FInteractableActorManagerSingleVisualizer::GenerateContextMe
 		{
 			FVisualizerUtils::HideActorComponentCategory(DetailBuilder);
 
-			TSharedRef<IPropertyHandle> Behaviors = DetailBuilder.GetProperty(GET_MEMBER_NAME_CHECKED(UInteractableActorManagerSingle, Behaviors));
+			TSharedPtr<IPropertyHandle> Behaviors = DetailBuilder.GetProperty(GET_MEMBER_NAME_CHECKED(UInteractableActorManagerSingle, Config))->GetChildHandle(GET_MEMBER_NAME_CHECKED(FInteractBehaviorConfig, Behaviors));
 			TSharedPtr<IPropertyHandle> ActivedElement = Behaviors->GetChildHandle(FInteractableActorManagerSingleVisualizer::EditIndex);
 			IDetailCategoryBuilder& ActiveBehaviorRow = DetailBuilder.EditCategory(TEXT("选中的行为"));
 
@@ -126,4 +132,34 @@ TSharedPtr<SWidget> FInteractableActorManagerSingleVisualizer::GenerateContextMe
 	InteractableActorManagerWidget->PropertyWidget->RegisterInstancedCustomPropertyLayout(UInteractableActorManagerSingle::StaticClass(), FOnGetDetailCustomizationInstance::CreateLambda([] {return MakeShareable(new FNavPathCustomization); }));
 	InteractableActorManagerWidget->PropertyWidget->SetObject(InteractableActorManager_Simple.Get());
 	return InteractableActorManagerWidget;
+}
+
+void FInteractableActorManagerMultiVisualizer::DrawVisualization(const UActorComponent* Component, const FSceneView* View, FPrimitiveDrawInterface* PDI)
+{
+
+}
+
+bool FInteractableActorManagerMultiVisualizer::VisProxyHandleClick(FEditorViewportClient* InViewportClient, HComponentVisProxy* VisProxy, const FViewportClick& Click)
+{
+	return false;
+}
+
+bool FInteractableActorManagerMultiVisualizer::GetWidgetLocation(const FEditorViewportClient* ViewportClient, FVector& OutLocation) const
+{
+	return false;
+}
+
+bool FInteractableActorManagerMultiVisualizer::HandleInputDelta(FEditorViewportClient* ViewportClient, FViewport* Viewport, FVector& DeltaTranslate, FRotator& DeltalRotate, FVector& DeltaScale)
+{
+	return false;
+}
+
+void FInteractableActorManagerMultiVisualizer::EndEditing()
+{
+
+}
+
+TSharedPtr<SWidget> FInteractableActorManagerMultiVisualizer::GenerateContextMenu() const
+{
+	return nullptr;
 }

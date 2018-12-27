@@ -14,6 +14,32 @@ class ACharacterBase;
 class UARPG_CharacterBehaviorConfigBase;
 class UARPG_CharacterBehaviorBase;
 
+USTRUCT(BlueprintType, meta = (BlueprintInternalUseOnly = true))
+struct FInteractBehavior : public FBehaviorWithPosition
+{
+	GENERATED_BODY()
+public:
+	FVector GetWorldLocation(const UActorComponent* Component) const { return Component->GetOwner()->GetActorTransform().TransformPosition(Location); }
+	FRotator GetWorldRotator(const UActorComponent* Component) const { return Component->GetOwner()->GetActorTransform().TransformRotation(Rotation.Quaternion()).Rotator(); }
+};
+
+USTRUCT(BlueprintType)
+struct FInteractBehaviorConfig
+{
+	GENERATED_BODY()
+public:
+	FInteractBehaviorConfig()
+	{
+		Behaviors.Add(FInteractBehavior());
+	}
+
+	UPROPERTY()
+	ACharacterBase* User;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "行为")
+	TArray<FInteractBehavior> Behaviors;
+};
+
 UCLASS(abstract)
 class ARPG_API UARPG_InteractableActorManagerBase : public UActorComponent
 {
@@ -38,25 +64,25 @@ public:
 private:
 	void WhenInteractFinished(bool Succeed, ACharacterBase* Invoker, FOnInteractFinished OnInteractFinished);
 
-	void WhenEnterReleaseState(bool Succeed, ACharacterBase* Invoker, FVector Location, FOnInteractFinished OnInteractFinished);
+	void WhenEnterReleaseState(bool Succeed, ACharacterBase* Invoker, const FInteractBehaviorConfig* InvokeConfig, const FInteractBehavior* InvokeBehavior, FOnInteractFinished OnInteractFinished);
 
-	void WhenMoveFinished(const FPathFollowingResult& Result, ACharacterBase* Invoker, FVector Location, FRotator Rotation, FOnInteractFinished OnInteractFinished);
+	void WhenMoveFinished(const FPathFollowingResult& Result, ACharacterBase* Invoker, const FInteractBehaviorConfig* InvokeConfig, const FInteractBehavior* InvokeBehavior, FOnInteractFinished OnInteractFinished);
 
-	void WhenTurnFinished(bool Succeed, ACharacterBase* Invoker, FBehaviorWithPosition BehaviorConfig, FOnInteractFinished OnInteractFinished);
+	void WhenTurnFinished(bool Succeed, ACharacterBase* Invoker, FInteractBehavior BehaviorConfig, FOnInteractFinished OnInteractFinished);
 
 	void WhenBehaviorAbortFinished(ACharacterBase* Invoker, FOnInteractAbortFinished OnInteractAbortFinished);
 
 	void InteractActorBeginSetCollision(ACharacterBase* Invoker);
 	void InteractActorEndSetCollision(ACharacterBase* Invoker);
 
-	void ExecuteWhenBeginInteract(ACharacterBase* Invoker);
+	void ExecuteWhenBeginInteract(ACharacterBase* Invoker, FInteractBehaviorConfig& InvokeConfig);
 	void ExecuteWhenEndInteract(ACharacterBase* Invoker, bool bFinishPerfectly);
 public:
-	virtual FBehaviorWithPosition GetBehavior(ACharacterBase* Invoker, const FVector& InteractableLocation) const { return {}; }
+	virtual void GetBehavior(ACharacterBase* Invoker, const FInteractBehaviorConfig*& ValidConfig, const FInteractBehavior*& ValidBehavior) const { }
 	virtual bool CanInteract(const ACharacterBase* Invoker) const { return false; }
 	virtual void PostMoveFinished(ACharacterBase* Invoker) {}
 public:
-	virtual void WhenBeginInteract(ACharacterBase* Invoker) {}
+	virtual void WhenBeginInteract(ACharacterBase* Invoker, const FInteractBehaviorConfig& InvokeConfig) {}
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnInteractBegin, AActor*, Which, class UARPG_InteractableActorManagerBase*, Manager, class ACharacterBase*, Who);
 	UPROPERTY(BlueprintAssignable, Category = "交互")
 	FOnInteractBegin OnInteractBegin;
@@ -86,8 +112,6 @@ public:
 private:
 	UPROPERTY()
 	TMap<ACharacterBase*, UARPG_CharacterBehaviorBase*> CurBehaviorMap;
-
-	virtual void GetInteractableLocationAndRotation(ACharacterBase* Invoker, FVector& InteractableLocation, FRotator& InteractableRotation) const;
 };
 
 UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent, DisplayName = "交互管理器_单人使用"))
@@ -97,19 +121,31 @@ class ARPG_API UInteractableActorManagerSingle : public UARPG_InteractableActorM
 public:
 	UInteractableActorManagerSingle();
 
-	virtual bool CanInteract(const ACharacterBase* Invoker) const { return User == nullptr; }
+	bool CanInteract(const ACharacterBase* Invoker) const override { return Config.User == nullptr; }
 
-	virtual FBehaviorWithPosition GetBehavior(ACharacterBase* Invoker, const FVector& InteractableLocation) const;
+	void GetBehavior(ACharacterBase* Invoker, const FInteractBehaviorConfig*& ValidConfig, const FInteractBehavior*& ValidBehavior) const override;
 
-	virtual void WhenBeginInteract(ACharacterBase* Invoker);
-
-	virtual void WhenEndInteract(ACharacterBase* Invoker);
-
-	virtual void GetInteractableLocationAndRotation(ACharacterBase* Invoker, FVector& InteractableLocation, FRotator& InteractableRotation) const;
+	void WhenEndInteract(ACharacterBase* Invoker) override;
 public:
-	UPROPERTY()
-	ACharacterBase* User;
+	const TArray<FInteractBehavior>& GetBehaviors() const { return Config.Behaviors; }
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "行为")
-	TArray<FBehaviorWithPosition> Behaviors;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "配置", meta = (ShowOnlyInnerProperties = true))
+	FInteractBehaviorConfig Config;
+};
+
+UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent, DisplayName = "交互管理器_多人使用"))
+class ARPG_API UInteractableActorManagerMulti : public UARPG_InteractableActorManagerBase
+{
+	GENERATED_BODY()
+public:
+	UInteractableActorManagerMulti();
+
+	bool CanInteract(const ACharacterBase* Invoker) const override;
+
+	void GetBehavior(ACharacterBase* Invoker, const FInteractBehaviorConfig*& ValidConfig, const FInteractBehavior*& ValidBehavior) const override;
+
+	void WhenEndInteract(ACharacterBase* Invoker) override;
+public:
+	UPROPERTY(EditAnywhere, Category = "配置")
+	TArray<FInteractBehaviorConfig> Configs;
 };
