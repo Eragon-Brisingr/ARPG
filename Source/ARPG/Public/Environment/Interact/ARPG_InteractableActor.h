@@ -10,6 +10,8 @@
 
 class ACharacterBase;
 class UARPG_InteractableActorManagerBase;
+class UInteractableActorManagerSingle;
+class UInteractableActorManagerMulti;
 
 UCLASS(abstract, NotBlueprintable)
 class ARPG_API AARPG_InteractableActorBase : public AActor,
@@ -17,7 +19,7 @@ class ARPG_API AARPG_InteractableActorBase : public AActor,
 {
 	GENERATED_BODY()
 public:
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "行为")
+	UPROPERTY(VisibleAnywhere, Category = "行为")
 	UARPG_InteractableActorManagerBase* InteractableActorManager;
 
 	void StartInteract(ACharacterBase* Invoker, const FOnInteractFinished& OnInteractFinished);
@@ -35,4 +37,19 @@ class ARPG_API AARPG_InteractableActorSingle : public AARPG_InteractableActorBas
 	GENERATED_BODY()
 public:
 	AARPG_InteractableActorSingle();
+
+	UPROPERTY(BlueprintReadOnly, Category = "行为")
+	UInteractableActorManagerSingle* InteractableActorManagerSingle;
 };
+
+UCLASS(meta = (DisplayName = "多人交互Actor"), Blueprintable)
+class ARPG_API AARPG_InteractableActorMulti : public AARPG_InteractableActorBase
+{
+	GENERATED_BODY()
+public:
+	AARPG_InteractableActorMulti();
+
+	UPROPERTY(BlueprintReadOnly, Category = "行为")
+	UInteractableActorManagerMulti* InteractableActorManagerMulti;
+};
+

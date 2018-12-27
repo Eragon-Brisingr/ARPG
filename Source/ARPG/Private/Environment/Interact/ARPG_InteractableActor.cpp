@@ -25,5 +25,12 @@ void AARPG_InteractableActorBase::WhenInvokeInteract_Implementation(class AChara
 
 AARPG_InteractableActorSingle::AARPG_InteractableActorSingle()
 {
-	InteractableActorManager = CreateDefaultSubobject<UInteractableActorManagerSingle>(GET_MEMBER_NAME_CHECKED(AARPG_InteractableActorBase, InteractableActorManager));
+	InteractableActorManagerSingle = CreateDefaultSubobject<UInteractableActorManagerSingle>(GET_MEMBER_NAME_CHECKED(AARPG_InteractableActorBase, InteractableActorManager));
+	InteractableActorManager = InteractableActorManagerSingle;
+}
+
+AARPG_InteractableActorMulti::AARPG_InteractableActorMulti()
+{
+	InteractableActorManagerMulti = CreateDefaultSubobject<UInteractableActorManagerMulti>(GET_MEMBER_NAME_CHECKED(AARPG_InteractableActorBase, InteractableActorManager));
+	InteractableActorManager = InteractableActorManagerMulti;
 }
