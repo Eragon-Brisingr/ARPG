@@ -142,11 +142,40 @@ void UARPG_ActorFunctionLibrary::PushComponentTo(USceneComponent* Component, con
 	}
 }
 
-void UARPG_ActorFunctionLibrary::MoveActorTo(AActor* Actor, const FVector& Location, const FRotator& Rotator, float OverTime /*= 0.2f*/, bool Sweep /*= true*/)
+void UARPG_ActorFunctionLibrary::MoveActorTo(AActor* Actor, const FVector& Location, const FRotator& Rotation, float OverTime /*= 0.2f*/, bool Sweep /*= false*/)
 {
 	if (Actor)
 	{
-		MoveComponentTo(Actor->GetRootComponent(), Location, Rotator, OverTime, Sweep);
+		USceneComponent* Component = Actor->GetRootComponent();
+		TWeakObjectPtr<USceneComponent> _Component = Component;
+		if (FDelegateHandle* TickerHandle = MovingComponentMap.Find(_Component))
+		{
+			FTicker::GetCoreTicker().RemoveTicker(*TickerHandle);
+		}
+
+		float _ExecuteTime = 0.f;
+		const FVector _StartWorldLocation = Component->GetComponentLocation();
+		const FRotator _StartWorldRotation = Component->GetComponentRotation();
+		MovingComponentMap.FindOrAdd(Component) = FTicker::GetCoreTicker().AddTicker(FTickerDelegate::CreateLambda([=](float DeltaSeconds) mutable
+		{
+			if (_Component.IsValid())
+			{
+				if (_ExecuteTime < OverTime)
+				{
+					_ExecuteTime += DeltaSeconds;
+					const FVector DeltaRelativeLocation = UKismetMathLibrary::VLerp(_StartWorldLocation, Location, _ExecuteTime / OverTime);
+					const FRotator DeltaRelativeRotation = UKismetMathLibrary::RLerp(_StartWorldRotation, Rotation, _ExecuteTime / OverTime, true);
+					_Component->SetWorldLocationAndRotation(DeltaRelativeLocation, DeltaRelativeRotation, Sweep);
+					return true;
+				}
+				else
+				{
+					_Component->SetWorldLocationAndRotation(Location, Rotation, Sweep);
+				}
+			}
+			MovingComponentMap.Remove(_Component);
+			return false;
+		}));
 	}
 }
 
@@ -154,15 +183,69 @@ void UARPG_ActorFunctionLibrary::MoveActorToLocation(AActor* Actor, const FVecto
 {
 	if (Actor)
 	{
-		MoveComponentToLocation(Actor->GetRootComponent(), Location, OverTime, Sweep);
+		USceneComponent* Component = Actor->GetRootComponent();
+		TWeakObjectPtr<USceneComponent> _Component = Component;
+		if (FDelegateHandle* TickerHandle = MovingComponentMap.Find(_Component))
+		{
+			FTicker::GetCoreTicker().RemoveTicker(*TickerHandle);
+		}
+
+		float _ExecuteTime = 0.f;
+		const FVector _StartRelativeLocation = Component->GetComponentLocation();
+		MovingComponentMap.FindOrAdd(Component) = FTicker::GetCoreTicker().AddTicker(FTickerDelegate::CreateLambda([=](float DeltaSeconds) mutable
+		{
+			if (_Component.IsValid())
+			{
+				if (_ExecuteTime < OverTime)
+				{
+					_ExecuteTime += DeltaSeconds;
+					const FVector DeltaRelativeLocation = UKismetMathLibrary::VLerp(_StartRelativeLocation, Location, _ExecuteTime / OverTime);
+					_Component->SetWorldLocation(DeltaRelativeLocation, Sweep);
+					return true;
+				}
+				else
+				{
+					_Component->SetWorldLocation(Location, Sweep);
+				}
+			}
+			MovingComponentMap.Remove(_Component);
+			return false;
+		}));
 	}
 }
 
-void UARPG_ActorFunctionLibrary::MoveActorToRotation(AActor* Actor, const FRotator& Rotator, float OverTime /*= 0.2f*/, bool Sweep /*= false*/)
+void UARPG_ActorFunctionLibrary::MoveActorToRotation(AActor* Actor, const FRotator& Rotation, float OverTime /*= 0.2f*/, bool Sweep /*= false*/)
 {
 	if (Actor)
 	{
-		MoveComponentToRotation(Actor->GetRootComponent(), Rotator, OverTime, Sweep);
+		USceneComponent* Component = Actor->GetRootComponent();
+		TWeakObjectPtr<USceneComponent> _Component = Component;
+		if (FDelegateHandle* TickerHandle = MovingComponentMap.Find(_Component))
+		{
+			FTicker::GetCoreTicker().RemoveTicker(*TickerHandle);
+		}
+
+		float _ExecuteTime = 0.f;
+		const FRotator _StartWorldRotation = Component->GetComponentRotation();
+		MovingComponentMap.FindOrAdd(Component) = FTicker::GetCoreTicker().AddTicker(FTickerDelegate::CreateLambda([=](float DeltaSeconds) mutable
+		{
+			if (_Component.IsValid())
+			{
+				if (_ExecuteTime < OverTime)
+				{
+					_ExecuteTime += DeltaSeconds;
+					const FRotator DeltaRelativeRotation = UKismetMathLibrary::RLerp(_StartWorldRotation, Rotation, _ExecuteTime / OverTime, true);
+					_Component->SetWorldRotation(DeltaRelativeRotation, Sweep);
+					return true;
+				}
+				else
+				{
+					_Component->SetWorldRotation(Rotation, Sweep);
+				}
+			}
+			MovingComponentMap.Remove(_Component);
+			return false;
+		}));
 	}
 }
 
