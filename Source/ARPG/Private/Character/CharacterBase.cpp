@@ -388,6 +388,26 @@ bool ACharacterBase::CanPlayFullBodyMontage() const
 	return GetMesh()->GetAnimInstance()->GetSlotMontageGlobalWeight(FullBodySlotName) == 0.f;
 }
 
+void ACharacterBase::EnableAutoUpdateLookAtRotation(bool Enable)
+{
+	ARPG_MovementComponent->bAutoUpdateLookingRotation = Enable;
+}
+
+void ACharacterBase::SetLookAtRotation(const FRotator& LookAtRotation)
+{
+	ARPG_MovementComponent->LookingRotation = LookAtRotation;
+}
+
+void ACharacterBase::SetLookAtLocation(const FVector& WorldLocation)
+{
+	ARPG_MovementComponent->LookingRotation = (WorldLocation - GetPawnViewLocation()).Rotation();
+}
+
+FRotator ACharacterBase::GetLookAtRotation() const
+{
+	return ARPG_MovementComponent->LookingRotation;
+}
+
 void ACharacterBase::InvokeDodge()
 {
 	if (ARPG_InputIsPressed(ARPG_InputType::ToBitMask(EARPG_InputType::Dodge)))
