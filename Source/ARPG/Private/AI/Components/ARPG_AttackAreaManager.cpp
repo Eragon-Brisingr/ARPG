@@ -108,9 +108,12 @@ void UARPG_AttackAreaManager::TickComponent(float DeltaTime, ELevelTick TickType
 
 FVector UARPG_AttackAreaManager::GetAttackMoveLocation_Implementation(class AActor* AttackTarget) const
 {
-	if (UARPG_AttackAreaBase* AttackArea = AttackConfigs[MainAttackConfig].AttackArea)
+	if (MainAttackConfig < AttackConfigs.Num())
 	{
-		return AttackConfigs[MainAttackConfig].AttackArea->GetAttackMoveLocation(Attacker, AttackTarget);
+		if (UARPG_AttackAreaBase* AttackArea = AttackConfigs[MainAttackConfig].AttackArea)
+		{
+			return AttackConfigs[MainAttackConfig].AttackArea->GetAttackMoveLocation(Attacker, AttackTarget);
+		}
 	}
 
 	return FVector::ZeroVector;

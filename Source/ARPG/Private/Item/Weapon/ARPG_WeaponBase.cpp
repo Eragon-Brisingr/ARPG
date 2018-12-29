@@ -73,11 +73,6 @@ void AARPG_WeaponBase::WhenRemoveFromInventory_Implementation(class AActor* Item
 	}
 }
 
-void AARPG_WeaponBase::PostInitializeComponents()
-{
-	Super::PostInitializeComponents();
-}
-
 void AARPG_WeaponBase::EnableNearAttackTrace(const FApplyPointDamageParameter& ApplyPointDamageParameter, bool ClearIgnoreList /*= true*/)
 {
 	PointDamageParameter = ApplyPointDamageParameter;

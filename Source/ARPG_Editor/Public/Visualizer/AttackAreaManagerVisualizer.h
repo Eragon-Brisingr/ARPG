@@ -31,6 +31,7 @@ public:
 	bool GetCustomInputCoordinateSystem(const FEditorViewportClient* ViewportClient, FMatrix& OutMatrix) const override;
 	bool HandleInputDelta(FEditorViewportClient* ViewportClient, FViewport* Viewport, FVector& DeltaTranslate, FRotator& DeltalRotate, FVector& DeltaScale) override;
 	void EndEditing() override;
+	virtual bool IsVisualizingArchetype() const;
 
 	TSharedPtr<SWidget> GenerateContextMenu() const override;
 

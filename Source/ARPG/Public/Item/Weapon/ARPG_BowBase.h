@@ -24,4 +24,19 @@ public:
 	void SpawnArrowInHand();
 
 	void LaunchArrow(float FullBowTime, const struct FApplyPointDamageParameter& ApplyPointDamageParameter);
+
+	void WhenUse(class ACharacterBase* ItemOwner) override;
+public:
+	FTimerHandle BowRelease_TimerHandle;
+
+	bool IsAllowedAttack_Implementation(class AActor* AttackTarget) const override;
+
+	FVector GetAttackMoveLocation_Implementation(class AActor* AttackTarget) const override;
+
+	void InvokeAttack_Implementation(class AActor* AttackTarget, const FBP_OnAttackFinished& OnAttackFinished) override;
+
+	void AttackingTick_Implementation(class AActor* AttackTarget, float DeltaSecond) override;
+
+
+	void AI_ReleaseArrow(FBP_OnAttackFinished OnAttackFinished);
 };

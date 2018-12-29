@@ -19,8 +19,4 @@ public:
 	virtual class ACharacterBase* GetMostHatredCharacter(const TArray<class ACharacterBase*>& Sources) override;
 
 	virtual void TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, class AController* EventInstigator, class  AActor* DamageCauser) override;
-
-public:
-	UPROPERTY(EditAnywhere, Category = "仇恨系统")
-	float SightRemberAge = 5.f;
 };
