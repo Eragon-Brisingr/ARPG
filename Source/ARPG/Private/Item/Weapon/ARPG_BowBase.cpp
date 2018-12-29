@@ -72,6 +72,7 @@ void AARPG_BowBase::InvokeAttack_Implementation(class AActor* AttackTarget, cons
 	if (AHumanBase* Human = Cast<AHumanBase>(GetItemOwner()))
 	{
 		Human->ARPG_InputPressed(EARPG_InputType::LeftLightAttack);
+		Human->EnableAutoUpdateLookAtRotation(false);
 		GetWorld()->GetTimerManager().SetTimer(BowRelease_TimerHandle, FTimerDelegate::CreateUObject(this, &AARPG_BowBase::AI_ReleaseArrow, OnAttackFinished), 4.f, false);
 	}
 }
@@ -80,7 +81,10 @@ void AARPG_BowBase::AttackingTick_Implementation(class AActor* AttackTarget, flo
 {
 	if (AHumanBase* Human = Cast<AHumanBase>(GetItemOwner()))
 	{
-		
+		if (APawn* AttackTargetPawn = Cast<APawn>(AttackTarget))
+		{
+			Human->SetLookAtLocation(AttackTargetPawn->GetPawnViewLocation());
+		}
 	}
 }
 
@@ -89,6 +93,7 @@ void AARPG_BowBase::AI_ReleaseArrow(FBP_OnAttackFinished OnAttackFinished)
 	if (AHumanBase* Human = Cast<AHumanBase>(GetItemOwner()))
 	{
 		Human->ARPG_InputReleased(EARPG_InputType::LeftLightAttack);
+		Human->EnableAutoUpdateLookAtRotation(true);
 		OnAttackFinished.ExecuteIfBound(true);
 	}
 }
