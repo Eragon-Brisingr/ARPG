@@ -10,6 +10,7 @@
 #include "ARPG_EditorSettings.h"
 #include "XD_CampConfig_Customization.h"
 #include "VisualizerRegister.h"
+#include "ARPG_AI_Config.h"
 
 #define LOCTEXT_NAMESPACE "ARPG_Editor"
 
@@ -34,10 +35,16 @@ void FARPG_EditorModule::StartupModule()
 
 		if (SettingsModule != nullptr)
 		{
-			ISettingsSectionPtr SettingsSection = SettingsModule->RegisterSettings("Project", "Plugins", "XD_UnrealLibrarySettings",
+			SettingsModule->RegisterSettings("Project", "ARPG", "ARPG_EditorSettings",
 				LOCTEXT("ARPG_EditorSettings", "ARPG_EditorSettings"),
 				LOCTEXT("ARPG_EditorSettingsDescription", "Configure the ARPG_EditorSettings plug-in."),
 				GetMutableDefault<UARPG_EditorSettings>()
+			);
+
+			SettingsModule->RegisterSettings("Project", "ARPG", "ARPG_AI_Settings",
+				LOCTEXT("ARPG_AI_Settings", "ARPG_AI_Settings"),
+				LOCTEXT("ARPG_AI_SettingsDescription", "Configure the ARPG_AI_Settings."),
+				GetMutableDefault<UARPG_AI_Config>()
 			);
 		}
 	}

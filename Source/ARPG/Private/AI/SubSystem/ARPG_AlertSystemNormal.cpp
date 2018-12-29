@@ -3,6 +3,15 @@
 #include "ARPG_AlertSystemNormal.h"
 #include "CharacterBase.h"
 #include "ARPG_SneakSystemBase.h"
+#include "Configs/ARPG_AI_Config.h"
+
+UARPG_AlertSystemNormal::UARPG_AlertSystemNormal()
+{
+	const UARPG_AI_Config* ARPG_AI_Config = GetDefault<UARPG_AI_Config>();
+	SightAlertCurve.ExternalCurve = ARPG_AI_Config->DefaultSightAlertCurve.Get();
+	HearAlertCurve.ExternalCurve = ARPG_AI_Config->DefaultHearAlertCurve.Get();
+	NoseAlertCurve.ExternalCurve = ARPG_AI_Config->DefaultNoseAlertCurve.Get();
+}
 
 float UARPG_AlertSystemNormal::GetSightAddAlertValue(const FVector& ObserverLocation, const FVector& SeenLocation, const class ACharacterBase* LookedCharacter) const
 {
