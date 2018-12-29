@@ -5,8 +5,9 @@
 #include "ARPG_BowCoreBase.h"
 #include "HumanBase.h"
 #include "ARPG_ArrowBase.h"
-#include "CharacterBase.h"
 #include "ARPG_InventoryComponent.h"
+#include "TimerManager.h"
+#include "DrawDebugHelpers.h"
 
 
 
@@ -45,5 +46,49 @@ void AARPG_BowBase::LaunchArrow(float FullBowTime, const FApplyPointDamageParame
 		HoldingArrow->Launch(FMath::GetMappedRangeValueClamped({ 0.f, FullBowTime }, { 500.f, 3000.f }, HoldingTime), ApplyPointDamageParameter);
 
 		HoldingArrow = nullptr;
+	}
+}
+
+void AARPG_BowBase::WhenUse(class ACharacterBase* ItemOwner)
+{
+	Super::WhenUse(ItemOwner);
+
+	ItemOwner->BattleControl = this;
+}
+
+bool AARPG_BowBase::IsAllowedAttack_Implementation(class AActor* AttackTarget) const
+{
+	return true;
+}
+
+FVector AARPG_BowBase::GetAttackMoveLocation_Implementation(class AActor* AttackTarget) const
+{
+	FVector MoveToLocation = AttackTarget->GetActorLocation() + (GetItemOwner()->GetActorLocation() - AttackTarget->GetActorLocation()).GetSafeNormal() * 500.f;
+	return MoveToLocation;
+}
+
+void AARPG_BowBase::InvokeAttack_Implementation(class AActor* AttackTarget, const FBP_OnAttackFinished& OnAttackFinished)
+{
+	if (AHumanBase* Human = Cast<AHumanBase>(GetItemOwner()))
+	{
+		Human->ARPG_InputPressed(EARPG_InputType::LeftLightAttack);
+		GetWorld()->GetTimerManager().SetTimer(BowRelease_TimerHandle, FTimerDelegate::CreateUObject(this, &AARPG_BowBase::AI_ReleaseArrow, OnAttackFinished), 4.f, false);
+	}
+}
+
+void AARPG_BowBase::AttackingTick_Implementation(class AActor* AttackTarget, float DeltaSecond)
+{
+	if (AHumanBase* Human = Cast<AHumanBase>(GetItemOwner()))
+	{
+		
+	}
+}
+
+void AARPG_BowBase::AI_ReleaseArrow(FBP_OnAttackFinished OnAttackFinished)
+{
+	if (AHumanBase* Human = Cast<AHumanBase>(GetItemOwner()))
+	{
+		Human->ARPG_InputReleased(EARPG_InputType::LeftLightAttack);
+		OnAttackFinished.ExecuteIfBound(true);
 	}
 }

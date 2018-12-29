@@ -8,6 +8,7 @@
 #include "ExecuteActionSet.h"
 #include "SocketMoveTraceManager.h"
 #include "CharacterDamageType.h"
+#include "ARPG_AI_BattleInterface.h"
 #include "ARPG_WeaponBase.generated.h"
 
 /**
@@ -25,24 +26,27 @@ enum class EWeaponUseType : uint8
 
 
 UCLASS(Abstract, meta = (DisplayName = "武器"))
-class ARPG_API AARPG_WeaponBase : public AARPG_ItemBase
+class ARPG_API AARPG_WeaponBase : public AARPG_ItemBase, public IARPG_AI_BattleInterface
 {
 	GENERATED_BODY()
 	
 public:
 	AARPG_WeaponBase(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
-	virtual void UseItemImpl_Implementation(class UARPG_ItemCoreBase* ItemCore, class ACharacterBase* ItemOwner, EUseItemInput UseItemInput) const override;
+	void UseItemImpl_Implementation(class UARPG_ItemCoreBase* ItemCore, class ACharacterBase* ItemOwner, EUseItemInput UseItemInput) const override;
 
-	virtual FText GetItemTypeDescImpl_Implementation(const class UXD_ItemCoreBase* ItemCore) const override;
+	FText GetItemTypeDescImpl_Implementation(const class UXD_ItemCoreBase* ItemCore) const override;
 
-	virtual void WhenUse(class ACharacterBase* ItemOwner) override;
+	void WhenUse(class ACharacterBase* ItemOwner) override;
 
-	virtual void WhenNotUse(class ACharacterBase* ItemOwner) override;
+	void WhenNotUse(class ACharacterBase* ItemOwner) override;
 
-	virtual void WhenRemoveFromInventory_Implementation(class AActor* ItemOwner, class UXD_ItemCoreBase* ItemCore, int32 RemoveNumber, int32 ExistNumber) const override;
+	void WhenRemoveFromInventory_Implementation(class AActor* ItemOwner, class UXD_ItemCoreBase* ItemCore, int32 RemoveNumber, int32 ExistNumber) const override;
 
-	virtual void PostInitializeComponents();
+	//IARPG_AI_BattleInterface
+public:
+	bool CanAttack_Implementation(class AActor* AttackTarget) const override { return true; }
+
 public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "武器", meta = (DisplayName = "持武器模式"))
 	EWeaponUseType WeaponUseType = EWeaponUseType::SingleHand;

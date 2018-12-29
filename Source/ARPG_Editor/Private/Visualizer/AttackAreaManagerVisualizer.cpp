@@ -153,6 +153,11 @@ void FAttackAreaManagerVisualizer::EndEditing()
 	EditIndex = INDEX_NONE;
 }
 
+bool FAttackAreaManagerVisualizer::IsVisualizingArchetype() const
+{
+	return true;
+}
+
 TSharedPtr<SWidget> FAttackAreaManagerVisualizer::GenerateContextMenu() const
 {
 	if (UARPG_AttackAreaManager* AttackAreaManager = AttackAreaManagerW.Get())

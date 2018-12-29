@@ -111,7 +111,7 @@ class ARPG_API UAE_NormalMontage : public UARPG_AttackExecuterBase
 	GENERATED_BODY()
 public:
 	UPROPERTY(EditAnywhere, Category = "配置")
-		UAnimMontage* Montage;
+	UAnimMontage* Montage;
 
 	void InvokeAttack(AActor* AttackTarget, const FBP_OnAttackFinished& OnAttackFinished) override;
 

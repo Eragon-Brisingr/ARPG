@@ -17,7 +17,7 @@ class ARPG_API UARPG_HatredControlSystemBase : public UObject
 public:
 	virtual class UWorld* GetWorld() const override;
 
-	UPROPERTY(BlueprintReadWrite, Category = "仇恨系统")
+	UPROPERTY(BlueprintReadOnly, Category = "仇恨系统")
 	class ACharacterBase* Character;
 
 	void InitHatredControlSystem(class ACharacterBase* Owner)
