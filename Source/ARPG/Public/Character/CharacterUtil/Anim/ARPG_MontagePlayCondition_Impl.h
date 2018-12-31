@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "CharacterUtil/ARPG_CharacterAnimType.h"
+#include "ARPG_CharacterAnimType.h"
 #include "ARPG_MontagePlayCondition_Impl.generated.h"
 
 /**
