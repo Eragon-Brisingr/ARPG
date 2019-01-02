@@ -67,6 +67,8 @@ public:
 	UFUNCTION(BlueprintImplementableEvent, Category = "角色|初始化", meta = (DisplayName = "GetInitItemList"))
 	TArray<struct FARPG_Item> ReceivedGetInitItemList() const;
 
+public:
+
 	//重生用
 public:
 	UPROPERTY(SaveGame, BlueprintReadOnly, Category = "角色|重生")

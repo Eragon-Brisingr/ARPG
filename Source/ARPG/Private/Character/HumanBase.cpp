@@ -5,6 +5,7 @@
 #include <Components/SkeletalMeshComponent.h>
 #include <Kismet/KismetMathLibrary.h>
 #include <Animation/AnimInstance.h>
+#include <TimerManager.h>
 #include "ARPG_MovementComponent.h"
 #include "ARPG_WeaponBase.h"
 #include "ARPG_ItemCoreBase.h"
@@ -242,6 +243,111 @@ bool AHumanBase::IsDefenseSucceed_Implementation(const FVector& DamageFromLocati
 bool AHumanBase::IsInReleaseState() const
 {
 	return UseWeaponState == EUseWeaponState::NoneWeapon_Default;
+}
+
+bool AHumanBase::CanAttack_Implementation(class AActor* AttackTarget) const
+{
+	return true;
+}
+
+FVector AHumanBase::GetAttackMoveLocation_Implementation(class AActor* AttackTarget) const
+{
+	if (RightWeapon)
+	{
+		return IARPG_AI_BattleInterface::GetAttackMoveLocation(RightWeapon, AttackTarget);
+	}
+	else if (LeftWeapon)
+	{
+		return IARPG_AI_BattleInterface::GetAttackMoveLocation(LeftWeapon, AttackTarget);
+	}
+	else
+	{
+		return AttackTarget->GetActorLocation();
+	}
+}
+
+FRotator AHumanBase::GetAttackFaceRotation_Implementation(class AActor* AttackTarget) const
+{
+	if (RightWeapon)
+	{
+		return IARPG_AI_BattleInterface::GetAttackFaceRotation(RightWeapon, AttackTarget);
+	}
+	else if (LeftWeapon)
+	{
+		return IARPG_AI_BattleInterface::GetAttackFaceRotation(LeftWeapon, AttackTarget);
+	}
+	else
+	{
+		return (AttackTarget->GetActorLocation() - GetActorLocation()).Rotation();
+	}
+}
+
+bool AHumanBase::IsAllowedAttack_Implementation(class AActor* AttackTarget) const
+{
+	if (RightWeapon)
+	{
+		return IARPG_AI_BattleInterface::IsAllowedAttack(RightWeapon, AttackTarget);
+	}
+	else if (LeftWeapon)
+	{
+		return IARPG_AI_BattleInterface::IsAllowedAttack(LeftWeapon, AttackTarget);
+	}
+	else
+	{
+		return (AttackTarget->GetActorLocation() - GetActorLocation()).Size() < 200.f;
+	}
+}
+
+void AHumanBase::InvokeAttack_Implementation(class AActor* AttackTarget, const FBP_OnAttackFinished& OnAttackFinished)
+{
+	if (RightWeapon)
+	{
+		return IARPG_AI_BattleInterface::InvokeAttack(RightWeapon, AttackTarget, OnAttackFinished);
+	}
+	else if (LeftWeapon)
+	{
+		return IARPG_AI_BattleInterface::InvokeAttack(LeftWeapon, AttackTarget, OnAttackFinished);
+	}
+	else
+	{
+		ARPG_InputPressed(EARPG_InputType::RightLightAttack);
+		GetWorld()->GetTimerManager().SetTimer(FinishAttack_TimeHandle, FTimerDelegate::CreateUObject(this, &AHumanBase::FinishAttack, OnAttackFinished), 0.2f, false);
+	}
+}
+
+void AHumanBase::AbortAttack_Implementation(class AActor* AttackTarget, const FBP_OnAttackAborted& OnAttackAborted)
+{
+	if (RightWeapon)
+	{
+		return IARPG_AI_BattleInterface::AbortAttack(RightWeapon, AttackTarget, OnAttackAborted);
+	}
+	else if (LeftWeapon)
+	{
+		return IARPG_AI_BattleInterface::AbortAttack(LeftWeapon, AttackTarget, OnAttackAborted);
+	}
+	else
+	{
+		ARPG_InputReleased(EARPG_InputType::RightLightAttack);
+		OnAttackAborted.ExecuteIfBound();
+	}
+}
+
+void AHumanBase::AttackingTick_Implementation(class AActor* AttackTarget, float DeltaSecond)
+{
+	if (RightWeapon)
+	{
+		return IARPG_AI_BattleInterface::AttackingTick(RightWeapon, AttackTarget, DeltaSecond);
+	}
+	else if (LeftWeapon)
+	{
+		return IARPG_AI_BattleInterface::AttackingTick(LeftWeapon, AttackTarget, DeltaSecond);
+	}
+}
+
+void AHumanBase::FinishAttack(FBP_OnAttackFinished OnAttackFinished)
+{
+	ARPG_InputReleased(EARPG_InputType::RightLightAttack);
+	OnAttackFinished.ExecuteIfBound(true);
 }
 
 void AHumanBase::WhenTakeBackWeaponFinished(UAnimMontage* AnimMontage, bool bInterrupted, FOnCharacterBehaviorFinished OnBehaviorFinished)
