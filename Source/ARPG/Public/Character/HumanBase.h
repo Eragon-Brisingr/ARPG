@@ -36,6 +36,20 @@ public:
 	bool IsDefenseSucceed_Implementation(const FVector& DamageFromLocation, const FHitResult& HitInfo) const override;
 
 	bool IsInReleaseState() const override;
+
+public:
+	//IARPG_AI_BattleInterface
+	bool CanAttack_Implementation(class AActor* AttackTarget) const override;
+	FVector GetAttackMoveLocation_Implementation(class AActor* AttackTarget) const override;
+	FRotator GetAttackFaceRotation_Implementation(class AActor* AttackTarget) const override;
+	bool IsAllowedAttack_Implementation(class AActor* AttackTarget) const override;
+	void InvokeAttack_Implementation(class AActor* AttackTarget, const FBP_OnAttackFinished& OnAttackFinished) override;
+	void AbortAttack_Implementation(class AActor* AttackTarget, const FBP_OnAttackAborted& OnAttackAborted) override;
+	void AttackingTick_Implementation(class AActor* AttackTarget, float DeltaSecond) override;
+	//
+	FTimerHandle FinishAttack_TimeHandle;
+	void FinishAttack(FBP_OnAttackFinished OnAttackFinished);
+
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "角色|配置|常用", meta = (DisplayName = "默认左手武器", ExposeOnSpawn = "True"), SaveGame)
 	FARPG_Item DefaultLeftWeapon;

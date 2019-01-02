@@ -49,13 +49,6 @@ void AARPG_BowBase::LaunchArrow(float FullBowTime, const FApplyPointDamageParame
 	}
 }
 
-void AARPG_BowBase::WhenUse(class ACharacterBase* ItemOwner)
-{
-	Super::WhenUse(ItemOwner);
-
-	ItemOwner->BattleControl = this;
-}
-
 bool AARPG_BowBase::IsAllowedAttack_Implementation(class AActor* AttackTarget) const
 {
 	return true;

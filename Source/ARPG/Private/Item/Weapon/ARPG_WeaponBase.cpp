@@ -12,6 +12,7 @@
 #include "ARPG_CharacterAnimType.h"
 #include "ARPG_ActorFunctionLibrary.h"
 #include "ARPG_DebugFunctionLibrary.h"
+#include "TimerManager.h"
 
 #define LOCTEXT_NAMESPACE "ARPG_Item"
 
@@ -71,6 +72,69 @@ void AARPG_WeaponBase::WhenRemoveFromInventory_Implementation(class AActor* Item
 			Human->SetLeftWeapon(nullptr);
 		}
 	}
+}
+
+FVector AARPG_WeaponBase::GetAttackMoveLocation_Implementation(class AActor* AttackTarget) const
+{
+	return AttackTarget->GetActorLocation();
+}
+
+FRotator AARPG_WeaponBase::GetAttackFaceRotation_Implementation(class AActor* AttackTarget) const
+{
+	return (AttackTarget->GetActorLocation() - GetItemOwner()->GetActorLocation()).Rotation();
+}
+
+bool AARPG_WeaponBase::IsAllowedAttack_Implementation(class AActor* AttackTarget) const
+{
+	return (AttackTarget->GetActorLocation() - GetItemOwner()->GetActorLocation()).Size() < 200.f;
+}
+
+void AARPG_WeaponBase::InvokeAttack_Implementation(class AActor* AttackTarget, const FBP_OnAttackFinished& OnAttackFinished)
+{
+	if (AHumanBase* Human = Cast<AHumanBase>(GetItemOwner()))
+	{
+		if (Human->LeftWeapon == this)
+		{
+			GetItemOwner()->ARPG_InputPressed(EARPG_InputType::LeftLightAttack);
+		}
+		else
+		{
+			GetItemOwner()->ARPG_InputPressed(EARPG_InputType::RightLightAttack);
+		}
+	}
+	GetWorld()->GetTimerManager().SetTimer(FinishAttack_TimeHandle, FTimerDelegate::CreateUObject(this, &AARPG_WeaponBase::FinishAttack, OnAttackFinished), 0.2f, false);
+}
+
+void AARPG_WeaponBase::AbortAttack_Implementation(class AActor* AttackTarget, const FBP_OnAttackAborted& OnAttackAborted)
+{
+	if (AHumanBase* Human = Cast<AHumanBase>(GetItemOwner()))
+	{
+		if (Human->LeftWeapon == this)
+		{
+			GetItemOwner()->ARPG_InputReleased(EARPG_InputType::LeftLightAttack);
+		}
+		else
+		{
+			GetItemOwner()->ARPG_InputReleased(EARPG_InputType::RightLightAttack);
+		}
+	}
+	OnAttackAborted.ExecuteIfBound();
+}
+
+void AARPG_WeaponBase::FinishAttack(FBP_OnAttackFinished OnAttackFinished)
+{
+	if (AHumanBase* Human = Cast<AHumanBase>(GetItemOwner()))
+	{
+		if (Human->LeftWeapon == this)
+		{
+			GetItemOwner()->ARPG_InputReleased(EARPG_InputType::LeftLightAttack);
+		}
+		else
+		{
+			GetItemOwner()->ARPG_InputReleased(EARPG_InputType::RightLightAttack);
+		}
+	}
+	OnAttackFinished.ExecuteIfBound(true);
 }
 
 void AARPG_WeaponBase::EnableNearAttackTrace(const FApplyPointDamageParameter& ApplyPointDamageParameter, bool ClearIgnoreList /*= true*/)
