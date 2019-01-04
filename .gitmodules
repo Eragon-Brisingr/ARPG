@@ -34,3 +34,6 @@ url=https://gitlab.com/eragon.xuduo/RawAssets.git
 [submodule "Plugins/XD_AI_SystemEx"]
 	path = Plugins/XD_AI_SystemEx
 	url = https://github.com/Eragon-Brisingr/XD_AI_SystemEx
+[submodule "Plugins/XD_EventFlowSystem"]
+	path = Plugins/XD_EventFlowSystem
+	url = https://github.com/Eragon-Brisingr/XD_EventFlowSystem.git
