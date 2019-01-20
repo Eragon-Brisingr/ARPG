@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 using UnrealBuildTool;
 
@@ -27,7 +27,6 @@ public class ARPG_Editor : ModuleRules
 			"XD_TimeSystem",
 			"XD_MovementComponentPlugin",
 			"XD_GenericGraph",
-			"XD_GameEventSystem",
 			"XD_EnvironmentSystem",
 			"XD_CampSystem",
             "XD_CampSystem_Editor",
