@@ -63,4 +63,8 @@ public:
 	uint8 bIsInPathFollowing : 1;
 	UFUNCTION()
 	void OnRep_bIsInPathFollowing();
+
+public:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "任务")
+	class UARPG_GameTaskManager* GameTaskManager;
 };
