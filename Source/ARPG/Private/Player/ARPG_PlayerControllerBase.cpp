@@ -4,11 +4,14 @@
 #include "CharacterBase.h"
 #include "ARPG_PathFollowingComponent.h"
 #include "UnrealNetwork.h"
+#include "ARPG_GameTaskManager.h"
 
 
 AARPG_PlayerControllerBase::AARPG_PlayerControllerBase()
 {
 	PathFollowingComponent = CreateDefaultSubobject<UARPG_PathFollowingComponent>(GET_MEMBER_NAME_CHECKED(AARPG_PlayerControllerBase, PathFollowingComponent));
+
+	GameTaskManager = CreateDefaultSubobject<UARPG_GameTaskManager>(GET_MEMBER_NAME_CHECKED(AARPG_PlayerControllerBase, GameTaskManager));
 }
 
 void AARPG_PlayerControllerBase::Tick(float DeltaSeconds)

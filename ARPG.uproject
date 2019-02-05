@@ -19,7 +19,8 @@
 				"XD_UnrealLibraryEx",
 				"AIModule",
 				"XD_CampSystem",
-				"NavigationSystem"
+				"NavigationSystem",
+				"XD_EventFlowSystem"
 			]
 		},
 		{
