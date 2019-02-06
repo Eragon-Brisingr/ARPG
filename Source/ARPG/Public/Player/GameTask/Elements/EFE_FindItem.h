@@ -32,10 +32,10 @@ public:
 	UFUNCTION()
 	void WhenRemoveItem(UXD_ItemCoreBase* ItemCore, int32 RemoveNumber, int32 ExistNumber);
 public:
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "任务目标", Replicated, meta = (DisplayName = "目标数量"))
-	int32 TargetNumber;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "任务目标", Replicated, SaveGame, meta = (DisplayName = "目标数量", ClampMin = "1"))
+	int32 TargetNumber = 1;
 
-	UPROPERTY(BlueprintReadOnly, Category = "任务目标", Replicated, meta = (DisplayName = "当前数量"))
+	UPROPERTY(BlueprintReadOnly, Category = "任务目标", Replicated, SaveGame, meta = (DisplayName = "当前数量"))
 	int32 CurrentNumber;
 };
 
@@ -47,10 +47,13 @@ public:
 	UEFE_FindItem_ByRef();
 
 	void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
+	void ReplicatedElementSubobject(bool& WroteSomething, class UActorChannel * Channel, class FOutBunch * Bunch, FReplicationFlags * RepFlags) override;
 
 	bool IsNeedFindItem(UXD_ItemCoreBase* ItemCore) const override;
 
-	UPROPERTY(EditAnywhere, Category = "任务目标", Replicated, meta = (DisplayName = "目标物品"))
+	FText ReceiveGetDescribe_Implementation() const override;
+
+	UPROPERTY(EditAnywhere, Category = "任务目标", Replicated, meta = (DisplayName = "目标物品"), SaveGame)
 	FARPG_Item TargetItem;
 };
 
@@ -60,9 +63,10 @@ class ARPG_API UEFE_FindItem_ByType : public UEFE_FindItemBase
 	GENERATED_BODY()
 public:
 	void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
-
 	bool IsNeedFindItem(UXD_ItemCoreBase* ItemCore) const override;
 
-	UPROPERTY(EditAnywhere, Category = "任务目标", Replicated, meta = (DisplayName = "目标物品类型"))
+	FText ReceiveGetDescribe_Implementation() const override;
+
+	UPROPERTY(EditAnywhere, Category = "任务目标", Replicated, meta = (DisplayName = "目标物品类型"), SaveGame)
 	TSubclassOf<AARPG_ItemBase> TargetItemType;
 };
