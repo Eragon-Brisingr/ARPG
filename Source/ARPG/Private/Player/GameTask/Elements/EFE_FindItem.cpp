@@ -6,17 +6,22 @@
 #include "ARPG_InventoryComponent.h"
 #include "ARPG_ItemCoreBase.h"
 #include "ARPG_ItemBase.h"
+#include <Engine/ActorChannel.h>
+
+#define LOCTEXT_NAMESPACE "ARPG_EventFlow"
 
 void UEFE_FindItemBase::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
-	DOREPLIFETIME_CONDITION(UEFE_FindItemBase, TargetNumber, COND_InitialOnly);
+	DOREPLIFETIME(UEFE_FindItemBase, TargetNumber);
 	DOREPLIFETIME(UEFE_FindItemBase, CurrentNumber);
 }
 
 void UEFE_FindItemBase::WhenActivateEventFlowElement_Implementation(class APawn* EventFlowOwnerCharacter, class AController* EventFlowOwner)
 {
+	CurrentNumber = 0;
+
 	ACharacterBase* Character = GetARPG_Character();
 	Character->Inventory->OnAddItem.AddDynamic(this, &UEFE_FindItemBase::WhenAddItem);
 	Character->Inventory->OnRemoveItem.AddDynamic(this, &UEFE_FindItemBase::WhenRemoveItem);
@@ -73,14 +78,24 @@ void UEFE_FindItemBase::WhenRemoveItem(UXD_ItemCoreBase* ItemCore, int32 RemoveN
 
 UEFE_FindItem_ByRef::UEFE_FindItem_ByRef()
 {
+#if WITH_EDITOR
 	TargetItem.bShowNumber = false;
+#endif
 }
 
 void UEFE_FindItem_ByRef::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
-	DOREPLIFETIME_CONDITION(UEFE_FindItem_ByRef, TargetItem, COND_InitialOnly);
+	DOREPLIFETIME(UEFE_FindItem_ByRef, TargetItem);
+}
+
+void UEFE_FindItem_ByRef::ReplicatedElementSubobject(bool& WroteSomething, class UActorChannel * Channel, class FOutBunch * Bunch, FReplicationFlags * RepFlags)
+{
+	if (TargetItem)
+	{
+		WroteSomething |= Channel->ReplicateSubobject(TargetItem.ItemCore, *Bunch, *RepFlags);
+	}
 }
 
 bool UEFE_FindItem_ByRef::IsNeedFindItem(UXD_ItemCoreBase* ItemCore) const
@@ -88,14 +103,50 @@ bool UEFE_FindItem_ByRef::IsNeedFindItem(UXD_ItemCoreBase* ItemCore) const
 	return TargetItem->IsEqualWithItemCore(ItemCore);
 }
 
+FText UEFE_FindItem_ByRef::ReceiveGetDescribe_Implementation() const
+{
+	if (TargetItem.ItemCore == nullptr)
+	{
+		return FText::GetEmpty();
+	}
+
+	if (TargetNumber == 1)
+	{
+		return FText::Format(LOCTEXT("需找到物品{0}", "需找到物品{0}"), TargetItem->GetItemName());
+	}
+	else
+	{
+		return FText::Format(LOCTEXT("需找到物品{0} {1}/{2}", "需找到物品{0} {1}/{2}"), TargetItem->GetItemName(), CurrentNumber, TargetNumber);
+	}
+}
+
 void UEFE_FindItem_ByType::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
-	DOREPLIFETIME_CONDITION(UEFE_FindItem_ByType, TargetItemType, COND_InitialOnly);
+	DOREPLIFETIME(UEFE_FindItem_ByType, TargetItemType);
 }
 
 bool UEFE_FindItem_ByType::IsNeedFindItem(UXD_ItemCoreBase* ItemCore) const
 {
 	return TargetItemType && ItemCore->ItemClass->IsChildOf(TargetItemType);
 }
+
+FText UEFE_FindItem_ByType::ReceiveGetDescribe_Implementation() const
+{
+	if (TargetItemType == nullptr)
+	{
+		return FText::GetEmpty();
+	}
+
+	if (TargetNumber == 1)
+	{
+		return FText::Format(LOCTEXT("需找到物品{0}", "需找到物品{0}"), TargetItemType.GetDefaultObject()->GetItemName());
+	}
+	else
+	{
+		return FText::Format(LOCTEXT("需找到物品{0} {1}/{2}", "需找到物品{0} {1}/{2}"), TargetItemType.GetDefaultObject()->GetItemName(), CurrentNumber, TargetNumber);
+	}
+}
+
+#undef LOCTEXT_NAMESPACE
