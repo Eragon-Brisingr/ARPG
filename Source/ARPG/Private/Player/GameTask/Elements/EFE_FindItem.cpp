@@ -103,6 +103,16 @@ bool UEFE_FindItem_ByRef::IsNeedFindItem(UXD_ItemCoreBase* ItemCore) const
 	return TargetItem->IsEqualWithItemCore(ItemCore);
 }
 
+EEventFlowCompileMessageType UEFE_FindItem_ByRef::GetCompileMessage_Implementation(FString& Message) const
+{
+	if (TargetItem.ItemCore == nullptr)
+	{
+		Message = TEXT("目标物品不得为空");
+		return EEventFlowCompileMessageType::Error;
+	}
+	return EEventFlowCompileMessageType::None;
+}
+
 FText UEFE_FindItem_ByRef::ReceiveGetDescribe_Implementation() const
 {
 	if (TargetItem.ItemCore == nullptr)
@@ -116,7 +126,7 @@ FText UEFE_FindItem_ByRef::ReceiveGetDescribe_Implementation() const
 	}
 	else
 	{
-		return FText::Format(LOCTEXT("需找到物品{0} {1}/{2}", "需找到物品{0} {1}/{2}"), TargetItem->GetItemName(), CurrentNumber, TargetNumber);
+		return FText::Format(LOCTEXT("需找到物品{0} {1}/{2}", "需找到物品{0} {1}/{2}"), TargetItem->GetItemName(), FMath::Min(CurrentNumber, TargetNumber), TargetNumber);
 	}
 }
 
@@ -132,6 +142,16 @@ bool UEFE_FindItem_ByType::IsNeedFindItem(UXD_ItemCoreBase* ItemCore) const
 	return TargetItemType && ItemCore->ItemClass->IsChildOf(TargetItemType);
 }
 
+EEventFlowCompileMessageType UEFE_FindItem_ByType::GetCompileMessage_Implementation(FString& Message) const
+{
+	if (TargetItemType == nullptr)
+	{
+		Message = TEXT("目标物品类型不得为空");
+		return EEventFlowCompileMessageType::Error;
+	}
+	return EEventFlowCompileMessageType::None;
+}
+
 FText UEFE_FindItem_ByType::ReceiveGetDescribe_Implementation() const
 {
 	if (TargetItemType == nullptr)
@@ -145,7 +165,7 @@ FText UEFE_FindItem_ByType::ReceiveGetDescribe_Implementation() const
 	}
 	else
 	{
-		return FText::Format(LOCTEXT("需找到物品{0} {1}/{2}", "需找到物品{0} {1}/{2}"), TargetItemType.GetDefaultObject()->GetItemName(), CurrentNumber, TargetNumber);
+		return FText::Format(LOCTEXT("需找到物品{0} {1}/{2}", "需找到物品{0} {1}/{2}"), TargetItemType.GetDefaultObject()->GetItemName(), FMath::Min(CurrentNumber, TargetNumber), TargetNumber);
 	}
 }
 
