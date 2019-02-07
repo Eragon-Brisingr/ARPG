@@ -39,7 +39,7 @@ public:
 	int32 CurrentNumber;
 };
 
-UCLASS(meta = (DisplayName = "找到物品"))
+UCLASS(meta = (DisplayName = "找到物品", Category = "物品相关"))
 class ARPG_API UEFE_FindItem_ByRef : public UEFE_FindItemBase
 {
 	GENERATED_BODY()
@@ -50,21 +50,26 @@ public:
 	void ReplicatedElementSubobject(bool& WroteSomething, class UActorChannel * Channel, class FOutBunch * Bunch, FReplicationFlags * RepFlags) override;
 
 	bool IsNeedFindItem(UXD_ItemCoreBase* ItemCore) const override;
+	EEventFlowCompileMessageType GetCompileMessage_Implementation(FString& Message) const override;
 
 	FText ReceiveGetDescribe_Implementation() const override;
 
 	UPROPERTY(EditAnywhere, Category = "任务目标", Replicated, meta = (DisplayName = "目标物品"), SaveGame)
 	FARPG_Item TargetItem;
+
+	UPROPERTY(EditAnywhere, Category = "任务目标", Instanced)
+	class UARPG_ItemCoreBase* Test;
 };
 
-UCLASS(meta = (DisplayName = "找到物品（类型）"))
+UCLASS(meta = (DisplayName = "找到物品（类型）", Category = "物品相关"))
 class ARPG_API UEFE_FindItem_ByType : public UEFE_FindItemBase
 {
 	GENERATED_BODY()
 public:
 	void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
-	bool IsNeedFindItem(UXD_ItemCoreBase* ItemCore) const override;
 
+	bool IsNeedFindItem(UXD_ItemCoreBase* ItemCore) const override;
+	EEventFlowCompileMessageType GetCompileMessage_Implementation(FString& Message) const override;
 	FText ReceiveGetDescribe_Implementation() const override;
 
 	UPROPERTY(EditAnywhere, Category = "任务目标", Replicated, meta = (DisplayName = "目标物品类型"), SaveGame)
