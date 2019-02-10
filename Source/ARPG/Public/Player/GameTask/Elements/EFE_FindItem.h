@@ -56,9 +56,6 @@ public:
 
 	UPROPERTY(EditAnywhere, Category = "任务目标", Replicated, meta = (DisplayName = "目标物品"), SaveGame)
 	FARPG_Item TargetItem;
-
-	UPROPERTY(EditAnywhere, Category = "任务目标", Instanced)
-	class UARPG_ItemCoreBase* Test;
 };
 
 UCLASS(meta = (DisplayName = "找到物品（类型）", Category = "物品相关"))
