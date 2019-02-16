@@ -385,7 +385,11 @@ void ACharacterBase::TryPlayMontage(const FARPG_MontageParameter& Montage)
 
 bool ACharacterBase::CanPlayFullBodyMontage() const
 {
-	return GetMesh()->GetAnimInstance()->GetSlotMontageGlobalWeight(FullBodySlotName) == 0.f;
+	if (UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance())
+	{
+		return AnimInstance->GetSlotMontageGlobalWeight(FullBodySlotName) == 0.f;
+	}
+	return false;
 }
 
 void ACharacterBase::EnableAutoUpdateLookAtRotation(bool Enable)
