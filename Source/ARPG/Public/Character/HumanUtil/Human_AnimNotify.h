@@ -36,7 +36,7 @@ public:
 		bIsNativeBranchingPoint = true;
 	}
 
-	UPROPERTY(EditAnywhere, Category = "武器位置", meta = (DisplayName = "为左手武器"))
+	UPROPERTY(EditAnywhere, Category = "武器位置", meta = (DisplayName = "拔出武器"))
 	uint8 bPullOutWeapon : 1;
 
 	virtual void Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation) override;
