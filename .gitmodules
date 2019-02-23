@@ -34,3 +34,6 @@ url=https://gitlab.com/eragon.xuduo/RawAssets.git
 [submodule "Plugins/XD_EventFlowSystem"]
 	path = Plugins/XD_EventFlowSystem
 	url = https://github.com/Eragon-Brisingr/XD_EventFlowSystem.git
+[submodule "Plugins/XD_CharacterActionDispatcher"]
+	path = Plugins/XD_CharacterActionDispatcher
+	url = https://github.com/Eragon-Brisingr/XD_CharacterActionDispatcher
