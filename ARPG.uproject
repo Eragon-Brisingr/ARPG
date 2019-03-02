@@ -20,7 +20,8 @@
 				"AIModule",
 				"XD_CampSystem",
 				"NavigationSystem",
-				"XD_EventFlowSystem"
+				"XD_EventFlowSystem",
+				"XD_CharacterActionDispatcher"
 			]
 		},
 		{
