@@ -31,6 +31,7 @@
 #include "Engine/Engine.h"
 #include "Action/ARPG_EnterReleaseStateBase.h"
 #include "ARPG_PlayerControllerBase.h"
+#include "XD_DispatchableActionBase.h"
 
 
 // Sets default values
@@ -203,6 +204,16 @@ TArray<struct FARPG_Item> ACharacterBase::GetInitItemList() const
 	TArray<FARPG_Item> Res = ReceivedGetInitItemList();
 	Res.Append(ArrayCast<FARPG_Item>(Inventory->InitItems));
 	return Res;
+}
+
+UXD_DispatchableActionBase* ACharacterBase::GetCurrentDispatchableAction_Implementation() const
+{
+	return CurrentAction.Get();
+}
+
+void ACharacterBase::SetCurrentDispatchableAction_Implementation(UXD_DispatchableActionBase* Action)
+{
+	CurrentAction = Action;
 }
 
 void ACharacterBase::SetRebornLocation(const FVector& RebornLocation)
