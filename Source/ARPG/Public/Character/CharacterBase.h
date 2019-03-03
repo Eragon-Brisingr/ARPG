@@ -20,18 +20,21 @@
 #include "ARPG_BattleType.h"
 #include "BehaviorTreeEx.h"
 #include "ARPG_CharacterBehaviorType.h"
-#include "Battle/ARPG_AI_BattleInterface.h"
+#include "ARPG_AI_BattleInterface.h"
+#include "XD_DispatchableEntityInterface.h"
 #include "CharacterBase.generated.h"
 
 class UARPG_InteractableActorManagerBase;
 class UCA_EnterReleaseStateBase;
+class UXD_DispatchableActionBase;
 
 UCLASS()
 class ARPG_API ACharacterBase : public ACharacter, 
 	public IXD_SaveGameInterface,
 	public IARPG_LockOnTargetInterface,
 	public IAISightTargetInterface,
-	public IARPG_AI_BattleInterface
+	public IARPG_AI_BattleInterface,
+	public IXD_DispatchableEntityInterface
 {
 	GENERATED_BODY()
 
@@ -67,6 +70,12 @@ public:
 	UFUNCTION(BlueprintImplementableEvent, Category = "角色|初始化", meta = (DisplayName = "GetInitItemList"))
 	TArray<struct FARPG_Item> ReceivedGetInitItemList() const;
 
+	//DispatchableEntityInterface
+protected:
+	UXD_DispatchableActionBase* GetCurrentDispatchableAction_Implementation() const override;
+	void SetCurrentDispatchableAction_Implementation(UXD_DispatchableActionBase* Action) override;
+	UPROPERTY(SaveGame)
+	TSoftObjectPtr<UXD_DispatchableActionBase> CurrentAction;
 public:
 
 	//重生用
