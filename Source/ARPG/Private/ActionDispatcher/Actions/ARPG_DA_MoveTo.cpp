@@ -4,34 +4,23 @@
 #include "CharacterBase.h"
 #include "ARPG_MoveUtils.h"
 
-void UARPG_DA_MoveTo::WhenActionActived()
+void UARPG_DA_MoveToBase::WhenActionActived()
 {
-	ACharacterBase* Mover = Cast<ACharacterBase>(Pawn.Get());
-	RegisterEntity(Mover);
-
-	if (AActor* Target = Goal.Get())
-	{
-		UARPG_MoveUtils::ARPG_MoveToActor(Mover, Target, FOnARPG_MoveFinished::CreateUObject(this, &UARPG_DA_MoveTo::WhenRequestFinished));
-	}
-	else
-	{
-		UARPG_MoveUtils::ARPG_MoveToLocation(Mover, Location, FOnARPG_MoveFinished::CreateUObject(this, &UARPG_DA_MoveTo::WhenRequestFinished));
-	}
+	RegisterEntity(Mover.Get());
 }
 
-void UARPG_DA_MoveTo::WhenActionDeactived()
+void UARPG_DA_MoveToBase::WhenActionDeactived()
 {
-	ACharacterBase* Mover = Cast<ACharacterBase>(Pawn.Get());
-	Mover->StopMovement();
+	ACharacterBase* Character = Cast<ACharacterBase>(Mover.Get());
+	Character->StopMovement();
 }
 
-void UARPG_DA_MoveTo::WhenActionFinished()
+void UARPG_DA_MoveToBase::WhenActionFinished()
 {
-	APawn* Mover = Pawn.Get();
-	UnregisterEntity(Mover);
+	UnregisterEntity(Mover.Get());
 }
 
-void UARPG_DA_MoveTo::WhenRequestFinished(const FPathFollowingResult& Result)
+void UARPG_DA_MoveToBase::WhenRequestFinished(const FPathFollowingResult& Result)
 {
 	if (Result.Code == EPathFollowingResult::Success)
 	{
@@ -43,4 +32,18 @@ void UARPG_DA_MoveTo::WhenRequestFinished(const FPathFollowingResult& Result)
 		FinishAction();
 		WhenCanNotReached.ExecuteIfBound();
 	}
+}
+
+void UARPG_DA_MoveToActor::WhenActionActived()
+{
+	Super::WhenActionActived();
+	ACharacterBase* Character = Cast<ACharacterBase>(Mover.Get());
+	UARPG_MoveUtils::ARPG_MoveToActor(Character, Goal.Get(), FOnARPG_MoveFinished::CreateUObject(this, &UARPG_DA_MoveToActor::WhenRequestFinished));
+}
+
+void UARPG_DA_MoveToLocation::WhenActionActived()
+{
+	Super::WhenActionActived();
+	ACharacterBase* Character = Cast<ACharacterBase>(Mover.Get());
+	UARPG_MoveUtils::ARPG_MoveToLocation(Character, Destination, FOnARPG_MoveFinished::CreateUObject(this, &UARPG_DA_MoveToLocation::WhenRequestFinished));
 }

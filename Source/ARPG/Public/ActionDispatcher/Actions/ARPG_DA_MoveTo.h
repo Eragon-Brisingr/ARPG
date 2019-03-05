@@ -11,30 +11,49 @@ struct FPathFollowingResult;
 /**
  * 
  */
-UCLASS(meta = (DisplayName = "移动至"))
-class ARPG_API UARPG_DA_MoveTo : public UXD_DispatchableActionBase
+UCLASS(abstract)
+class ARPG_API UARPG_DA_MoveToBase : public UXD_DispatchableActionBase
 {
 	GENERATED_BODY()
 public:
 	void WhenActionActived() override;
 	void WhenActionDeactived() override;
 	void WhenActionFinished() override;
-
 protected:
-	UPROPERTY(SaveGame)
+	UPROPERTY(SaveGame, meta = (DisplayName = "当到达了"))
 	FDispatchableActionFinishedEvent WhenReached;
 
-	UPROPERTY(SaveGame)
+	UPROPERTY(SaveGame, meta = (DisplayName = "当无法到达"))
 	FDispatchableActionFinishedEvent WhenCanNotReached;
 
 	void WhenRequestFinished(const FPathFollowingResult& Result);
 public:
-	UPROPERTY(SaveGame, BlueprintReadOnly, meta = (ExposeOnSpawn = "true"))
-	TSoftObjectPtr<APawn> Pawn;
+	//移动者
+	UPROPERTY(SaveGame, BlueprintReadOnly, meta = (ExposeOnSpawn = "true", DisplayName = "移动者"))
+	TSoftObjectPtr<APawn> Mover;
+};
 
-	UPROPERTY(SaveGame, BlueprintReadOnly, meta = (ExposeOnSpawn = "true"))
-	FVector Location;
-
-	UPROPERTY(SaveGame, BlueprintReadOnly, meta = (ExposeOnSpawn = "true"))
+UCLASS(meta = (DisplayName = "移动至目标"))
+class ARPG_API UARPG_DA_MoveToActor : public UARPG_DA_MoveToBase
+{
+	GENERATED_BODY()
+public:
+	void WhenActionActived() override;
+public:
+	//目标
+	UPROPERTY(SaveGame, BlueprintReadOnly, meta = (ExposeOnSpawn = "true", DisplayName = "目标"))
 	TSoftObjectPtr<AActor> Goal;
 };
+
+UCLASS(meta = (DisplayName = "移动至目的地"))
+class ARPG_API UARPG_DA_MoveToLocation : public UARPG_DA_MoveToBase
+{
+	GENERATED_BODY()
+public:
+	void WhenActionActived() override;
+public:
+	//目的地
+	UPROPERTY(SaveGame, BlueprintReadOnly, meta = (ExposeOnSpawn = "true", DisplayName = "目的地"))
+	FVector Destination;
+};
+
