@@ -48,7 +48,7 @@ protected:
 
 	void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
-	virtual bool NeedNotSave_Implementation() const override;
+	virtual bool NeedSave_Implementation() const override;
 
 	void PreInitializeComponents() override;
 public:
