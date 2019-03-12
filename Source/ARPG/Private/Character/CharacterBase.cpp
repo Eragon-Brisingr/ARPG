@@ -88,9 +88,9 @@ void ACharacterBase::EndPlay(const EEndPlayReason::Type EndPlayReason)
 	}
 }
 
-bool ACharacterBase::NeedNotSave_Implementation() const
+bool ACharacterBase::NeedSave_Implementation() const
 {
-	return IsPlayerControlled();
+	return IsPlayerControlled() == false;
 }
 
 void ACharacterBase::PreInitializeComponents()
