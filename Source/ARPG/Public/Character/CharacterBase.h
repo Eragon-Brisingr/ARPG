@@ -76,6 +76,9 @@ protected:
 	void SetCurrentDispatchableAction_Implementation(UXD_DispatchableActionBase* Action) override;
 	UPROPERTY(SaveGame)
 	TSoftObjectPtr<UXD_DispatchableActionBase> CurrentAction;
+
+	UPROPERTY(SaveGame)
+	TArray<UXD_DispatchableActionBase*> PendingActions;
 public:
 
 	//重生用
