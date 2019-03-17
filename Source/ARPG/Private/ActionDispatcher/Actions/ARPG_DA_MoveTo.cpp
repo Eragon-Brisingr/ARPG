@@ -66,7 +66,7 @@ void UARPG_DA_MoveToActor::WhenActionActived()
 {
 	Super::WhenActionActived();
 	ACharacterBase* Character = Cast<ACharacterBase>(Mover.Get());
-	UARPG_MoveUtils::ARPG_MoveToActor(Character, Goal.Get(), FOnARPG_MoveFinished::CreateUObject(this, &UARPG_DA_MoveToActor::WhenRequestFinished));
+	UARPG_MoveUtils::ARPG_MoveToActor(Character, Goal.Get(), FOnARPG_MoveFinished::CreateUObject(this, &UARPG_DA_MoveToActor::WhenRequestFinished), AcceptRadius, false);
 }
 
 bool UARPG_DA_MoveToLocation::CanActiveAction() const
@@ -78,5 +78,5 @@ void UARPG_DA_MoveToLocation::WhenActionActived()
 {
 	Super::WhenActionActived();
 	ACharacterBase* Character = Cast<ACharacterBase>(Mover.Get());
-	UARPG_MoveUtils::ARPG_MoveToLocation(Character, Destination, FOnARPG_MoveFinished::CreateUObject(this, &UARPG_DA_MoveToLocation::WhenRequestFinished));
+	UARPG_MoveUtils::ARPG_MoveToLocation(Character, Destination, FOnARPG_MoveFinished::CreateUObject(this, &UARPG_DA_MoveToLocation::WhenRequestFinished), AcceptRadius, false);
 }
