@@ -3,6 +3,13 @@
 #include "ARPG_DA_MoveTo.h"
 #include "CharacterBase.h"
 #include "ARPG_MoveUtils.h"
+#include "NavigationSystem.h"
+
+bool UARPG_DA_MoveToBase::CanActiveAction() const
+{
+	APawn* Pawn = Mover.Get();
+	return Pawn != nullptr && Pawn->GetController() != nullptr;
+}
 
 void UARPG_DA_MoveToBase::WhenActionActived()
 {
@@ -34,11 +41,37 @@ void UARPG_DA_MoveToBase::WhenRequestFinished(const FPathFollowingResult& Result
 	}
 }
 
+bool UARPG_DA_MoveToBase::IsExistValidPath(const FVector& Start, const FVector& End) const
+{
+	UNavigationSystemV1* const NavSys = FNavigationSystem::GetCurrent<UNavigationSystemV1>(GetWorld());
+	if (!NavSys)
+	{
+		return false;
+	}
+	const ANavigationData* NavData = NavSys->GetNavDataForProps(FNavAgentProperties::DefaultProperties);
+	if (!NavData)
+	{
+		return false;
+	}
+	FPathFindingQuery Query(this, *NavData, Start, End);
+	return NavSys->TestPathSync(Query);
+}
+
+bool UARPG_DA_MoveToActor::CanActiveAction() const
+{
+	return Super::CanActiveAction() && Goal.Get() != nullptr && IsExistValidPath(Mover->GetActorLocation(), Goal->GetActorLocation());
+}
+
 void UARPG_DA_MoveToActor::WhenActionActived()
 {
 	Super::WhenActionActived();
 	ACharacterBase* Character = Cast<ACharacterBase>(Mover.Get());
 	UARPG_MoveUtils::ARPG_MoveToActor(Character, Goal.Get(), FOnARPG_MoveFinished::CreateUObject(this, &UARPG_DA_MoveToActor::WhenRequestFinished));
+}
+
+bool UARPG_DA_MoveToLocation::CanActiveAction() const
+{
+	return Super::CanActiveAction() && IsExistValidPath(Mover->GetActorLocation(), Destination);
 }
 
 void UARPG_DA_MoveToLocation::WhenActionActived()
