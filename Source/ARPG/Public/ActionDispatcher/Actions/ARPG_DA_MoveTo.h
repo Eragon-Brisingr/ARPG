@@ -34,6 +34,9 @@ public:
 	//移动者
 	UPROPERTY(SaveGame, BlueprintReadOnly, meta = (ExposeOnSpawn = "true", DisplayName = "移动者"))
 	TSoftObjectPtr<APawn> Mover;
+
+	UPROPERTY(SaveGame, BlueprintReadOnly, meta = (ExposeOnSpawn = "true", DisplayName = "有效半径"))
+	float AcceptRadius = 5.f;
 };
 
 UCLASS(meta = (DisplayName = "移动至目标"))

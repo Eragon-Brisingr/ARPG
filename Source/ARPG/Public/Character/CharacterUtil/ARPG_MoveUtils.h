@@ -39,7 +39,7 @@ public:
 	static void SettingRequest(FPathFollowingRequestResult &ResultData, class ACharacterBase* Character, const FOnARPG_MoveFinished &OnARPG_MoveFinished);
 
 	void OnMoveCompleted(FAIRequestID RequestID, const FPathFollowingResult& Result, FOnARPG_MoveFinished OnARPG_MoveFinish, UPathFollowingComponent* PathFollowingComponent, FAIRequestID InvokeRequestID);
-};
+}; 
 
 UCLASS()
 class ARPG_API UARPG_CharacterMove_AsyncAction : public UBlueprintAsyncActionBase

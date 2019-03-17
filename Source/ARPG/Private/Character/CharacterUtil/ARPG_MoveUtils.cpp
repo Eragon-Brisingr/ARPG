@@ -324,7 +324,6 @@ UARPG_CharacterMove_AsyncAction* UARPG_CharacterMove_AsyncAction::SettingRequest
 {
 	UARPG_CharacterMove_AsyncAction* CharacterMove_AsyncAction = NewObject<UARPG_CharacterMove_AsyncAction>(Character);
 	CharacterMove_AsyncAction->Character = Character;
-	//CharacterMove_AsyncAction->RegisterWithGameInstance(Character);
 	UWorld* World = Character->GetWorld();
 	switch (ResultData.Code)
 	{
