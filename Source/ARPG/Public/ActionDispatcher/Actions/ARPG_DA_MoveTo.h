@@ -16,6 +16,7 @@ class ARPG_API UARPG_DA_MoveToBase : public UXD_DispatchableActionBase
 {
 	GENERATED_BODY()
 public:
+	bool CanActiveAction() const override;
 	void WhenActionActived() override;
 	void WhenActionDeactived() override;
 	void WhenActionFinished() override;
@@ -27,6 +28,8 @@ protected:
 	FDispatchableActionFinishedEvent WhenCanNotReached;
 
 	void WhenRequestFinished(const FPathFollowingResult& Result);
+
+	bool IsExistValidPath(const FVector& Start, const FVector& End) const;
 public:
 	//移动者
 	UPROPERTY(SaveGame, BlueprintReadOnly, meta = (ExposeOnSpawn = "true", DisplayName = "移动者"))
@@ -38,6 +41,7 @@ class ARPG_API UARPG_DA_MoveToActor : public UARPG_DA_MoveToBase
 {
 	GENERATED_BODY()
 public:
+	bool CanActiveAction() const override;
 	void WhenActionActived() override;
 public:
 	//目标
@@ -50,6 +54,7 @@ class ARPG_API UARPG_DA_MoveToLocation : public UARPG_DA_MoveToBase
 {
 	GENERATED_BODY()
 public:
+	bool CanActiveAction() const override;
 	void WhenActionActived() override;
 public:
 	//目的地

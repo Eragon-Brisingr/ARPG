@@ -4,6 +4,7 @@
 #include "ARPG_TimeManager.h"
 #include "ARPG_EnvironmentManager.h"
 #include "ARPG_CampManager.h"
+#include "XD_ActionDispatcherManager.h"
 
 
 
@@ -15,6 +16,8 @@ AARPG_GameStateBase::AARPG_GameStateBase()
 	TimeManager = CreateDefaultSubobject<UARPG_TimeManager>(GET_MEMBER_NAME_CHECKED(AARPG_GameStateBase, TimeManager));
 
 	CampManager = CreateDefaultSubobject<UARPG_CampManager>(GET_MEMBER_NAME_CHECKED(AARPG_GameStateBase, CampManager));
+
+	ActionDispatcherManager = CreateDefaultSubobject<UXD_ActionDispatcherManager>(GET_MEMBER_NAME_CHECKED(AARPG_GameStateBase, ActionDispatcherManager));
 }
 
 class UXD_TimeManager* AARPG_GameStateBase::GetGameTimeManager_Implementation() const
@@ -30,4 +33,9 @@ class UXD_EnvironmentManager* AARPG_GameStateBase::GetEnvironmentManager_Impleme
 class UXD_CampManager* AARPG_GameStateBase::GetCampManager_Implementation() const
 {
 	return CampManager;
+}
+
+UXD_ActionDispatcherManager* AARPG_GameStateBase::GetActionDispatcherManager_Implementation() const
+{
+	return ActionDispatcherManager;
 }
