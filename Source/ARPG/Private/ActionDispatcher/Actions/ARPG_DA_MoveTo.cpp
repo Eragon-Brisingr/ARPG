@@ -5,7 +5,7 @@
 #include "ARPG_MoveUtils.h"
 #include "NavigationSystem.h"
 
-bool UARPG_DA_MoveToBase::CanActiveAction() const
+bool UARPG_DA_MoveToBase::IsActionValid() const
 {
 	APawn* Pawn = Mover.Get();
 	return Pawn != nullptr && Pawn->GetController() != nullptr;
@@ -57,9 +57,9 @@ bool UARPG_DA_MoveToBase::IsExistValidPath(const FVector& Start, const FVector& 
 	return NavSys->TestPathSync(Query);
 }
 
-bool UARPG_DA_MoveToActor::CanActiveAction() const
+bool UARPG_DA_MoveToActor::IsActionValid() const
 {
-	return Super::CanActiveAction() && Goal.Get() != nullptr && IsExistValidPath(Mover->GetActorLocation(), Goal->GetActorLocation());
+	return Super::IsActionValid() && Goal.Get() != nullptr && IsExistValidPath(Mover->GetActorLocation(), Goal->GetActorLocation());
 }
 
 void UARPG_DA_MoveToActor::WhenActionActived()
@@ -69,7 +69,7 @@ void UARPG_DA_MoveToActor::WhenActionActived()
 	UARPG_MoveUtils::ARPG_MoveToActor(Character, Goal.Get(), FOnARPG_MoveFinished::CreateUObject(this, &UARPG_DA_MoveToActor::WhenRequestFinished), AcceptRadius, false);
 }
 
-bool UARPG_DA_MoveToLocation::CanActiveAction() const
+bool UARPG_DA_MoveToLocation::IsActionValid() const
 {
 	return Super::CanActiveAction() && IsExistValidPath(Mover->GetActorLocation(), Destination);
 }

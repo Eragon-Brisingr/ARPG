@@ -16,7 +16,7 @@ class ARPG_API UARPG_DA_MoveToBase : public UXD_DispatchableActionBase
 {
 	GENERATED_BODY()
 public:
-	bool CanActiveAction() const override;
+	bool IsActionValid() const override;
 	void WhenActionActived() override;
 	void WhenActionDeactived() override;
 	void WhenActionFinished() override;
@@ -44,7 +44,7 @@ class ARPG_API UARPG_DA_MoveToActor : public UARPG_DA_MoveToBase
 {
 	GENERATED_BODY()
 public:
-	bool CanActiveAction() const override;
+	bool IsActionValid() const override;
 	void WhenActionActived() override;
 public:
 	//目标
@@ -57,7 +57,7 @@ class ARPG_API UARPG_DA_MoveToLocation : public UARPG_DA_MoveToBase
 {
 	GENERATED_BODY()
 public:
-	bool CanActiveAction() const override;
+	bool IsActionValid() const override;
 	void WhenActionActived() override;
 public:
 	//目的地
