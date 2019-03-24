@@ -17,11 +17,14 @@ class ARPG_API AARPG_WorldSettingsBase : public AWorldSettings,
 {
 	GENERATED_BODY()
 public:
-	UPROPERTY(EditAnywhere, Category = "时间")
+	UPROPERTY(EditAnywhere, Category = "时间", meta = (DisplayName = "游戏开始时间"))
 	FXD_GameTime StartGameTime;
 
-	UPROPERTY(EditAnywhere, Category = "时间")
+	UPROPERTY(EditAnywhere, Category = "时间", meta = (DisplayName = "时间流逝速度"))
 	float TimeSpendRate = 20.f;
 
 	void WhenGameInit_Implementation() override;
+	bool NeedSave_Implementation() const override;
+
+	bool IsMainWorldSettings() const;
 };
