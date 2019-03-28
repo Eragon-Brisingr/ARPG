@@ -18,7 +18,7 @@ class ARPG_API UARPG_CharacterBehaviorBase : public UObject
 {
 	GENERATED_BODY()
 public:
-	virtual UWorld* GetWorld() const;
+	UWorld* GetWorld() const override;
 
 public:
 	UPROPERTY(BlueprintReadOnly, Category = "行为")
