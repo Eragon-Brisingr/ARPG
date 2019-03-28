@@ -22,10 +22,10 @@ public:
 	void WhenActionFinished() override;
 protected:
 	UPROPERTY(SaveGame, meta = (DisplayName = "当到达了"))
-	FDispatchableActionFinishedEvent WhenReached;
+	FOnDispatchableActionFinishedEvent WhenReached;
 
 	UPROPERTY(SaveGame, meta = (DisplayName = "当无法到达"))
-	FDispatchableActionFinishedEvent WhenCanNotReached;
+	FOnDispatchableActionFinishedEvent WhenCanNotReached;
 
 	void WhenRequestFinished(const FPathFollowingResult& Result);
 
