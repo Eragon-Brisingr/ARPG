@@ -699,11 +699,14 @@ void ACharacterBase::ExecuteOther(ACharacterBase* ExecuteTarget, const FVector& 
 
 void ACharacterBase::ExecuteOtherToServer_Implementation(ACharacterBase* ExecuteTarget, const FVector& TargetLocation, const FRotator& TargetRotation, UAnimMontage* ExecuteMontage, UAnimMontage* BeExecutedMontage)
 {
-	ExecuteTargetCharacter = ExecuteTarget;
-	ExecuteTarget->ExecuteFromCharacter = this;
-	UARPG_ActorFunctionLibrary::MoveActorTo(this, TargetLocation, TargetRotation, 0.2f, false);
-	PlayMontage(ExecuteMontage);
-	ExecuteTarget->PlayMontage(BeExecutedMontage);
+	if (ExecuteTarget)
+	{
+		ExecuteTargetCharacter = ExecuteTarget;
+		ExecuteTarget->ExecuteFromCharacter = this;
+		UARPG_ActorFunctionLibrary::MoveActorTo(ExecuteTarget, TargetLocation, TargetRotation, 0.2f, false);
+		PlayMontage(ExecuteMontage);
+		ExecuteTarget->PlayMontage(BeExecutedMontage);
+	}
 }
 
 void ACharacterBase::WhenKillOther(ACharacterBase* WhoBeKilled, UObject* KillInstigator)

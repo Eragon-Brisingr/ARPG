@@ -20,9 +20,9 @@ bool FExecuteActionSet::InvokeExecuteOther(class ACharacterBase* Invoker, class 
 			FRotator CompareRotation = UKismetMathLibrary::FindLookAtRotation(ExecuteTarget->GetActorLocation(), ExecuteTarget->GetActorLocation() + ExecuteTarget->GetActorRotation().RotateVector(ExecuteAnimData->RelationLocation));
 			if (FMath::Abs(FRotator::NormalizeAxis(LookAtRotation.Yaw - CompareRotation.Yaw)) <= ExecuteAnimData->Tolerance)
 			{
-				FVector TargetLocation(ExecuteTarget->GetActorLocation() + ExecuteTarget->GetActorRotation().RotateVector(ExecuteAnimData->RelationLocation));
+				FVector TargetLocation(Invoker->GetActorLocation() - Invoker->GetActorRotation().RotateVector(ExecuteAnimData->RelationLocation));
 				TargetLocation.Z = Invoker->GetActorLocation().Z;
-				FRotator TargetRotation(Invoker->GetActorRotation().Pitch, UKismetMathLibrary::FindLookAtRotation(Invoker->GetActorLocation(), ExecuteTarget->GetActorLocation()).Yaw + ExecuteAnimData->YawOffset, Invoker->GetActorRotation().Roll);
+				FRotator TargetRotation(Invoker->GetActorRotation().Pitch, LookAtRotation.Yaw + ExecuteAnimData->YawOffset, Invoker->GetActorRotation().Roll);
 
 				Invoker->ExecuteOther(ExecuteTarget, TargetLocation, TargetRotation, ExecuteAnimData->AttackMontage, ExecuteAnimData->BeAttackedMontage);
 				return true;
@@ -37,9 +37,9 @@ bool FExecuteActionSet::InvokeExecuteOther(class ACharacterBase* Invoker, class 
 		{
 			if (AttackMontagePair->AttackMontage && AttackMontagePair->BeAttackedMontage)
 			{
-				FVector TargetLocation(ExecuteTarget->GetActorLocation() + ExecuteTarget->GetActorRotation().RotateVector(AttackMontagePair->RelationLocation));
+				FVector TargetLocation(Invoker->GetActorLocation() - Invoker->GetActorRotation().RotateVector(AttackMontagePair->RelationLocation));
 				TargetLocation.Z = Invoker->GetActorLocation().Z;
-				FRotator TargetRotation(Invoker->GetActorRotation().Pitch, ExecuteTarget->GetActorRotation().Yaw, Invoker->GetActorRotation().Roll);
+				FRotator TargetRotation(Invoker->GetActorRotation().Pitch, Invoker->GetActorRotation().Yaw, Invoker->GetActorRotation().Roll);
 
 				Invoker->ExecuteOther(ExecuteTarget, TargetLocation, TargetRotation, AttackMontagePair->AttackMontage, AttackMontagePair->BeAttackedMontage);
 				return true;
