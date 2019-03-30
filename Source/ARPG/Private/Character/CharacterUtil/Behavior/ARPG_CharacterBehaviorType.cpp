@@ -12,7 +12,7 @@ UARPG_CharacterBehaviorConfigurable* FBehaviorWithPosition::WorldPositionExecute
 {
 	if (bAttachToLocation && bAttachToRotation)
 	{
-		UARPG_ActorFunctionLibrary::MoveCharacterToFitGround(Character, Location, Rotation);
+		UARPG_ActorMoveUtils::MoveCharacterToFitGround(Character, Location, Rotation);
 		if (Character->GetRemoteRole() == ENetRole::ROLE_AutonomousProxy)
 		{
 			Character->ForceSetClientWorldLocationAndRotation(Location, Rotation);
@@ -20,7 +20,7 @@ UARPG_CharacterBehaviorConfigurable* FBehaviorWithPosition::WorldPositionExecute
 	}
 	else if (bAttachToLocation)
 	{
-		UARPG_ActorFunctionLibrary::MoveCharacterToLocationFitGround(Character, Location);
+		UARPG_ActorMoveUtils::MoveCharacterToLocationFitGround(Character, Location);
 		if (Character->GetRemoteRole() == ENetRole::ROLE_AutonomousProxy)
 		{
 			Character->ForceSetClientWorldLocation(Location);
@@ -28,7 +28,7 @@ UARPG_CharacterBehaviorConfigurable* FBehaviorWithPosition::WorldPositionExecute
 	}
 	else if (bAttachToRotation)
 	{
-		UARPG_ActorFunctionLibrary::MoveCharacterToRotationFitGround(Character, Rotation);
+		UARPG_ActorMoveUtils::MoveCharacterToRotationFitGround(Character, Rotation);
 		if (Character->GetRemoteRole() == ENetRole::ROLE_AutonomousProxy)
 		{
 			Character->ForceSetClientWorldRotation(Rotation);
@@ -44,7 +44,7 @@ UARPG_CharacterBehaviorConfigurable* FBehaviorWithPosition::RelativePositionExec
 	FVector WorldLocation = Transform.TransformPosition(Location);
 	if (bAttachToLocation && bAttachToRotation)
 	{
-		UARPG_ActorFunctionLibrary::MoveCharacterToFitGround(Character, WorldLocation, Transform.TransformRotation(Rotation.Quaternion()).Rotator());
+		UARPG_ActorMoveUtils::MoveCharacterToFitGround(Character, WorldLocation, Transform.TransformRotation(Rotation.Quaternion()).Rotator());
 		if (Character->GetRemoteRole() == ENetRole::ROLE_AutonomousProxy)
 		{
 			Character->ForceSetClientWorldLocationAndRotation(WorldLocation, Rotation);
@@ -52,7 +52,7 @@ UARPG_CharacterBehaviorConfigurable* FBehaviorWithPosition::RelativePositionExec
 	}
 	else if (bAttachToLocation)
 	{
-		UARPG_ActorFunctionLibrary::MoveCharacterToLocationFitGround(Character, WorldLocation);
+		UARPG_ActorMoveUtils::MoveCharacterToLocationFitGround(Character, WorldLocation);
 		if (Character->GetRemoteRole() == ENetRole::ROLE_AutonomousProxy)
 		{
 			Character->ForceSetClientWorldLocation(WorldLocation);
@@ -61,7 +61,7 @@ UARPG_CharacterBehaviorConfigurable* FBehaviorWithPosition::RelativePositionExec
 	else if (bAttachToRotation)
 	{
 		FRotator WorldRotation = Transform.TransformRotation(Rotation.Quaternion()).Rotator();
-		UARPG_ActorFunctionLibrary::MoveCharacterToRotationFitGround(Character, WorldRotation);
+		UARPG_ActorMoveUtils::MoveCharacterToRotationFitGround(Character, WorldRotation);
 		if (Character->GetRemoteRole() == ENetRole::ROLE_AutonomousProxy)
 		{
 			Character->ForceSetClientWorldRotation(WorldRotation);

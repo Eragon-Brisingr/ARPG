@@ -36,20 +36,33 @@ public:
 
 	static void ARPG_MoveToLocation(class ACharacterBase* Character, const FVector& Dest, const FOnARPG_MoveFinished& OnARPG_MoveFinished, float AcceptanceRadius = 5.f, bool bStopOnOverlap = true, bool bUsePathfinding = true, bool bProjectDestinationToNavigation = false, bool bCanStrafe = true, TSubclassOf<UNavigationQueryFilter> FilterClass = nullptr, bool bAllowPartialPaths = true);
 
-	static void SettingRequest(FPathFollowingRequestResult &ResultData, class ACharacterBase* Character, const FOnARPG_MoveFinished &OnARPG_MoveFinished);
+private:
+	static void SettingRequest(FPathFollowingRequestResult &ResultData, class ACharacterBase* Character, const FOnARPG_MoveFinished &OnARPG_MoveFinished, float AcceptanceRadius);
 
 	void OnMoveCompleted(FAIRequestID RequestID, const FPathFollowingResult& Result, FOnARPG_MoveFinished OnARPG_MoveFinish, UPathFollowingComponent* PathFollowingComponent, FAIRequestID InvokeRequestID);
-}; 
+
+	static void OnSnapMoveFinished(bool bIsAbort, FPathFollowingResult Result, FVector TargetLocation, FOnARPG_MoveFinished OnARPG_MoveFinished);
+public:
+	static void ARPG_MoveToLocationAndTurn(class ACharacterBase* Character, const FVector& Dest, const FRotator& TurnRotation, const FOnARPG_MoveFinished& OnARPG_MoveFinished, float AcceptanceRadius = 5.f, bool bStopOnOverlap = true, bool bUsePathfinding = true, bool bProjectDestinationToNavigation = false, bool bCanStrafe = true, TSubclassOf<UNavigationQueryFilter> FilterClass = nullptr, bool bAllowPartialPaths = true);
+
+	static void ARPG_MoveToActorAndTurn(class ACharacterBase* Character, AActor* Goal, AActor* TurnToActor, const FOnARPG_MoveFinished& OnARPG_MoveFinished, float AcceptanceRadius = 5.f, bool bStopOnOverlap = true, bool bUsePathfinding = true, bool bCanStrafe = true, TSubclassOf<class UNavigationQueryFilter> FilterClass = nullptr, bool bAllowPartialPaths = true);
+private:
+	static void OnLocationTurnMoveCompleted(const FPathFollowingResult& PathFollowingResult, class ACharacterBase* Character, FRotator TurnRotation, FOnARPG_MoveFinished OnARPG_MoveFinish);
+
+	static void OnActorTurnMoveCompleted(const FPathFollowingResult& PathFollowingResult, class ACharacterBase* Character, AActor* TurnToActor, FOnARPG_MoveFinished OnARPG_MoveFinish);
+
+	static void OnTurnCompleted(bool Result, FPathFollowingResult PathFollowingResult, FOnARPG_MoveFinished OnARPG_MoveFinish);
+};
 
 UCLASS()
 class ARPG_API UARPG_CharacterMove_AsyncAction : public UBlueprintAsyncActionBase
 {
 	GENERATED_BODY()
 public:
-	UFUNCTION(BlueprintCallable, Category = "角色|移动", meta = (BlueprintInternalUseOnly = "true", DisplayName = "ARPG MoveToActor", AdvancedDisplay = "bStopOnOverlap,bCanStrafe,bAllowPartialPaths"))
+	UFUNCTION(BlueprintCallable, Category = "角色|移动", meta = (BlueprintInternalUseOnly = "true", DisplayName = "ARPG Move To Actor", AdvancedDisplay = "bStopOnOverlap,bCanStrafe,bAllowPartialPaths"))
 	static class UARPG_CharacterMove_AsyncAction* BP_ARPG_MoveToActor(class ACharacterBase* Character, AActor* Goal, float AcceptanceRadius = 5.f, bool bStopOnOverlap = true, bool bUsePathfinding = true, bool bCanStrafe = true, TSubclassOf<class UNavigationQueryFilter> FilterClass = nullptr, bool bAllowPartialPaths = true);
 
-	UFUNCTION(BlueprintCallable, Category = "角色|移动", meta = (BlueprintInternalUseOnly = "true", DisplayName = "ARPG MoveToLocation", AdvancedDisplay = "bStopOnOverlap,bCanStrafe,bAllowPartialPaths,bProjectDestinationToNavigation"))
+	UFUNCTION(BlueprintCallable, Category = "角色|移动", meta = (BlueprintInternalUseOnly = "true", DisplayName = "ARPG Move To Location", AdvancedDisplay = "bStopOnOverlap,bCanStrafe,bAllowPartialPaths,bProjectDestinationToNavigation"))
 	static class UARPG_CharacterMove_AsyncAction* BP_ARPG_MoveToLocation(class ACharacterBase* Character, const FVector& Dest, float AcceptanceRadius = 5.f, bool bStopOnOverlap = true, bool bUsePathfinding = true, bool bProjectDestinationToNavigation = false, bool bCanStrafe = true, TSubclassOf<UNavigationQueryFilter> FilterClass = nullptr, bool bAllowPartialPaths = true);
 public:
 	UPROPERTY()

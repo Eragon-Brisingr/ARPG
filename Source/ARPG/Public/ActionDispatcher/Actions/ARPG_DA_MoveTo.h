@@ -63,5 +63,13 @@ public:
 	//目的地
 	UPROPERTY(SaveGame, BlueprintReadOnly, meta = (ExposeOnSpawn = "true", DisplayName = "目的地"))
 	FVector Destination;
+
+	//使用到达时朝向
+	UPROPERTY(SaveGame, BlueprintReadOnly, meta = (ExposeOnSpawn = "true", DisplayName = "使用到达时朝向"))
+	uint8 bUseRotation : 1;
+
+	//到达时朝向
+	UPROPERTY(SaveGame, BlueprintReadOnly, meta = (ExposeOnSpawn = "true", DisplayName = "到达时朝向"))
+	FRotator Rotation;
 };
 

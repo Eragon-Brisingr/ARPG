@@ -14,7 +14,7 @@ class ARPG_API UARPG_DA_Wait : public UXD_DispatchableActionBase
 {
 	GENERATED_BODY()
 public:
-	bool CanActiveAction() const override;
+	bool IsActionValid() const override;
 	void WhenActionActived() override;
 	void WhenActionDeactived() override;
 	void WhenActionFinished() override;

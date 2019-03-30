@@ -7,22 +7,20 @@
 #include <GameFramework/Actor.h>
 #include "CharacterBase.h"
 
-TMap<TWeakObjectPtr<USceneComponent>, FDelegateHandle> UARPG_ActorFunctionLibrary::MovingComponentMap;
+TMap<TWeakObjectPtr<USceneComponent>, UARPG_ActorMoveUtils::FActorMoveData> UARPG_ActorMoveUtils::MovingComponentMap;
 
-void UARPG_ActorFunctionLibrary::MoveComponentTo(USceneComponent* Component, const FVector& TargetRelativeLocation, const FRotator& TargetRelativeRotation, float OverTime /*= 0.2f*/, bool Sweep /*= true*/)
+void UARPG_ActorMoveUtils::MoveComponentTo(USceneComponent* Component, const FVector& TargetRelativeLocation, const FRotator& TargetRelativeRotation, const FOnActorMoveFinished& OnMoveFinished, float OverTime /*= 0.2f*/, bool Sweep /*= true*/)
 {
 	if (Component)
 	{
 		TWeakObjectPtr<USceneComponent> _Component = Component;
-		if (FDelegateHandle* TickerHandle = MovingComponentMap.Find(_Component))
-		{
-			FTicker::GetCoreTicker().RemoveTicker(*TickerHandle);
-		}
+		StopComponentMove(Component);
 
 		float _ExecuteTime = 0.f;
 		const FVector _StartRelativeLocation = Component->RelativeLocation;
 		const FRotator _StartRelativeRotation = Component->RelativeRotation;
-		MovingComponentMap.FindOrAdd(Component) = FTicker::GetCoreTicker().AddTicker(FTickerDelegate::CreateLambda([=](float DeltaSeconds) mutable
+
+		FDelegateHandle TickerHandle = FTicker::GetCoreTicker().AddTicker(FTickerDelegate::CreateLambda([=](float DeltaSeconds) mutable
 		{
 			if (_Component.IsValid())
 			{
@@ -39,25 +37,23 @@ void UARPG_ActorFunctionLibrary::MoveComponentTo(USceneComponent* Component, con
 					_Component->SetRelativeLocationAndRotation(TargetRelativeLocation, TargetRelativeRotation, Sweep);
 				}
 			}
-			MovingComponentMap.Remove(_Component);
+			MovingComponentMap.FindAndRemoveChecked(_Component).OnActorMoveFinished.ExecuteIfBound(false);
 			return false;
 		}));
+		MovingComponentMap.FindOrAdd(Component) = FActorMoveData(TickerHandle, OnMoveFinished);
 	}
 }
 
-void UARPG_ActorFunctionLibrary::MoveComponentToLocation(USceneComponent* Component, const FVector& TargetRelativeLocation, float OverTime /*= 0.2f*/, bool Sweep /*= false*/)
+void UARPG_ActorMoveUtils::MoveComponentToLocation(USceneComponent* Component, const FVector& TargetRelativeLocation, const FOnActorMoveFinished& OnMoveFinished, float OverTime /*= 0.2f*/, bool Sweep /*= false*/)
 {
 	if (Component)
 	{
 		TWeakObjectPtr<USceneComponent> _Component = Component;
-		if (FDelegateHandle* TickerHandle = MovingComponentMap.Find(_Component))
-		{
-			FTicker::GetCoreTicker().RemoveTicker(*TickerHandle);
-		}
+		StopComponentMove(Component);
 
 		float _ExecuteTime = 0.f;
 		const FVector _StartRelativeLocation = Component->RelativeLocation;
-		MovingComponentMap.FindOrAdd(Component) = FTicker::GetCoreTicker().AddTicker(FTickerDelegate::CreateLambda([=](float DeltaSeconds) mutable
+		FDelegateHandle TickerHandle = FTicker::GetCoreTicker().AddTicker(FTickerDelegate::CreateLambda([=](float DeltaSeconds) mutable
 		{
 			if (_Component.IsValid())
 			{
@@ -73,25 +69,23 @@ void UARPG_ActorFunctionLibrary::MoveComponentToLocation(USceneComponent* Compon
 					_Component->SetRelativeLocation(TargetRelativeLocation, Sweep);
 				}
 			}
-			MovingComponentMap.Remove(_Component);
+			MovingComponentMap.FindAndRemoveChecked(_Component).OnActorMoveFinished.ExecuteIfBound(false);
 			return false;
 		}));
+		MovingComponentMap.FindOrAdd(Component) = FActorMoveData(TickerHandle, OnMoveFinished);
 	}
 }
 
-void UARPG_ActorFunctionLibrary::MoveComponentToRotation(USceneComponent* Component, const FRotator& TargetRelativeRotation, float OverTime /*= 0.2f*/, bool Sweep /*= false*/)
+void UARPG_ActorMoveUtils::MoveComponentToRotation(USceneComponent* Component, const FRotator& TargetRelativeRotation, const FOnActorMoveFinished& OnMoveFinished, float OverTime /*= 0.2f*/, bool Sweep /*= false*/)
 {
 	if (Component)
 	{
 		TWeakObjectPtr<USceneComponent> _Component = Component;
-		if (FDelegateHandle* TickerHandle = MovingComponentMap.Find(_Component))
-		{
-			FTicker::GetCoreTicker().RemoveTicker(*TickerHandle);
-		}
+		StopComponentMove(Component);
 
 		float _ExecuteTime = 0.f;
 		const FRotator _StartRelativeRotation = Component->RelativeRotation;
-		MovingComponentMap.FindOrAdd(Component) = FTicker::GetCoreTicker().AddTicker(FTickerDelegate::CreateLambda([=](float DeltaSeconds) mutable
+		FDelegateHandle TickerHandle = FTicker::GetCoreTicker().AddTicker(FTickerDelegate::CreateLambda([=](float DeltaSeconds) mutable
 		{
 			if (_Component.IsValid())
 			{
@@ -107,24 +101,22 @@ void UARPG_ActorFunctionLibrary::MoveComponentToRotation(USceneComponent* Compon
 					_Component->SetRelativeRotation(TargetRelativeRotation, Sweep);
 				}
 			}
-			MovingComponentMap.Remove(_Component);
+			MovingComponentMap.FindAndRemoveChecked(_Component).OnActorMoveFinished.ExecuteIfBound(false);
 			return false;
 		}));
+		MovingComponentMap.FindOrAdd(Component) = FActorMoveData(TickerHandle, OnMoveFinished);
 	}
 }
 
-void UARPG_ActorFunctionLibrary::PushComponentTo(USceneComponent* Component, const FVector& Distance, float OverTime /*= 0.2f*/, bool Sweep /*= true*/)
+void UARPG_ActorMoveUtils::PushComponentTo(USceneComponent* Component, const FVector& Distance, const FOnActorMoveFinished& OnMoveFinished, float OverTime /*= 0.2f*/, bool Sweep /*= true*/)
 {
 	if (Component)
 	{
 		TWeakObjectPtr<USceneComponent> _Component = Component;
-		if (FDelegateHandle* TickerHandle = MovingComponentMap.Find(_Component))
-		{
-			FTicker::GetCoreTicker().RemoveTicker(*TickerHandle);
-		}
+		StopComponentMove(Component);
 
 		float _ExecuteTime = 0.f;
-		MovingComponentMap.FindOrAdd(_Component) = FTicker::GetCoreTicker().AddTicker(FTickerDelegate::CreateLambda([=](float DeltaSeconds) mutable
+		FDelegateHandle TickerHandle = FTicker::GetCoreTicker().AddTicker(FTickerDelegate::CreateLambda([=](float DeltaSeconds) mutable
 		{
 			if (_Component.IsValid())
 			{
@@ -136,36 +128,34 @@ void UARPG_ActorFunctionLibrary::PushComponentTo(USceneComponent* Component, con
 					return true;
 				}
 			}
-			MovingComponentMap.Remove(_Component);
+			MovingComponentMap.FindAndRemoveChecked(_Component).OnActorMoveFinished.ExecuteIfBound(false);
 			return false;
 		}));
+		MovingComponentMap.FindOrAdd(_Component) = FActorMoveData(TickerHandle, OnMoveFinished);
 	}
 }
 
-void UARPG_ActorFunctionLibrary::MoveActorTo(AActor* Actor, const FVector& Location, const FRotator& Rotation, float OverTime /*= 0.2f*/, bool Sweep /*= false*/)
+void UARPG_ActorMoveUtils::MoveActorTo(AActor* Actor, const FVector& Location, const FRotator& Rotation, const FOnActorMoveFinished& OnMoveFinished, float OverTime /*= 0.2f*/, bool Sweep /*= false*/)
 {
 	if (Actor)
 	{
 		USceneComponent* Component = Actor->GetRootComponent();
 		TWeakObjectPtr<USceneComponent> _Component = Component;
-		if (FDelegateHandle* TickerHandle = MovingComponentMap.Find(_Component))
-		{
-			FTicker::GetCoreTicker().RemoveTicker(*TickerHandle);
-		}
+		StopComponentMove(Component);
 
 		float _ExecuteTime = 0.f;
 		const FVector _StartWorldLocation = Component->GetComponentLocation();
 		const FRotator _StartWorldRotation = Component->GetComponentRotation();
-		MovingComponentMap.FindOrAdd(Component) = FTicker::GetCoreTicker().AddTicker(FTickerDelegate::CreateLambda([=](float DeltaSeconds) mutable
+		FDelegateHandle TickerHandle = FTicker::GetCoreTicker().AddTicker(FTickerDelegate::CreateLambda([=](float DeltaSeconds) mutable
 		{
 			if (_Component.IsValid())
 			{
 				if (_ExecuteTime < OverTime)
 				{
 					_ExecuteTime += DeltaSeconds;
-					const FVector DeltaRelativeLocation = UKismetMathLibrary::VLerp(_StartWorldLocation, Location, _ExecuteTime / OverTime);
-					const FRotator DeltaRelativeRotation = UKismetMathLibrary::RLerp(_StartWorldRotation, Rotation, _ExecuteTime / OverTime, true);
-					_Component->SetWorldLocationAndRotation(DeltaRelativeLocation, DeltaRelativeRotation, Sweep);
+					const FVector DeltaWorldLocation = UKismetMathLibrary::VLerp(_StartWorldLocation, Location, _ExecuteTime / OverTime);
+					const FRotator DeltaWorldRotation = UKismetMathLibrary::RLerp(_StartWorldRotation, Rotation, _ExecuteTime / OverTime, true);
+					_Component->SetWorldLocationAndRotation(DeltaWorldLocation, DeltaWorldRotation, Sweep);
 					return true;
 				}
 				else
@@ -173,34 +163,32 @@ void UARPG_ActorFunctionLibrary::MoveActorTo(AActor* Actor, const FVector& Locat
 					_Component->SetWorldLocationAndRotation(Location, Rotation, Sweep);
 				}
 			}
-			MovingComponentMap.Remove(_Component);
+			MovingComponentMap.FindAndRemoveChecked(_Component).OnActorMoveFinished.ExecuteIfBound(false);
 			return false;
 		}));
+		MovingComponentMap.FindOrAdd(_Component) = FActorMoveData(TickerHandle, OnMoveFinished);
 	}
 }
 
-void UARPG_ActorFunctionLibrary::MoveActorToLocation(AActor* Actor, const FVector& Location, float OverTime /*= 0.2f*/, bool Sweep /*= false*/)
+void UARPG_ActorMoveUtils::MoveActorToLocation(AActor* Actor, const FVector& Location, const FOnActorMoveFinished& OnMoveFinished, float OverTime /*= 0.2f*/, bool Sweep /*= false*/)
 {
 	if (Actor)
 	{
 		USceneComponent* Component = Actor->GetRootComponent();
 		TWeakObjectPtr<USceneComponent> _Component = Component;
-		if (FDelegateHandle* TickerHandle = MovingComponentMap.Find(_Component))
-		{
-			FTicker::GetCoreTicker().RemoveTicker(*TickerHandle);
-		}
+		StopComponentMove(Component);
 
 		float _ExecuteTime = 0.f;
 		const FVector _StartRelativeLocation = Component->GetComponentLocation();
-		MovingComponentMap.FindOrAdd(Component) = FTicker::GetCoreTicker().AddTicker(FTickerDelegate::CreateLambda([=](float DeltaSeconds) mutable
+		FDelegateHandle TickerHandle = FTicker::GetCoreTicker().AddTicker(FTickerDelegate::CreateLambda([=](float DeltaSeconds) mutable
 		{
 			if (_Component.IsValid())
 			{
 				if (_ExecuteTime < OverTime)
 				{
 					_ExecuteTime += DeltaSeconds;
-					const FVector DeltaRelativeLocation = UKismetMathLibrary::VLerp(_StartRelativeLocation, Location, _ExecuteTime / OverTime);
-					_Component->SetWorldLocation(DeltaRelativeLocation, Sweep);
+					const FVector DeltaWorldLocation = UKismetMathLibrary::VLerp(_StartRelativeLocation, Location, _ExecuteTime / OverTime);
+					_Component->SetWorldLocation(DeltaWorldLocation, Sweep);
 					return true;
 				}
 				else
@@ -208,34 +196,32 @@ void UARPG_ActorFunctionLibrary::MoveActorToLocation(AActor* Actor, const FVecto
 					_Component->SetWorldLocation(Location, Sweep);
 				}
 			}
-			MovingComponentMap.Remove(_Component);
+			MovingComponentMap.FindAndRemoveChecked(_Component).OnActorMoveFinished.ExecuteIfBound(false);
 			return false;
 		}));
+		MovingComponentMap.FindOrAdd(Component) = FActorMoveData(TickerHandle, OnMoveFinished);
 	}
 }
 
-void UARPG_ActorFunctionLibrary::MoveActorToRotation(AActor* Actor, const FRotator& Rotation, float OverTime /*= 0.2f*/, bool Sweep /*= false*/)
+void UARPG_ActorMoveUtils::MoveActorToRotation(AActor* Actor, const FRotator& Rotation, const FOnActorMoveFinished& OnMoveFinished, float OverTime /*= 0.2f*/, bool Sweep /*= false*/)
 {
 	if (Actor)
 	{
 		USceneComponent* Component = Actor->GetRootComponent();
 		TWeakObjectPtr<USceneComponent> _Component = Component;
-		if (FDelegateHandle* TickerHandle = MovingComponentMap.Find(_Component))
-		{
-			FTicker::GetCoreTicker().RemoveTicker(*TickerHandle);
-		}
+		StopComponentMove(Component);
 
 		float _ExecuteTime = 0.f;
 		const FRotator _StartWorldRotation = Component->GetComponentRotation();
-		MovingComponentMap.FindOrAdd(Component) = FTicker::GetCoreTicker().AddTicker(FTickerDelegate::CreateLambda([=](float DeltaSeconds) mutable
+		FDelegateHandle TickerHandle = FTicker::GetCoreTicker().AddTicker(FTickerDelegate::CreateLambda([=](float DeltaSeconds) mutable
 		{
 			if (_Component.IsValid())
 			{
 				if (_ExecuteTime < OverTime)
 				{
 					_ExecuteTime += DeltaSeconds;
-					const FRotator DeltaRelativeRotation = UKismetMathLibrary::RLerp(_StartWorldRotation, Rotation, _ExecuteTime / OverTime, true);
-					_Component->SetWorldRotation(DeltaRelativeRotation, Sweep);
+					const FRotator DeltaWorldRotation = UKismetMathLibrary::RLerp(_StartWorldRotation, Rotation, _ExecuteTime / OverTime, true);
+					_Component->SetWorldRotation(DeltaWorldRotation, Sweep);
 					return true;
 				}
 				else
@@ -243,44 +229,66 @@ void UARPG_ActorFunctionLibrary::MoveActorToRotation(AActor* Actor, const FRotat
 					_Component->SetWorldRotation(Rotation, Sweep);
 				}
 			}
-			MovingComponentMap.Remove(_Component);
+			MovingComponentMap.FindAndRemoveChecked(_Component).OnActorMoveFinished.ExecuteIfBound(false);
 			return false;
 		}));
+		MovingComponentMap.FindOrAdd(Component) = FActorMoveData(TickerHandle, OnMoveFinished);
 	}
 }
 
-void UARPG_ActorFunctionLibrary::PushActorTo(AActor* Actor, const FVector& Distance, float OverTime /*= 0.2f*/, bool Sweep /*= true*/)
+void UARPG_ActorMoveUtils::PushActorTo(AActor* Actor, const FVector& Distance, const FOnActorMoveFinished& OnMoveFinished, float OverTime /*= 0.2f*/, bool Sweep /*= true*/)
 {
 	if (Actor)
 	{
-		PushComponentTo(Actor->GetRootComponent(), Distance, OverTime, Sweep);
+		PushComponentTo(Actor->GetRootComponent(), Distance, OnMoveFinished, OverTime, Sweep);
 	}
 }
 
-void UARPG_ActorFunctionLibrary::MoveCharacterToFitGround(ACharacterBase* Character, const FVector& Location, const FRotator& Rotator, float OverTime /*= 0.2f*/, bool Sweep /*= false*/)
+void UARPG_ActorMoveUtils::MoveCharacterToFitGround(ACharacterBase* Character, const FVector& Location, const FRotator& Rotator, const FOnActorMoveFinished& OnMoveFinished, float OverTime /*= 0.2f*/, bool Sweep /*= false*/)
 {
 	if (Character)
 	{
 		FVector MoveLocation = Location;
 		MoveLocation.Z = Character->GetActorLocation().Z;
-		MoveActorTo(Character, MoveLocation, Rotator, OverTime, Sweep);
+		MoveActorTo(Character, MoveLocation, Rotator, OnMoveFinished, OverTime, Sweep);
 	}
 }
 
-void UARPG_ActorFunctionLibrary::MoveCharacterToLocationFitGround(ACharacterBase* Character, const FVector& Location, float OverTime /*= 0.2f*/, bool Sweep /*= false*/)
+void UARPG_ActorMoveUtils::MoveCharacterToLocationFitGround(ACharacterBase* Character, const FVector& Location, const FOnActorMoveFinished& OnMoveFinished, float OverTime /*= 0.2f*/, bool Sweep /*= false*/)
 {
 	if (Character)
 	{
 		FVector MoveLocation = Location;
 		MoveLocation.Z = Character->GetActorLocation().Z;
-		MoveActorToLocation(Character, MoveLocation, OverTime, Sweep);
+		MoveActorToLocation(Character, MoveLocation, OnMoveFinished, OverTime, Sweep);
 	}
 }
 
-void UARPG_ActorFunctionLibrary::MoveCharacterToRotationFitGround(ACharacterBase* Character, const FRotator& Rotator, float OverTime /*= 0.2f*/, bool Sweep /*= false*/)
+void UARPG_ActorMoveUtils::MoveCharacterToRotationFitGround(ACharacterBase* Character, const FRotator& Rotator, const FOnActorMoveFinished& OnMoveFinished, float OverTime /*= 0.2f*/, bool Sweep /*= false*/)
 {
 	if (Character)
 	{
-		MoveActorToRotation(Character, Rotator, OverTime, Sweep);
+		MoveActorToRotation(Character, Rotator, OnMoveFinished, OverTime, Sweep);
+	}
+}
+
+void UARPG_ActorMoveUtils::StopComponentMove(USceneComponent* Component)
+{
+	if (Component)
+	{
+		if (FActorMoveData* ActorMoveData = MovingComponentMap.Find(Component))
+		{
+			FTicker::GetCoreTicker().RemoveTicker(ActorMoveData->TickerHandle);
+			ActorMoveData->OnActorMoveFinished.ExecuteIfBound(true);
+			MovingComponentMap.Remove(Component);
+		}
+	}
+}
+
+void UARPG_ActorMoveUtils::StopActorMove(AActor* Actor)
+{
+	if (Actor)
+	{
+		StopComponentMove(Actor->GetRootComponent());
 	}
 }

@@ -16,8 +16,7 @@ public class ARPG : ModuleRules
             "NavigationSystem",
             "GameplayTasks",
             "GameplayTags",
-
-
+            
             "XD_UnrealLibraryEx",
 			"XD_SaveGameSystem",
 			"XD_TimeSystem",

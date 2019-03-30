@@ -33,7 +33,7 @@ protected:
 
 	UPROPERTY()
 	UAnimMontage* CurrentTurnMontage;
-public:
+
 	void AbortBehavior(ACharacterBase* Executer) override;
 };
 

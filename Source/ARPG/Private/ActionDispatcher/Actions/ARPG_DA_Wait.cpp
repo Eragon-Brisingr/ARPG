@@ -3,7 +3,7 @@
 #include "ARPG_DA_Wait.h"
 #include "GameFramework/Pawn.h"
 
-bool UARPG_DA_Wait::CanActiveAction() const
+bool UARPG_DA_Wait::IsActionValid() const
 {
 	return Pawn.Get() != nullptr;
 }
