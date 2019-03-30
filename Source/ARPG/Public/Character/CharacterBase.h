@@ -53,16 +53,16 @@ protected:
 	void PreInitializeComponents() override;
 public:
 	// Called every frame
-	virtual void Tick(float DeltaTime) override;
+	void Tick(float DeltaTime) override;
 
 	// Called to bind functionality to input
-	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+	void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
-	virtual void GetLifetimeReplicatedProps(TArray< class FLifetimeProperty > & OutLifetimeProps) const override;
+	void GetLifetimeReplicatedProps(TArray< class FLifetimeProperty > & OutLifetimeProps) const override;
 
-	virtual void OnConstruction(const FTransform& Transform) override;
+	void OnConstruction(const FTransform& Transform) override;
 
-	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser);
+	float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
 public:
 	virtual void WhenGameInit_Implementation() override;
 
@@ -77,6 +77,7 @@ protected:
 	UPROPERTY(SaveGame)
 	TSoftObjectPtr<UXD_DispatchableActionBase> CurrentAction;
 
+	bool CanExecuteDispatchableAction_Implementation() const override;
 	//重生用
 public:
 	UPROPERTY(SaveGame, BlueprintReadOnly, Category = "角色|重生")
