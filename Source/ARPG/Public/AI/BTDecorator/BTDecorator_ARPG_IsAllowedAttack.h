@@ -16,5 +16,5 @@ class ARPG_API UBTDecorator_ARPG_IsAllowedAttack : public UBTDecorator_Blackboar
 public:
 	UBTDecorator_ARPG_IsAllowedAttack();
 
-	virtual bool CalculateRawConditionValue(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) const;
+	bool CalculateRawConditionValue(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) const override;
 };

@@ -216,6 +216,11 @@ void ACharacterBase::SetCurrentDispatchableAction_Implementation(UXD_Dispatchabl
 	CurrentAction = Action;
 }
 
+bool ACharacterBase::CanExecuteDispatchableAction_Implementation() const
+{
+	return AlertValue == 0.f;
+}
+
 void ACharacterBase::SetRebornLocation(const FVector& RebornLocation)
 {
 	BornLocation = RebornLocation;
