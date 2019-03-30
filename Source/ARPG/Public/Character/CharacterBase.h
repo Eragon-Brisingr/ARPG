@@ -123,6 +123,7 @@ public:
 	virtual void InvokeChangeMoveGaitToServer_Implementation(const ECharacterGait& Gait);
 	bool InvokeChangeMoveGaitToServer_Validate(const ECharacterGait& Gait) { return true; }
 
+	//停止移动，也会停止转身行为
 	UFUNCTION(BlueprintCallable, Category = "角色|行为")
 	void StopMovement();
 

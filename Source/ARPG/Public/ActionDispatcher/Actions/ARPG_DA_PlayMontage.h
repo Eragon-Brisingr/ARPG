@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -11,16 +11,17 @@ class UAnimMontage;
 /**
  * 
  */
-UCLASS()
+UCLASS(meta = (DisplayName = "播放蒙太奇"))
 class ARPG_API UARPG_DA_PlayMontage : public UXD_DispatchableActionBase
 {
 	GENERATED_BODY()
 public:
-	bool CanActiveAction() const override;
+	bool IsActionValid() const override;
 	void WhenActionActived() override;
+
+	void WhenActionAborted() override;
 	void WhenActionDeactived() override;
 	void WhenActionFinished() override;
-
 public:
 	UPROPERTY(SaveGame, BlueprintReadOnly, meta = (ExposeOnSpawn = "true"))
 	TSoftObjectPtr<APawn> Pawn;
@@ -28,9 +29,14 @@ public:
 	UPROPERTY(SaveGame, BlueprintReadOnly, meta = (ExposeOnSpawn = "true"))
 	UAnimMontage* MontageToPlay;
 
+	//当行为被打断时播放的Montage
+	UPROPERTY(SaveGame, BlueprintReadOnly, meta = (ExposeOnSpawn = "true"))
+	UAnimMontage* WhenAbortedMontage;
 protected:
-	UPROPERTY(SaveGame, meta = (DisplayName = "�����Ž���"))
+	UPROPERTY(SaveGame, meta = (DisplayName = "当播放结束"))
 	FOnDispatchableActionFinishedEvent WhenPlayFinished;
 
-	void WhenMontageBlendingOutStart(UAnimMontage* Montage, bool bInterrupted);
+	void WhenMontagePlayFinished(UAnimMontage* Montage, bool bInterrupted);
+
+	void WhenAbortPlayFinished(UAnimMontage* Montage, bool bInterrupted);
 };

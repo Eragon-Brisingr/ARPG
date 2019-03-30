@@ -278,6 +278,11 @@ void ACharacterBase::StopMovement()
 	{
 		Controller->StopMovement();
 	}
+	if (CharacterTurnAction && CharacterTurnAction->bIsExecuting)
+	{
+		CharacterTurnAction->AbortTurnTo(this, {});
+	}
+	UARPG_ActorMoveUtils::StopActorMove(this);
 }
 
 FVector ACharacterBase::GetTargetLocation_Implementation(const FName& CurLockSocketName) const
@@ -511,7 +516,7 @@ UARPG_CharacterBehaviorBase* ACharacterBase::TurnTo(const FRotator& TargetWorldR
 		}
 		else
 		{
-			UARPG_ActorFunctionLibrary::MoveCharacterToRotationFitGround(this, TargetWorldRotation);
+			UARPG_ActorMoveUtils::MoveCharacterToRotationFitGround(this, TargetWorldRotation);
 			OnCharacterBehaviorFinished.ExecuteIfBound(true);
 		}
 	}
@@ -646,7 +651,7 @@ void ACharacterBase::WhenDefenseSucceed(float BaseDamage, class ACharacterBase* 
 
 	//击退效果
 	FVector BeakBackOffset = HitFromDirection.GetSafeNormal2D() * DefenseBeakBackDistance;
-	UARPG_ActorFunctionLibrary::PushActorTo(this, BeakBackOffset);
+	UARPG_ActorMoveUtils::PushActorTo(this, BeakBackOffset);
 }
 
 void ACharacterBase::WhenAttackedDefenseCharacter(float BaseDamage, ACharacterBase* DefenseSucceedCharacter, const FHitResult& HitResult)
@@ -703,7 +708,7 @@ void ACharacterBase::ExecuteOtherToServer_Implementation(ACharacterBase* Execute
 	{
 		ExecuteTargetCharacter = ExecuteTarget;
 		ExecuteTarget->ExecuteFromCharacter = this;
-		UARPG_ActorFunctionLibrary::MoveActorTo(ExecuteTarget, TargetLocation, TargetRotation, 0.2f, false);
+		UARPG_ActorMoveUtils::MoveActorTo(ExecuteTarget, TargetLocation, TargetRotation);
 		PlayMontage(ExecuteMontage);
 		ExecuteTarget->PlayMontage(BeExecutedMontage);
 	}
@@ -773,7 +778,7 @@ float ACharacterBase::ApplyPointDamage(float BaseDamage, const FVector& HitFromD
 
 			//击退效果
 			FVector BeakBackOffset = HitFromDirection.GetSafeNormal2D() * Param.NormalBeakBackDistance;
-			UARPG_ActorFunctionLibrary::PushActorTo(this, BeakBackOffset);
+			UARPG_ActorMoveUtils::PushActorTo(this, BeakBackOffset);
 		}
 	}
 

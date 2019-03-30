@@ -26,9 +26,9 @@ public:
 
 	void EndInteract(ACharacterBase* Invoker, const FOnInteractAbortFinished& OnInteractAbortFinished);
 public:
-	virtual bool CanInteract_Implementation(const class ACharacterBase* InteractInvoker) const;
+	bool CanInteract_Implementation(const class ACharacterBase* InteractInvoker) const override;
 
-	virtual void WhenInvokeInteract_Implementation(class ACharacterBase* InteractInvoker);
+	void WhenInvokeInteract_Implementation(class ACharacterBase* InteractInvoker) override;
 };
 
 UCLASS(meta = (DisplayName = "单人交互Actor"), Blueprintable)

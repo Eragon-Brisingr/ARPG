@@ -115,7 +115,7 @@ void UARPG_InteractableActorManagerBase::WhenEnterReleaseState(bool Succeed, ACh
 				FTransform Transfrom = GetOwner()->GetActorTransform();
 				if (Behavior.bAttachToLocation)
 				{
-					UARPG_ActorFunctionLibrary::MoveCharacterToLocationFitGround(Invoker, Transfrom.TransformPosition(Behavior.Location), 1.f);
+					UARPG_ActorMoveUtils::MoveCharacterToLocationFitGround(Invoker, Transfrom.TransformPosition(Behavior.Location), {}, 1.f);
 				}
 				if (UARPG_CharacterBehaviorBase* TurnBehavior = Invoker->TurnTo(Transfrom.TransformRotation(Behavior.Rotation.Quaternion()).Rotator(), FOnCharacterBehaviorFinished::CreateUObject(this, &UARPG_InteractableActorManagerBase::WhenTurnFinished, Invoker, Behavior, OnInteractFinished)))
 				{

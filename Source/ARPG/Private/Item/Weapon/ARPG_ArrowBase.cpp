@@ -155,7 +155,7 @@ void AARPG_ArrowBase::Launch_Multicast_Implementation(float ForceSize)
 	{
 		SetItemCollisionProfileName(FARPG_CollisionProfile::ArrowReleasing);
 
-		UARPG_ProjectileMovementComponent* ProjectileMovementComponent = UARPG_ActorFunctionLibrary::AddComponent<UARPG_ProjectileMovementComponent>(this, TEXT("弓箭移动组件"));
+		UARPG_ProjectileMovementComponent* ProjectileMovementComponent = UARPG_ActorMoveUtils::AddComponent<UARPG_ProjectileMovementComponent>(this, TEXT("弓箭移动组件"));
 		ProjectileMovementComponent->IgnoreActors.Add(GetItemOwner());
 		ProjectileMovementComponent->Activate(true);
 		ProjectileMovementComponent->Velocity = GetActorForwardVector() * ForceSize;
