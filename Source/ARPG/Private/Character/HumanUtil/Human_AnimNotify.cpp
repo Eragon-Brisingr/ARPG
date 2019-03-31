@@ -13,7 +13,7 @@ void UARPG_DodgeAttack::NotifyTick(USkeletalMeshComponent* MeshComp, UAnimSequen
 {
 	if (AHumanBase* Human = Cast<AHumanBase>(MeshComp->GetOwner()))
 	{
-		if (Human->IsLocallyControlled())
+		if (Human->IsLocallyControlled() && Human->UseWeaponState != EUseWeaponState::NoneWeapon_Default)
 		{
 			if (UAnimMontage* CurPlayingMontage = Cast<UAnimMontage>(Animation))
 			{
