@@ -31,7 +31,8 @@ public class ARPG_Editor : ModuleRules
 			"XD_CampSystem",
             "XD_CampSystem_Editor",
             "XD_ItemSystem",
-            "XD_ItemSystem_Editor"
+            "XD_ItemSystem_Editor",
+            "XD_CharacterActionDispatcher",
         });
 
 		// Uncomment if you are using Slate UI

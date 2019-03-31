@@ -11,6 +11,12 @@ class ACharacterBase;
 /**
  * 
  */
+UCLASS(abstract)
+class ARPG_API UCB_ContainerBase : public UARPG_CharacterBehaviorBase
+{
+	GENERATED_BODY()
+};
+
 USTRUCT()
 struct FRandomSelectBehaviorElement
 {
@@ -20,55 +26,35 @@ public:
 	float Weight = 1.f;
 
 	UPROPERTY(EditAnywhere, Category = "容器", Instanced)
-	UARPG_CharacterBehaviorConfigBase* Behavior;
+	UARPG_CharacterBehaviorBase* Behavior;
 };
 
 UCLASS(meta = (DisplayName = "行为容器_随机选择"))
-class ARPG_API UCBC_RandomSelect : public UARPG_CharacterBehaviorConfigBase
+class ARPG_API UCB_RandomSelect : public UCB_ContainerBase
 {
 	GENERATED_BODY()
 public:
-	UCBC_RandomSelect();
-
 	UPROPERTY(EditAnywhere, Category = "容器")
 	TArray<FRandomSelectBehaviorElement> RandomBehaviors;
-};
 
-UCLASS()
-class ARPG_API UCB_RandomSelect : public UARPG_CharacterBehaviorConfigurable
-{
-	GENERATED_BODY()
+	void WhenBehaviorExecuted(class ACharacterBase* Executer) override;
+
+	void WhenBehaviorAborted(ACharacterBase* Executer) override;
 public:
-	void ExecuteBehavior(class ACharacterBase* Executer) override;
-
-	void AbortBehavior(ACharacterBase* Executer) override;
-public:
-	const UCBC_RandomSelect* GetConfig() const;
-
-	UARPG_CharacterBehaviorConfigBase* CurrentBehavior;
+	UARPG_CharacterBehaviorBase* CurrentBehavior;
 };
 
 UCLASS(meta = (DisplayName = "行为容器_顺序执行"))
-class ARPG_API UCBC_Sequence : public UARPG_CharacterBehaviorConfigBase
+class ARPG_API UCB_Sequence : public UCB_ContainerBase
 {
 	GENERATED_BODY()
 public:
-	UCBC_Sequence();
-
 	UPROPERTY(EditAnywhere, Category = "容器", Instanced)
-	TArray<UARPG_CharacterBehaviorConfigBase*> Behaviors;
-};
+	TArray<UARPG_CharacterBehaviorBase*> Behaviors;
 
-UCLASS()
-class ARPG_API UCB_Sequence : public UARPG_CharacterBehaviorConfigurable
-{
-	GENERATED_BODY()
-public:
-	void ExecuteBehavior(class ACharacterBase* Executer) override;
+	void WhenBehaviorExecuted(class ACharacterBase* Executer) override;
 
-	void AbortBehavior(ACharacterBase* Executer) override;
-
-	const UCBC_Sequence* GetConfig() const;
+	void WhenBehaviorAborted(ACharacterBase* Executer) override;
 
 	void WhenElementBehaviorFinished(bool Succeed, ACharacterBase* Executer);
 
@@ -81,35 +67,25 @@ public:
 };
 
 UCLASS(meta = (DisplayName = "行为容器_状态行为"))
-class ARPG_API UCBC_StateBehavior : public UARPG_CharacterBehaviorConfigBase
+class ARPG_API UCB_StateBehavior : public UCB_ContainerBase
 {
 	GENERATED_BODY()
 public:
-	UCBC_StateBehavior();
+	UPROPERTY(EditAnywhere, Category = "行为", Instanced)
+	UARPG_CharacterBehaviorBase* StartBehavior;
 
 	UPROPERTY(EditAnywhere, Category = "行为", Instanced)
-	UARPG_CharacterBehaviorConfigBase* StartBehavior;
+	UARPG_CharacterBehaviorBase* LoopBehavior;
 
 	UPROPERTY(EditAnywhere, Category = "行为", Instanced)
-	UARPG_CharacterBehaviorConfigBase* LoopBehavior;
+	UARPG_CharacterBehaviorBase* EndBehavior;
 
-	UPROPERTY(EditAnywhere, Category = "行为", Instanced)
-	UARPG_CharacterBehaviorConfigBase* EndBehavior;
-};
+	void WhenBehaviorExecuted(ACharacterBase* Executer) override;
 
-UCLASS()
-class ARPG_API UCB_StateBehavior : public UARPG_CharacterBehaviorConfigurable
-{
-	GENERATED_BODY()
-public:
-	void ExecuteBehavior(ACharacterBase* Executer) override;
-
-	void AbortBehavior(ACharacterBase* Executer) override;
+	void WhenBehaviorAborted(ACharacterBase* Executer) override;
 private:
 	UPROPERTY()
-	UARPG_CharacterBehaviorConfigBase* CurrentBehavior;
-
-	const UCBC_StateBehavior* GetConfig() const;
+	UARPG_CharacterBehaviorBase* CurrentBehavior;
 
 	void WhenStartBehaviorEnd(bool Succeed, ACharacterBase* Executer);
 

@@ -35,9 +35,11 @@ void UARPG_ActorMoveUtils::MoveComponentTo(USceneComponent* Component, const FVe
 				else
 				{
 					_Component->SetRelativeLocationAndRotation(TargetRelativeLocation, TargetRelativeRotation, Sweep);
+					MovingComponentMap.FindAndRemoveChecked(_Component).OnActorMoveFinished.ExecuteIfBound(false);
+					return false;
 				}
 			}
-			MovingComponentMap.FindAndRemoveChecked(_Component).OnActorMoveFinished.ExecuteIfBound(false);
+			MovingComponentMap.Remove(_Component);
 			return false;
 		}));
 		MovingComponentMap.FindOrAdd(Component) = FActorMoveData(TickerHandle, OnMoveFinished);
@@ -67,9 +69,11 @@ void UARPG_ActorMoveUtils::MoveComponentToLocation(USceneComponent* Component, c
 				else
 				{
 					_Component->SetRelativeLocation(TargetRelativeLocation, Sweep);
+					MovingComponentMap.FindAndRemoveChecked(_Component).OnActorMoveFinished.ExecuteIfBound(false);
+					return false;
 				}
 			}
-			MovingComponentMap.FindAndRemoveChecked(_Component).OnActorMoveFinished.ExecuteIfBound(false);
+			MovingComponentMap.Remove(_Component);
 			return false;
 		}));
 		MovingComponentMap.FindOrAdd(Component) = FActorMoveData(TickerHandle, OnMoveFinished);
@@ -99,9 +103,11 @@ void UARPG_ActorMoveUtils::MoveComponentToRotation(USceneComponent* Component, c
 				else
 				{
 					_Component->SetRelativeRotation(TargetRelativeRotation, Sweep);
+					MovingComponentMap.FindAndRemoveChecked(_Component).OnActorMoveFinished.ExecuteIfBound(false);
+					return false;
 				}
 			}
-			MovingComponentMap.FindAndRemoveChecked(_Component).OnActorMoveFinished.ExecuteIfBound(false);
+			MovingComponentMap.Remove(_Component);
 			return false;
 		}));
 		MovingComponentMap.FindOrAdd(Component) = FActorMoveData(TickerHandle, OnMoveFinished);
@@ -127,8 +133,13 @@ void UARPG_ActorMoveUtils::PushComponentTo(USceneComponent* Component, const FVe
 					_Component->AddWorldOffset(Distance * DeltaSeconds / OverTime, Sweep);
 					return true;
 				}
+				else
+				{
+					MovingComponentMap.FindAndRemoveChecked(_Component).OnActorMoveFinished.ExecuteIfBound(false);
+					return false;
+				}
 			}
-			MovingComponentMap.FindAndRemoveChecked(_Component).OnActorMoveFinished.ExecuteIfBound(false);
+			MovingComponentMap.Remove(_Component);
 			return false;
 		}));
 		MovingComponentMap.FindOrAdd(_Component) = FActorMoveData(TickerHandle, OnMoveFinished);
@@ -161,9 +172,11 @@ void UARPG_ActorMoveUtils::MoveActorTo(AActor* Actor, const FVector& Location, c
 				else
 				{
 					_Component->SetWorldLocationAndRotation(Location, Rotation, Sweep);
+					MovingComponentMap.FindAndRemoveChecked(_Component).OnActorMoveFinished.ExecuteIfBound(false);
+					return false;
 				}
 			}
-			MovingComponentMap.FindAndRemoveChecked(_Component).OnActorMoveFinished.ExecuteIfBound(false);
+			MovingComponentMap.Remove(_Component);
 			return false;
 		}));
 		MovingComponentMap.FindOrAdd(_Component) = FActorMoveData(TickerHandle, OnMoveFinished);
@@ -194,9 +207,11 @@ void UARPG_ActorMoveUtils::MoveActorToLocation(AActor* Actor, const FVector& Loc
 				else
 				{
 					_Component->SetWorldLocation(Location, Sweep);
+					MovingComponentMap.FindAndRemoveChecked(_Component).OnActorMoveFinished.ExecuteIfBound(false);
+					return false;
 				}
 			}
-			MovingComponentMap.FindAndRemoveChecked(_Component).OnActorMoveFinished.ExecuteIfBound(false);
+			MovingComponentMap.Remove(_Component);
 			return false;
 		}));
 		MovingComponentMap.FindOrAdd(Component) = FActorMoveData(TickerHandle, OnMoveFinished);
@@ -227,9 +242,11 @@ void UARPG_ActorMoveUtils::MoveActorToRotation(AActor* Actor, const FRotator& Ro
 				else
 				{
 					_Component->SetWorldRotation(Rotation, Sweep);
+					MovingComponentMap.FindAndRemoveChecked(_Component).OnActorMoveFinished.ExecuteIfBound(false);
+					return false;
 				}
 			}
-			MovingComponentMap.FindAndRemoveChecked(_Component).OnActorMoveFinished.ExecuteIfBound(false);
+			MovingComponentMap.Remove(_Component);
 			return false;
 		}));
 		MovingComponentMap.FindOrAdd(Component) = FActorMoveData(TickerHandle, OnMoveFinished);

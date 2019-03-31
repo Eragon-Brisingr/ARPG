@@ -11,7 +11,6 @@
 #include "ARPG_InteractableActorManager.generated.h"
 
 class ACharacterBase;
-class UARPG_CharacterBehaviorConfigBase;
 class UARPG_CharacterBehaviorBase;
 
 USTRUCT(BlueprintType, meta = (BlueprintInternalUseOnly = true))
@@ -20,7 +19,7 @@ struct FInteractBehavior : public FBehaviorWithPosition
 	GENERATED_BODY()
 public:
 	FVector GetWorldLocation(const UActorComponent* Component) const { return Component->GetOwner()->GetActorTransform().TransformPosition(Location); }
-	FRotator GetWorldRotator(const UActorComponent* Component) const { return Component->GetOwner()->GetActorTransform().TransformRotation(Rotation.Quaternion()).Rotator(); }
+	FRotator GetWorldRotation(const UActorComponent* Component) const { return Component->GetOwner()->GetActorTransform().TransformRotation(Rotation.Quaternion()).Rotator(); }
 };
 
 USTRUCT(BlueprintType)
@@ -64,11 +63,7 @@ public:
 private:
 	void WhenInteractFinished(bool Succeed, ACharacterBase* Invoker, FOnInteractFinished OnInteractFinished);
 
-	void WhenEnterReleaseState(bool Succeed, ACharacterBase* Invoker, const FInteractBehaviorConfig* InvokeConfig, const FInteractBehavior* InvokeBehavior, FOnInteractFinished OnInteractFinished);
-
-	void WhenMoveFinished(const FPathFollowingResult& Result, ACharacterBase* Invoker, const FInteractBehaviorConfig* InvokeConfig, const FInteractBehavior* InvokeBehavior, FOnInteractFinished OnInteractFinished);
-
-	void WhenTurnFinished(bool Succeed, ACharacterBase* Invoker, FInteractBehavior BehaviorConfig, FOnInteractFinished OnInteractFinished);
+	void StartInteractImpl(ACharacterBase* Invoker, const FInteractBehavior* InvokeBehavior, const FInteractBehaviorConfig* InvokeConfig, const FOnInteractFinished &OnInteractFinished);
 
 	void WhenBehaviorAbortFinished(ACharacterBase* Invoker, FOnInteractAbortFinished OnInteractAbortFinished);
 

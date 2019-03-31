@@ -2,23 +2,18 @@
 
 #include "ARPG_CharacterBehaviorContainer.h"
 
-UCBC_RandomSelect::UCBC_RandomSelect()
-{
-	BehaviorType = UCB_RandomSelect::StaticClass();
-}
-
-void UCB_RandomSelect::ExecuteBehavior(class ACharacterBase* Executer)
+void UCB_RandomSelect::WhenBehaviorExecuted(class ACharacterBase* Executer)
 {
 	CurrentBehavior = nullptr;
 
 	float TotalWeight = 0;
-	for (const FRandomSelectBehaviorElement& Element : GetConfig()->RandomBehaviors)
+	for (const FRandomSelectBehaviorElement& Element : RandomBehaviors)
 	{
 		TotalWeight += Element.Weight;
 	}
 
 	float RandomRes = FMath::FRand() * TotalWeight;
-	for (const FRandomSelectBehaviorElement& Element : GetConfig()->RandomBehaviors)
+	for (const FRandomSelectBehaviorElement& Element : RandomBehaviors)
 	{
 		RandomRes -= Element.Weight;
 		if (RandomRes < 0.f)
@@ -38,7 +33,7 @@ void UCB_RandomSelect::ExecuteBehavior(class ACharacterBase* Executer)
 	}
 }
 
-void UCB_RandomSelect::AbortBehavior(ACharacterBase* Executer)
+void UCB_RandomSelect::WhenBehaviorAborted(ACharacterBase* Executer)
 {
 	if (CurrentBehavior)
 	{
@@ -50,38 +45,23 @@ void UCB_RandomSelect::AbortBehavior(ACharacterBase* Executer)
 	}
 }
 
-const UCBC_RandomSelect* UCB_RandomSelect::GetConfig() const
-{
-	return UARPG_CharacterBehaviorConfigurable::GetConfig<UCBC_RandomSelect>();
-}
-
-UCBC_Sequence::UCBC_Sequence()
-{
-	BehaviorType = UCB_Sequence::StaticClass();
-}
-
-void UCB_Sequence::ExecuteBehavior(class ACharacterBase* Executer)
+void UCB_Sequence::WhenBehaviorExecuted(class ACharacterBase* Executer)
 {
 	ExecuteIndex = 0;
 	ExecuteElement(Executer);
 }
 
-void UCB_Sequence::AbortBehavior(ACharacterBase* Executer)
+void UCB_Sequence::WhenBehaviorAborted(ACharacterBase* Executer)
 {
-	if (ExecuteIndex < GetConfig()->Behaviors.Num())
+	if (ExecuteIndex < Behaviors.Num())
 	{
-		if (UARPG_CharacterBehaviorConfigBase* Behavior = GetConfig()->Behaviors[ExecuteIndex])
+		if (UARPG_CharacterBehaviorBase* Behavior = Behaviors[ExecuteIndex])
 		{
 			Behavior->AbortBehavior(Executer, FOnCharacterBehaviorAbortFinished::CreateUObject(this, &UCB_Sequence::WhenElementBehaviorAbortFinished));
 			return;
 		}
 	}
 	FinishAbort();
-}
-
-const UCBC_Sequence* UCB_Sequence::GetConfig() const
-{
-	return UARPG_CharacterBehaviorConfigurable::GetConfig<UCBC_Sequence>();
 }
 
 void UCB_Sequence::WhenElementBehaviorFinished(bool Succeed, ACharacterBase* Executer)
@@ -104,9 +84,9 @@ void UCB_Sequence::WhenElementBehaviorAbortFinished()
 
 void UCB_Sequence::ExecuteElement(ACharacterBase* Executer)
 {
-	if (ExecuteIndex < GetConfig()->Behaviors.Num())
+	if (ExecuteIndex < Behaviors.Num())
 	{
-		if (UARPG_CharacterBehaviorConfigBase* Behavior = GetConfig()->Behaviors[ExecuteIndex])
+		if (UARPG_CharacterBehaviorBase* Behavior = Behaviors[ExecuteIndex])
 		{
 			Behavior->ExecuteBehavior(Executer, FOnCharacterBehaviorFinished::CreateUObject(this, &UCB_Sequence::WhenElementBehaviorFinished, Executer));
 		}
@@ -121,14 +101,10 @@ void UCB_Sequence::ExecuteElement(ACharacterBase* Executer)
 	}
 }
 
-UCBC_StateBehavior::UCBC_StateBehavior()
+void UCB_StateBehavior::WhenBehaviorExecuted(class ACharacterBase* Executer)
 {
-	BehaviorType = UCB_StateBehavior::StaticClass();
-}
-
-void UCB_StateBehavior::ExecuteBehavior(class ACharacterBase* Executer)
-{
-	if (CurrentBehavior = GetConfig()->StartBehavior, CurrentBehavior)
+	CurrentBehavior = StartBehavior;
+	if (CurrentBehavior)
 	{
 		CurrentBehavior->ExecuteBehavior(Executer, FOnCharacterBehaviorFinished::CreateUObject(this, &UCB_StateBehavior::WhenStartBehaviorEnd, Executer));
 	}
@@ -138,7 +114,7 @@ void UCB_StateBehavior::ExecuteBehavior(class ACharacterBase* Executer)
 	}
 }
 
-void UCB_StateBehavior::AbortBehavior(ACharacterBase* Executer)
+void UCB_StateBehavior::WhenBehaviorAborted(ACharacterBase* Executer)
 {
 	if (CurrentBehavior)
 	{
@@ -150,14 +126,10 @@ void UCB_StateBehavior::AbortBehavior(ACharacterBase* Executer)
 	}
 }
 
-const UCBC_StateBehavior* UCB_StateBehavior::GetConfig() const
-{
-	return UARPG_CharacterBehaviorConfigurable::GetConfig<UCBC_StateBehavior>();
-}
-
 void UCB_StateBehavior::WhenStartBehaviorEnd(bool Succeed, ACharacterBase* Executer)
 {
-	if (CurrentBehavior = GetConfig()->LoopBehavior, CurrentBehavior)
+	CurrentBehavior = LoopBehavior;
+	if (CurrentBehavior)
 	{
 		CurrentBehavior->ExecuteBehavior(Executer, FOnCharacterBehaviorFinished::CreateUObject(this, &UCB_StateBehavior::WhenLoopBehaviorEnd, Executer));
 	}
@@ -187,7 +159,7 @@ void UCB_StateBehavior::WhenEndBehaviorEnd(bool Succeed, ACharacterBase* Execute
 
 void UCB_StateBehavior::WhenAbortBehaviorEnd(ACharacterBase* Executer)
 {
-	CurrentBehavior = GetConfig()->EndBehavior;
+	CurrentBehavior = EndBehavior;
 	if (CurrentBehavior)
 	{
 		CurrentBehavior->ExecuteBehavior(Executer, FOnCharacterBehaviorFinished::CreateUObject(this, &UCB_StateBehavior::WhenEndBehaviorEnd, Executer));

@@ -19,7 +19,7 @@ public:
 	UBTTask_CharacterBehavior();
 
 	UPROPERTY(EditAnywhere, Category = "行为", Instanced)
-	class UARPG_CharacterBehaviorConfigBase* Behavior;
+	class UARPG_CharacterBehaviorBase* Behavior;
 
 	UPROPERTY(EditAnywhere, Category = "行为")
 	FVector Location;

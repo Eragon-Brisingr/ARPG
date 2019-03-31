@@ -42,57 +42,73 @@ void UARPG_InteractableActorManagerBase::StartInteract(ACharacterBase* Invoker, 
 {
 	if (CanInteract(Invoker))
 	{
-		if (bForceEnterReleaseState && Invoker->IsInReleaseState() == false && Invoker->EnterReleaseStateAction)
-		{
-			Invoker->EnterReleaseState({});
-		}
-
 		const FInteractBehaviorConfig* ValidConfig = nullptr;
 		const FInteractBehavior* ValidBehavior = nullptr;
 		GetBehavior(Invoker, ValidConfig, ValidBehavior);
-		if (ValidConfig && ValidBehavior)
-		{
-			FVector WorldLocation = ValidBehavior->GetWorldLocation(this);
-			UARPG_MoveUtils::ARPG_MoveToLocation(Invoker, WorldLocation, FOnARPG_MoveFinished::CreateUObject(this, &UARPG_InteractableActorManagerBase::WhenMoveFinished, Invoker, ValidConfig, ValidBehavior,
-				FOnInteractFinished::CreateUObject(this, &UARPG_InteractableActorManagerBase::WhenInteractFinished, Invoker, OnInteractFinished)), 1.f);
-			return;
-		}
-	}
-	OnInteractFinished.ExecuteIfBound(false);
-}
 
-void UARPG_InteractableActorManagerBase::WhenMoveFinished(const FPathFollowingResult& Result, ACharacterBase* Invoker, const FInteractBehaviorConfig* InvokeConfig, const FInteractBehavior* InvokeBehavior, FOnInteractFinished OnInteractFinished)
-{
-	//TODO 考虑动态物体 计算距离 (InvokeBehavior->GetWorldLocation(this) - Invoker->GetActorLocation())
-	if (InvokeConfig->User == nullptr && Result.Code == EPathFollowingResult::Success)
-	{
+		// TODO 之后修改为CreateWeakLamdba
+		TWeakObjectPtr<UARPG_InteractableActorManagerBase> WeakSelf = this;
+		auto MoveToAndInteract = [=]()
+		{
+			auto OnMoveFinished = FOnARPG_MoveFinished::CreateLambda([=](const FPathFollowingResult& Result)
+			{
+				if (WeakSelf.IsValid() == false)
+				{
+					return;
+				}
+
+				//TODO 考虑动态物体 计算距离 (InvokeBehavior->GetWorldLocation(this) - Invoker->GetActorLocation())
+				if (ValidConfig->User == nullptr && Result.Code == EPathFollowingResult::Success)
+				{
+					StartInteractImpl(Invoker, ValidBehavior, ValidConfig, OnInteractFinished);
+				}
+				else
+				{
+					OnInteractFinished.ExecuteIfBound(false);
+				}
+			});
+
+			if (ValidConfig && ValidBehavior)
+			{
+				FVector WorldLocation = ValidBehavior->GetWorldLocation(this);
+				if (ValidBehavior->bAttachToRotation)
+				{
+					FRotator WorldRotation = ValidBehavior->GetWorldRotation(this);
+					UARPG_MoveUtils::ARPG_MoveToLocationAndTurn(Invoker, WorldLocation, WorldRotation, OnMoveFinished);
+				}
+				else
+				{
+					UARPG_MoveUtils::ARPG_MoveToLocation(Invoker, WorldLocation, OnMoveFinished);
+				}
+				return;
+			}
+		};
+
 		if (bForceEnterReleaseState && Invoker->IsInReleaseState() == false && Invoker->EnterReleaseStateAction)
 		{
-			FOnInteractFinished FOnEnterReleaseState = FOnInteractFinished::CreateUObject(this, &UARPG_InteractableActorManagerBase::WhenEnterReleaseState, Invoker, InvokeConfig, InvokeBehavior, OnInteractFinished);
-			if (Invoker->EnterReleaseStateAction->bIsExecuting)
+			Invoker->EnterReleaseState(FOnCharacterBehaviorFinished::CreateLambda([=](bool Succeed)
 			{
-				Invoker->EnterReleaseStateAction->OnBehaviorFinished = FOnEnterReleaseState;
-			}
-			else
-			{
-				CurBehaviorMap.FindOrAdd(Invoker) = Invoker->EnterReleaseState(FOnEnterReleaseState);
-			}
+				if (WeakSelf.IsValid() == false)
+				{
+					return;
+				}
+
+				if (Succeed)
+				{
+					MoveToAndInteract();
+				}
+				else
+				{
+					OnInteractFinished.ExecuteIfBound(false);
+				}
+			}));
 		}
 		else
 		{
-			WhenEnterReleaseState(true, Invoker, InvokeConfig, InvokeBehavior, OnInteractFinished);
+			MoveToAndInteract();
 		}
 	}
-	else
-	{
-		OnInteractFinished.ExecuteIfBound(false);
-	}
-}
-
-void UARPG_InteractableActorManagerBase::WhenTurnFinished(bool Succeed, ACharacterBase* Invoker, FInteractBehavior BehaviorConfig, FOnInteractFinished OnInteractFinished)
-{
-	UARPG_CharacterBehaviorConfigurable* Behavior = BehaviorConfig.RelativePositionExecuteBehavior(Invoker, OnInteractFinished, GetOwner());
-	CurBehaviorMap.FindOrAdd(Invoker) = Behavior;
+	OnInteractFinished.ExecuteIfBound(false);
 }
 
 void UARPG_InteractableActorManagerBase::WhenInteractFinished(bool Succeed, ACharacterBase* Invoker, FOnInteractFinished OnInteractFinished)
@@ -101,37 +117,16 @@ void UARPG_InteractableActorManagerBase::WhenInteractFinished(bool Succeed, ACha
 	ExecuteWhenEndInteract(Invoker, Succeed);
 }
 
-void UARPG_InteractableActorManagerBase::WhenEnterReleaseState(bool Succeed, ACharacterBase* Invoker, const FInteractBehaviorConfig* InvokeConfig, const FInteractBehavior* InvokeBehavior, FOnInteractFinished OnInteractFinished)
+void UARPG_InteractableActorManagerBase::StartInteractImpl(ACharacterBase* Invoker, const FInteractBehavior* InvokeBehavior, const FInteractBehaviorConfig* InvokeConfig, const FOnInteractFinished &OnInteractFinished)
 {
-	if (Succeed && CanInteract(Invoker))
+	const FInteractBehavior& Behavior = *InvokeBehavior;
+	if (Behavior.Behavior)
 	{
-		const FInteractBehavior& Behavior = *InvokeBehavior;
-		if (Behavior.Behavior)
-		{
-			InteractActorBeginSetCollision(Invoker);
-			ExecuteWhenBeginInteract(Invoker, const_cast<FInteractBehaviorConfig&>(*InvokeConfig));
-			if (Behavior.bAttachToRotation && Invoker->CharacterTurnAction && Invoker->CanPlayTurnMontage())
-			{
-				FTransform Transfrom = GetOwner()->GetActorTransform();
-				if (Behavior.bAttachToLocation)
-				{
-					UARPG_ActorMoveUtils::MoveCharacterToLocationFitGround(Invoker, Transfrom.TransformPosition(Behavior.Location), {}, 1.f);
-				}
-				if (UARPG_CharacterBehaviorBase* TurnBehavior = Invoker->TurnTo(Transfrom.TransformRotation(Behavior.Rotation.Quaternion()).Rotator(), FOnCharacterBehaviorFinished::CreateUObject(this, &UARPG_InteractableActorManagerBase::WhenTurnFinished, Invoker, Behavior, OnInteractFinished)))
-				{
-					CurBehaviorMap.FindOrAdd(Invoker) = TurnBehavior;
-				}
-			}
-			else
-			{
-				WhenTurnFinished(true, Invoker, Behavior, OnInteractFinished);
-			}
-			return;
-		}
-	}
-	else
-	{
-		OnInteractFinished.ExecuteIfBound(false);
+		InteractActorBeginSetCollision(Invoker);
+		ExecuteWhenBeginInteract(Invoker, const_cast<FInteractBehaviorConfig&>(*InvokeConfig));
+
+		CurBehaviorMap.FindOrAdd(Invoker) = Behavior.RelativePositionExecuteBehavior(Invoker, FOnInteractFinished::CreateUObject(this, &UARPG_InteractableActorManagerBase::WhenInteractFinished, Invoker, OnInteractFinished), GetOwner());
+		return;
 	}
 }
 

@@ -8,34 +8,35 @@
 #include "ARPG_CharacterBehaviorType.h"
 #include "ARPG_CharacterBehaviorBase.generated.h"
 
-class UARPG_CharacterBehaviorConfigBase;
-
 /**
- *  执行行为时切记调用ExecuteInit
+ *  
  */
-UCLASS(abstract)
+UCLASS(abstract, EditInlineNew, collapsecategories, Blueprintable)
 class ARPG_API UARPG_CharacterBehaviorBase : public UObject
 {
 	GENERATED_BODY()
 public:
 	UWorld* GetWorld() const override;
-
 public:
 	UPROPERTY(BlueprintReadOnly, Category = "行为")
 	class ACharacterBase* Character;
 
 	UPROPERTY(BlueprintReadOnly, Category = "行为")
 	uint8 bIsExecuting : 1;
+public:
+	void ExecuteBehavior(class ACharacterBase* Executer, const FOnCharacterBehaviorFinished& WhenBehaviorFinished);
 
-	void ExecuteInit(class ACharacterBase* Executer, const FOnCharacterBehaviorFinished& OnBehaviorFinished);
-
-	void AbortBehavior(class ACharacterBase* Executer, const FOnCharacterBehaviorAbortFinished& OnBehaviorAbortFinished);
+	void AbortBehavior(class ACharacterBase* Executer, const FOnCharacterBehaviorAbortFinished& WhenBehaviorAbortFinished);
 protected:
-	virtual void AbortBehavior(class ACharacterBase* Executer) { ReceiveAbortBehavior(Executer); }
-	UFUNCTION(BlueprintNativeEvent, Category = "行为", meta = (DisplayName = "AbortBehavior"))
-	void ReceiveAbortBehavior(class ACharacterBase* Executer);
-	void ReceiveAbortBehavior_Implementation(class ACharacterBase* Executer) { OnBehaviorAbortFinished.ExecuteIfBound(); }
+	virtual void WhenBehaviorExecuted(class ACharacterBase* Executer) { ReceiveWhenBehaviorExecuted(Executer); }
+	UFUNCTION(BlueprintImplementableEvent, Category = "行为", meta = (DisplayName = "WhenBehaviorExecuted"))
+	void ReceiveWhenBehaviorExecuted(class ACharacterBase* Executer);
 
+protected:
+	virtual void WhenBehaviorAborted(class ACharacterBase* Executer) { ReceiveWhenBehaviorAborted(Executer); }
+	UFUNCTION(BlueprintNativeEvent, Category = "行为", meta = (DisplayName = "WhenBehaviorAborted"))
+	void ReceiveWhenBehaviorAborted(class ACharacterBase* Executer);
+	void ReceiveWhenBehaviorAborted_Implementation(class ACharacterBase* Executer) { OnBehaviorAbortFinished.ExecuteIfBound(); }
 public:
 	UFUNCTION(BlueprintCallable, Category = "行为")
 	void FinishExecute(bool Succeed);
@@ -46,6 +47,8 @@ public:
 	void FinishAbort();
 
 	FOnCharacterBehaviorAbortFinished OnBehaviorAbortFinished;
+
+	virtual FString GetDescribe() const;
 };
 
 USTRUCT(BlueprintType)
@@ -54,46 +57,5 @@ struct ARPG_API FCharacterBehavior
 	GENERATED_BODY()
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "行为", Instanced)
-	class UARPG_CharacterBehaviorConfigBase* Behavior = nullptr;
-};
-
-UCLASS(abstract, Blueprintable)
-class ARPG_API UARPG_CharacterBehaviorConfigurable : public UARPG_CharacterBehaviorBase
-{
-	GENERATED_BODY()
-		
-	friend class UARPG_CharacterBehaviorConfigBase;
-public:
-	UPROPERTY(BlueprintReadOnly, Category = "行为")
-	const UARPG_CharacterBehaviorConfigBase* Config;
-
-protected:
-	virtual void ExecuteBehavior(class ACharacterBase* Executer) { ReceiveExecuteBehavior(Executer); }
-	UFUNCTION(BlueprintImplementableEvent, Category = "行为", meta = (DisplayName = "ExecuteBehavior"))
-	void ReceiveExecuteBehavior(class ACharacterBase* Executer);
-
-public:
-	template<typename T>
-	const T* GetConfig() const { return Cast<const T>(Config); }
-
-	UFUNCTION(BlueprintCallable, Category = "行为", meta = (DeterminesOutputType = "ConfigType"))
-	UARPG_CharacterBehaviorConfigBase* GetConfig(TSubclassOf<UARPG_CharacterBehaviorConfigBase> ConfigType) const { return const_cast<UARPG_CharacterBehaviorConfigBase*>(Config); }
-};
-
-UCLASS(abstract, EditInlineNew, collapsecategories, Blueprintable)
-class ARPG_API UARPG_CharacterBehaviorConfigBase : public UObject
-{
-	GENERATED_BODY()
-public:
-	UPROPERTY(EditDefaultsOnly, Category = "配置", Transient)
-	TSubclassOf<UARPG_CharacterBehaviorConfigurable> BehaviorType;
-
-	UPROPERTY()
-	mutable TMap<class ACharacterBase*, class UARPG_CharacterBehaviorConfigurable*> BehaviorMap;
-
-	UARPG_CharacterBehaviorConfigurable* ExecuteBehavior(class ACharacterBase* Character, const FOnCharacterBehaviorFinished& OnBehaviorFinished) const;
-
-	void AbortBehavior(class ACharacterBase* Character, const FOnCharacterBehaviorAbortFinished& OnBehaviorAbortFinished);
-
-	virtual FString GetDescribe() const;
+	class UARPG_CharacterBehaviorBase* Behavior = nullptr;
 };
