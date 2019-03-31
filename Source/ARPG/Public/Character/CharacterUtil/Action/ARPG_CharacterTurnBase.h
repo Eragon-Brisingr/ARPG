@@ -18,23 +18,27 @@ class ARPG_API UCA_CharacterTurnBase : public UARPG_CharacterBehaviorBase
 {
 	GENERATED_BODY()
 public:
-	bool TurnTo(ACharacterBase* Executer, const FRotator& TargetWorldRotation, const FOnCharacterBehaviorFinished& OnCharacterTurnFinished);
+	void TurnTo(ACharacterBase* Executer, const FRotator& TargetWorldRotation, const FOnCharacterBehaviorFinished& OnCharacterTurnFinished);
 
 	void AbortTurnTo(ACharacterBase* Executer, const FOnCharacterBehaviorAbortFinished& OnCharacterBehaviorAbortFinished);
+protected:
+	UPROPERTY(EditAnywhere, Category = "行为")
+	FRotator TurnToRotation;
+
+	void WhenBehaviorExecuted(class ACharacterBase* Executer) override;
+	void WhenBehaviorAborted(ACharacterBase* Executer) override;
 
 	virtual UAnimMontage* GetTurnMontage(ACharacterBase* Executer, const FRotator& TargetWorldRotation) { return ReceiveGetTurnMontage(Executer, TargetWorldRotation); }
 	UFUNCTION(BlueprintImplementableEvent, Category = "角色|动作", meta = (DisplayName = "GetTurnMontage"))
 	UAnimMontage* ReceiveGetTurnMontage(ACharacterBase* Executer, const FRotator& TargetWorldRotation);
 
 	void WhenMontageBlendOutStart(UAnimMontage* Montage, bool bInterrupted);
-protected:
+
 	UFUNCTION(BlueprintCallable, Category = "角色|动作")
 	UAnimMontage* GetTurnMontageFourDirection(const FRotator& CurrentWorldRotation, const FRotator& TargetWorldRotation, UAnimMontage* TurnLeft90, UAnimMontage* TurnRight90, UAnimMontage* TurnLeft180, UAnimMontage* TurnRight180);
 
 	UPROPERTY()
 	UAnimMontage* CurrentTurnMontage;
-
-	void AbortBehavior(ACharacterBase* Executer) override;
 };
 
 UCLASS(meta = (DisplayName = "转身_普通"))

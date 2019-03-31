@@ -26,7 +26,8 @@ EBTNodeResult::Type UBTTask_ARPG_FollowPathMove::ExecuteTask(UBehaviorTreeCompon
 
 			FollowPathMoveMemory->TargetPointIndex = FollowPathMoveConfig.GetDefaultObject()->GetStartFollowPathMoveIndex(Character, Path.Get(), FollowPathMoveMemory->TargetPointIndex);
 			FollowPathMoveMemory->TargetPointIndex %= Path->NavPathPoints.Num();
-			UARPG_MoveUtils::ARPG_MoveToLocation(Character, Path->NavPathPoints[FollowPathMoveMemory->TargetPointIndex].Location, FOnARPG_MoveFinished::CreateUObject(this, &UBTTask_ARPG_FollowPathMove::WhenMoveFinished, &OwnerComp, FollowPathMoveMemory), AcceptableRadius, false, true, true, true, FilterClass, false);
+
+			MoveToNavPoint(Path->NavPathPoints[FollowPathMoveMemory->TargetPointIndex], Character, OwnerComp, FollowPathMoveMemory);
 			return EBTNodeResult::InProgress;
 		}
 	}
@@ -91,24 +92,13 @@ void UBTTask_ARPG_FollowPathMove::WhenMoveFinished(const FPathFollowingResult& R
 				}
 
 				const FARPG_NavPathPoint& CurPoint = Path->NavPathPoints[CurIndex];
-				if (CurPoint.Behavior && Character->CanPlayTurnMontage())
+				if (CurPoint.Behavior)
 				{
-					if (CurPoint.bAttachToRotation && Character->CharacterTurnAction)
-					{
-						if (CurPoint.bAttachToLocation)
-						{
-							UARPG_ActorMoveUtils::MoveCharacterToLocationFitGround(Character, CurPoint.Location, {}, 1.f);
-						}
-						FollowPathMoveMemory->CurBehavior = Character->TurnTo(CurPoint.Rotation, FOnCharacterBehaviorFinished::CreateUObject(this, &UBTTask_ARPG_FollowPathMove::WhenTurnFinished, Character, CurPoint, OwnerComp, FollowPathMoveMemory));
-					}
-					else
-					{
-						WhenTurnFinished(true, Character, CurPoint, OwnerComp, FollowPathMoveMemory);
-					}
+					FollowPathMoveMemory->CurBehavior = CurPoint.WorldPositionExecuteBehavior(Character, FOnCharacterBehaviorFinished::CreateUObject(this, &UBTTask_ARPG_FollowPathMove::WhenBehaviorFinished, OwnerComp, FollowPathMoveMemory));
 				}
 				else
 				{
-					UARPG_MoveUtils::ARPG_MoveToLocation(Character, Path->NavPathPoints[FollowPathMoveMemory->TargetPointIndex].Location, FOnARPG_MoveFinished::CreateUObject(this, &UBTTask_ARPG_FollowPathMove::WhenMoveFinished, OwnerComp, FollowPathMoveMemory), AcceptableRadius, false, true, true, true, FilterClass, false);
+					MoveToNavPoint(Path->NavPathPoints[FollowPathMoveMemory->TargetPointIndex], Character, *OwnerComp, FollowPathMoveMemory);
 				}
 			}
 		}
@@ -119,11 +109,6 @@ void UBTTask_ARPG_FollowPathMove::WhenMoveFinished(const FPathFollowingResult& R
 	}
 }
 
-void UBTTask_ARPG_FollowPathMove::WhenTurnFinished(bool Succeed, ACharacterBase* Character, FARPG_NavPathPoint CurPoint, UBehaviorTreeComponent* OwnerComp, FARPG_FollowPathMoveMemory* FollowPathMoveMemory)
-{
-	FollowPathMoveMemory->CurBehavior = CurPoint.WorldPositionExecuteBehavior(Character, FOnCharacterBehaviorFinished::CreateUObject(this, &UBTTask_ARPG_FollowPathMove::WhenBehaviorFinished, OwnerComp, FollowPathMoveMemory));
-}
-
 void UBTTask_ARPG_FollowPathMove::WhenBehaviorFinished(bool Succeed, UBehaviorTreeComponent* OwnerComp, FARPG_FollowPathMoveMemory* FollowPathMoveMemory)
 {
 	AAIController * MyController = OwnerComp->GetAIOwner();
@@ -132,7 +117,7 @@ void UBTTask_ARPG_FollowPathMove::WhenBehaviorFinished(bool Succeed, UBehaviorTr
 		if (Path)
 		{
 			FollowPathMoveMemory->CurBehavior = nullptr;
-			UARPG_MoveUtils::ARPG_MoveToLocation(Character, Path->NavPathPoints[FollowPathMoveMemory->TargetPointIndex].Location, FOnARPG_MoveFinished::CreateUObject(this, &UBTTask_ARPG_FollowPathMove::WhenMoveFinished, OwnerComp, FollowPathMoveMemory), AcceptableRadius, false, true, true, true, FilterClass, false);
+			MoveToNavPoint(Path->NavPathPoints[FollowPathMoveMemory->TargetPointIndex], Character, *OwnerComp, FollowPathMoveMemory);
 		}
 		else
 		{
@@ -146,6 +131,18 @@ void UBTTask_ARPG_FollowPathMove::WhenBehaviorAborted(UBehaviorTreeComponent* Ow
 	FARPG_FollowPathMoveMemory* FollowPathMoveMemory = reinterpret_cast<FARPG_FollowPathMoveMemory*>(NodeMemory);
 	FollowPathMoveMemory->CurBehavior = nullptr;
 	FinishLatentAbort(*OwnerComp);
+}
+
+void UBTTask_ARPG_FollowPathMove::MoveToNavPoint(const FARPG_NavPathPoint &NavPoint, ACharacterBase* Character, UBehaviorTreeComponent& OwnerComp, FARPG_FollowPathMoveMemory* FollowPathMoveMemory)
+{
+	if (NavPoint.bAttachToRotation)
+	{
+		UARPG_MoveUtils::ARPG_MoveToLocationAndTurn(Character, NavPoint.Location, NavPoint.Rotation, FOnARPG_MoveFinished::CreateUObject(this, &UBTTask_ARPG_FollowPathMove::WhenMoveFinished, &OwnerComp, FollowPathMoveMemory), NavPoint.GetAcceptableRadius(), false, true, true, true, FilterClass, false);
+	}
+	else
+	{
+		UARPG_MoveUtils::ARPG_MoveToLocation(Character, NavPoint.Location, FOnARPG_MoveFinished::CreateUObject(this, &UBTTask_ARPG_FollowPathMove::WhenMoveFinished, &OwnerComp, FollowPathMoveMemory), NavPoint.GetAcceptableRadius(), false, true, true, true, FilterClass, false);
+	}
 }
 
 int32 UARPG_FollowPathMoveConfigBase::GetStartFollowPathMoveIndex(ACharacterBase* Mover, class AARPG_NavPath* Path, int32 RememberIndex) const

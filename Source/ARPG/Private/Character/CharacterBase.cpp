@@ -508,16 +508,14 @@ bool ACharacterBase::CanPlayTurnMontage() const
 	return GetMesh()->GetAnimInstance()->GetSlotMontageGlobalWeight(TurnSlotName) == 0.f && IsPlayingRootMotion() == false;
 }
 
-UARPG_CharacterBehaviorBase* ACharacterBase::TurnTo(const FRotator& TargetWorldRotation, const FOnCharacterBehaviorFinished& OnCharacterBehaviorFinished)
+bool ACharacterBase::TurnTo(const FRotator& TargetWorldRotation, const FOnCharacterBehaviorFinished& OnCharacterBehaviorFinished)
 {
 	if (CanPlayTurnMontage())
 	{
 		if (CharacterTurnAction)
 		{
-			if (CharacterTurnAction->TurnTo(this, TargetWorldRotation, OnCharacterBehaviorFinished))
-			{
-				return CharacterTurnAction;
-			}
+			CharacterTurnAction->TurnTo(this, TargetWorldRotation, OnCharacterBehaviorFinished);
+			return true;
 		}
 		else
 		{
@@ -525,10 +523,10 @@ UARPG_CharacterBehaviorBase* ACharacterBase::TurnTo(const FRotator& TargetWorldR
 			OnCharacterBehaviorFinished.ExecuteIfBound(true);
 		}
 	}
-	return nullptr;
+	return false;
 }
 
-UARPG_CharacterBehaviorBase* ACharacterBase::TurnTo(const FRotator& TargetWorldRotation)
+bool ACharacterBase::TurnTo(const FRotator& TargetWorldRotation)
 {
 	return TurnTo(TargetWorldRotation, {});
 }

@@ -5,7 +5,7 @@
 #include "Components/SkeletalMeshComponent.h"
 #include "Animation/AnimInstance.h"
 
-void UHuman_EnterReleaseState::ExecuteEnterReleaseState(ACharacterBase* Executer)
+void UHuman_EnterReleaseState::WhenBehaviorExecuted(ACharacterBase* Executer)
 {
 	if (AHumanBase* Human = Cast<AHumanBase>(Executer))
 	{
@@ -22,7 +22,7 @@ void UHuman_EnterReleaseState::ExecuteEnterReleaseState(ACharacterBase* Executer
 	FinishExecute(false);
 }
 
-void UHuman_EnterReleaseState::AbortBehavior(class ACharacterBase* Executer)
+void UHuman_EnterReleaseState::WhenBehaviorAborted(class ACharacterBase* Executer)
 {
 	Executer->ClearMontageBlendingOutDelegate(CurMontage);
 	FinishAbort();

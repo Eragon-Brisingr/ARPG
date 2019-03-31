@@ -531,9 +531,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "角色|动作")
 	bool CanPlayTurnMontage() const;
 
-	UARPG_CharacterBehaviorBase* TurnTo(const FRotator& TargetWorldRotation, const FOnCharacterBehaviorFinished& OnCharacterBehaviorFinished);
+	bool TurnTo(const FRotator& TargetWorldRotation, const FOnCharacterBehaviorFinished& OnCharacterBehaviorFinished);
 	UFUNCTION(BlueprintCallable, Category = "角色|动作")
-	UARPG_CharacterBehaviorBase* TurnTo(const FRotator& TargetWorldRotation);
+	bool TurnTo(const FRotator& TargetWorldRotation);
 
 public:
 	void ForceSetClientWorldLocation(const FVector& Location);

@@ -31,23 +31,22 @@ public:
 	UPROPERTY(Category = "寻路", EditAnywhere)
 	TSubclassOf<class UARPG_FollowPathMoveConfigBase> FollowPathMoveConfig;
 
-	UPROPERTY(Category = "寻路", EditAnywhere, meta=(ClampMin = "0.0", UIMin="0.0"))
-	float AcceptableRadius = 5.f;
-
 	UPROPERTY(Category = "寻路", EditAnywhere)
 	TSubclassOf<UNavigationQueryFilter> FilterClass;
 
 	virtual EBTNodeResult::Type ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) override;
+
 	virtual EBTNodeResult::Type AbortTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) override;
 	virtual uint16 GetInstanceMemorySize() const override { return sizeof(FARPG_FollowPathMoveMemory); }
 
 	void WhenMoveFinished(const FPathFollowingResult& Result, UBehaviorTreeComponent* OwnerComp, FARPG_FollowPathMoveMemory* FollowPathMoveMemory);
 
-	void WhenTurnFinished(bool Succeed, ACharacterBase* Character, FARPG_NavPathPoint CurPoint, UBehaviorTreeComponent* OwnerComp, FARPG_FollowPathMoveMemory* FollowPathMoveMemory);
-
 	void WhenBehaviorFinished(bool Succeed, UBehaviorTreeComponent* OwnerComp, FARPG_FollowPathMoveMemory* FollowPathMoveMemory);
 
 	void WhenBehaviorAborted(UBehaviorTreeComponent* OwnerComp, uint8* NodeMemory);
+protected:
+	void MoveToNavPoint(const FARPG_NavPathPoint &NavPoint, ACharacterBase* Character, UBehaviorTreeComponent& OwnerComp, FARPG_FollowPathMoveMemory* FollowPathMoveMemory);
+
 };
 
 UCLASS()

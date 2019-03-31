@@ -13,6 +13,15 @@ struct FARPG_NavPathPoint : public FBehaviorWithPosition
 {
 	GENERATED_BODY()
 public:
+	FARPG_NavPathPoint()
+	{
+		bAttachToRotation = true;
+	}
+
+	UPROPERTY(EditAnywhere, Category = "行为")
+	float AcceptableRadius = 100.f;
+
+	float GetAcceptableRadius() const;
 };
 
 UCLASS()

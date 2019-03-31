@@ -5,21 +5,10 @@
 #include "Components/SkeletalMeshComponent.h"
 #include "Animation/AnimInstance.h"
 
-bool UCA_CharacterTurnBase::TurnTo(ACharacterBase* Executer, const FRotator& TargetWorldRotation, const FOnCharacterBehaviorFinished& OnCharacterTurnFinished)
+void UCA_CharacterTurnBase::TurnTo(ACharacterBase* Executer, const FRotator& TargetWorldRotation, const FOnCharacterBehaviorFinished& OnCharacterTurnFinished)
 {
-	ExecuteInit(Executer, OnCharacterTurnFinished);
-
-	CurrentTurnMontage = GetTurnMontage(Executer, TargetWorldRotation);
-	if (CurrentTurnMontage)
-	{
-		Executer->PlayMontageWithBlendingOutDelegate(CurrentTurnMontage, FOnMontageBlendingOutStarted::CreateUObject(this, &UCA_CharacterTurnBase::WhenMontageBlendOutStart));
-		return true;
-	}
-	else
-	{
-		FinishExecute(true);
-		return false;
-	}
+	TurnToRotation = TargetWorldRotation;
+	ExecuteBehavior(Executer, OnCharacterTurnFinished);
 }
 
 void UCA_CharacterTurnBase::AbortTurnTo(ACharacterBase* Executer, const FOnCharacterBehaviorAbortFinished& OnCharacterBehaviorAbortFinished)
@@ -57,7 +46,20 @@ UAnimMontage* UCA_CharacterTurnBase::GetTurnMontageFourDirection(const FRotator&
 	}
 }
 
-void UCA_CharacterTurnBase::AbortBehavior(ACharacterBase* Executer)
+void UCA_CharacterTurnBase::WhenBehaviorExecuted(class ACharacterBase* Executer)
+{
+	CurrentTurnMontage = GetTurnMontage(Executer, TurnToRotation);
+	if (CurrentTurnMontage)
+	{
+		Executer->PlayMontageWithBlendingOutDelegate(CurrentTurnMontage, FOnMontageBlendingOutStarted::CreateUObject(this, &UCA_CharacterTurnBase::WhenMontageBlendOutStart));
+	}
+	else
+	{
+		FinishExecute(true);
+	}
+}
+
+void UCA_CharacterTurnBase::WhenBehaviorAborted(ACharacterBase* Executer)
 {
 	Executer->ClearMontageBlendingOutDelegate(CurrentTurnMontage);
 	Executer->StopAnimMontage(CurrentTurnMontage);

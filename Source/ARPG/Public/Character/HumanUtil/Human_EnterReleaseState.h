@@ -17,9 +17,9 @@ class ARPG_API UHuman_EnterReleaseState : public UCA_EnterReleaseStateBase
 {
 	GENERATED_BODY()
 public:
-	void ExecuteEnterReleaseState(ACharacterBase* Executer) override;
+	void WhenBehaviorExecuted(class ACharacterBase* Executer) override;
 
-	void AbortBehavior(class ACharacterBase* Executer) override;
+	void WhenBehaviorAborted(class ACharacterBase* Executer) override;
 
 	void WhenMontageBlendOutStart(UAnimMontage* Montage, bool bInterrupted);
 

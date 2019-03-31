@@ -34,9 +34,14 @@ void AARPG_NavPath::OnConstruction(const FTransform& Transform)
 
 	for (int32 i = PreNum; i < NavPathPoints.Num(); ++i)
 	{
-		NavPathPoints[i].Behavior = NewObject<UCBC_Wait>(this);
+		NavPathPoints[i].Behavior = NewObject<UCB_Wait>(this);
 	}
 
 	VisualControl->SetClosedLoop(bIsClosedLoop);
 }
 #endif
+
+float FARPG_NavPathPoint::GetAcceptableRadius() const
+{
+	return bAttachToLocation ? 5.f : AcceptableRadius;
+}
