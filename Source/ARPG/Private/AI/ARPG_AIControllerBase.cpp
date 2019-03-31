@@ -39,6 +39,20 @@ AARPG_AIControllerBase::AARPG_AIControllerBase(const FObjectInitializer& ObjectI
 void AARPG_AIControllerBase::BeginPlay()
 {
 	Super::BeginPlay();
+}
+
+ETeamAttitude::Type AARPG_AIControllerBase::GetTeamAttitudeTowards(const AActor& Other) const
+{
+	if (ACharacterBase* ControlledCharacter = Cast<ACharacterBase>(GetPawn()))
+	{
+		ControlledCharacter->GetRelationshipTowards(&Other);
+	}
+	return ETeamAttitude::Neutral;
+}
+
+void AARPG_AIControllerBase::Possess(APawn* InPawn)
+{
+	Super::Possess(InPawn);
 
 	if (ACharacterBase* ControlledCharacter = Cast<ACharacterBase>(GetPawn()))
 	{
@@ -55,13 +69,4 @@ void AARPG_AIControllerBase::BeginPlay()
 			}
 		}
 	}
-}
-
-ETeamAttitude::Type AARPG_AIControllerBase::GetTeamAttitudeTowards(const AActor& Other) const
-{
-	if (ACharacterBase* ControlledCharacter = Cast<ACharacterBase>(GetPawn()))
-	{
-		ControlledCharacter->GetRelationshipTowards(&Other);
-	}
-	return ETeamAttitude::Neutral;
 }

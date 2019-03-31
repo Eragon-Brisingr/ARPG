@@ -108,7 +108,10 @@ void UARPG_InteractableActorManagerBase::StartInteract(ACharacterBase* Invoker, 
 			MoveToAndInteract();
 		}
 	}
-	OnInteractFinished.ExecuteIfBound(false);
+	else
+	{
+		OnInteractFinished.ExecuteIfBound(false);
+	}
 }
 
 void UARPG_InteractableActorManagerBase::WhenInteractFinished(bool Succeed, ACharacterBase* Invoker, FOnInteractFinished OnInteractFinished)

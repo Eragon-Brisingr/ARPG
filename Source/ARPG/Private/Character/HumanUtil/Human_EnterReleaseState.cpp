@@ -19,7 +19,10 @@ void UHuman_EnterReleaseState::WhenBehaviorExecuted(ACharacterBase* Executer)
 			FinishExecute(true);
 		}
 	}
-	FinishExecute(false);
+	else
+	{
+		FinishExecute(false);
+	}
 }
 
 void UHuman_EnterReleaseState::WhenBehaviorAborted(class ACharacterBase* Executer)
