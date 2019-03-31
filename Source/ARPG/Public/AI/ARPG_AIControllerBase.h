@@ -22,4 +22,7 @@ public:
 	class UARPG_AIPerceptionComponent* AIPerception;
 
 	virtual ETeamAttitude::Type GetTeamAttitudeTowards(const AActor& Other) const override;
+
+public:
+	void Possess(APawn* InPawn) override;
 };
