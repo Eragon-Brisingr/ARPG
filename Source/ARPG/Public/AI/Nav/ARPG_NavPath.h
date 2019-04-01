@@ -9,7 +9,7 @@
 #include "ARPG_NavPath.generated.h"
 
 USTRUCT(BlueprintType)
-struct FARPG_NavPathPoint : public FBehaviorWithPosition
+struct FARPG_NavPathPoint : public FBehaviorPositionData
 {
 	GENERATED_BODY()
 public:
@@ -20,8 +20,10 @@ public:
 
 	UPROPERTY(EditAnywhere, Category = "行为")
 	float AcceptableRadius = 100.f;
-
 	float GetAcceptableRadius() const;
+	
+ 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "行为", Instanced)
+	UARPG_CharacterBehaviorBase* Behavior = nullptr;
 };
 
 UCLASS()

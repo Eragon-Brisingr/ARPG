@@ -94,7 +94,8 @@ void UBTTask_ARPG_FollowPathMove::WhenMoveFinished(const FPathFollowingResult& R
 				const FARPG_NavPathPoint& CurPoint = Path->NavPathPoints[CurIndex];
 				if (CurPoint.Behavior)
 				{
-					FollowPathMoveMemory->CurBehavior = CurPoint.WorldPositionExecuteBehavior(Character, FOnCharacterBehaviorFinished::CreateUObject(this, &UBTTask_ARPG_FollowPathMove::WhenBehaviorFinished, OwnerComp, FollowPathMoveMemory));
+					CurPoint.Behavior->ExecuteBehavior(Character, FOnCharacterBehaviorFinished::CreateUObject(this, &UBTTask_ARPG_FollowPathMove::WhenBehaviorFinished, OwnerComp, FollowPathMoveMemory));
+					FollowPathMoveMemory->CurBehavior = CurPoint.Behavior;
 				}
 				else
 				{

@@ -14,9 +14,16 @@ class ACharacterBase;
 class UARPG_CharacterBehaviorBase;
 
 USTRUCT(BlueprintType, meta = (BlueprintInternalUseOnly = true))
-struct FInteractBehavior : public FBehaviorWithPosition
+struct FInteractBehavior : public FBehaviorPositionData
 {
 	GENERATED_BODY()
+
+	//e.g.电梯的情况
+	UPROPERTY(EditAnywhere, Category = "行为")
+	uint8 bAttachToActor : 1;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "行为", Instanced)
+	UARPG_CharacterBehaviorBase* Behavior = nullptr;
 public:
 	FVector GetWorldLocation(const UActorComponent* Component) const { return Component->GetOwner()->GetActorTransform().TransformPosition(Location); }
 	FRotator GetWorldRotation(const UActorComponent* Component) const { return Component->GetOwner()->GetActorTransform().TransformRotation(Rotation.Quaternion()).Rotator(); }

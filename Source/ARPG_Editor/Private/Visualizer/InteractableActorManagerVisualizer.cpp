@@ -39,7 +39,7 @@ void FInteractableActorManagerSingleVisualizer::DrawVisualization(const UActorCo
 
 		for (int32 i = 0; i < Behaviors.Num(); ++i)
 		{
-			const FBehaviorWithPosition& Behavior = Behaviors[i];
+			const FBehaviorPositionData& Behavior = Behaviors[i];
 			FVector WorldLocation = Transform.TransformPosition(Behavior.Location);
 			FRotator WorldRotation = Transform.TransformRotation(Behavior.Rotation.Quaternion()).Rotator();
 			FTransform WorldWidgetTransform(WorldRotation, WorldLocation);

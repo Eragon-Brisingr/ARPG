@@ -172,6 +172,13 @@ void UARPG_ActorMoveUtils::MoveActorTo(AActor* Actor, const FVector& Location, c
 				else
 				{
 					_Component->SetWorldLocationAndRotation(Location, Rotation, Sweep);
+					if (ACharacterBase* Character = Cast<ACharacterBase>(_Component->GetOwner()))
+					{
+						if (Character->GetRemoteRole() == ENetRole::ROLE_AutonomousProxy)
+						{
+							Character->ForceSetClientWorldLocationAndRotation(Location, Rotation);
+						}
+					}
 					MovingComponentMap.FindAndRemoveChecked(_Component).OnActorMoveFinished.ExecuteIfBound(false);
 					return false;
 				}
@@ -206,7 +213,14 @@ void UARPG_ActorMoveUtils::MoveActorToLocation(AActor* Actor, const FVector& Loc
 				}
 				else
 				{
-					_Component->SetWorldLocation(Location, Sweep);
+					_Component->SetWorldLocation(Location, Sweep);					
+					if (ACharacterBase* Character = Cast<ACharacterBase>(_Component->GetOwner()))
+					{
+						if (Character->GetRemoteRole() == ENetRole::ROLE_AutonomousProxy)
+						{
+							Character->ForceSetClientWorldLocation(Location);
+						}
+					}
 					MovingComponentMap.FindAndRemoveChecked(_Component).OnActorMoveFinished.ExecuteIfBound(false);
 					return false;
 				}
@@ -242,6 +256,13 @@ void UARPG_ActorMoveUtils::MoveActorToRotation(AActor* Actor, const FRotator& Ro
 				else
 				{
 					_Component->SetWorldRotation(Rotation, Sweep);
+					if (ACharacterBase* Character = Cast<ACharacterBase>(_Component->GetOwner()))
+					{
+						if (Character->GetRemoteRole() == ENetRole::ROLE_AutonomousProxy)
+						{
+							Character->ForceSetClientWorldRotation(Rotation);
+						}
+					}
 					MovingComponentMap.FindAndRemoveChecked(_Component).OnActorMoveFinished.ExecuteIfBound(false);
 					return false;
 				}

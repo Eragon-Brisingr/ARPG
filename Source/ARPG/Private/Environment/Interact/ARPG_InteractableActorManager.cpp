@@ -122,13 +122,20 @@ void UARPG_InteractableActorManagerBase::WhenInteractFinished(bool Succeed, ACha
 
 void UARPG_InteractableActorManagerBase::StartInteractImpl(ACharacterBase* Invoker, const FInteractBehavior* InvokeBehavior, const FInteractBehaviorConfig* InvokeConfig, const FOnInteractFinished &OnInteractFinished)
 {
-	const FInteractBehavior& Behavior = *InvokeBehavior;
-	if (Behavior.Behavior)
+	const FInteractBehavior& BehaviorData = *InvokeBehavior;
+	UARPG_CharacterBehaviorBase* Behavior = BehaviorData.Behavior;
+	if (Behavior)
 	{
 		InteractActorBeginSetCollision(Invoker);
 		ExecuteWhenBeginInteract(Invoker, const_cast<FInteractBehaviorConfig&>(*InvokeConfig));
 
-		CurBehaviorMap.FindOrAdd(Invoker) = Behavior.RelativePositionExecuteBehavior(Invoker, FOnInteractFinished::CreateUObject(this, &UARPG_InteractableActorManagerBase::WhenInteractFinished, Invoker, OnInteractFinished), GetOwner());
+		if (BehaviorData.bAttachToActor)
+		{
+			Invoker->AttachToActor(GetOwner(), FAttachmentTransformRules::KeepWorldTransform);
+		}
+
+		Behavior->ExecuteBehavior(Invoker, FOnInteractFinished::CreateUObject(this, &UARPG_InteractableActorManagerBase::WhenInteractFinished, Invoker, OnInteractFinished));
+		CurBehaviorMap.FindOrAdd(Invoker) = Behavior;
 		return;
 	}
 }
@@ -189,6 +196,11 @@ void UARPG_InteractableActorManagerBase::ExecuteWhenEndInteract(ACharacterBase* 
 		Invoker->bIsInteractingWithActor = false;
 		WhenEndInteract(Invoker);
 		OnInteractEnd.Broadcast(GetOwner(), this, Invoker, bFinishPerfectly);
+
+		if (Invoker->IsAttachedTo(GetOwner()))
+		{
+			Invoker->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
+		}
 	}
 }
 
