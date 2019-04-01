@@ -18,8 +18,8 @@ EBTNodeResult::Type UBTTask_InteractWithActor::ExecuteTask(UBehaviorTreeComponen
 		if (ACharacterBase* Character = Cast<ACharacterBase>(MyController->GetPawn()))
 		{
 			InteractableActor->StartInteract(Character, FOnInteractFinished::CreateUObject(this, &UBTTask_InteractWithActor::WhenInteractFinished, &OwnerComp));
+			return EBTNodeResult::InProgress;
 		}
-		return EBTNodeResult::InProgress;
 	}
 	return EBTNodeResult::Failed;
 }
@@ -38,12 +38,24 @@ EBTNodeResult::Type UBTTask_InteractWithActor::AbortTask(UBehaviorTreeComponent&
 	return EBTNodeResult::Aborted;
 }
 
-void UBTTask_InteractWithActor::WhenInteractFinished(bool Succeed, UBehaviorTreeComponent* OwnerComp)
+void UBTTask_InteractWithActor::WhenInteractFinished(EInteractResult Result, UBehaviorTreeComponent* OwnerComp)
 {
-	FinishLatentTask(*OwnerComp, Succeed ? EBTNodeResult::Succeeded : EBTNodeResult::Failed);
+	FinishLatentTask(*OwnerComp, Result == EInteractResult::InteractedSucceed ? EBTNodeResult::Succeeded : EBTNodeResult::Failed);
 }
 
 void UBTTask_InteractWithActor::WhenInteractAbortFinished(UBehaviorTreeComponent* OwnerComp)
 {
 	FinishLatentAbort(*OwnerComp);
+}
+
+void UBTTask_InteractWithActor::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds)
+{
+	if (InteractableActor)
+	{
+		AAIController* MyController = OwnerComp.GetAIOwner();
+		if (ACharacterBase* Character = Cast<ACharacterBase>(MyController->GetPawn()))
+		{
+			InteractableActor->StartInteract(Character, FOnInteractFinished::CreateUObject(this, &UBTTask_InteractWithActor::WhenInteractFinished, &OwnerComp));
+		}
+	}
 }

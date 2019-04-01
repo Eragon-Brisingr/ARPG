@@ -72,11 +72,13 @@ public:
 
 	void EndInteract(ACharacterBase* Invoker, const FOnInteractAbortFinished& OnInteractAbortFinished);
 private:
-	void WhenInteractFinished(const FName& Tag, ACharacterBase* Invoker, FOnInteractFinished OnInteractFinished);
-
 	void StartInteractImpl(ACharacterBase* Invoker, const FInteractBehavior* InvokeBehavior, const FInteractBehaviorConfig* InvokeConfig, const FOnInteractFinished &OnInteractFinished);
 
-	void WhenBehaviorAbortFinished(ACharacterBase* Invoker, FOnInteractAbortFinished OnInteractAbortFinished);
+	void WhenInteractFinishedSucceed(const FName& Tag, ACharacterBase* Invoker, FOnInteractFinished OnInteractFinished);
+
+	void WhenInteractFinishedFailed(ACharacterBase* Invoker, FOnInteractFinished OnInteractFinished);
+
+	void WhenActionAbortFinished(ACharacterBase* Invoker, FOnInteractAbortFinished OnInteractAbortFinished);
 
 	void InteractActorBeginSetCollision(ACharacterBase* Invoker);
 	void InteractActorEndSetCollision(ACharacterBase* Invoker);
