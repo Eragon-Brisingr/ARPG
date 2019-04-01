@@ -71,7 +71,7 @@ public:
 	TArray<struct FARPG_Item> ReceivedGetInitItemList() const;
 
 	//DispatchableEntityInterface
-protected:
+public:
 	UXD_DispatchableActionBase* GetCurrentDispatchableAction_Implementation() const override;
 	void SetCurrentDispatchableAction_Implementation(UXD_DispatchableActionBase* Action) override;
 	UPROPERTY(SaveGame)

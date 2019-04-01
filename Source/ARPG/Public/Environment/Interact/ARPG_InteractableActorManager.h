@@ -11,6 +11,7 @@
 #include "ARPG_InteractableActorManager.generated.h"
 
 class ACharacterBase;
+class UARPG_AD_InteractableBase;
 class UARPG_CharacterBehaviorBase;
 
 USTRUCT(BlueprintType, meta = (BlueprintInternalUseOnly = true))
@@ -24,6 +25,9 @@ struct FInteractBehavior : public FBehaviorPositionData
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "行为", Instanced)
 	UARPG_CharacterBehaviorBase* Behavior = nullptr;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "行为", Instanced)
+	UARPG_AD_InteractableBase* InteractAction = nullptr;
 public:
 	FVector GetWorldLocation(const UActorComponent* Component) const { return Component->GetOwner()->GetActorTransform().TransformPosition(Location); }
 	FRotator GetWorldRotation(const UActorComponent* Component) const { return Component->GetOwner()->GetActorTransform().TransformRotation(Rotation.Quaternion()).Rotator(); }
@@ -68,7 +72,7 @@ public:
 
 	void EndInteract(ACharacterBase* Invoker, const FOnInteractAbortFinished& OnInteractAbortFinished);
 private:
-	void WhenInteractFinished(bool Succeed, ACharacterBase* Invoker, FOnInteractFinished OnInteractFinished);
+	void WhenInteractFinished(const FName& Tag, ACharacterBase* Invoker, FOnInteractFinished OnInteractFinished);
 
 	void StartInteractImpl(ACharacterBase* Invoker, const FInteractBehavior* InvokeBehavior, const FInteractBehaviorConfig* InvokeConfig, const FOnInteractFinished &OnInteractFinished);
 
@@ -113,7 +117,7 @@ public:
 	uint8 bForceEnterReleaseState : 1;
 private:
 	UPROPERTY()
-	TMap<ACharacterBase*, UARPG_CharacterBehaviorBase*> CurBehaviorMap;
+	TMap<ACharacterBase*, UARPG_AD_InteractableBase*> CurBehaviorMap;
 };
 
 UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent, DisplayName = "交互管理器_单人使用"))

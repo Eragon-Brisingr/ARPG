@@ -21,4 +21,11 @@ public:
 
 	UPROPERTY(BlueprintReadOnly, Category = "行为|交互")
  	TSoftObjectPtr<ACharacterBase> InteractInvoker;
+
+public:
+	void StartInteractDispatcher(AActor* InInteractTarget, ACharacterBase* InInteractInvoker, const FWhenDispatchFinishedNative& DispatchFinishedEvent, const FOnActionDispatcherAbortedNative::FDelegate& DispatcherAbortedEvent);
+	void AbortInteractDispatcher(const FOnActionDispatcherAbortedNative::FDelegate& DispatcherAbortedEvent);
+private:
+	using UXD_ActionDispatcherBase::StartDispatch;
+	using UXD_ActionDispatcherBase::AbortDispatch;
 };
