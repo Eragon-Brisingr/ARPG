@@ -65,7 +65,7 @@ void UARPG_InteractableActorManagerBase::StartInteract(ACharacterBase* Invoker, 
 				}
 				else
 				{
-					OnInteractFinished.ExecuteIfBound(false);
+					OnInteractFinished.ExecuteIfBound(EInteractResult::CanNotInteract);
 				}
 			});
 
@@ -100,7 +100,7 @@ void UARPG_InteractableActorManagerBase::StartInteract(ACharacterBase* Invoker, 
 				}
 				else
 				{
-					OnInteractFinished.ExecuteIfBound(false);
+					OnInteractFinished.ExecuteIfBound(EInteractResult::CanNotInteract);
 				}
 			}));
 		}
@@ -111,18 +111,11 @@ void UARPG_InteractableActorManagerBase::StartInteract(ACharacterBase* Invoker, 
 	}
 	else
 	{
-		OnInteractFinished.ExecuteIfBound(false);
+		OnInteractFinished.ExecuteIfBound(EInteractResult::CanNotInteract);
 	}
 }
 
-void UARPG_InteractableActorManagerBase::WhenInteractFinished(const FName& Tag, ACharacterBase* Invoker, FOnInteractFinished OnInteractFinished)
-{
-	//TODO 把Tag传出去
-	OnInteractFinished.ExecuteIfBound(true);
-	ExecuteWhenEndInteract(Invoker, true);
-}
-
-void UARPG_InteractableActorManagerBase::StartInteractImpl(ACharacterBase* Invoker, const FInteractBehavior* InvokeBehavior, const FInteractBehaviorConfig* InvokeConfig, const FOnInteractFinished &OnInteractFinished)
+void UARPG_InteractableActorManagerBase::StartInteractImpl(ACharacterBase* Invoker, const FInteractBehavior* InvokeBehavior, const FInteractBehaviorConfig* InvokeConfig, const FOnInteractFinished& OnInteractFinished)
 {
 	const FInteractBehavior& BehaviorData = *InvokeBehavior;
 	UARPG_AD_InteractableBase* Behavior = BehaviorData.InteractAction;
@@ -136,11 +129,25 @@ void UARPG_InteractableActorManagerBase::StartInteractImpl(ACharacterBase* Invok
 			Invoker->AttachToActor(GetOwner(), FAttachmentTransformRules::KeepWorldTransform);
 		}
 
-		Behavior->StartInteractDispatcher(GetOwner(), Invoker, FWhenDispatchFinishedNative::CreateUObject(this, &UARPG_InteractableActorManagerBase::WhenInteractFinished, Invoker, OnInteractFinished), FOnActionDispatcherAbortedNative::FDelegate::CreateUObject(this, &UARPG_InteractableActorManagerBase::ExecuteWhenEndInteract, Invoker, false));
+		Behavior->StartInteractDispatcher(GetOwner(), Invoker, FWhenDispatchFinishedNative::CreateUObject(this, &UARPG_InteractableActorManagerBase::WhenInteractFinishedSucceed, Invoker, OnInteractFinished),
+			FOnActionDispatcherAbortedNative::FDelegate::CreateUObject(this, &UARPG_InteractableActorManagerBase::WhenInteractFinishedFailed, Invoker, OnInteractFinished));
 
 		CurBehaviorMap.FindOrAdd(Invoker) = Behavior;
 		return;
 	}
+}
+
+void UARPG_InteractableActorManagerBase::WhenInteractFinishedSucceed(const FName& Tag, ACharacterBase* Invoker, FOnInteractFinished OnInteractFinished)
+{
+	//TODO 把Tag传出去
+	OnInteractFinished.ExecuteIfBound(EInteractResult::InteractedSucceed);
+	ExecuteWhenEndInteract(Invoker, true);
+}
+
+void UARPG_InteractableActorManagerBase::WhenInteractFinishedFailed(ACharacterBase* Invoker, FOnInteractFinished OnInteractFinished)
+{
+	OnInteractFinished.ExecuteIfBound(EInteractResult::InteractedFailed);
+	ExecuteWhenEndInteract(Invoker, false);
 }
 
 void UARPG_InteractableActorManagerBase::EndInteract(ACharacterBase* Invoker, const FOnInteractAbortFinished& OnInteractAbortFinished)
@@ -151,12 +158,12 @@ void UARPG_InteractableActorManagerBase::EndInteract(ACharacterBase* Invoker, co
 		UXD_DispatchableActionBase* Action = Invoker->CurrentAction.Get();
 		if (Action->GetOwner() == (*P_Behavior))
 		{
-			Action->OnActionAborted.BindUObject(this, &UARPG_InteractableActorManagerBase::WhenBehaviorAbortFinished, Invoker, OnInteractAbortFinished);
+			Action->OnActionAborted.BindUObject(this, &UARPG_InteractableActorManagerBase::WhenActionAbortFinished, Invoker, OnInteractAbortFinished);
 			Action->AbortDispatcher({});
 		}
 		else
 		{
-			(*P_Behavior)->AbortInteractDispatcher(FOnActionDispatcherAbortedNative::FDelegate::CreateUObject(this, &UARPG_InteractableActorManagerBase::WhenBehaviorAbortFinished, Invoker, OnInteractAbortFinished));
+			(*P_Behavior)->AbortInteractDispatcher(FOnActionDispatcherAbortedNative::FDelegate::CreateUObject(this, &UARPG_InteractableActorManagerBase::WhenActionAbortFinished, Invoker, OnInteractAbortFinished));
 		}
 		CurBehaviorMap.Remove(Invoker);
 	}
@@ -167,7 +174,7 @@ void UARPG_InteractableActorManagerBase::EndInteract(ACharacterBase* Invoker, co
 	}
 }
 
-void UARPG_InteractableActorManagerBase::WhenBehaviorAbortFinished(ACharacterBase* Invoker, FOnInteractAbortFinished OnInteractAbortFinished)
+void UARPG_InteractableActorManagerBase::WhenActionAbortFinished(ACharacterBase* Invoker, FOnInteractAbortFinished OnInteractAbortFinished)
 {
 	OnInteractAbortFinished.ExecuteIfBound();
 	ExecuteWhenEndInteract(Invoker, false);

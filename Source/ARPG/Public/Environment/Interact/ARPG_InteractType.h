@@ -8,6 +8,14 @@
 /**
  * 
  */
-DECLARE_DELEGATE_OneParam(FOnInteractFinished, bool /*Succeed*/);
+UENUM()
+enum class EInteractResult
+{
+	CanNotInteract,
+	InteractedFailed,
+	InteractedSucceed
+};
+
+DECLARE_DELEGATE_OneParam(FOnInteractFinished, EInteractResult /*Result*/);
 
 DECLARE_DELEGATE(FOnInteractAbortFinished);

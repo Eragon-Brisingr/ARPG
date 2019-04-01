@@ -52,6 +52,10 @@ void UARPG_DA_PlayMontage::WhenMontagePlayFinished(UAnimMontage* Montage, bool b
 		FinishAction();
 		WhenPlayFinished.ExecuteIfBound();
 	}
+	else
+	{
+		AbortDispatcher({});
+	}
 }
 
 void UARPG_DA_PlayMontage::WhenAbortPlayFinished(UAnimMontage* Montage, bool bInterrupted)

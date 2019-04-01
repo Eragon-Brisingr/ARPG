@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "BehaviorTree/BTTaskNode.h"
+#include "ARPG_InteractType.h"
 #include "BTTask_InteractWithActor.generated.h"
 
 class AARPG_InteractableActorBase;
@@ -21,9 +22,11 @@ public:
 	UPROPERTY(EditAnywhere, Category = "交互")
 	TSoftObjectPtr<AARPG_InteractableActorBase> InteractableActor;
 
-	virtual EBTNodeResult::Type ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) override;
-	virtual EBTNodeResult::Type AbortTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) override;
+	EBTNodeResult::Type ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) override;
+	EBTNodeResult::Type AbortTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) override;
 
-	void WhenInteractFinished(bool Succeed, UBehaviorTreeComponent* OwnerComp);
+	void WhenInteractFinished(EInteractResult Result, UBehaviorTreeComponent* OwnerComp);
 	void WhenInteractAbortFinished(UBehaviorTreeComponent* OwnerComp);
+protected:
+	void TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds) override;
 };
