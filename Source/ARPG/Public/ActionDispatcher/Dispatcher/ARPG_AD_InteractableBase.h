@@ -16,10 +16,10 @@ class ARPG_API UARPG_AD_InteractableBase : public UARPG_ActionDispatcherBase
 {
 	GENERATED_BODY()
 public:
-	UPROPERTY(BlueprintReadOnly, Category = "行为|交互")
+	UPROPERTY(BlueprintReadOnly, Category = "行为|交互", meta = (ExposeOnSpawn = true))
 	TSoftObjectPtr<AActor> InteractTarget;
 
-	UPROPERTY(BlueprintReadOnly, Category = "行为|交互")
+	UPROPERTY(BlueprintReadOnly, Category = "行为|交互", meta = (ExposeOnSpawn = true))
  	TSoftObjectPtr<ACharacterBase> InteractInvoker;
 
 public:
