@@ -31,13 +31,15 @@ void UARPG_DA_MoveToBase::WhenRequestFinished(const FPathFollowingResult& Result
 {
 	if (Result.Code == EPathFollowingResult::Success)
 	{
-		FinishAction();
-		WhenReached.ExecuteIfBound();
+		ExecuteEventAndFinishAction(WhenReached);
 	}
 	else if (Result.Code != EPathFollowingResult::Aborted)
 	{
-		FinishAction();
-		WhenCanNotReached.ExecuteIfBound();
+		ExecuteEventAndFinishAction(WhenCanNotReached);
+	}
+	else
+	{
+		AbortDispatcher({});
 	}
 }
 

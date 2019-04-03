@@ -49,12 +49,11 @@ void UARPG_DA_PlayMontage::WhenMontagePlayFinished(UAnimMontage* Montage, bool b
 {
 	if (bInterrupted == false)
 	{
-		FinishAction();
-		WhenPlayFinished.ExecuteIfBound();
+		ExecuteEventAndFinishAction(WhenPlayFinished);
 	}
 	else
 	{
-		AbortDispatcher({});
+		AbortDispatcher({}, true);
 	}
 }
 
