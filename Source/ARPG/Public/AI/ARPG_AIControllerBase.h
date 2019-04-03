@@ -24,5 +24,5 @@ public:
 	virtual ETeamAttitude::Type GetTeamAttitudeTowards(const AActor& Other) const override;
 
 public:
-	void Possess(APawn* InPawn) override;
+	void OnPossess(APawn* InPawn) override;
 };

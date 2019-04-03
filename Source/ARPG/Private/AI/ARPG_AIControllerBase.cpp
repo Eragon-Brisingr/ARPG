@@ -50,9 +50,9 @@ ETeamAttitude::Type AARPG_AIControllerBase::GetTeamAttitudeTowards(const AActor&
 	return ETeamAttitude::Neutral;
 }
 
-void AARPG_AIControllerBase::Possess(APawn* InPawn)
+void AARPG_AIControllerBase::OnPossess(APawn* InPawn)
 {
-	Super::Possess(InPawn);
+	Super::OnPossess(InPawn);
 
 	if (ACharacterBase* ControlledCharacter = Cast<ACharacterBase>(GetPawn()))
 	{

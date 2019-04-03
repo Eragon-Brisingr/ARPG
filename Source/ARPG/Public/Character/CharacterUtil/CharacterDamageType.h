@@ -27,13 +27,6 @@ public:
 		:AddHitStunValue(AddHitStunValue), ReceiveDamageAction(ReceiveDamageAction), NormalBeakBackDistance(NormalBeakBackDistance), DefenseBeakBackDistance(DefenseBeakBackDistance), bCanDefense(bCanDefense), bCanDefenseSwipe(bCanDefenseSwipe), bCanDodge(bCanDodge)
 	{}
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "伤害", meta = (DisplayName = "能闪避该伤害"))
-	uint8 bCanDodge : 1;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "伤害", meta = (DisplayName = "能防御该伤害"))
-	uint8 bCanDefense : 1;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "伤害", meta = (DisplayName = "能防反该伤害"))
-	uint8 bCanDefenseSwipe : 1;
-
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "伤害", meta = (DisplayName = "增加削韧量"))
 	float AddHitStunValue;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "伤害", meta = (DisplayName = "受击特殊动作"))
@@ -45,4 +38,11 @@ public:
 	//防御时受击时的推动距离
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "伤害", meta = (DisplayName = "防御时击退距离"))
 	float DefenseBeakBackDistance;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "伤害", meta = (DisplayName = "能防御该伤害"))
+	uint8 bCanDefense : 1;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "伤害", meta = (DisplayName = "能防反该伤害"))
+	uint8 bCanDefenseSwipe : 1;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "伤害", meta = (DisplayName = "能闪避该伤害"))
+	uint8 bCanDodge : 1;
 };
