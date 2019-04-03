@@ -43,7 +43,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "警戒系统")
 	bool CanSee(const FVector& ObserverLocation, const FVector& SeenLocation, const class ACharacterBase* LookedCharacter) const;
 	UFUNCTION(BlueprintCallable, Category = "警戒系统")
-	bool CanHear(const class ACharacterBase* HeardCharacter, const FVector& SimulusLocation, float Strength) const { return GetHearAddAlertValue(HeardCharacter, SimulusLocation, Strength); }
+	bool CanHear(const class ACharacterBase* HeardCharacter, const FVector& SimulusLocation, float Strength) const { return GetHearAddAlertValue(HeardCharacter, SimulusLocation, Strength) != 0.f; }
 	UFUNCTION(BlueprintCallable, Category = "警戒系统")
 	bool CanNose(const class ACharacterBase* NosedCharacter) const { return GetNoseAddAlertValue(NosedCharacter) > 0.f; }
 
