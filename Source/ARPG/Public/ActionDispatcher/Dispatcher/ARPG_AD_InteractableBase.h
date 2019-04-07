@@ -11,7 +11,7 @@ class ACharacterBase;
 /**
  * 
  */
-UCLASS(abstract, editinlinenew, meta = (DisplayName = "交互调度器"))
+UCLASS(abstract, editinlinenew, collapseCategories, meta = (DisplayName = "交互调度器"))
 class ARPG_API UARPG_AD_InteractableBase : public UARPG_ActionDispatcherBase
 {
 	GENERATED_BODY()

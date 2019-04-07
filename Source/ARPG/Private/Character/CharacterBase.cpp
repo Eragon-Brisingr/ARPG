@@ -7,6 +7,7 @@
 #include <Kismet/GameplayStatics.h>
 #include <TimerManager.h>
 #include <Kismet/KismetMathLibrary.h>
+#include <Perception/AISenseConfig_Sight.h>
 
 #include "ARPG_MovementComponent.h"
 #include "ARPG_InventoryComponent.h"
@@ -18,7 +19,6 @@
 #include "XD_TemplateLibrary.h"
 #include "UnrealNetwork.h"
 #include "ARPG_ActorFunctionLibrary.h"
-#include "Perception/AISenseConfig_Sight.h"
 #include "ARPG_CampInfo.h"
 #include "ARPG_CampRelationship.h"
 #include "ARPG_HatredControlSystemNormal.h"
@@ -27,11 +27,12 @@
 #include "ARPG_SneakSystemNormal.h"
 #include "ARPG_NavigationQueryFilter.h"
 #include "ARPG_InteractableActorManager.h"
-#include "Action/ARPG_CharacterTurnBase.h"
+#include "ARPG_CharacterTurnBase.h"
 #include "Engine/Engine.h"
-#include "Action/ARPG_EnterReleaseStateBase.h"
+#include "ARPG_EnterReleaseStateBase.h"
 #include "ARPG_PlayerControllerBase.h"
 #include "XD_DispatchableActionBase.h"
+#include "ARPG_AD_CharacterInteract.h"
 
 
 // Sets default values
@@ -73,6 +74,12 @@ ACharacterBase::ACharacterBase(const FObjectInitializer& ObjectInitializer)
 void ACharacterBase::BeginPlay()
 {
 	Super::BeginPlay();
+
+	if (InteractBehavior)
+	{
+		InteractBehavior->Character = this;
+		InteractBehavior->InitLeader(this);
+	}
 }
 
 void ACharacterBase::EndPlay(const EEndPlayReason::Type EndPlayReason)
@@ -214,6 +221,16 @@ UXD_DispatchableActionBase* ACharacterBase::GetCurrentDispatchableAction_Impleme
 void ACharacterBase::SetCurrentDispatchableAction_Implementation(UXD_DispatchableActionBase* Action)
 {
 	CurrentAction = Action;
+}
+
+UXD_ActionDispatcherBase* ACharacterBase::GetCurrentDispatcher_Implementation() const
+{
+	return CurrentDispatcher;
+}
+
+void ACharacterBase::SetCurrentDispatcher_Implementation(UXD_ActionDispatcherBase* Dispatcher)
+{
+	CurrentDispatcher = Dispatcher;
 }
 
 bool ACharacterBase::CanExecuteDispatchableAction_Implementation() const
@@ -796,7 +813,7 @@ bool ACharacterBase::IsSneaking() const
 
 void ACharacterBase::InvokeInteract(AActor* InteractTarget)
 {
-	if (CanInteract(InteractTarget))
+	if (CanInteractWithTarget(InteractTarget))
 	{
 		InvokeInteract_ToServer(InteractTarget);
 	}
@@ -804,7 +821,7 @@ void ACharacterBase::InvokeInteract(AActor* InteractTarget)
 
 void ACharacterBase::InvokeInteract_ToServer_Implementation(AActor* InteractTarget)
 {
-	if (CanInteract(InteractTarget))
+	if (CanInteractWithTarget(InteractTarget))
 	{
 		IARPG_InteractInterface::WhenInvokeInteract(InteractTarget, this);
 	}
@@ -815,7 +832,7 @@ bool ACharacterBase::InvokeInteract_ToServer_Validate(AActor* InteractTarget)
 	return true;
 }
 
-bool ACharacterBase::CanInteract(AActor* InteractTarget) const
+bool ACharacterBase::CanInteractWithTarget(AActor* InteractTarget) const
 {
 	return InteractTarget && InteractTarget->Implements<UARPG_InteractInterface>() && IARPG_InteractInterface::CanInteract(InteractTarget, this);
 }
@@ -856,6 +873,43 @@ void ACharacterBase::InvokeFinishInteract_ToServer_Implementation()
 
 bool ACharacterBase::InvokeFinishInteract_ToServer_Validate()
 {
+	return true;
+}
+
+void ACharacterBase::WhenExecuteInteract_Implementation(class ACharacterBase* InteractInvoker)
+{
+	if (OnPreInteractEvents.Num() > 0)
+	{
+		for (FOnPreInteractEvent& OnPreInteractEvent : OnPreInteractEvents)
+		{
+			if (OnPreInteractEvent.IsBound())
+			{
+				OnPreInteractEvent.Execute();
+				break;
+			}
+		}
+	}
+	else if (InteractBehavior)
+	{
+		InteractBehavior->InteractTarget = InteractInvoker;
+		if (InteractBehavior->CanStartDispatcher())
+		{
+			InteractBehavior->StartDispatch();
+		}
+	}
+}
+
+bool ACharacterBase::CanInteract_Implementation(const class ACharacterBase* InteractInvoker) const
+{
+	if (InteractInvoker == this)
+	{
+		return false;
+	}
+	if (CurrentDispatcher && CurrentDispatcher->State != EActionDispatcherState::Deactive)
+	{
+		return false;
+	}
+
 	return true;
 }
 

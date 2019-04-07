@@ -10,7 +10,7 @@ bool UARPG_DA_PlaySequence::MoveToSequencePlayLocation(APawn* Mover, const FVect
 {
 	if (ACharacterBase* Character = Cast<ACharacterBase>(Mover))
 	{
-		UARPG_MoveUtils::ARPG_MoveToLocationAndTurn(Character, PlayLocation, PlayRotation, FOnARPG_MoveFinished::CreateUObject(this, &UARPG_DA_PlaySequence::WhenMoveFinished, MoverIdx, Character, PlayLocation, PlayRotation));
+		UARPG_MoveUtils::ARPG_MoveToLocationAndTurn(Character, PlayLocation, PlayRotation, FOnARPG_MoveFinished::CreateUObject(this, &UARPG_DA_PlaySequence::WhenMoveFinished, MoverIdx, Character, PlayLocation, PlayRotation), 0.f);
 		return true;
 	}
 	return Super::MoveToSequencePlayLocation(Mover, PlayLocation, PlayRotation, MoverIdx);

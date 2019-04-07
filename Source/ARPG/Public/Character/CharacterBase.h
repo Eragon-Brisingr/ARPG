@@ -26,15 +26,16 @@
 
 class UARPG_InteractableActorManagerBase;
 class UCA_EnterReleaseStateBase;
-class UXD_DispatchableActionBase;
+class UARPG_AD_CharacterInteract;
 
 UCLASS()
 class ARPG_API ACharacterBase : public ACharacter, 
 	public IXD_SaveGameInterface,
+	public IXD_DispatchableEntityInterface,
 	public IARPG_LockOnTargetInterface,
 	public IAISightTargetInterface,
 	public IARPG_AI_BattleInterface,
-	public IXD_DispatchableEntityInterface
+	public IARPG_InteractInterface
 {
 	GENERATED_BODY()
 
@@ -76,6 +77,11 @@ public:
 	void SetCurrentDispatchableAction_Implementation(UXD_DispatchableActionBase* Action) override;
 	UPROPERTY(SaveGame)
 	TSoftObjectPtr<UXD_DispatchableActionBase> CurrentAction;
+
+	UXD_ActionDispatcherBase* GetCurrentDispatcher_Implementation() const override;
+	void SetCurrentDispatcher_Implementation(UXD_ActionDispatcherBase* Dispatcher) override;
+	UPROPERTY(BlueprintReadOnly, Category = "行为")
+	UXD_ActionDispatcherBase* CurrentDispatcher;
 
 	bool CanExecuteDispatchableAction_Implementation() const override;
 	//重生用
@@ -400,7 +406,7 @@ public:
 	void InvokeInteract_ToServer(AActor* InteractTarget);
 
 	UFUNCTION(BlueprintCallable, Category = "角色|交互")
-	bool CanInteract(AActor* InteractTarget) const;
+	bool CanInteractWithTarget(AActor* InteractTarget) const;
 
 	UFUNCTION(BlueprintCallable, Category = "角色|交互")
 	void InvokeFinishInteract();
@@ -416,6 +422,16 @@ public:
 
 	UPROPERTY(BlueprintReadOnly, Category = "角色|交互", Replicated)
 	uint8 bIsInteractingWithActor : 1;
+
+	//交互前的处理，可能由任务之类的附加的操作，会打断之后的交互行为
+	DECLARE_DELEGATE(FOnPreInteractEvent);
+	TArray<FOnPreInteractEvent> OnPreInteractEvents;
+
+	void WhenExecuteInteract_Implementation(class ACharacterBase* InteractInvoker) override;
+	bool CanInteract_Implementation(const class ACharacterBase* InteractInvoker) const override;
+
+	UPROPERTY(EditAnywhere, Category = "角色|交互", Instanced)
+	UARPG_AD_CharacterInteract* InteractBehavior;
 public:
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "Character")
 	class UARPG_MovementComponent* ARPG_MovementComponent;
