@@ -237,12 +237,14 @@ class UPathFollowingComponent* UARPG_MoveUtils::GetPathFollowingComponent(const 
 void UARPG_MoveUtils::ARPG_MoveToActor(class ACharacterBase* Character, AActor* Goal, const FOnARPG_MoveFinished& OnARPG_MoveFinished, float AcceptanceRadius, bool bStopOnOverlap, bool bUsePathfinding, bool bCanStrafe, TSubclassOf<class UNavigationQueryFilter> FilterClass, bool bAllowPartialPaths)
 {
 	FPathFollowingRequestResult ResultData = ARPG_MoveToActorImpl(Character, Goal, AcceptanceRadius, bStopOnOverlap, bUsePathfinding, bCanStrafe, FilterClass, bAllowPartialPaths);
-	if (AcceptanceRadius > 50.f)
+	if (AcceptanceRadius > 0.f)
 	{
 		SettingRequest(ResultData, Character, OnARPG_MoveFinished, AcceptanceRadius);
 	}
 	else
 	{
+		AcceptanceRadius = 5.f;
+
 		TWeakObjectPtr<AActor> _Goal = Goal;
 		FOnARPG_MoveFinished Snap = FOnARPG_MoveFinished::CreateLambda([=](const FPathFollowingResult& Result)
 		{
@@ -275,12 +277,14 @@ void UARPG_MoveUtils::ARPG_MoveToLocation(class ACharacterBase* Character, const
 {
 	FPathFollowingRequestResult ResultData = ARPG_MoveToLocationImpl(Character, Dest, AcceptanceRadius, bStopOnOverlap, bUsePathfinding, bProjectDestinationToNavigation, bCanStrafe, FilterClass, bAllowPartialPaths);
 
-	if (AcceptanceRadius > 50.f)
+	if (AcceptanceRadius > 0.f)
 	{
 		SettingRequest(ResultData, Character, OnARPG_MoveFinished, AcceptanceRadius);
 	}
 	else
 	{
+		AcceptanceRadius = 5.f;
+
 		FOnARPG_MoveFinished Snap = FOnARPG_MoveFinished::CreateLambda([=](const FPathFollowingResult& Result)
 		{
 			if (Result.IsSuccess())

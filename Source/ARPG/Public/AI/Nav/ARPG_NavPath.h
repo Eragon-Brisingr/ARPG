@@ -22,6 +22,7 @@ public:
 	float AcceptableRadius = 100.f;
 	float GetAcceptableRadius() const;
 	
+	//TODO 改为动作调度器，并且为多个调用
  	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "行为", Instanced)
 	UARPG_CharacterBehaviorBase* Behavior = nullptr;
 };

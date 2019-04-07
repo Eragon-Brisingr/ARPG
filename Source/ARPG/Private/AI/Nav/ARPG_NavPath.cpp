@@ -43,5 +43,5 @@ void AARPG_NavPath::OnConstruction(const FTransform& Transform)
 
 float FARPG_NavPathPoint::GetAcceptableRadius() const
 {
-	return bAttachToLocation ? 5.f : AcceptableRadius;
+	return bAttachToLocation ? 0.f : AcceptableRadius;
 }

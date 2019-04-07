@@ -75,7 +75,7 @@ void UARPG_InteractableActorManagerBase::StartInteract(ACharacterBase* Invoker, 
 				if (ValidBehavior->bAttachToRotation)
 				{
 					FRotator WorldRotation = ValidBehavior->GetWorldRotation(this);
-					UARPG_MoveUtils::ARPG_MoveToLocationAndTurn(Invoker, WorldLocation, WorldRotation, OnMoveFinished);
+					UARPG_MoveUtils::ARPG_MoveToLocationAndTurn(Invoker, WorldLocation, WorldRotation, OnMoveFinished, 0.f);
 				}
 				else
 				{

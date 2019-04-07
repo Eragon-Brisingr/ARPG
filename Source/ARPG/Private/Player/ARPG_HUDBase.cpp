@@ -24,7 +24,7 @@ void AARPG_HUDBase::Tick(float DeltaSeconds)
 		{
 			Algo::Sort(PotentialInteractableActors, [&](AActor* LHS, AActor* RHS)
 			{
-				if (!Character->CanInteract(RHS))
+				if (!Character->CanInteractWithTarget(RHS))
 				{
 					return true;
 				}
