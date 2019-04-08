@@ -10,9 +10,10 @@
 
 #define LOCTEXT_NAMESPACE "ARPG_Item"
 
-void AARPG_ItemBase::WhenExecuteInteract_Implementation(class ACharacterBase* InteractInvoker)
+void AARPG_ItemBase::WhenExecuteInteract_Implementation(class ACharacterBase* InteractInvoker, const FOnInteractEndEvent& Event)
 {
 	InteractInvoker->Inventory->AddItemCore(GetItemCore(), GetItemCore()->Number);
+	Event.ExecuteIfBound(EInteractEndResult::Succeed);
 	Destroy();
 }
 

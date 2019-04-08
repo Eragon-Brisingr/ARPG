@@ -18,7 +18,7 @@ bool AARPG_InteractableActorBase::CanInteract_Implementation(const class ACharac
 	return InteractableActorManager->CanInteract(InteractInvoker);
 }
 
-void AARPG_InteractableActorBase::WhenInvokeInteract_Implementation(class ACharacterBase* InteractInvoker)
+void AARPG_InteractableActorBase::WhenInvokeInteract_Implementation(class ACharacterBase* InteractInvoker, const FOnInteractEndEvent& Event)
 {
 	StartInteract(InteractInvoker, {});
 }

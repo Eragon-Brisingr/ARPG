@@ -823,7 +823,11 @@ void ACharacterBase::InvokeInteract_ToServer_Implementation(AActor* InteractTarg
 {
 	if (CanInteractWithTarget(InteractTarget))
 	{
-		IARPG_InteractInterface::WhenInvokeInteract(InteractTarget, this);
+		InteractingTarget = InteractTarget;
+		IARPG_InteractInterface::WhenInvokeInteract(InteractTarget, this, FOnInteractEnd::CreateWeakLambda(this, [this](EInteractEndResult Result) 
+			{ 
+				InteractingTarget = nullptr;
+			}));
 	}
 }
 
@@ -832,9 +836,19 @@ bool ACharacterBase::InvokeInteract_ToServer_Validate(AActor* InteractTarget)
 	return true;
 }
 
+void ACharacterBase::InvokeInteractWithEndEvent(AActor* InteractTarget, const FOnInteractEndEvent& OnInteractEndEvent)
+{
+	check(HasAuthority());
+	IARPG_InteractInterface::WhenInvokeInteract(InteractTarget, this, FOnInteractEnd::CreateWeakLambda(this, [=](EInteractEndResult Result) 
+		{
+			InteractingTarget = nullptr;
+			OnInteractEndEvent.ExecuteIfBound(Result); 
+		}));
+}
+
 bool ACharacterBase::CanInteractWithTarget(AActor* InteractTarget) const
 {
-	return InteractTarget && InteractTarget->Implements<UARPG_InteractInterface>() && IARPG_InteractInterface::CanInteract(InteractTarget, this);
+	return InteractingTarget == nullptr && InteractTarget && InteractTarget->Implements<UARPG_InteractInterface>() && IARPG_InteractInterface::CanInteract(InteractTarget, this);
 }
 
 void ACharacterBase::InvokeFinishInteract()
@@ -876,8 +890,9 @@ bool ACharacterBase::InvokeFinishInteract_ToServer_Validate()
 	return true;
 }
 
-void ACharacterBase::WhenExecuteInteract_Implementation(class ACharacterBase* InteractInvoker)
+void ACharacterBase::WhenExecuteInteract_Implementation(class ACharacterBase* InteractInvoker, const FOnInteractEndEvent& Event)
 {
+	//TODO 呼叫InteractEndEvent
 	if (OnPreInteractEvents.Num() > 0)
 	{
 		for (FOnPreInteractEvent& OnPreInteractEvent : OnPreInteractEvents)
