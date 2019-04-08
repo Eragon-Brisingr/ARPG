@@ -28,7 +28,7 @@ public:
 public:
 	bool CanInteract_Implementation(const class ACharacterBase* InteractInvoker) const override;
 
-	void WhenInvokeInteract_Implementation(class ACharacterBase* InteractInvoker) override;
+	void WhenInvokeInteract_Implementation(class ACharacterBase* InteractInvoker, const FOnInteractEndEvent& Event) override;
 };
 
 UCLASS(meta = (DisplayName = "单人交互Actor"), Blueprintable)

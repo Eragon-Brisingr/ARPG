@@ -8,6 +8,7 @@
 #include "BTTask_InteractWithActor.generated.h"
 
 class AARPG_InteractableActorBase;
+enum class EInteractEndResult : uint8;
 
 /**
  * 
@@ -20,12 +21,12 @@ public:
 	UBTTask_InteractWithActor();
 
 	UPROPERTY(EditAnywhere, Category = "交互")
-	TSoftObjectPtr<AARPG_InteractableActorBase> InteractableActor;
+	TSoftObjectPtr<AActor> InteractableActor;
 
 	EBTNodeResult::Type ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) override;
 	EBTNodeResult::Type AbortTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) override;
 
-	void WhenInteractFinished(EInteractResult Result, UBehaviorTreeComponent* OwnerComp);
+	void WhenInteractEnd(EInteractEndResult Result, UBehaviorTreeComponent* OwnerComp);
 	void WhenInteractAbortFinished(UBehaviorTreeComponent* OwnerComp);
 protected:
 	void TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds) override;

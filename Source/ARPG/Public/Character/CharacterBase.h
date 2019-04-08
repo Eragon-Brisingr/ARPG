@@ -405,6 +405,8 @@ public:
 	UFUNCTION(Reliable, WithValidation, Server)
 	void InvokeInteract_ToServer(AActor* InteractTarget);
 
+	void InvokeInteractWithEndEvent(AActor* InteractTarget, const FOnInteractEndEvent& OnInteractEndEvent);
+
 	UFUNCTION(BlueprintCallable, Category = "角色|交互")
 	bool CanInteractWithTarget(AActor* InteractTarget) const;
 
@@ -418,6 +420,9 @@ public:
 	void InvokeFinishPathFollowing_ToServer();
 
 	UPROPERTY(BlueprintReadOnly, Category = "角色|交互")
+	AActor* InteractingTarget;
+
+	UPROPERTY(BlueprintReadOnly, Category = "角色|交互")
 	UARPG_InteractableActorManagerBase* InteractingManager;
 
 	UPROPERTY(BlueprintReadOnly, Category = "角色|交互", Replicated)
@@ -427,7 +432,7 @@ public:
 	DECLARE_DELEGATE(FOnPreInteractEvent);
 	TArray<FOnPreInteractEvent> OnPreInteractEvents;
 
-	void WhenExecuteInteract_Implementation(class ACharacterBase* InteractInvoker) override;
+	void WhenExecuteInteract_Implementation(class ACharacterBase* InteractInvoker, const FOnInteractEndEvent& Event) override;
 	bool CanInteract_Implementation(const class ACharacterBase* InteractInvoker) const override;
 
 	UPROPERTY(EditAnywhere, Category = "角色|交互", Instanced)
