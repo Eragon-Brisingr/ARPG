@@ -411,10 +411,12 @@ public:
 	bool CanInteractWithTarget(AActor* InteractTarget) const;
 
 	UFUNCTION(BlueprintCallable, Category = "角色|交互")
-	void InvokeFinishInteract();
+	void InvokeAbortInteract();
+
+	void InvokeAbortInteractWithAbortEvent(const FOnInteractAbortEndEvent& OnInteractAbortEndEvent);
 
 	UFUNCTION(Reliable, WithValidation, Server)
-	void InvokeFinishInteract_ToServer();
+	void InvokeAbortInteract_ToServer();
 
 	UFUNCTION(Reliable, WithValidation, Server)
 	void InvokeFinishPathFollowing_ToServer();

@@ -55,11 +55,11 @@ class ARPG_API UARPG_InteractLibrary : public UBlueprintFunctionLibrary
 {
 	GENERATED_BODY()
 public:
-	UFUNCTION()
-	void ExecuteInteractEndEvent(const FOnInteractEndEvent& Event, EInteractEndResult Result) { Event.ExecuteIfBound(Result); }
+	UFUNCTION(BlueprintCallable, Category = "角色|交互")
+	static void ExecuteInteractEndEvent(const FOnInteractEndEvent& Event, EInteractEndResult Result) { Event.ExecuteIfBound(Result); }
 
-	UFUNCTION()
-	void ExecuteInteractAbortEndEvent(const FOnInteractAbortEndEvent& Event) { Event.ExecuteIfBound(); }
+	UFUNCTION(BlueprintCallable, Category = "角色|交互")
+	static void ExecuteInteractAbortEndEvent(const FOnInteractAbortEndEvent& Event) { Event.ExecuteIfBound(); }
 };
 
 // This class does not need to be modified.
