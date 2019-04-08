@@ -851,20 +851,38 @@ bool ACharacterBase::CanInteractWithTarget(AActor* InteractTarget) const
 	return InteractingTarget == nullptr && InteractTarget && InteractTarget->Implements<UARPG_InteractInterface>() && IARPG_InteractInterface::CanInteract(InteractTarget, this);
 }
 
-void ACharacterBase::InvokeFinishInteract()
+void ACharacterBase::InvokeAbortInteract()
 {
-	if (bIsInteractingWithActor)
+	if (InteractingTarget)
 	{
-		InvokeFinishInteract_ToServer();
+		InvokeAbortInteract_ToServer();
 	}
+}
 
-	if (AARPG_PlayerControllerBase* PlayerController = Cast<AARPG_PlayerControllerBase>(GetController()))
-	{
-		if (PlayerController->bIsInPathFollowing)
+void ACharacterBase::InvokeAbortInteractWithAbortEvent(const FOnInteractAbortEndEvent& OnInteractAbortEndEvent)
+{
+	check(HasAuthority());
+	IARPG_InteractInterface::WhenAbortInteract(this, FOnInteractAbortEnd::CreateWeakLambda(this, [=]()
 		{
-			InvokeFinishPathFollowing_ToServer();
-		}
+			InteractingTarget = nullptr;
+			OnInteractAbortEndEvent.ExecuteIfBound();
+		}));
+}
+
+void ACharacterBase::InvokeAbortInteract_ToServer_Implementation()
+{
+	if (InteractingTarget)
+	{
+		IARPG_InteractInterface::WhenAbortInteract(InteractingTarget, this, FOnInteractAbortEnd::CreateWeakLambda(this, [this]()
+			{
+				InteractingTarget = nullptr;
+			}));
 	}
+}
+
+bool ACharacterBase::InvokeAbortInteract_ToServer_Validate()
+{
+	return true;
 }
 
 void ACharacterBase::InvokeFinishPathFollowing_ToServer_Implementation()
@@ -873,19 +891,6 @@ void ACharacterBase::InvokeFinishPathFollowing_ToServer_Implementation()
 }
 
 bool ACharacterBase::InvokeFinishPathFollowing_ToServer_Validate()
-{
-	return true;
-}
-
-void ACharacterBase::InvokeFinishInteract_ToServer_Implementation()
-{
-	if (InteractingManager)
-	{
-		InteractingManager->EndInteract(this, {});
-	}
-}
-
-bool ACharacterBase::InvokeFinishInteract_ToServer_Validate()
 {
 	return true;
 }
