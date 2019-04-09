@@ -24,6 +24,7 @@
 #include "XD_DispatchableEntityInterface.h"
 #include "CharacterBase.generated.h"
 
+class UARPG_InteractableActorManagerBase;
 class UCA_EnterReleaseStateBase;
 class UARPG_AD_CharacterInteract;
 

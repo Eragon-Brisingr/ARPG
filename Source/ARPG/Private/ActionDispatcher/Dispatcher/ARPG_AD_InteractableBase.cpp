@@ -27,8 +27,19 @@ void UARPG_AD_InteractableBase::StartInteractDispatcher(ACharacterBase* InIntera
 
 void UARPG_AD_InteractableBase::AbortInteractDispatcher(const FOnActionDispatcherAbortedNative& DispatcherAbortedEvent)
 {
-	OnActionDispatcherAbortedNative = DispatcherAbortedEvent;
-	AbortDispatch({});
+	//TODO 修复中断时的问题
+	if (State == EActionDispatcherState::Active)
+	{
+		AbortDispatch();
+	}
+	else if (State == EActionDispatcherState::Aborting)
+	{
+		OnActionDispatcherAbortedNative = DispatcherAbortedEvent;
+	}
+	else
+	{
+		DispatcherAbortedEvent.ExecuteIfBound();
+	}
 }
 
 void UARPG_AD_InteractableBase::WhenDeactived()
