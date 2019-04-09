@@ -26,7 +26,6 @@
 #include "ARPG_AlertSystemNormal.h"
 #include "ARPG_SneakSystemNormal.h"
 #include "ARPG_NavigationQueryFilter.h"
-#include "ARPG_InteractableActorManager.h"
 #include "ARPG_CharacterTurnBase.h"
 #include "Engine/Engine.h"
 #include "ARPG_EnterReleaseStateBase.h"
@@ -823,6 +822,10 @@ void ACharacterBase::InvokeInteract_ToServer_Implementation(AActor* InteractTarg
 {
 	if (CanInteractWithTarget(InteractTarget))
 	{
+#if WITH_EDITOR
+		check(PreInvokeInteractTarget.IsValid() == false);
+		PreInvokeInteractTarget = InteractTarget;
+#endif
 		InvokeInteractTarget = InteractTarget;
 		IARPG_InteractInterface::WhenInvokeInteract(InteractTarget, this);
 	}
@@ -906,6 +909,14 @@ void ACharacterBase::WhenExecuteInteract_Implementation(ACharacterBase* Interact
 		InteractBehavior->InteractTarget = InteractInvoker;
 		if (InteractBehavior->CanStartDispatcher())
 		{
+			InteractBehavior->WhenDispatchFinishedNative = FWhenDispatchFinishedNative::CreateWeakLambda(InteractInvoker, [InteractInvoker](const FName & Tag)
+				{
+					InteractInvoker->ExecuteInteractEnd(EInteractEndResult::Succeed);
+				});
+			InteractBehavior->OnActionDispatcherAbortedNative = FOnActionDispatcherAbortedNative::CreateWeakLambda(InteractInvoker, [InteractInvoker]()
+				{
+					InteractInvoker->ExecuteInteractAbortEnd();
+				});
 			InteractBehavior->StartDispatch();
 		}
 	}
@@ -927,6 +938,9 @@ bool ACharacterBase::CanInteract_Implementation(const class ACharacterBase* Inte
 
 void ACharacterBase::ExecuteInteractEnd(EInteractEndResult Result)
 {
+#if WITH_EDITOR
+	PreInvokeInteractTarget = nullptr;
+#endif
 	InvokeInteractTarget = nullptr;
 	if (OnInteractEnd.IsBound())
 	{
@@ -937,6 +951,9 @@ void ACharacterBase::ExecuteInteractEnd(EInteractEndResult Result)
 
 void ACharacterBase::ExecuteInteractAbortEnd()
 {
+#if WITH_EDITOR
+	PreInvokeInteractTarget = nullptr;
+#endif
 	InvokeInteractTarget = nullptr;
 	if (OnInteractAbortEnd.IsBound())
 	{

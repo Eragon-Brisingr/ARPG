@@ -446,8 +446,5 @@ public:
 	virtual void NotifyBegin(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, float TotalDuration) override;
 	virtual void NotifyEnd(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation) override;
 
-	UFUNCTION()
-	void WhenInteractEnd(AActor* Which, class UARPG_InteractableActorManagerBase* Manager, class ACharacterBase* Who, bool bFinishPerfectly);
-
 	FString GetNotifyName_Implementation() const override;
 };

@@ -17,8 +17,14 @@ class ARPG_API AARPG_InteractableActorSingle : public AActor,
 	GENERATED_BODY()
 public:
 	AARPG_InteractableActorSingle();
+	
+	UPROPERTY(EditAnywhere, Category = "行为")
+	float StartBehaviousRadius;
 
-	UPROPERTY(EditAnywhere, meta = (MakeEditWidget = true))
+	UPROPERTY(EditAnywhere, Category = "行为")
+	uint8 bSnapRotation : 1;
+
+	UPROPERTY(EditAnywhere, Category = "行为", meta = (MakeEditWidget = true))
 	FTransform InteractLocation;
 
 	UPROPERTY(EditAnywhere, Category = "行为", Instanced)

@@ -10,7 +10,6 @@
 #include "ARPG_DebugFunctionLibrary.h"
 #include "ReceiveDamageActionBase.h"
 #include "XD_MacrosLibrary.h"
-#include "ARPG_InteractableActorManager.h"
 
 
 void UARPG_PlayMontageByState::Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation)
@@ -451,10 +450,7 @@ void UARPG_InteractEventNotify::Notify(USkeletalMeshComponent* MeshComp, UAnimSe
 {
 	if (ACharacterBase* Character = Cast<ACharacterBase>(MeshComp->GetOwner()))
 	{
-		if (UARPG_InteractableActorManagerBase* InteractableActorManager = Character->InteractingManager)
-		{
-			InteractableActorManager->OnReceiveInteractEvent.Broadcast(InteractableActorManager, Character, EventTag);
-		}
+
 	}
 }
 
@@ -467,12 +463,7 @@ void UARPG_InteractEventNotifyState::NotifyBegin(USkeletalMeshComponent* MeshCom
 {
 	if (ACharacterBase* Character = Cast<ACharacterBase>(MeshComp->GetOwner()))
 	{
-		if (UARPG_InteractableActorManagerBase* InteractableActorManager = Character->InteractingManager)
-		{
-			InteractableActorManager->OnReceiveInteractStateEventBegin.Broadcast(InteractableActorManager, Character, EventTag);
 
-			InteractableActorManager->OnInteractEnd.AddDynamic(this, &UARPG_InteractEventNotifyState::WhenInteractEnd);
-		}
 	}
 }
 
@@ -480,18 +471,8 @@ void UARPG_InteractEventNotifyState::NotifyEnd(USkeletalMeshComponent* MeshComp,
 {
 	if (ACharacterBase* Character = Cast<ACharacterBase>(MeshComp->GetOwner()))
 	{
-		if (UARPG_InteractableActorManagerBase* InteractableActorManager = Character->InteractingManager)
-		{
-			InteractableActorManager->OnInteractEnd.RemoveDynamic(this, &UARPG_InteractEventNotifyState::WhenInteractEnd);
-			InteractableActorManager->OnReceiveInteractStateEventEnd.Broadcast(InteractableActorManager, Character, EventTag, true);
-		}
-	}
-}
 
-void UARPG_InteractEventNotifyState::WhenInteractEnd(AActor* Which, class UARPG_InteractableActorManagerBase* Manager, class ACharacterBase* Who, bool bFinishPerfectly)
-{
-	Manager->OnInteractEnd.RemoveDynamic(this, &UARPG_InteractEventNotifyState::WhenInteractEnd);
-	Manager->OnReceiveInteractStateEventEnd.Broadcast(Manager, Cast<ACharacterBase>(Which), EventTag, bFinishPerfectly);
+	}
 }
 
 FString UARPG_InteractEventNotifyState::GetNotifyName_Implementation() const

@@ -37,12 +37,14 @@ void UARPG_CharacterBehaviorBase::FinishExecute(bool Succeed)
 
 	bIsExecuting = false;
 	OnBehaviorFinished.ExecuteIfBound(Succeed);
+	OnBehaviorFinished.Unbind();
 	AI_V_Display_Log(Character, "行为[%s]结束，结果为", *UXD_ObjectFunctionLibrary::GetObjectClassName(this), Succeed ? TEXT("成功") : TEXT("失败"));
 }
 
 void UARPG_CharacterBehaviorBase::FinishAbort()
 {
 	OnBehaviorAbortFinished.ExecuteIfBound();
+	OnBehaviorAbortFinished.Unbind();
 	AI_V_Display_Log(Character, "行为中止状态[%s]结束", *UXD_ObjectFunctionLibrary::GetObjectClassName(this));
 }
 
