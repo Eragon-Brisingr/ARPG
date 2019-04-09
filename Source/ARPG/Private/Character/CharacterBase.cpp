@@ -823,11 +823,8 @@ void ACharacterBase::InvokeInteract_ToServer_Implementation(AActor* InteractTarg
 {
 	if (CanInteractWithTarget(InteractTarget))
 	{
-		InteractingTarget = InteractTarget;
-		IARPG_InteractInterface::WhenInvokeInteract(InteractTarget, this, FOnInteractEnd::CreateWeakLambda(this, [this](EInteractEndResult Result) 
-			{ 
-				InteractingTarget = nullptr;
-			}));
+		InvokeInteractTarget = InteractTarget;
+		IARPG_InteractInterface::WhenInvokeInteract(InteractTarget, this);
 	}
 }
 
@@ -836,47 +833,42 @@ bool ACharacterBase::InvokeInteract_ToServer_Validate(AActor* InteractTarget)
 	return true;
 }
 
-void ACharacterBase::InvokeInteractWithEndEvent(AActor* InteractTarget, const FOnInteractEndEvent& OnInteractEndEvent)
+void ACharacterBase::InvokeInteractWithEndEvent(AActor* InteractTarget, const FOnInteractEnd& OnInteractEndEvent)
 {
 	check(HasAuthority());
-	IARPG_InteractInterface::WhenInvokeInteract(InteractTarget, this, FOnInteractEnd::CreateWeakLambda(this, [=](EInteractEndResult Result) 
-		{
-			InteractingTarget = nullptr;
-			OnInteractEndEvent.ExecuteIfBound(Result); 
-		}));
+	check(OnInteractEnd.IsBound() == false);
+
+	OnInteractEnd = OnInteractEndEvent;
+	IARPG_InteractInterface::WhenInvokeInteract(InteractTarget, this);
 }
 
 bool ACharacterBase::CanInteractWithTarget(AActor* InteractTarget) const
 {
-	return InteractingTarget == nullptr && InteractTarget && InteractTarget->Implements<UARPG_InteractInterface>() && IARPG_InteractInterface::CanInteract(InteractTarget, this);
+	return InvokeInteractTarget == nullptr && InteractTarget && InteractTarget->Implements<UARPG_InteractInterface>() && IARPG_InteractInterface::CanInteract(InteractTarget, this);
 }
 
 void ACharacterBase::InvokeAbortInteract()
 {
-	if (InteractingTarget)
+	if (InvokeInteractTarget)
 	{
 		InvokeAbortInteract_ToServer();
 	}
 }
 
-void ACharacterBase::InvokeAbortInteractWithAbortEvent(const FOnInteractAbortEndEvent& OnInteractAbortEndEvent)
+void ACharacterBase::InvokeAbortInteractWithAbortEvent(const FOnInteractAbortEnd& OnInteractAbortEndEvent)
 {
 	check(HasAuthority());
-	IARPG_InteractInterface::WhenAbortInteract(this, FOnInteractAbortEnd::CreateWeakLambda(this, [=]()
-		{
-			InteractingTarget = nullptr;
-			OnInteractAbortEndEvent.ExecuteIfBound();
-		}));
+	check(OnInteractAbortEnd.IsBound() == false);
+
+	OnInteractAbortEnd = OnInteractAbortEndEvent;
+	IARPG_InteractInterface::WhenAbortInteract(this);
 }
 
 void ACharacterBase::InvokeAbortInteract_ToServer_Implementation()
 {
-	if (InteractingTarget)
+	if (InvokeInteractTarget)
 	{
-		IARPG_InteractInterface::WhenAbortInteract(InteractingTarget, this, FOnInteractAbortEnd::CreateWeakLambda(this, [this]()
-			{
-				InteractingTarget = nullptr;
-			}));
+		IARPG_InteractInterface::WhenAbortInteract(InvokeInteractTarget, this);
 	}
 }
 
@@ -895,7 +887,7 @@ bool ACharacterBase::InvokeFinishPathFollowing_ToServer_Validate()
 	return true;
 }
 
-void ACharacterBase::WhenExecuteInteract_Implementation(class ACharacterBase* InteractInvoker, const FOnInteractEndEvent& Event)
+void ACharacterBase::WhenExecuteInteract_Implementation(ACharacterBase* InteractInvoker)
 {
 	//TODO 呼叫InteractEndEvent
 	if (OnPreInteractEvents.Num() > 0)
@@ -931,6 +923,26 @@ bool ACharacterBase::CanInteract_Implementation(const class ACharacterBase* Inte
 	}
 
 	return true;
+}
+
+void ACharacterBase::ExecuteInteractEnd(EInteractEndResult Result)
+{
+	InvokeInteractTarget = nullptr;
+	if (OnInteractEnd.IsBound())
+	{
+		OnInteractEnd.Execute(Result);
+		OnInteractEnd.Unbind();
+	}
+}
+
+void ACharacterBase::ExecuteInteractAbortEnd()
+{
+	InvokeInteractTarget = nullptr;
+	if (OnInteractAbortEnd.IsBound())
+	{
+		OnInteractAbortEnd.Execute();
+		OnInteractAbortEnd.Unbind();
+	}
 }
 
 class UARPG_CampInfo* ACharacterBase::GetCampInfo() const

@@ -3,27 +3,37 @@
 #include "ARPG_AD_InteractableBase.h"
 #include "CharacterBase.h"
 
-void UARPG_AD_InteractableBase::StartInteractDispatcher(AActor* InInteractTarget, ACharacterBase* InInteractInvoker, const FWhenDispatchFinishedNative& DispatchFinishedEvent, const FOnActionDispatcherAbortedNative::FDelegate& DispatcherAbortedEvent)
+void UARPG_AD_InteractableBase::InitInteractDispatcher(AActor* InInteractTarget)
 {
-	if (DispatcherLeader == nullptr)
-	{
-		InitLeader(InInteractTarget);
-	}
+	check(InteractTarget == nullptr);
 
 	InteractTarget = InInteractTarget;
+	InitLeader(InInteractTarget);
+}
+
+void UARPG_AD_InteractableBase::StartInteractDispatcher(ACharacterBase* InInteractInvoker, const FWhenDispatchFinishedNative& DispatchFinishedEvent, const FOnActionDispatcherAbortedNative& DispatcherAbortedEvent)
+{
+	check(OnActionDispatcherAbortedNative.IsBound() == false);
+
 	InteractInvoker = InInteractInvoker;
 	WhenDispatchFinishedNative = DispatchFinishedEvent;
 
-	OnActionDispatcherAbortedNative.Clear();
-	OnActionDispatcherAbortedNative.Add(DispatcherAbortedEvent);
+	OnActionDispatcherAbortedNative = DispatcherAbortedEvent;
 
 	CurrentActions.Empty();
 
 	StartDispatch();
 }
 
-void UARPG_AD_InteractableBase::AbortInteractDispatcher(const FOnActionDispatcherAbortedNative::FDelegate& DispatcherAbortedEvent)
+void UARPG_AD_InteractableBase::AbortInteractDispatcher(const FOnActionDispatcherAbortedNative& DispatcherAbortedEvent)
 {
-	OnActionDispatcherAbortedNative.Add(DispatcherAbortedEvent);
+	OnActionDispatcherAbortedNative = DispatcherAbortedEvent;
 	AbortDispatch({});
+}
+
+void UARPG_AD_InteractableBase::WhenDeactived()
+{
+	Super::WhenDeactived();
+
+	InteractTarget = nullptr;
 }

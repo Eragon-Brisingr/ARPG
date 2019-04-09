@@ -4,11 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "BehaviorTree/BTTaskNode.h"
-#include "ARPG_InteractType.h"
 #include "BTTask_InteractWithActor.generated.h"
-
-class AARPG_InteractableActorBase;
-enum class EInteractEndResult : uint8;
 
 /**
  * 
@@ -25,9 +21,6 @@ public:
 
 	EBTNodeResult::Type ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) override;
 	EBTNodeResult::Type AbortTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) override;
-
-	void WhenInteractEnd(EInteractEndResult Result, UBehaviorTreeComponent* OwnerComp);
-	void WhenInteractAbortFinished(UBehaviorTreeComponent* OwnerComp);
 protected:
 	void TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds) override;
 };
