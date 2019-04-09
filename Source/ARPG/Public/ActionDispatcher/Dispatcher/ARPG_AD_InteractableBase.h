@@ -23,8 +23,14 @@ public:
  	TSoftObjectPtr<ACharacterBase> InteractInvoker;
 
 public:
-	void StartInteractDispatcher(AActor* InInteractTarget, ACharacterBase* InInteractInvoker, const FWhenDispatchFinishedNative& DispatchFinishedEvent, const FOnActionDispatcherAbortedNative::FDelegate& DispatcherAbortedEvent);
-	void AbortInteractDispatcher(const FOnActionDispatcherAbortedNative::FDelegate& DispatcherAbortedEvent);
+	void InitInteractDispatcher(AActor* InInteractTarget);
+
+	void StartInteractDispatcher(ACharacterBase* InInteractInvoker, const FWhenDispatchFinishedNative& DispatchFinishedEvent, const FOnActionDispatcherAbortedNative& DispatcherAbortedEvent);
+	void AbortInteractDispatcher(const FOnActionDispatcherAbortedNative& DispatcherAbortedEvent);
+
+public:
+	void WhenDeactived() override;
+
 private:
 	using UXD_ActionDispatcherBase::StartDispatch;
 	using UXD_ActionDispatcherBase::AbortDispatch;

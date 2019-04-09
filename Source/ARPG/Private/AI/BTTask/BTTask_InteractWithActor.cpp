@@ -3,7 +3,6 @@
 #include "BTTask_InteractWithActor.h"
 #include "AIController.h"
 #include "CharacterBase.h"
-#include "ARPG_InteractableActor.h"
 
 UBTTask_InteractWithActor::UBTTask_InteractWithActor()
 {
@@ -17,7 +16,10 @@ EBTNodeResult::Type UBTTask_InteractWithActor::ExecuteTask(UBehaviorTreeComponen
 		AAIController* MyController = OwnerComp.GetAIOwner();
 		if (ACharacterBase* Character = Cast<ACharacterBase>(MyController->GetPawn()))
 		{
-			Character->InvokeInteractWithEndEvent(InteractableActor.Get(), FOnInteractEnd::CreateUObject(this, &UBTTask_InteractWithActor::WhenInteractEnd, &OwnerComp));
+			Character->InvokeInteractWithEndEvent(InteractableActor.Get(), FOnInteractEnd::CreateWeakLambda(this, [this, P_OwnerComp = &OwnerComp](EInteractEndResult Result)
+				{
+					FinishLatentTask(*P_OwnerComp, Result == EInteractEndResult::Succeed ? EBTNodeResult::Succeeded : EBTNodeResult::Failed);
+				}));
 			return EBTNodeResult::InProgress;
 		}
 	}
@@ -31,21 +33,14 @@ EBTNodeResult::Type UBTTask_InteractWithActor::AbortTask(UBehaviorTreeComponent&
 		AAIController* MyController = OwnerComp.GetAIOwner();
 		if (ACharacterBase* Character = Cast<ACharacterBase>(MyController->GetPawn()))
 		{
-			//InteractableActor->EndInteract(Character, FOnInteractAbortFinished::CreateUObject(this, &UBTTask_InteractWithActor::WhenInteractAbortFinished, &OwnerComp));
+			Character->InvokeAbortInteractWithAbortEvent(FOnInteractAbortEnd::CreateWeakLambda(this, [this, P_OwnerComp = &OwnerComp]()
+				{
+					FinishLatentAbort(*P_OwnerComp);
+				}));
 		}
 		return EBTNodeResult::InProgress;
 	}
 	return EBTNodeResult::Aborted;
-}
-
-void UBTTask_InteractWithActor::WhenInteractEnd(EInteractEndResult Result, UBehaviorTreeComponent* OwnerComp)
-{
-	FinishLatentTask(*OwnerComp, Result == EInteractEndResult::Succeed ? EBTNodeResult::Succeeded : EBTNodeResult::Failed);
-}
-
-void UBTTask_InteractWithActor::WhenInteractAbortFinished(UBehaviorTreeComponent* OwnerComp)
-{
-	FinishLatentAbort(*OwnerComp);
 }
 
 void UBTTask_InteractWithActor::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds)

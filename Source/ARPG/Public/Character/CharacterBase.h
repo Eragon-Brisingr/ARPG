@@ -28,6 +28,18 @@ class UARPG_InteractableActorManagerBase;
 class UCA_EnterReleaseStateBase;
 class UARPG_AD_CharacterInteract;
 
+UENUM()
+enum class EInteractEndResult : uint8
+{
+	CanNotInteract,
+	Succeed,
+	Failed
+};
+
+DECLARE_DELEGATE_OneParam(FOnInteractEnd, EInteractEndResult);
+
+DECLARE_DELEGATE(FOnInteractAbortEnd);
+
 UCLASS()
 class ARPG_API ACharacterBase : public ACharacter, 
 	public IXD_SaveGameInterface,
@@ -405,7 +417,7 @@ public:
 	UFUNCTION(Reliable, WithValidation, Server)
 	void InvokeInteract_ToServer(AActor* InteractTarget);
 
-	void InvokeInteractWithEndEvent(AActor* InteractTarget, const FOnInteractEndEvent& OnInteractEndEvent);
+	void InvokeInteractWithEndEvent(AActor* InteractTarget, const FOnInteractEnd& OnInteractEndEvent);
 
 	UFUNCTION(BlueprintCallable, Category = "角色|交互")
 	bool CanInteractWithTarget(AActor* InteractTarget) const;
@@ -413,7 +425,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "角色|交互")
 	void InvokeAbortInteract();
 
-	void InvokeAbortInteractWithAbortEvent(const FOnInteractAbortEndEvent& OnInteractAbortEndEvent);
+	void InvokeAbortInteractWithAbortEvent(const FOnInteractAbortEnd& OnInteractAbortEndEvent);
 
 	UFUNCTION(Reliable, WithValidation, Server)
 	void InvokeAbortInteract_ToServer();
@@ -422,7 +434,7 @@ public:
 	void InvokeFinishPathFollowing_ToServer();
 
 	UPROPERTY(BlueprintReadOnly, Category = "角色|交互")
-	AActor* InteractingTarget;
+	AActor* InvokeInteractTarget;
 
 	UPROPERTY(BlueprintReadOnly, Category = "角色|交互")
 	UARPG_InteractableActorManagerBase* InteractingManager;
@@ -434,11 +446,19 @@ public:
 	DECLARE_DELEGATE(FOnPreInteractEvent);
 	TArray<FOnPreInteractEvent> OnPreInteractEvents;
 
-	void WhenExecuteInteract_Implementation(class ACharacterBase* InteractInvoker, const FOnInteractEndEvent& Event) override;
+	void WhenExecuteInteract_Implementation(ACharacterBase* InteractInvoker) override;
 	bool CanInteract_Implementation(const class ACharacterBase* InteractInvoker) const override;
 
 	UPROPERTY(EditAnywhere, Category = "角色|交互", Instanced)
 	UARPG_AD_CharacterInteract* InteractBehavior;
+
+	UFUNCTION(BlueprintCallable, Category = "角色|交互")
+	void ExecuteInteractEnd(EInteractEndResult Result);
+	UFUNCTION(BlueprintCallable, Category = "角色|交互")
+	void ExecuteInteractAbortEnd();
+private:
+	FOnInteractEnd OnInteractEnd;
+	FOnInteractAbortEnd OnInteractAbortEnd;
 public:
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "Character")
 	class UARPG_MovementComponent* ARPG_MovementComponent;

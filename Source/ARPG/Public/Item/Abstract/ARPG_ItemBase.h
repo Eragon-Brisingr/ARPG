@@ -17,7 +17,7 @@ class ARPG_API AARPG_ItemBase : public AXD_ItemBase, public IARPG_InteractInterf
 	GENERATED_BODY()
 public:
 	//Begin IARPG_InteractInterface
-	virtual void WhenExecuteInteract_Implementation(class ACharacterBase* InteractInvoker, const FOnInteractEndEvent& Event) override;
+	virtual void WhenExecuteInteract_Implementation(ACharacterBase* InteractInvoker) override;
 	virtual bool CanInteract_Implementation(const class ACharacterBase* InteractInvoker) const override;
 	//End IARPG_InteractInterface
 public:

@@ -129,8 +129,13 @@ void UARPG_InteractableActorManagerBase::StartInteractImpl(ACharacterBase* Invok
 			Invoker->AttachToActor(GetOwner(), FAttachmentTransformRules::KeepWorldTransform);
 		}
 
-		Behavior->StartInteractDispatcher(GetOwner(), Invoker, FWhenDispatchFinishedNative::CreateUObject(this, &UARPG_InteractableActorManagerBase::WhenInteractFinishedSucceed, Invoker, OnInteractFinished),
-			FOnActionDispatcherAbortedNative::FDelegate::CreateUObject(this, &UARPG_InteractableActorManagerBase::WhenInteractFinishedFailed, Invoker, OnInteractFinished));
+		if (Behavior->DispatcherLeader == nullptr)
+		{
+			Behavior->InitInteractDispatcher(GetOwner());
+		}
+
+		Behavior->StartInteractDispatcher(Invoker, FWhenDispatchFinishedNative::CreateUObject(this, &UARPG_InteractableActorManagerBase::WhenInteractFinishedSucceed, Invoker, OnInteractFinished),
+			FOnActionDispatcherAbortedNative::CreateUObject(this, &UARPG_InteractableActorManagerBase::WhenInteractFinishedFailed, Invoker, OnInteractFinished));
 
 		CurBehaviorMap.FindOrAdd(Invoker) = Behavior;
 		return;
@@ -163,7 +168,7 @@ void UARPG_InteractableActorManagerBase::EndInteract(ACharacterBase* Invoker, co
 		}
 		else
 		{
-			(*P_Behavior)->AbortInteractDispatcher(FOnActionDispatcherAbortedNative::FDelegate::CreateUObject(this, &UARPG_InteractableActorManagerBase::WhenActionAbortFinished, Invoker, OnInteractAbortFinished));
+			(*P_Behavior)->AbortInteractDispatcher(FOnActionDispatcherAbortedNative::CreateUObject(this, &UARPG_InteractableActorManagerBase::WhenActionAbortFinished, Invoker, OnInteractAbortFinished));
 		}
 		CurBehaviorMap.Remove(Invoker);
 	}
