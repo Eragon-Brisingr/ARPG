@@ -25,12 +25,11 @@ public:
 public:
 	void InitInteractDispatcher(AActor* InInteractTarget);
 
-	void StartInteractDispatcher(ACharacterBase* InInteractInvoker, const FWhenDispatchFinishedNative& DispatchFinishedEvent, const FOnActionDispatcherAbortedNative& DispatcherAbortedEvent);
+	void StartInteractDispatcher(ACharacterBase* InInteractInvoker, const FOnDispatchDeactiveNative& OnDispatchDeactive);
 	void AbortInteractDispatcher(const FOnActionDispatcherAbortedNative& DispatcherAbortedEvent);
 
 public:
-	void WhenDeactived() override;
-
+	void WhenDeactived(bool IsFinsihedCompleted) override;
 private:
 	using UXD_ActionDispatcherBase::StartDispatch;
 	using UXD_ActionDispatcherBase::AbortDispatch;

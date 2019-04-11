@@ -5,40 +5,33 @@
 #include "ARPG_MoveUtils.h"
 #include "CharacterBase.h"
 
-AARPG_InteractableActorSingle::AARPG_InteractableActorSingle()
-	:StartBehaviousRadius(0.f), bSnapRotation(true)
+void FARPG_InteractSingleConfig::InitConfig(AActor* Owner)
 {
-
+	if (InteractDispatcher)
+	{
+		InteractDispatcher->InitInteractDispatcher(Owner);
+	}
 }
 
-ACharacterBase* AARPG_InteractableActorSingle::GetInteracter() const
-{
-	return InteractDispatcher ? InteractDispatcher->InteractInvoker.Get() : nullptr;
-}
-
-bool AARPG_InteractableActorSingle::CanInteract_Implementation(const ACharacterBase* InteractInvoker) const
+bool FARPG_InteractSingleConfig::CanInteract(const ACharacterBase* InteractInvoker) const
 {
 	return InteractDispatcher && InteractDispatcher->State == EActionDispatcherState::Deactive;
 }
 
-void AARPG_InteractableActorSingle::WhenInvokeInteract_Implementation(ACharacterBase* InteractInvoker)
+void FARPG_InteractSingleConfig::WhenInvokeInteract(AActor* Owner, ACharacterBase* InteractInvoker)
 {
-	FVector WorldLocation = GetActorTransform().TransformPosition(InteractLocation.GetLocation());
+	FVector WorldLocation = Owner->GetActorTransform().TransformPosition(InteractLocation.GetLocation());
 
-	FOnARPG_MoveFinished OnARPG_MoveFinished = FOnARPG_MoveFinished::CreateWeakLambda(this, [=](const FPathFollowingResult & Result)
+	FOnARPG_MoveFinished OnARPG_MoveFinished = FOnARPG_MoveFinished::CreateWeakLambda(Owner, [=](const FPathFollowingResult & Result)
 		{
-			if (Result.IsSuccess())
+			if (Result.Code == EPathFollowingResult::Success)
 			{
-				if (CanInteract(this, InteractInvoker))
+				if (IARPG_InteractInterface::CanInteract(Owner, InteractInvoker))
 				{
 					InteractDispatcher->StartInteractDispatcher(InteractInvoker,
-						FWhenDispatchFinishedNative::CreateWeakLambda(this, [=](const FName & Tag)
+						FOnDispatchDeactiveNative::CreateWeakLambda(Owner, [=](bool IsFinishedCompleted)
 							{
-								InteractInvoker->ExecuteInteractEnd(EInteractEndResult::Succeed);
-							}),
-						FOnActionDispatcherAbortedNative::CreateWeakLambda(this, [=]()
-							{
-								InteractInvoker->ExecuteInteractEnd(EInteractEndResult::Failed);
+								InteractInvoker->ExecuteInteractEnd(IsFinishedCompleted ? EInteractEndResult::Succeed : EInteractEndResult::Failed);
 							}));
 				}
 				else
@@ -54,7 +47,7 @@ void AARPG_InteractableActorSingle::WhenInvokeInteract_Implementation(ACharacter
 
 	if (bSnapRotation)
 	{
-		FRotator WorldRotation = GetActorTransform().TransformRotation(InteractLocation.GetRotation()).Rotator();
+		FRotator WorldRotation = Owner->GetActorTransform().TransformRotation(InteractLocation.GetRotation()).Rotator();
 		UARPG_MoveUtils::ARPG_MoveToLocationAndTurn(InteractInvoker, WorldLocation, WorldRotation, OnARPG_MoveFinished, StartBehaviousRadius);
 	}
 	else
@@ -63,11 +56,11 @@ void AARPG_InteractableActorSingle::WhenInvokeInteract_Implementation(ACharacter
 	}
 }
 
-void AARPG_InteractableActorSingle::WhenAbortInteract_Implementation(ACharacterBase* InteractInvoker)
+void FARPG_InteractSingleConfig::WhenAbortInteract(AActor* Owner, ACharacterBase* InteractInvoker)
 {
 	if (InteractInvoker == GetInteracter())
 	{
-		InteractDispatcher->AbortInteractDispatcher(FOnActionDispatcherAbortedNative::CreateWeakLambda(this, [=]()
+		InteractDispatcher->AbortInteractDispatcher(FOnActionDispatcherAbortedNative::CreateWeakLambda(Owner, [=]()
 			{
 				InteractInvoker->ExecuteInteractAbortEnd();
 			}));
@@ -79,12 +72,38 @@ void AARPG_InteractableActorSingle::WhenAbortInteract_Implementation(ACharacterB
 	}
 }
 
+ACharacterBase* FARPG_InteractSingleConfig::GetInteracter() const
+{
+	return InteractDispatcher ? InteractDispatcher->InteractInvoker.Get() : nullptr;
+}
+
+AARPG_InteractableActorSingle::AARPG_InteractableActorSingle()
+{
+
+}
+
+ACharacterBase* AARPG_InteractableActorSingle::GetInteracter() const
+{
+	return InteractSingleConfig.GetInteracter();
+}
+
+bool AARPG_InteractableActorSingle::CanInteract_Implementation(const ACharacterBase* InteractInvoker) const
+{
+	return InteractSingleConfig.CanInteract(InteractInvoker);
+}
+
+void AARPG_InteractableActorSingle::WhenInvokeInteract_Implementation(ACharacterBase* InteractInvoker)
+{
+	InteractSingleConfig.WhenInvokeInteract(this, InteractInvoker);
+}
+
+void AARPG_InteractableActorSingle::WhenAbortInteract_Implementation(ACharacterBase* InteractInvoker)
+{
+	InteractSingleConfig.WhenAbortInteract(this, InteractInvoker);
+}
+
 void AARPG_InteractableActorSingle::BeginPlay()
 {
 	Super::BeginPlay();
-
-	if (InteractDispatcher)
-	{
-		InteractDispatcher->InitInteractDispatcher(this);
-	}
+	InteractSingleConfig.InitConfig(this);
 }

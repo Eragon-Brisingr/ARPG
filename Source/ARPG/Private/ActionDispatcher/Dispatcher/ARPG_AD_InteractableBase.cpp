@@ -11,14 +11,12 @@ void UARPG_AD_InteractableBase::InitInteractDispatcher(AActor* InInteractTarget)
 	InitLeader(InInteractTarget);
 }
 
-void UARPG_AD_InteractableBase::StartInteractDispatcher(ACharacterBase* InInteractInvoker, const FWhenDispatchFinishedNative& DispatchFinishedEvent, const FOnActionDispatcherAbortedNative& DispatcherAbortedEvent)
+void UARPG_AD_InteractableBase::StartInteractDispatcher(ACharacterBase* InInteractInvoker, const FOnDispatchDeactiveNative& OnDispatchDeactive)
 {
 	check(OnActionDispatcherAbortedNative.IsBound() == false);
 
 	InteractInvoker = InInteractInvoker;
-	WhenDispatchFinishedNative = DispatchFinishedEvent;
-
-	OnActionDispatcherAbortedNative = DispatcherAbortedEvent;
+	OnDispatchDeactiveNative = OnDispatchDeactive;
 
 	CurrentActions.Empty();
 
@@ -27,7 +25,8 @@ void UARPG_AD_InteractableBase::StartInteractDispatcher(ACharacterBase* InIntera
 
 void UARPG_AD_InteractableBase::AbortInteractDispatcher(const FOnActionDispatcherAbortedNative& DispatcherAbortedEvent)
 {
-	//TODO 修复中断时的问题
+	check(State != EActionDispatcherState::Deactive);
+
 	if (State == EActionDispatcherState::Active)
 	{
 		AbortDispatch();
@@ -36,15 +35,11 @@ void UARPG_AD_InteractableBase::AbortInteractDispatcher(const FOnActionDispatche
 	{
 		OnActionDispatcherAbortedNative = DispatcherAbortedEvent;
 	}
-	else
-	{
-		DispatcherAbortedEvent.ExecuteIfBound();
-	}
 }
 
-void UARPG_AD_InteractableBase::WhenDeactived()
+void UARPG_AD_InteractableBase::WhenDeactived(bool IsFinsihedCompleted)
 {
-	Super::WhenDeactived();
+	Super::WhenDeactived(IsFinsihedCompleted);
 
-	InteractTarget = nullptr;
+	InteractInvoker = nullptr;
 }
