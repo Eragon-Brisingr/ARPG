@@ -10,14 +10,15 @@
 class ACharacterBase;
 class UARPG_AD_InteractableBase;
 
-UCLASS(meta = (DisplayName = "单人交互Actor"), Blueprintable)
-class ARPG_API AARPG_InteractableActorSingle : public AActor, 
-	public IARPG_InteractInterface
+USTRUCT(BlueprintType)
+struct FARPG_InteractSingleConfig
 {
 	GENERATED_BODY()
 public:
-	AARPG_InteractableActorSingle();
-	
+	FARPG_InteractSingleConfig()
+		:bSnapRotation(true)
+	{}
+
 	UPROPERTY(EditAnywhere, Category = "行为")
 	float StartBehaviousRadius;
 
@@ -29,6 +30,24 @@ public:
 
 	UPROPERTY(EditAnywhere, Category = "行为", Instanced)
 	UARPG_AD_InteractableBase* InteractDispatcher;
+
+	void InitConfig(AActor* Owner);
+	bool CanInteract(const ACharacterBase* InteractInvoker) const;
+	void WhenInvokeInteract(AActor* Owner, ACharacterBase* InteractInvoker);
+	void WhenAbortInteract(AActor* Owner, ACharacterBase* InteractInvoker);
+	ACharacterBase* GetInteracter() const;
+};
+
+UCLASS(meta = (DisplayName = "单人交互Actor"), Blueprintable)
+class ARPG_API AARPG_InteractableActorSingle : public AActor, 
+	public IARPG_InteractInterface
+{
+	GENERATED_BODY()
+public:
+	AARPG_InteractableActorSingle();
+	
+	UPROPERTY(EditAnywhere, Category = "行为", meta = (ShowOnlyInnerProperties))
+	FARPG_InteractSingleConfig InteractSingleConfig;
 
 	UFUNCTION()
 	ACharacterBase* GetInteracter() const;

@@ -822,12 +822,7 @@ void ACharacterBase::InvokeInteract_ToServer_Implementation(AActor* InteractTarg
 {
 	if (CanInteractWithTarget(InteractTarget))
 	{
-#if WITH_EDITOR
-		check(PreInvokeInteractTarget.IsValid() == false);
-		PreInvokeInteractTarget = InteractTarget;
-#endif
-		InvokeInteractTarget = InteractTarget;
-		IARPG_InteractInterface::WhenInvokeInteract(InteractTarget, this);
+		InvokeInteractWithEndEvent(InteractTarget, {});
 	}
 }
 
@@ -838,9 +833,12 @@ bool ACharacterBase::InvokeInteract_ToServer_Validate(AActor* InteractTarget)
 
 void ACharacterBase::InvokeInteractWithEndEvent(AActor* InteractTarget, const FOnInteractEnd& OnInteractEndEvent)
 {
-	check(HasAuthority());
-	check(OnInteractEnd.IsBound() == false);
-
+	check(HasAuthority() && InteractTarget);
+#if WITH_EDITOR
+	checkf(PreInvokeInteractTarget.IsValid() == false, TEXT("PreInvokeInteractTarget 还存在，上一个交互未调用ExecuteInteractEnd或ExecuteInteractAbortEnd"));
+	PreInvokeInteractTarget = InteractTarget;
+#endif
+	InvokeInteractTarget = InteractTarget;
 	OnInteractEnd = OnInteractEndEvent;
 	IARPG_InteractInterface::WhenInvokeInteract(InteractTarget, this);
 }
@@ -861,17 +859,16 @@ void ACharacterBase::InvokeAbortInteract()
 void ACharacterBase::InvokeAbortInteractWithAbortEvent(const FOnInteractAbortEnd& OnInteractAbortEndEvent)
 {
 	check(HasAuthority());
-	check(OnInteractAbortEnd.IsBound() == false);
 
 	OnInteractAbortEnd = OnInteractAbortEndEvent;
-	IARPG_InteractInterface::WhenAbortInteract(this);
+	IARPG_InteractInterface::WhenAbortInteract(InvokeInteractTarget, this);
 }
 
 void ACharacterBase::InvokeAbortInteract_ToServer_Implementation()
 {
 	if (InvokeInteractTarget)
 	{
-		IARPG_InteractInterface::WhenAbortInteract(InvokeInteractTarget, this);
+		InvokeAbortInteractWithAbortEvent({});
 	}
 }
 
