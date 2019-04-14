@@ -37,3 +37,6 @@ url=https://gitlab.com/eragon.xuduo/RawAssets.git
 [submodule "Plugins/XD_CharacterActionDispatcher"]
 	path = Plugins/XD_CharacterActionDispatcher
 	url = https://github.com/Eragon-Brisingr/XD_CharacterActionDispatcher
+[submodule "Plugins/XD_DrawGizmo"]
+	path = Plugins/XD_DrawGizmo
+	url = https://github.com/Eragon-Brisingr/XD_DrawGizmo.git

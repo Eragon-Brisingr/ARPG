@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "ARPG_InteractInterface.h"
+#include "XD_DrawGizmoInterface.h"
 #include "ARPG_InteractableActor.generated.h"
 
 class ACharacterBase;
@@ -40,7 +41,8 @@ public:
 
 UCLASS(meta = (DisplayName = "单人交互Actor"), Blueprintable)
 class ARPG_API AARPG_InteractableActorSingle : public AActor, 
-	public IARPG_InteractInterface
+	public IARPG_InteractInterface,
+	public IXD_DrawGizmoInterface
 {
 	GENERATED_BODY()
 public:
@@ -58,4 +60,6 @@ public:
 
 public:
 	void BeginPlay() override;
+
+	void DrawGizmoNative(const FSceneView* View, FViewport* Viewport, FPrimitiveDrawInterface* PDI, bool IsSelected) override;
 };
