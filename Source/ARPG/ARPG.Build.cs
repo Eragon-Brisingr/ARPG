@@ -28,6 +28,8 @@ public class ARPG : ModuleRules
             "XD_AI_SystemEx",
             "XD_EventFlowSystem",
             "XD_CharacterActionDispatcher",
+
+            "XD_DrawGizmoRuntime",
         });
 
 		// Uncomment if you are using Slate UI
