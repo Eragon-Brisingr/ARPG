@@ -17,7 +17,7 @@ void UARPG_CharacterBehaviorBase::ExecuteBehavior(class ACharacterBase* Executer
 	bIsExecuting = true;
 	Character = Executer;
 	OnBehaviorFinished = WhenBehaviorFinished;
-	AI_V_Display_Log(Character, "执行行为[%s]", *UXD_ObjectFunctionLibrary::GetObjectClassName(this));
+	AI_Display_VLog(Character, "执行行为[%s]", *UXD_ObjectFunctionLibrary::GetObjectClassName(this));
 	WhenBehaviorExecuted(Executer);
 }
 
@@ -28,7 +28,7 @@ void UARPG_CharacterBehaviorBase::AbortBehavior(class ACharacterBase* Executer, 
 	bIsExecuting = false;
 	OnBehaviorAbortFinished = WhenBehaviorAbortFinished;
 	WhenBehaviorAborted(Executer);
-	AI_V_Display_Log(Executer, "行为[%s]中断", *UXD_ObjectFunctionLibrary::GetObjectClassName(this));
+	AI_Display_VLog(Executer, "行为[%s]中断", *UXD_ObjectFunctionLibrary::GetObjectClassName(this));
 }
 
 void UARPG_CharacterBehaviorBase::FinishExecute(bool Succeed)
@@ -38,14 +38,14 @@ void UARPG_CharacterBehaviorBase::FinishExecute(bool Succeed)
 	bIsExecuting = false;
 	OnBehaviorFinished.ExecuteIfBound(Succeed);
 	OnBehaviorFinished.Unbind();
-	AI_V_Display_Log(Character, "行为[%s]结束，结果为", *UXD_ObjectFunctionLibrary::GetObjectClassName(this), Succeed ? TEXT("成功") : TEXT("失败"));
+	AI_Display_VLog(Character, "行为[%s]结束，结果为", *UXD_ObjectFunctionLibrary::GetObjectClassName(this), Succeed ? TEXT("成功") : TEXT("失败"));
 }
 
 void UARPG_CharacterBehaviorBase::FinishAbort()
 {
 	OnBehaviorAbortFinished.ExecuteIfBound();
 	OnBehaviorAbortFinished.Unbind();
-	AI_V_Display_Log(Character, "行为中止状态[%s]结束", *UXD_ObjectFunctionLibrary::GetObjectClassName(this));
+	AI_Display_VLog(Character, "行为中止状态[%s]结束", *UXD_ObjectFunctionLibrary::GetObjectClassName(this));
 }
 
 FString UARPG_CharacterBehaviorBase::GetDescribe() const

@@ -845,7 +845,7 @@ void ACharacterBase::InvokeInteractWithEndEvent(AActor* InteractTarget, const FO
 
 bool ACharacterBase::CanInteractWithTarget(AActor* InteractTarget) const
 {
-	return InvokeInteractTarget == nullptr && InteractTarget && InteractTarget->Implements<UARPG_InteractInterface>() && IARPG_InteractInterface::CanInteract(InteractTarget, this);
+	return InvokeInteractTarget == nullptr && InteractTarget && CanPlayFullBodyMontage() && InteractTarget->Implements<UARPG_InteractInterface>() && IARPG_InteractInterface::CanInteract(InteractTarget, this);
 }
 
 void ACharacterBase::InvokeAbortInteract()

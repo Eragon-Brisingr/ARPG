@@ -3,6 +3,8 @@
 #include "BTTask_InteractWithActor.h"
 #include "AIController.h"
 #include "CharacterBase.h"
+#include "ARPG_AI_Log.h"
+#include "XD_DebugFunctionLibrary.h"
 
 UBTTask_InteractWithActor::UBTTask_InteractWithActor()
 {
@@ -16,11 +18,16 @@ EBTNodeResult::Type UBTTask_InteractWithActor::ExecuteTask(UBehaviorTreeComponen
 		AAIController* MyController = OwnerComp.GetAIOwner();
 		if (ACharacterBase* Character = Cast<ACharacterBase>(MyController->GetPawn()))
 		{
-			Character->InvokeInteractWithEndEvent(InteractableActor.Get(), FOnInteractEnd::CreateWeakLambda(this, [this, P_OwnerComp = &OwnerComp](EInteractEndResult Result)
-				{
-					FinishLatentTask(*P_OwnerComp, Result == EInteractEndResult::Succeed ? EBTNodeResult::Succeeded : EBTNodeResult::Failed);
-				}));
-			return EBTNodeResult::InProgress;
+			if (Character->CanInteractWithTarget(InteractableActor.Get()))
+			{
+				AI_Display_VLog(Character, "请求与%s进行交互", *UXD_DebugFunctionLibrary::GetDebugName(InteractableActor.Get()));
+				Character->InvokeInteractWithEndEvent(InteractableActor.Get(), FOnInteractEnd::CreateWeakLambda(this, [=, P_OwnerComp = &OwnerComp](EInteractEndResult Result)
+					{
+						AI_Display_VLog(Character, "与%s进行交互结束，结果为%s", *UXD_DebugFunctionLibrary::GetDebugName(InteractableActor.Get()), Result == EInteractEndResult::Succeed ? TEXT("成功") : TEXT("失败"));
+						FinishLatentTask(*P_OwnerComp, Result == EInteractEndResult::Succeed ? EBTNodeResult::Succeeded : EBTNodeResult::Failed);
+					}));
+				return EBTNodeResult::InProgress;
+			}
 		}
 	}
 	return EBTNodeResult::Failed;
@@ -33,6 +40,7 @@ EBTNodeResult::Type UBTTask_InteractWithActor::AbortTask(UBehaviorTreeComponent&
 		AAIController* MyController = OwnerComp.GetAIOwner();
 		if (ACharacterBase* Character = Cast<ACharacterBase>(MyController->GetPawn()))
 		{
+			AI_Display_VLog(Character, "中断与%s进行交互", *UXD_DebugFunctionLibrary::GetDebugName(InteractableActor.Get()));
 			Character->InvokeAbortInteractWithAbortEvent(FOnInteractAbortEnd::CreateWeakLambda(this, [this, P_OwnerComp = &OwnerComp]()
 				{
 					FinishLatentAbort(*P_OwnerComp);
