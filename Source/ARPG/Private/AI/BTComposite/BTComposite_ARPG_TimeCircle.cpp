@@ -58,7 +58,7 @@ void UBTComposite_ARPG_TimeCircleBase::NotifyNodeDeactivation(FBehaviorTreeSearc
 		FTimeCircleMemory* TimeCircleMemory = GetNodeMemory<FTimeCircleMemory>(SearchData);
 
 		TimeManager->RemoveNativeSpecialGameTimeEvent(TimeCircleMemory->Handle);
-		AI_V_Display_Log(&SearchData.OwnerComp, "[%s]时间行为循环被中断", *GetNodeName());
+		AI_Display_VLog(&SearchData.OwnerComp, "[%s]时间行为循环被中断", *GetNodeName());
 	}
 }
 
@@ -115,7 +115,7 @@ int32 UBTComposite_ARPG_HourTimeCircle::GetNextChildHandler(struct FBehaviorTree
 				}
 				TimeCircleMemory->Handle = TimeManager->AddNativeSpecialGameTimeEvent(NextExecuteTimeBehaviorStartTime, UXD_TimeManager::FXD_GameTimeNativeDelegate::CreateUObject(this, &UBTComposite_ARPG_HourTimeCircle::ExecuteNextTimeCircleEvent, SearchData, NextBehaviorIndex));
 
-				AI_V_Display_Log(&SearchData.OwnerComp, "[%s]", *GetRowBehaviorDesc(BehaviorIndex));
+				AI_Display_VLog(&SearchData.OwnerComp, "[%s]", *GetRowBehaviorDesc(BehaviorIndex));
 
 				return BehaviorIndex;
 			}
@@ -215,7 +215,7 @@ int32 UBTComposite_ARPG_DayTimeCircle::GetNextChildHandler(struct FBehaviorTreeS
 				}
 				TimeCircleMemory->Handle = TimeManager->AddNativeSpecialGameTimeEvent(NextExecuteTimeBehaviorStartTime, UXD_TimeManager::FXD_GameTimeNativeDelegate::CreateUObject(this, &UBTComposite_ARPG_HourTimeCircle::ExecuteNextTimeCircleEvent, SearchData, NextBehaviorIndex));
 
-				AI_V_Display_Log(&SearchData.OwnerComp, "[%s][%s]", *CurrentTime.ToString(), *GetRowBehaviorDesc(BehaviorIndex));
+				AI_Display_VLog(&SearchData.OwnerComp, "[%s][%s]", *CurrentTime.ToString(), *GetRowBehaviorDesc(BehaviorIndex));
 
 				return BehaviorIndex;
 			}
@@ -315,7 +315,7 @@ int32 UBTComposite_ARPG_WeekTimeCircle::GetNextChildHandler(struct FBehaviorTree
 				}
 				TimeCircleMemory->Handle = TimeManager->AddNativeSpecialGameTimeEvent(NextExecuteTimeBehaviorStartTime, UXD_TimeManager::FXD_GameTimeNativeDelegate::CreateUObject(this, &UBTComposite_ARPG_HourTimeCircle::ExecuteNextTimeCircleEvent, SearchData, NextBehaviorIndex));
 
-				AI_V_Display_Log(&SearchData.OwnerComp, "[%s]", *GetRowBehaviorDesc(BehaviorIndex));
+				AI_Display_VLog(&SearchData.OwnerComp, "[%s]", *GetRowBehaviorDesc(BehaviorIndex));
 
 				return BehaviorIndex;
 			}
@@ -423,7 +423,7 @@ int32 UBTComposite_ARPG_MonthTimeCircle::GetNextChildHandler(struct FBehaviorTre
 				FXD_SpecialTimeConfig NextExecuteTimeBehaviorStartTime = FXD_SpecialTimeConfig(Year, Month, DayOfMonth, Hour, Minute);
 				TimeCircleMemory->Handle = TimeManager->AddNativeSpecialGameTimeEvent(NextExecuteTimeBehaviorStartTime, UXD_TimeManager::FXD_GameTimeNativeDelegate::CreateUObject(this, &UBTComposite_ARPG_HourTimeCircle::ExecuteNextTimeCircleEvent, SearchData, NextBehaviorIndex));
 
-				AI_V_Display_Log(&SearchData.OwnerComp, "[%s][%s]", *CurrentTime.ToString(), *GetRowBehaviorDesc(BehaviorIndex));
+				AI_Display_VLog(&SearchData.OwnerComp, "[%s][%s]", *CurrentTime.ToString(), *GetRowBehaviorDesc(BehaviorIndex));
 
 				return BehaviorIndex;
 			}
@@ -526,7 +526,7 @@ int32 UBTComposite_ARPG_YearTimeCircle::GetNextChildHandler(struct FBehaviorTree
 				FXD_SpecialTimeConfig NextExecuteTimeBehaviorStartTime = FXD_SpecialTimeConfig(Year, Month, DayOfMonth, Hour, Minute);
 				TimeCircleMemory->Handle = TimeManager->AddNativeSpecialGameTimeEvent(NextExecuteTimeBehaviorStartTime, UXD_TimeManager::FXD_GameTimeNativeDelegate::CreateUObject(this, &UBTComposite_ARPG_HourTimeCircle::ExecuteNextTimeCircleEvent, SearchData, NextBehaviorIndex));
 
-				AI_V_Display_Log(&SearchData.OwnerComp, "[%s][%s]", *CurrentTime.ToString(), *GetRowBehaviorDesc(BehaviorIndex));
+				AI_Display_VLog(&SearchData.OwnerComp, "[%s][%s]", *CurrentTime.ToString(), *GetRowBehaviorDesc(BehaviorIndex));
 
 				return BehaviorIndex;
 			}
