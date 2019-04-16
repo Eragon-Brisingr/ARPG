@@ -8,6 +8,9 @@
 #include "ARPG_CharacterBehaviorType.h"
 #include "ARPG_NavPath.generated.h"
 
+class UARPG_AD_CharacterBase;
+class ACharacterBase;
+
 USTRUCT(BlueprintType)
 struct FARPG_NavPathPoint : public FBehaviorPositionData
 {
@@ -24,7 +27,12 @@ public:
 	
 	//TODO 改为动作调度器，并且为多个调用
  	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "行为", Instanced)
-	UARPG_CharacterBehaviorBase* Behavior = nullptr;
+	UARPG_AD_CharacterBase* BehaviorTemplate = nullptr;
+
+	UPROPERTY()
+	TMap<ACharacterBase*, UARPG_AD_CharacterBase*> BehaviorMap;
+
+	UARPG_AD_CharacterBase* GetBehavior(ACharacterBase* Invoker);
 };
 
 UCLASS()

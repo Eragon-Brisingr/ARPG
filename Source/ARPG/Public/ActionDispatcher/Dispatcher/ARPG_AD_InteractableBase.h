@@ -26,7 +26,7 @@ public:
 	void InitInteractDispatcher(AActor* InInteractTarget);
 
 	void StartInteractDispatcher(ACharacterBase* InInteractInvoker, const FOnDispatchDeactiveNative& OnDispatchDeactive);
-	void AbortInteractDispatcher(const FOnActionDispatcherAbortedNative& DispatcherAbortedEvent);
+	void AbortInteractDispatcher(const FOnDispatcherAbortedNative& DispatcherAbortedEvent);
 
 public:
 	void WhenDeactived(bool IsFinsihedCompleted) override;

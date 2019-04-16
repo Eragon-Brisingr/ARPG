@@ -13,7 +13,7 @@ void UARPG_AD_InteractableBase::InitInteractDispatcher(AActor* InInteractTarget)
 
 void UARPG_AD_InteractableBase::StartInteractDispatcher(ACharacterBase* InInteractInvoker, const FOnDispatchDeactiveNative& OnDispatchDeactive)
 {
-	check(OnActionDispatcherAbortedNative.IsBound() == false);
+	check(OnDispatcherAbortedNative.IsBound() == false);
 
 	InteractInvoker = InInteractInvoker;
 	OnDispatchDeactiveNative = OnDispatchDeactive;
@@ -23,7 +23,7 @@ void UARPG_AD_InteractableBase::StartInteractDispatcher(ACharacterBase* InIntera
 	StartDispatch();
 }
 
-void UARPG_AD_InteractableBase::AbortInteractDispatcher(const FOnActionDispatcherAbortedNative& DispatcherAbortedEvent)
+void UARPG_AD_InteractableBase::AbortInteractDispatcher(const FOnDispatcherAbortedNative& DispatcherAbortedEvent)
 {
 	check(State != EActionDispatcherState::Deactive);
 
@@ -33,7 +33,7 @@ void UARPG_AD_InteractableBase::AbortInteractDispatcher(const FOnActionDispatche
 	}
 	else if (State == EActionDispatcherState::Aborting)
 	{
-		OnActionDispatcherAbortedNative = DispatcherAbortedEvent;
+		OnDispatcherAbortedNative = DispatcherAbortedEvent;
 	}
 }
 

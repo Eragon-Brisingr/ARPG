@@ -1,7 +1,26 @@
 ﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 #include "ARPG_NavPath.h"
-#include "ARPG_CharacterBehaviorImpl.h"
+#include "ARPG_AD_CharacterBase.h"
+#include "CharacterBase.h"
+#include "ARPG_AI_Config.h"
+
+float FARPG_NavPathPoint::GetAcceptableRadius() const
+{
+	return bAttachToLocation ? 0.f : AcceptableRadius;
+}
+
+UARPG_AD_CharacterBase* FARPG_NavPathPoint::GetBehavior(ACharacterBase* Invoker)
+{
+	UARPG_AD_CharacterBase*& Behavior = BehaviorMap.FindOrAdd(Invoker);
+	if (Behavior == nullptr)
+	{
+		Behavior = DuplicateObject(BehaviorTemplate, Invoker);
+		Behavior->Character = Invoker;
+		Behavior->InitLeader(Invoker);
+	}
+	return Behavior;
+}
 
 // Sets default values
 AARPG_NavPath::AARPG_NavPath()
@@ -31,17 +50,15 @@ void AARPG_NavPath::OnConstruction(const FTransform& Transform)
 		NavPathPoints[i].Location = VisualControl->GetLocationAtSplinePoint(i, ESplineCoordinateSpace::World);
 		NavPathPoints[i].Rotation = VisualControl->GetRotationAtSplinePoint(i, ESplineCoordinateSpace::World);
 	}
-
-	for (int32 i = PreNum; i < NavPathPoints.Num(); ++i)
+	TSoftClassPtr<UARPG_AD_CharacterBase> PathFollowDefaultActionClass = GetDefault<UARPG_AI_Config>()->PathFollowDefaultActionClass;
+	if (!PathFollowDefaultActionClass.IsNull())
 	{
-		NavPathPoints[i].Behavior = NewObject<UCB_Wait>(this);
+		for (int32 i = PreNum; i < NavPathPoints.Num(); ++i)
+		{
+			NavPathPoints[i].BehaviorTemplate = NewObject<UARPG_AD_CharacterBase>(this, PathFollowDefaultActionClass.LoadSynchronous());
+		}
 	}
 
 	VisualControl->SetClosedLoop(bIsClosedLoop);
 }
 #endif
-
-float FARPG_NavPathPoint::GetAcceptableRadius() const
-{
-	return bAttachToLocation ? 0.f : AcceptableRadius;
-}

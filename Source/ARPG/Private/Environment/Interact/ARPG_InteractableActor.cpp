@@ -60,7 +60,7 @@ void FARPG_InteractSingleConfig::WhenAbortInteract(AActor* Owner, ACharacterBase
 {
 	if (InteractInvoker == GetInteracter())
 	{
-		InteractDispatcher->AbortInteractDispatcher(FOnActionDispatcherAbortedNative::CreateWeakLambda(Owner, [=]()
+		InteractDispatcher->AbortInteractDispatcher(FOnDispatcherAbortedNative::CreateWeakLambda(Owner, [=]()
 			{
 				InteractInvoker->ExecuteInteractAbortEnd();
 			}));

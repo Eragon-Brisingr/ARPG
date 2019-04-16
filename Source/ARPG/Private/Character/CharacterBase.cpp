@@ -910,7 +910,7 @@ void ACharacterBase::WhenExecuteInteract_Implementation(ACharacterBase* Interact
 				{
 					InteractInvoker->ExecuteInteractEnd(EInteractEndResult::Succeed);
 				});
-			InteractBehavior->OnActionDispatcherAbortedNative = FOnActionDispatcherAbortedNative::CreateWeakLambda(InteractInvoker, [InteractInvoker]()
+			InteractBehavior->OnDispatcherAbortedNative = FOnDispatcherAbortedNative::CreateWeakLambda(InteractInvoker, [InteractInvoker]()
 				{
 					InteractInvoker->ExecuteInteractAbortEnd();
 				});
