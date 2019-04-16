@@ -47,11 +47,7 @@ public:
 
 	static void ARPG_MoveToActorAndTurn(class ACharacterBase* Character, AActor* Goal, AActor* TurnToActor, const FOnARPG_MoveFinished& OnARPG_MoveFinished, float AcceptanceRadius = 5.f, bool bStopOnOverlap = true, bool bUsePathfinding = true, bool bCanStrafe = true, TSubclassOf<class UNavigationQueryFilter> FilterClass = nullptr, bool bAllowPartialPaths = true);
 private:
-	static void OnLocationTurnMoveCompleted(const FPathFollowingResult& PathFollowingResult, class ACharacterBase* Character, FRotator TurnRotation, FOnARPG_MoveFinished OnARPG_MoveFinish);
-
-	static void OnActorTurnMoveCompleted(const FPathFollowingResult& PathFollowingResult, class ACharacterBase* Character, AActor* TurnToActor, FOnARPG_MoveFinished OnARPG_MoveFinish);
-
-	static void OnTurnCompleted(bool Result, FPathFollowingResult PathFollowingResult, FOnARPG_MoveFinished OnARPG_MoveFinish);
+	static void OnTurnCompleted(bool Result, ACharacterBase* Character, FRotator TurnToRotation, FPathFollowingResult PathFollowingResult, FOnARPG_MoveFinished OnARPG_MoveFinish);
 };
 
 UCLASS()

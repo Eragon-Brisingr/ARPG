@@ -351,7 +351,17 @@ void UARPG_MoveUtils::OnMoveCompleted(FAIRequestID RequestID, const FPathFollowi
 
 void UARPG_MoveUtils::ARPG_MoveToLocationAndTurn(class ACharacterBase* Character, const FVector& Dest, const FRotator& TurnRotation, const FOnARPG_MoveFinished& OnARPG_MoveFinished, float AcceptanceRadius /*= 5.f*/, bool bStopOnOverlap /*= true*/, bool bUsePathfinding /*= true*/, bool bProjectDestinationToNavigation /*= false*/, bool bCanStrafe /*= true*/, TSubclassOf<UNavigationQueryFilter> FilterClass /*= nullptr*/, bool bAllowPartialPaths /*= true*/)
 {
-	FOnARPG_MoveFinished OnMoveFinishedThenTurn = FOnARPG_MoveFinished::CreateStatic(&UARPG_MoveUtils::OnLocationTurnMoveCompleted, Character, TurnRotation, OnARPG_MoveFinished);
+	FOnARPG_MoveFinished OnMoveFinishedThenTurn = FOnARPG_MoveFinished::CreateLambda([=](const FPathFollowingResult& PathFollowingResult)
+		{
+			if (PathFollowingResult.Code == EPathFollowingResult::Success)
+			{
+				Character->TurnTo(TurnRotation, FOnCharacterBehaviorFinished::CreateStatic(&UARPG_MoveUtils::OnTurnCompleted, Character, TurnRotation, PathFollowingResult, OnARPG_MoveFinished));
+			}
+			else
+			{
+				OnARPG_MoveFinished.ExecuteIfBound(PathFollowingResult);
+			}
+		});
 	ARPG_MoveToLocation(Character, Dest, OnMoveFinishedThenTurn, AcceptanceRadius, bStopOnOverlap, bUsePathfinding, bProjectDestinationToNavigation, bCanStrafe, FilterClass, bAllowPartialPaths);
 }
 
@@ -359,7 +369,18 @@ void UARPG_MoveUtils::ARPG_MoveToActorAndTurn(class ACharacterBase* Character, A
 {
 	if (TurnToActor)
 	{
-		FOnARPG_MoveFinished OnMoveFinishedThenTurn = FOnARPG_MoveFinished::CreateStatic(&UARPG_MoveUtils::OnActorTurnMoveCompleted, Character, TurnToActor, OnARPG_MoveFinished);
+		FOnARPG_MoveFinished OnMoveFinishedThenTurn = FOnARPG_MoveFinished::CreateLambda([=](const FPathFollowingResult& PathFollowingResult)
+			{
+				if (TurnToActor && PathFollowingResult.Code == EPathFollowingResult::Success)
+				{
+					FRotator TurnToRotation = UKismetMathLibrary::FindLookAtRotation(Character->GetActorLocation(), TurnToActor->GetActorLocation());
+					Character->TurnTo(TurnToRotation, FOnCharacterBehaviorFinished::CreateStatic(&UARPG_MoveUtils::OnTurnCompleted, Character, TurnToRotation, PathFollowingResult, OnARPG_MoveFinished));
+				}
+				else
+				{
+					OnARPG_MoveFinished.ExecuteIfBound(PathFollowingResult);
+				}
+			});
 		ARPG_MoveToActor(Character, Goal, OnMoveFinishedThenTurn, AcceptanceRadius, bStopOnOverlap, bUsePathfinding, bCanStrafe, FilterClass, bAllowPartialPaths);
 	}
 	else
@@ -368,35 +389,29 @@ void UARPG_MoveUtils::ARPG_MoveToActorAndTurn(class ACharacterBase* Character, A
 	}
 }
 
-void UARPG_MoveUtils::OnLocationTurnMoveCompleted(const FPathFollowingResult& PathFollowingResult, class ACharacterBase* Character, FRotator TurnRotation, FOnARPG_MoveFinished OnARPG_MoveFinish)
-{
-	if (PathFollowingResult.Code == EPathFollowingResult::Success)
-	{
-		Character->TurnTo(TurnRotation, FOnCharacterBehaviorFinished::CreateStatic(&UARPG_MoveUtils::OnTurnCompleted, PathFollowingResult, OnARPG_MoveFinish));
-	}
-	else
-	{
-		OnARPG_MoveFinish.ExecuteIfBound(PathFollowingResult);
-	}
-}
-
-void UARPG_MoveUtils::OnActorTurnMoveCompleted(const FPathFollowingResult& PathFollowingResult, class ACharacterBase* Character, AActor* TurnToActor, FOnARPG_MoveFinished OnARPG_MoveFinish)
-{
-	if (TurnToActor && PathFollowingResult.Code == EPathFollowingResult::Success)
-	{
-		Character->TurnTo(UKismetMathLibrary::FindLookAtRotation(Character->GetActorLocation(), TurnToActor->GetActorLocation()), FOnCharacterBehaviorFinished::CreateStatic(&UARPG_MoveUtils::OnTurnCompleted, PathFollowingResult, OnARPG_MoveFinish));
-	}
-	else
-	{
-		OnARPG_MoveFinish.ExecuteIfBound(PathFollowingResult);
-	}
-}
-
-void UARPG_MoveUtils::OnTurnCompleted(bool Result, FPathFollowingResult PathFollowingResult, FOnARPG_MoveFinished OnARPG_MoveFinish)
+void UARPG_MoveUtils::OnTurnCompleted(bool Result, ACharacterBase* Character, FRotator TurnToRotation, FPathFollowingResult PathFollowingResult, FOnARPG_MoveFinished OnARPG_MoveFinish)
 {
 	if (Result)
 	{
-		OnARPG_MoveFinish.ExecuteIfBound(PathFollowingResult);
+		if (FMath::Abs(Character->GetActorRotation().Yaw - TurnToRotation.Yaw) > 2.f)
+		{
+			UARPG_ActorMoveUtils::MoveCharacterToRotationFitGround(Character, TurnToRotation, FOnActorMoveFinished::CreateLambda([=](bool bIsAborted) mutable
+				{
+					if (bIsAborted)
+					{
+						PathFollowingResult.Code = EPathFollowingResult::Aborted;
+						OnARPG_MoveFinish.ExecuteIfBound(PathFollowingResult);
+					}
+					else
+					{
+						OnARPG_MoveFinish.ExecuteIfBound(PathFollowingResult);
+					}
+				}), 0.1f);
+		}
+		else
+		{
+			OnARPG_MoveFinish.ExecuteIfBound(PathFollowingResult);
+		}
 	}
 	else
 	{
