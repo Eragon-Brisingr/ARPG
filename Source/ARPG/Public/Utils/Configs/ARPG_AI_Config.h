@@ -7,6 +7,7 @@
 #include "ARPG_AI_Config.generated.h"
 
 class UCurveFloat;
+class UARPG_AD_CharacterBase;
 
 /**
  * 
@@ -24,4 +25,7 @@ public:
 
 	UPROPERTY(EditAnywhere, Category = "AI", Config)
 	TSoftObjectPtr<UCurveFloat> DefaultNoseAlertCurve;
+
+	UPROPERTY(EditAnywhere, Category = "物品", Config)
+	TSoftClassPtr<UARPG_AD_CharacterBase> PathFollowDefaultActionClass;
 };

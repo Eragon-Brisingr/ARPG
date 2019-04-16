@@ -7,6 +7,7 @@
 #include "ARPG_NavPath.h"
 #include "ARPG_CharacterBehaviorBase.h"
 #include "ARPG_ActorFunctionLibrary.h"
+#include "ARPG_AD_CharacterBase.h"
 
 UBTTask_ARPG_FollowPathMove::UBTTask_ARPG_FollowPathMove()
 {
@@ -43,9 +44,14 @@ EBTNodeResult::Type UBTTask_ARPG_FollowPathMove::AbortTask(UBehaviorTreeComponen
 	if (ACharacterBase* Character = Cast<ACharacterBase>(MyController->GetPawn()))
 	{
 		FARPG_FollowPathMoveMemory* FollowPathMoveMemory = reinterpret_cast<FARPG_FollowPathMoveMemory*>(NodeMemory);
-		if (UARPG_CharacterBehaviorBase* CurBehavior = FollowPathMoveMemory->CurBehavior)
+		if (UARPG_AD_CharacterBase* CurBehavior = FollowPathMoveMemory->CurBehavior)
 		{
-			CurBehavior->AbortBehavior(Character, FOnCharacterBehaviorAbortFinished::CreateUObject(this, &UBTTask_ARPG_FollowPathMove::WhenBehaviorAborted, &OwnerComp, NodeMemory));
+			CurBehavior->AbortDispatch(FOnDispatcherAbortedNative::CreateWeakLambda(Character, [=, P_OwnerComp = &OwnerComp]()
+				{
+					FARPG_FollowPathMoveMemory* FollowPathMoveMemory = reinterpret_cast<FARPG_FollowPathMoveMemory*>(NodeMemory);
+					FollowPathMoveMemory->CurBehavior = nullptr;
+					FinishLatentAbort(*P_OwnerComp);
+				}));
 		}
 		else
 		{
@@ -91,11 +97,27 @@ void UBTTask_ARPG_FollowPathMove::WhenMoveFinished(const FPathFollowingResult& R
 					FollowPathMoveMemory->TargetPointIndex += FollowPathMoveMemory->bMoveReverse ? -1 : 1;
 				}
 
-				const FARPG_NavPathPoint& CurPoint = Path->NavPathPoints[CurIndex];
-				if (CurPoint.Behavior)
+				FARPG_NavPathPoint& CurPoint = Path->NavPathPoints[CurIndex];
+				UARPG_AD_CharacterBase* Behavior = CurPoint.GetBehavior(Character);
+				if (Behavior && Behavior->CanStartDispatcher())
 				{
-					CurPoint.Behavior->ExecuteBehavior(Character, FOnCharacterBehaviorFinished::CreateUObject(this, &UBTTask_ARPG_FollowPathMove::WhenBehaviorFinished, OwnerComp, FollowPathMoveMemory));
-					FollowPathMoveMemory->CurBehavior = CurPoint.Behavior;
+					Behavior->StartDispatchWithEvent(FOnDispatchDeactiveNative::CreateWeakLambda(Character, [=](bool IsFinsihedCompleted)
+						{
+							AAIController * MyController = OwnerComp->GetAIOwner();
+							if (ACharacterBase* Character = Cast<ACharacterBase>(MyController->GetPawn()))
+							{
+								if (Path)
+								{
+									FollowPathMoveMemory->CurBehavior = nullptr;
+									MoveToNavPoint(Path->NavPathPoints[FollowPathMoveMemory->TargetPointIndex], Character, *OwnerComp, FollowPathMoveMemory);
+								}
+								else
+								{
+									FinishLatentTask(*OwnerComp, EBTNodeResult::Failed);
+								}
+							}
+						}));
+					FollowPathMoveMemory->CurBehavior = Behavior;
 				}
 				else
 				{
@@ -108,30 +130,6 @@ void UBTTask_ARPG_FollowPathMove::WhenMoveFinished(const FPathFollowingResult& R
 	{
 		FinishLatentTask(*OwnerComp, EBTNodeResult::Failed);
 	}
-}
-
-void UBTTask_ARPG_FollowPathMove::WhenBehaviorFinished(bool Succeed, UBehaviorTreeComponent* OwnerComp, FARPG_FollowPathMoveMemory* FollowPathMoveMemory)
-{
-	AAIController * MyController = OwnerComp->GetAIOwner();
-	if (ACharacterBase* Character = Cast<ACharacterBase>(MyController->GetPawn()))
-	{
-		if (Path)
-		{
-			FollowPathMoveMemory->CurBehavior = nullptr;
-			MoveToNavPoint(Path->NavPathPoints[FollowPathMoveMemory->TargetPointIndex], Character, *OwnerComp, FollowPathMoveMemory);
-		}
-		else
-		{
-			FinishLatentTask(*OwnerComp, EBTNodeResult::Failed);
-		}
-	}
-}
-
-void UBTTask_ARPG_FollowPathMove::WhenBehaviorAborted(UBehaviorTreeComponent* OwnerComp, uint8* NodeMemory)
-{
-	FARPG_FollowPathMoveMemory* FollowPathMoveMemory = reinterpret_cast<FARPG_FollowPathMoveMemory*>(NodeMemory);
-	FollowPathMoveMemory->CurBehavior = nullptr;
-	FinishLatentAbort(*OwnerComp);
 }
 
 void UBTTask_ARPG_FollowPathMove::MoveToNavPoint(const FARPG_NavPathPoint &NavPoint, ACharacterBase* Character, UBehaviorTreeComponent& OwnerComp, FARPG_FollowPathMoveMemory* FollowPathMoveMemory)
