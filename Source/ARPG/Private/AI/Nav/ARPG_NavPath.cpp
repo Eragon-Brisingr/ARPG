@@ -72,7 +72,7 @@ void AARPG_NavPath::DrawGizmoNative(const FSceneView* View, FViewport* Viewport,
 	{
 		if (NavPathPoint.bAttachToRotation)
 		{
-			DrawDirectionalArrow(PDI, (FTransform(NavPathPoint.Rotation, NavPathPoint.Location) * GetActorTransform()).ToMatrixWithScale(), FColor::Red, 50.f, 5.f, SDPG_World, 1.f);
+			DrawDirectionalArrow(PDI, FTransform(NavPathPoint.Rotation, NavPathPoint.Location).ToMatrixWithScale(), FColor::Red, 50.f, 5.f, SDPG_World, 1.f);
 		}
 	}
 }
