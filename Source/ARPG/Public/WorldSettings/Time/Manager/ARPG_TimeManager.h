@@ -14,7 +14,8 @@ class ARPG_API UARPG_TimeManager : public UXD_TimeManager
 {
 	GENERATED_BODY()
 	
-	
+public:
+	static UARPG_TimeManager* GetARPG_TimeManager(const UObject* WorldContextObject);
 	
 	
 };

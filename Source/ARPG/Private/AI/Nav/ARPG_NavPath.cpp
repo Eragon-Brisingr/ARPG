@@ -39,7 +39,7 @@ AARPG_NavPath::AARPG_NavPath()
 #endif
 }
 
-#if WITH_EDITORONLY_DATA
+#if WITH_EDITOR
 void AARPG_NavPath::OnConstruction(const FTransform& Transform)
 {
 	int32 PreNum = NavPathPoints.Num();
@@ -55,10 +55,26 @@ void AARPG_NavPath::OnConstruction(const FTransform& Transform)
 	{
 		for (int32 i = PreNum; i < NavPathPoints.Num(); ++i)
 		{
-			NavPathPoints[i].BehaviorTemplate = NewObject<UARPG_AD_CharacterBase>(this, PathFollowDefaultActionClass.LoadSynchronous());
+			if (NavPathPoints[i].BehaviorTemplate == nullptr)
+			{
+				NavPathPoints[i].BehaviorTemplate = NewObject<UARPG_AD_CharacterBase>(this, PathFollowDefaultActionClass.LoadSynchronous());
+				NavPathPoints[i].BehaviorTemplate->SetFlags(EObjectFlags::RF_ArchetypeObject);
+			}
 		}
 	}
 
 	VisualControl->SetClosedLoop(bIsClosedLoop);
 }
+
+void AARPG_NavPath::DrawGizmoNative(const FSceneView* View, FViewport* Viewport, FPrimitiveDrawInterface* PDI, bool IsSelected)
+{
+	for (FARPG_NavPathPoint& NavPathPoint : NavPathPoints)
+	{
+		if (NavPathPoint.bAttachToRotation)
+		{
+			DrawDirectionalArrow(PDI, (FTransform(NavPathPoint.Rotation, NavPathPoint.Location) * GetActorTransform()).ToMatrixWithScale(), FColor::Red, 50.f, 5.f, SDPG_World, 1.f);
+		}
+	}
+}
+
 #endif

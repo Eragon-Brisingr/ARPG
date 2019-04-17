@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "Components/SplineComponent.h"
+#include "XD_DrawGizmoInterface.h"
 #include "ARPG_CharacterBehaviorType.h"
 #include "ARPG_NavPath.generated.h"
 
@@ -12,7 +13,7 @@ class UARPG_AD_CharacterBase;
 class ACharacterBase;
 
 USTRUCT(BlueprintType)
-struct FARPG_NavPathPoint : public FBehaviorPositionData
+struct ARPG_API FARPG_NavPathPoint : public FBehaviorPositionData
 {
 	GENERATED_BODY()
 public:
@@ -44,7 +45,8 @@ public:
 };
 
 UCLASS(meta = (DisplayName = "路径"))
-class ARPG_API AARPG_NavPath : public AActor
+class ARPG_API AARPG_NavPath : public AActor, 
+	public IXD_DrawGizmoInterface
 {
 	GENERATED_BODY()
 	
@@ -62,6 +64,8 @@ public:
 	class UARPG_NavPathVisualHelper* VisualControl;
 
 	void OnConstruction(const FTransform& Transform) override;
+
+	void DrawGizmoNative(const FSceneView* View, FViewport* Viewport, FPrimitiveDrawInterface* PDI, bool IsSelected) override;
 #endif
 };
 
