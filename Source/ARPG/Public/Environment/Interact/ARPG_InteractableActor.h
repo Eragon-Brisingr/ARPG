@@ -61,5 +61,7 @@ public:
 public:
 	void BeginPlay() override;
 
+#if WITH_EDITOR
 	void DrawGizmoNative(const FSceneView* View, FViewport* Viewport, FPrimitiveDrawInterface* PDI, bool IsSelected) override;
+#endif
 };

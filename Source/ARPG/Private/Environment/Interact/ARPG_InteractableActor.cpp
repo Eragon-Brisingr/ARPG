@@ -108,7 +108,9 @@ void AARPG_InteractableActorSingle::BeginPlay()
 	InteractSingleConfig.InitConfig(this);
 }
 
+#if WITH_EDITOR
 void AARPG_InteractableActorSingle::DrawGizmoNative(const FSceneView* View, FViewport* Viewport, FPrimitiveDrawInterface* PDI, bool IsSelected)
 {
 	DrawDirectionalArrow(PDI, (InteractSingleConfig.InteractLocation * GetActorTransform()).ToMatrixWithScale(), FColor::Red, 50.f, 5.f, SDPG_World, 1.f);
 }
+#endif

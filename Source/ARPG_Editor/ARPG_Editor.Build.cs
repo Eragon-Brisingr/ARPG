@@ -33,6 +33,8 @@ public class ARPG_Editor : ModuleRules
             "XD_ItemSystem",
             "XD_ItemSystem_Editor",
             "XD_CharacterActionDispatcher",
+
+            "XD_DrawGizmoRuntime",
         });
 
 		// Uncomment if you are using Slate UI
