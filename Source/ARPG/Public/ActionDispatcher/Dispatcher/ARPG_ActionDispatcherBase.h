@@ -14,4 +14,7 @@ class ARPG_API UARPG_ActionDispatcherBase : public UXD_ActionDispatcherBase
 {
 	GENERATED_BODY()
 public:
+	UARPG_ActionDispatcherBase();
+
+	uint8 bInteractable : 1;
 };

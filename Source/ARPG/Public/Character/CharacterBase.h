@@ -26,6 +26,7 @@
 
 class UCA_EnterReleaseStateBase;
 class UARPG_AD_CharacterInteract;
+class UARPG_ActionDispatcherBase;
 
 UENUM()
 enum class EInteractEndResult : uint8
@@ -89,10 +90,10 @@ public:
 	UPROPERTY(SaveGame)
 	TSoftObjectPtr<UXD_DispatchableActionBase> CurrentAction;
 
-	UXD_ActionDispatcherBase* GetCurrentDispatcher_Implementation() const override;
+	UARPG_ActionDispatcherBase* GetCurrentDispatcher_Implementation() const override;
 	void SetCurrentDispatcher_Implementation(UXD_ActionDispatcherBase* Dispatcher) override;
 	UPROPERTY(BlueprintReadOnly, Category = "行为")
-	UXD_ActionDispatcherBase* CurrentDispatcher;
+	UARPG_ActionDispatcherBase* CurrentDispatcher;
 
 	bool CanExecuteDispatchableAction_Implementation() const override;
 	//重生用
@@ -434,9 +435,10 @@ public:
 
 	UPROPERTY(BlueprintReadOnly, Category = "角色|交互")
 	AActor* InvokeInteractTarget;
-
 	UPROPERTY(BlueprintReadOnly, Category = "角色|交互", Replicated)
 	uint8 bIsInteractingWithActor : 1;
+
+	uint8 bIsInBTreeInteracting : 1;
 
 	//交互前的处理，可能由任务之类的附加的操作，会打断之后的交互行为
 	DECLARE_DELEGATE(FOnPreInteractEvent);
@@ -553,6 +555,8 @@ public:
 	UPROPERTY(EditAnywhere, Category = "角色|AI|配置")
 	FBehaviorTreeWithSubTree MainBehaviorTree;
 
+	bool CanInDailyBehavior() const;
+
 	//CharacterBehavior接口
 public:
 	//进入松懈状态
@@ -570,22 +574,21 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = "角色|动作")
 	FName TurnSlotName = TEXT("TurnInPlace");
 
-	UFUNCTION(BlueprintCallable, Category = "角色|动作")
-	bool CanPlayTurnMontage() const;
-
+	bool CanTurnTo() const;
 	bool TurnTo(const FRotator& TargetWorldRotation, const FOnCharacterBehaviorFinished& OnCharacterBehaviorFinished);
 	UFUNCTION(BlueprintCallable, Category = "角色|动作")
 	bool TurnTo(const FRotator& TargetWorldRotation);
 
 public:
 	void ForceSetClientWorldLocation(const FVector& Location);
+	void ForceSetClientWorldLocationAndRotation(const FVector& Location, const FRotator& Rotation);
 private:
 	UFUNCTION(Reliable, WithValidation, Client)
 	void ForceSetClientWorldLocationImpl(const FVector& Location);
+
+	UFUNCTION(Reliable, WithValidation, Client)
+	void ForceSetClientWorldLocationAndRotationImpl(const FVector& Location, const FRotator& Rotation);
 public:
 	UFUNCTION(Reliable, WithValidation, Client)
 	void ForceSetClientWorldRotation(const FRotator& Rotation);
-
-	UFUNCTION(Reliable, WithValidation, Client)
-	void ForceSetClientWorldLocationAndRotation(const FVector& Location, const FRotator& Rotation);
 };
