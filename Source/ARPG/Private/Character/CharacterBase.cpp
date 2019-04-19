@@ -222,14 +222,14 @@ void ACharacterBase::SetCurrentDispatchableAction_Implementation(UXD_Dispatchabl
 	CurrentAction = Action;
 }
 
-UXD_ActionDispatcherBase* ACharacterBase::GetCurrentDispatcher_Implementation() const
+UARPG_ActionDispatcherBase* ACharacterBase::GetCurrentDispatcher_Implementation() const
 {
 	return CurrentDispatcher;
 }
 
 void ACharacterBase::SetCurrentDispatcher_Implementation(UXD_ActionDispatcherBase* Dispatcher)
 {
-	CurrentDispatcher = Dispatcher;
+	CurrentDispatcher = Dispatcher ? CastChecked<UARPG_ActionDispatcherBase>(Dispatcher) : nullptr;
 }
 
 bool ACharacterBase::CanExecuteDispatchableAction_Implementation() const
@@ -519,25 +519,26 @@ UARPG_CharacterBehaviorBase* ACharacterBase::EnterReleaseState(const FOnCharacte
 	}
 }
 
-bool ACharacterBase::CanPlayTurnMontage() const
+bool ACharacterBase::CanTurnTo() const
 {
-	return GetMesh()->GetAnimInstance()->GetSlotMontageGlobalWeight(TurnSlotName) == 0.f && IsPlayingRootMotion() == false;
+	return GetMesh()->GetAnimInstance()->GetSlotMontageGlobalWeight(TurnSlotName) < 1.f && IsPlayingRootMotion() == false;
 }
 
 bool ACharacterBase::TurnTo(const FRotator& TargetWorldRotation, const FOnCharacterBehaviorFinished& OnCharacterBehaviorFinished)
 {
-	if (CanPlayTurnMontage())
+	if (CharacterTurnAction)
 	{
-		if (CharacterTurnAction)
+		if (CanTurnTo())
 		{
 			CharacterTurnAction->TurnTo(this, TargetWorldRotation, OnCharacterBehaviorFinished);
 			return true;
 		}
-		else
-		{
-			UARPG_ActorMoveUtils::MoveCharacterToRotationFitGround(this, TargetWorldRotation);
-			OnCharacterBehaviorFinished.ExecuteIfBound(true);
-		}
+	}
+	else
+	{
+		UARPG_ActorMoveUtils::MoveCharacterToRotationFitGround(this, TargetWorldRotation);
+		OnCharacterBehaviorFinished.ExecuteIfBound(true);
+		return true;
 	}
 	return false;
 }
@@ -550,6 +551,11 @@ bool ACharacterBase::TurnTo(const FRotator& TargetWorldRotation)
 void ACharacterBase::ForceSetClientWorldLocation(const FVector& Location)
 {
 	ForceSetClientWorldLocationImpl(FRepMovement::RebaseOntoZeroOrigin(Location, this));
+}
+
+void ACharacterBase::ForceSetClientWorldLocationAndRotation(const FVector& Location, const FRotator& Rotation)
+{
+	ForceSetClientWorldLocationAndRotationImpl(FRepMovement::RebaseOntoZeroOrigin(Location, this), Rotation);
 }
 
 void ACharacterBase::ForceSetClientWorldLocationImpl_Implementation(const FVector& Location)
@@ -572,12 +578,12 @@ bool ACharacterBase::ForceSetClientWorldRotation_Validate(const FRotator& Rotati
 	return true;
 }
 
-void ACharacterBase::ForceSetClientWorldLocationAndRotation_Implementation(const FVector& Location, const FRotator& Rotation)
+void ACharacterBase::ForceSetClientWorldLocationAndRotationImpl_Implementation(const FVector& Location, const FRotator& Rotation)
 {
 	SetActorLocationAndRotation(FRepMovement::RebaseOntoLocalOrigin(Location, this), Rotation);
 }
 
-bool ACharacterBase::ForceSetClientWorldLocationAndRotation_Validate(const FVector& Location, const FRotator& Rotation)
+bool ACharacterBase::ForceSetClientWorldLocationAndRotationImpl_Validate(const FVector& Location, const FRotator& Rotation)
 {
 	return true;
 }
@@ -925,7 +931,7 @@ bool ACharacterBase::CanInteract_Implementation(const class ACharacterBase* Inte
 	{
 		return false;
 	}
-	if (CurrentDispatcher && CurrentDispatcher->State != EActionDispatcherState::Deactive)
+	if (CurrentDispatcher && CurrentDispatcher->bInteractable == false && CurrentDispatcher->State != EActionDispatcherState::Deactive)
 	{
 		return false;
 	}
@@ -1124,4 +1130,9 @@ EAlertState ACharacterBase::GetAlertState() const
 	{
 		return EAlertState::Alerting;
 	}
+}
+
+bool ACharacterBase::CanInDailyBehavior() const
+{
+	return GetAlertState() == EAlertState::None && (CurrentAction.IsValid() == false || CurrentAction->State == EDispatchableActionState::Deactive || bIsInBTreeInteracting);
 }
