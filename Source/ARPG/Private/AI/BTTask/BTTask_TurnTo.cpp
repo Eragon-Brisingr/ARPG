@@ -21,7 +21,7 @@ EBTNodeResult::Type UBTTask_TurnTo::ExecuteTask(UBehaviorTreeComponent& OwnerCom
 	if (ACharacterBase* Character = Cast<ACharacterBase>(MyController->GetPawn()))
 	{
 		FARPG_TurnToMemory* TurnToMemory = reinterpret_cast<FARPG_TurnToMemory*>(NodeMemory);
-		if (Character->CanPlayTurnMontage())
+		if (Character->CanTurnTo())
 		{
 			FRotator TargetWorldRotation;
 			if (BlackboardKey.SelectedKeyType == UBlackboardKeyType_Rotator::StaticClass())

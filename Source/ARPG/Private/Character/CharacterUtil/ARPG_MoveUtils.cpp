@@ -353,7 +353,7 @@ void UARPG_MoveUtils::ARPG_MoveToLocationAndTurn(class ACharacterBase* Character
 {
 	FOnARPG_MoveFinished OnMoveFinishedThenTurn = FOnARPG_MoveFinished::CreateLambda([=](const FPathFollowingResult& PathFollowingResult)
 		{
-			if (PathFollowingResult.Code == EPathFollowingResult::Success)
+			if (PathFollowingResult.Code == EPathFollowingResult::Success && Character->CanTurnTo())
 			{
 				Character->TurnTo(TurnRotation, FOnCharacterBehaviorFinished::CreateStatic(&UARPG_MoveUtils::OnTurnCompleted, Character, TurnRotation, PathFollowingResult, OnARPG_MoveFinished));
 			}
@@ -371,7 +371,7 @@ void UARPG_MoveUtils::ARPG_MoveToActorAndTurn(class ACharacterBase* Character, A
 	{
 		FOnARPG_MoveFinished OnMoveFinishedThenTurn = FOnARPG_MoveFinished::CreateLambda([=](const FPathFollowingResult& PathFollowingResult)
 			{
-				if (TurnToActor && PathFollowingResult.Code == EPathFollowingResult::Success)
+				if (TurnToActor && PathFollowingResult.Code == EPathFollowingResult::Success && Character->CanTurnTo())
 				{
 					FRotator TurnToRotation = UKismetMathLibrary::FindLookAtRotation(Character->GetActorLocation(), TurnToActor->GetActorLocation());
 					Character->TurnTo(TurnToRotation, FOnCharacterBehaviorFinished::CreateStatic(&UARPG_MoveUtils::OnTurnCompleted, Character, TurnToRotation, PathFollowingResult, OnARPG_MoveFinished));
