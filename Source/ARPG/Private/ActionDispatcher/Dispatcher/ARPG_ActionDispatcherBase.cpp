@@ -2,3 +2,8 @@
 
 #include "ARPG_ActionDispatcherBase.h"
 
+UARPG_ActionDispatcherBase::UARPG_ActionDispatcherBase()
+	:bInteractable(true)
+{
+
+}

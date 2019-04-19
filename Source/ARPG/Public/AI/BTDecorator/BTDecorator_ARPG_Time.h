@@ -15,9 +15,10 @@ class ARPG_API UBTDecorator_ARPG_TimeBase : public UBTDecorator
 {
 	GENERATED_BODY()
 public:
-
+	UBTDecorator_ARPG_TimeBase();
 private:
-	virtual FString GetStaticDescription() const override;
+	FString GetStaticDescription() const override;
+	void TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds) override;
 };
 
 UCLASS(meta = (DisplayName = "时间_在每时"))

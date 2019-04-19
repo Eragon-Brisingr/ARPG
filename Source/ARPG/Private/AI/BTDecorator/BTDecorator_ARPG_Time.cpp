@@ -6,6 +6,11 @@
 
 const TCHAR TimeDescFormat[] = TEXT("[%s]至[%s]");
 
+UBTDecorator_ARPG_TimeBase::UBTDecorator_ARPG_TimeBase()
+{
+	bNotifyTick = true;
+}
+
 FString UBTDecorator_ARPG_TimeBase::GetStaticDescription() const
 {
 	FString ReturnDesc = Super::GetStaticDescription();
@@ -24,6 +29,14 @@ FString UBTDecorator_ARPG_TimeBase::GetStaticDescription() const
 	}
 
 	return ReturnDesc;
+}
+
+void UBTDecorator_ARPG_TimeBase::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds)
+{
+	if (FlowAbortMode != EBTFlowAbortMode::None && !CalculateRawConditionValue(OwnerComp, NodeMemory))
+	{
+		OwnerComp.RequestExecution(this);
+	}
 }
 
 bool UBTDecorator_ARPG_Time_InHourRange::CalculateRawConditionValue(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) const
