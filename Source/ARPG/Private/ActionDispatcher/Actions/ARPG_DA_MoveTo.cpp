@@ -39,7 +39,7 @@ void UARPG_DA_MoveToBase::WhenRequestFinished(const FPathFollowingResult& Result
 	}
 	else
 	{
-		AbortDispatcher({});
+		AbortDispatcher();
 	}
 }
 

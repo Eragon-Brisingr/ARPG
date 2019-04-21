@@ -53,7 +53,7 @@ void UARPG_DA_PlayMontage::WhenMontagePlayFinished(UAnimMontage* Montage, bool b
 	}
 	else
 	{
-		AbortDispatcher({}, true);
+		AbortDispatcher(true);
 	}
 }
 

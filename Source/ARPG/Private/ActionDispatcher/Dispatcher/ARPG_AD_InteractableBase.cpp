@@ -13,8 +13,6 @@ void UARPG_AD_InteractableBase::InitInteractDispatcher(AActor* InInteractTarget)
 
 void UARPG_AD_InteractableBase::StartInteractDispatcher(ACharacterBase* InInteractInvoker, const FOnDispatchDeactiveNative& OnDispatchDeactive)
 {
-	check(OnDispatcherAbortedNative.IsBound() == false);
-
 	InteractInvoker = InInteractInvoker;
 	OnDispatchDeactiveNative = OnDispatchDeactive;
 
