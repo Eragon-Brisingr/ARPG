@@ -801,9 +801,12 @@ float ACharacterBase::ApplyPointDamage(float BaseDamage, const FVector& HitFromD
 		{
 			ReceivePlayNormalDamageMontage(FinalReduceValue, HitFromDirection, HitInfo, InstigatorBy, DamageCauser);
 
-			//击退效果
-			FVector BeakBackOffset = HitFromDirection.GetSafeNormal2D() * Param.NormalBeakBackDistance;
-			UARPG_ActorMoveUtils::PushActorTo(this, BeakBackOffset);
+			//击退效果，处于根骨骼位移时不动
+			if (!IsPlayingRootMotion())
+			{
+				FVector BeakBackOffset = HitFromDirection.GetSafeNormal2D() * Param.NormalBeakBackDistance;
+				UARPG_ActorMoveUtils::PushActorTo(this, BeakBackOffset);
+			}
 		}
 	}
 
