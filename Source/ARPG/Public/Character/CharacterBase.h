@@ -85,10 +85,9 @@ public:
 
 	//DispatchableEntityInterface
 public:
-	UXD_DispatchableActionBase* GetCurrentDispatchableAction_Implementation() const override;
-	void SetCurrentDispatchableAction_Implementation(UXD_DispatchableActionBase* Action) override;
-	UPROPERTY(SaveGame)
-	TSoftObjectPtr<UXD_DispatchableActionBase> CurrentAction;
+	FXD_DispatchableActionList GetCurrentDispatchableActions_Implementation() override;
+	UPROPERTY(BlueprintReadOnly, Category = "行为")
+	TArray<UXD_DispatchableActionBase*> CurrentActions;
 
 	UARPG_ActionDispatcherBase* GetCurrentDispatcher_Implementation() const override;
 	void SetCurrentDispatcher_Implementation(UXD_ActionDispatcherBase* Dispatcher) override;

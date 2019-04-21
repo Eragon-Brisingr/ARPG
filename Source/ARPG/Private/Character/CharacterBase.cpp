@@ -212,14 +212,9 @@ TArray<struct FARPG_Item> ACharacterBase::GetInitItemList() const
 	return Res;
 }
 
-UXD_DispatchableActionBase* ACharacterBase::GetCurrentDispatchableAction_Implementation() const
+FXD_DispatchableActionList ACharacterBase::GetCurrentDispatchableActions_Implementation()
 {
-	return CurrentAction.Get();
-}
-
-void ACharacterBase::SetCurrentDispatchableAction_Implementation(UXD_DispatchableActionBase* Action)
-{
-	CurrentAction = Action;
+	return CurrentActions;
 }
 
 UARPG_ActionDispatcherBase* ACharacterBase::GetCurrentDispatcher_Implementation() const
@@ -1137,5 +1132,10 @@ EAlertState ACharacterBase::GetAlertState() const
 
 bool ACharacterBase::CanInDailyBehavior() const
 {
-	return GetAlertState() == EAlertState::None && (CurrentAction.IsValid() == false || CurrentAction->State == EDispatchableActionState::Deactive || bIsInBTreeInteracting);
+	return GetAlertState() == EAlertState::None && (CurrentActions.Num() == 0 
+		|| bIsInBTreeInteracting
+		|| CurrentActions.ContainsByPredicate([](auto Action)
+			{
+				return Action->State != EDispatchableActionState::Deactive;
+			}) == false);
 }
