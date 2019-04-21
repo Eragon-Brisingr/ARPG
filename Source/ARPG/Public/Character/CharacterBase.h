@@ -201,7 +201,7 @@ public:
 	void ClearMontageBlendingOutDelegate(UAnimMontage* Montage);
 
 	UPROPERTY(EditDefaultsOnly, Category = "角色|动作")
-	FName FullBodySlotName = TEXT("FullBody");
+	FName FullBodySlotName = TEXT("DefaultSlot");
 
 	UFUNCTION(BlueprintCallable, Category = "角色|动作")
 	bool CanPlayFullBodyMontage() const;
