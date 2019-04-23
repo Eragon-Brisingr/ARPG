@@ -3,3 +3,7 @@
 
 #include "ARPG_AD_CharacterInteract.h"
 
+UARPG_AD_CharacterInteract::UARPG_AD_CharacterInteract()
+{
+	bIsMainDispatcher = false;
+}

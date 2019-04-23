@@ -3,6 +3,11 @@
 #include "ARPG_AD_InteractableBase.h"
 #include "CharacterBase.h"
 
+UARPG_AD_InteractableBase::UARPG_AD_InteractableBase()
+{
+	bIsMainDispatcher = false;
+}
+
 void UARPG_AD_InteractableBase::InitInteractDispatcher(AActor* InInteractTarget)
 {
 	check(InteractTarget == nullptr);
@@ -25,13 +30,10 @@ void UARPG_AD_InteractableBase::AbortInteractDispatcher(const FOnDispatcherAbort
 {
 	check(State != EActionDispatcherState::Deactive);
 
+	OnDispatcherAbortedNative = DispatcherAbortedEvent;
 	if (State == EActionDispatcherState::Active)
 	{
 		AbortDispatch();
-	}
-	else if (State == EActionDispatcherState::Aborting)
-	{
-		OnDispatcherAbortedNative = DispatcherAbortedEvent;
 	}
 }
 
