@@ -2,5 +2,24 @@
 
 #include "ARPG.h"
 #include "Modules/ModuleManager.h"
+#include "ShaderCore.h"
 
-IMPLEMENT_PRIMARY_GAME_MODULE( FDefaultGameModuleImpl, ARPG, "ARPG" );
+class FARPGGameModule : public FDefaultGameModuleImpl
+{
+
+public:
+	void StartupModule() override
+	{
+		// Maps virtual shader
+		FString ShaderDir = FPaths::Combine(FPaths::ProjectDir(), TEXT("Shaders"));
+		AddShaderSourceDirectoryMapping(TEXT("/ARPG"), ShaderDir);
+	}
+
+
+	void ShutdownModule() override
+	{
+
+	}
+};
+
+IMPLEMENT_PRIMARY_GAME_MODULE(FARPGGameModule, ARPG, "ARPG" );
