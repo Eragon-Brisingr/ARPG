@@ -217,17 +217,17 @@ FXD_DispatchableActionList ACharacterBase::GetCurrentDispatchableActions_Impleme
 	return CurrentActions;
 }
 
-UARPG_ActionDispatcherBase* ACharacterBase::GetCurrentDispatcher_Implementation() const
+UARPG_ActionDispatcherBase* ACharacterBase::GetCurrentMainDispatcher_Implementation() const
 {
-	return CurrentDispatcher;
+	return CurrentMainDispatcher;
 }
 
-void ACharacterBase::SetCurrentDispatcher_Implementation(UXD_ActionDispatcherBase* Dispatcher)
+void ACharacterBase::SetCurrentMainDispatcher_Implementation(UXD_ActionDispatcherBase* Dispatcher)
 {
-	CurrentDispatcher = Dispatcher ? CastChecked<UARPG_ActionDispatcherBase>(Dispatcher) : nullptr;
+	CurrentMainDispatcher = Dispatcher ? CastChecked<UARPG_ActionDispatcherBase>(Dispatcher) : nullptr;
 }
 
-bool ACharacterBase::CanExecuteDispatchableAction_Implementation() const
+bool ACharacterBase::CanExecuteDispatcher_Implementation() const
 {
 	return AlertValue == 0.f;
 }
@@ -929,7 +929,7 @@ bool ACharacterBase::CanInteract_Implementation(const class ACharacterBase* Inte
 	{
 		return false;
 	}
-	if (CurrentDispatcher && CurrentDispatcher->bInteractable == false && CurrentDispatcher->State != EActionDispatcherState::Deactive)
+	if (CurrentMainDispatcher && CurrentMainDispatcher->bInteractable == false && CurrentMainDispatcher->State != EActionDispatcherState::Deactive)
 	{
 		return false;
 	}

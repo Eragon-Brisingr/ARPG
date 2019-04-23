@@ -16,6 +16,8 @@ class ARPG_API UARPG_AD_CharacterBase : public UARPG_ActionDispatcherBase
 {
 	GENERATED_BODY()
 public:
+	UARPG_AD_CharacterBase();
+
 	UPROPERTY(BlueprintReadOnly, Category = "行为|交互", meta = (ExposeOnSpawn = true))
 	TSoftObjectPtr<ACharacterBase> Character;
 };

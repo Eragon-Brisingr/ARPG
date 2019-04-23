@@ -89,12 +89,12 @@ public:
 	UPROPERTY(BlueprintReadOnly, Category = "行为")
 	TArray<UXD_DispatchableActionBase*> CurrentActions;
 
-	UARPG_ActionDispatcherBase* GetCurrentDispatcher_Implementation() const override;
-	void SetCurrentDispatcher_Implementation(UXD_ActionDispatcherBase* Dispatcher) override;
+	UARPG_ActionDispatcherBase* GetCurrentMainDispatcher_Implementation() const override;
+	void SetCurrentMainDispatcher_Implementation(UXD_ActionDispatcherBase* Dispatcher) override;
 	UPROPERTY(BlueprintReadOnly, Category = "行为")
-	UARPG_ActionDispatcherBase* CurrentDispatcher;
+	UARPG_ActionDispatcherBase* CurrentMainDispatcher;
 
-	bool CanExecuteDispatchableAction_Implementation() const override;
+	bool CanExecuteDispatcher_Implementation() const override;
 	//重生用
 public:
 	UPROPERTY(SaveGame, BlueprintReadOnly, Category = "角色|重生")
