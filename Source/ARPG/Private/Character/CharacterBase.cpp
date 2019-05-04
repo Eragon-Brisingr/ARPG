@@ -411,7 +411,7 @@ void ACharacterBase::TryPlayMontage(const FARPG_MontageParameter& Montage)
 {
 	if (Montage.Condition == nullptr || Montage.Condition.GetDefaultObject()->CanPlayMontage(this))
 	{
-		PlayMontage(Montage.Montage, 1.f, NAME_None, true);
+		PlayMontage(Montage.Montage, 1.f, Montage.StartSectionName, Montage.bClientMaster);
 	}
 }
 
