@@ -14,18 +14,15 @@
 
 void UARPG_PlayMontageByState::Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation)
 {
-	if (ACharacterBase* Character = Cast<ACharacterBase>(MeshComp->GetOwner()))
+	if (ACharacterBase * Character = Cast<ACharacterBase>(MeshComp->GetOwner()))
 	{
-		if (bClientMaster || Character->HasAuthority())
-		{
-			Character->PlayMontage(Montage, 1.f, StartSectionName, bClientMaster);
-		}
+		Character->TryPlayMontage(MontageParameter);
 	}
 }
 
 FString UARPG_PlayMontageByState::GetNotifyName_Implementation() const
 {
-	return FString::Printf(TEXT("动画跳转[%s]"), Montage ? *Montage->GetName() : TEXT("None"));
+	return FString::Printf(TEXT("动画跳转[%s]"), MontageParameter.Montage ? *MontageParameter.Montage->GetName() : TEXT("None"));
 }
 
 void UARPG_PlayMontageCheckState::NotifyTick(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, float FrameDeltaTime)
@@ -36,10 +33,7 @@ void UARPG_PlayMontageCheckState::NotifyTick(USkeletalMeshComponent* MeshComp, U
 		{
 			if (MeshComp->GetAnimInstance()->Montage_IsPlaying(CurPlayingMontage))
 			{
-				if (Condition == nullptr || Condition.GetDefaultObject()->CanPlayMontage(Character))
-				{
-					Character->PlayMontage(Montage, 1.f, StartSectionName, bClientMaster);
-				}
+				Character->TryPlayMontage(MontageParameter);
 			}
 		}
 	}
@@ -47,7 +41,7 @@ void UARPG_PlayMontageCheckState::NotifyTick(USkeletalMeshComponent* MeshComp, U
 
 FString UARPG_PlayMontageCheckState::GetNotifyName_Implementation() const
 {
-	return FString::Printf(TEXT("动画跳转[%s]"), Montage ? *Montage->GetName() : TEXT("None"));
+	return FString::Printf(TEXT("动画跳转[%s]"), MontageParameter.Montage ? *MontageParameter.Montage->GetName() : TEXT("None"));
 }
 
 void UARPG_PlayMontageByInput::NotifyBegin(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, float TotalDuration)
@@ -67,7 +61,7 @@ void UARPG_PlayMontageByInput::NotifyTick(USkeletalMeshComponent* MeshComp, UAni
 				{
 					if (MeshComp->GetAnimInstance()->Montage_IsPlaying(CurPlayingMontage))
 					{
-						Character->PlayMontage(Montage, 1.f, StartSectionName, bClientMaster);
+						Character->TryPlayMontage(MontageParameter);
 					}
 				}
 			}
@@ -82,7 +76,7 @@ void UARPG_PlayMontageByInput::NotifyEnd(USkeletalMeshComponent* MeshComp, UAnim
 
 FString UARPG_PlayMontageByInput::GetNotifyName_Implementation() const
 {
-	return FString::Printf(TEXT("输入_动画跳转[%s]"), Montage ? *Montage->GetName() : TEXT("None"));
+	return FString::Printf(TEXT("输入_动画跳转[%s]"), MontageParameter.Montage ? *MontageParameter.Montage->GetName() : TEXT("None"));
 }
 
 void UARPG_DodgeAnim::NotifyTick(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, float FrameDeltaTime)

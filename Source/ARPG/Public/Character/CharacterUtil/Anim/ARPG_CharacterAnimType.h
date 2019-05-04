@@ -43,14 +43,21 @@ struct FARPG_MontageParameter
 	GENERATED_BODY()
 public:
 	FARPG_MontageParameter()
-		:Condition(UMPC_WeaponAttackNormal::StaticClass())
+		:Condition(UMPC_WeaponAttackNormal::StaticClass()),
+		bClientMaster(true)
 	{}
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "动画")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "动画", meta = (DisplayName = "播放条件"))
 	TSubclassOf<class UARPG_AnimPlayCondition> Condition;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "动画")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "动画", meta = (DisplayName = "跳转的蒙太奇"))
 	class UAnimMontage* Montage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "动画", meta = (DisplayName = "跳转片段名"))
+	FName StartSectionName;
+
+	UPROPERTY(EditAnywhere, Category = "动画", meta = (DisplayName = "客户端主导"))
+	uint8 bClientMaster : 1;
 };
 
 UCLASS()
@@ -84,34 +91,34 @@ public:
 
 	virtual void InvokePlayDodgeAnim_Implementation(class ACharacterBase* Character, EDodgeDirection DodgeDirection) const override;
 
-	UPROPERTY(EditAnywhere, Category = "动画")
+	UPROPERTY(EditAnywhere, Category = "动画", meta = (DisplayName = "左手轻攻击"))
 	FARPG_MontageParameter LeftLightAttack;
 
-	UPROPERTY(EditAnywhere, Category = "动画")
+	UPROPERTY(EditAnywhere, Category = "动画", meta = (DisplayName = "左手重攻击"))
 	FARPG_MontageParameter LeftHeavyAttack;
 
-	UPROPERTY(EditAnywhere, Category = "动画")
+	UPROPERTY(EditAnywhere, Category = "动画", meta = (DisplayName = "右手重攻击"))
 	FARPG_MontageParameter RightLightAttack;
 
-	UPROPERTY(EditAnywhere, Category = "动画")
+	UPROPERTY(EditAnywhere, Category = "动画", meta = (DisplayName = "右手重攻击"))
 	FARPG_MontageParameter RightHeavyAttack;
 
-	UPROPERTY(EditAnywhere, Category = "动画")
+	UPROPERTY(EditAnywhere, Category = "动画", meta = (DisplayName = "左手冲刺攻击"))
 	FARPG_MontageParameter LeftSprintAttack;
 
-	UPROPERTY(EditAnywhere, Category = "动画")
+	UPROPERTY(EditAnywhere, Category = "动画", meta = (DisplayName = "右手冲刺攻击"))
 	FARPG_MontageParameter RightSprintAttack;
 
-	UPROPERTY(EditAnywhere, Category = "动画")
+	UPROPERTY(EditAnywhere, Category = "动画", meta = (DisplayName = "左手下落攻击"))
 	FARPG_MontageParameter LeftFallingAttack;
 
-	UPROPERTY(EditAnywhere, Category = "动画")
+	UPROPERTY(EditAnywhere, Category = "动画", meta = (DisplayName = "右手下落攻击"))
 	FARPG_MontageParameter RightFallingAttack;
 
-	UPROPERTY(EditDefaultsOnly, Category = "动画")
+	UPROPERTY(EditDefaultsOnly, Category = "动画", meta = (DisplayName = "左手翻滚攻击"))
 	FARPG_MontageParameter DodogeForwardLeftAttack;
 
-	UPROPERTY(EditDefaultsOnly, Category = "动画")
+	UPROPERTY(EditDefaultsOnly, Category = "动画", meta = (DisplayName = "右手翻滚攻击"))
 	FARPG_MontageParameter DodogeForwardRightAttack;
 };
 
@@ -143,12 +150,12 @@ public:
 	virtual void InvokeDodge(class ACharacterBase* Character, EDodgeDirection Direction) const override;
 	virtual bool CanDodge(const class ACharacterBase* Character) const override;
 
-	UPROPERTY(EditDefaultsOnly, Category = "动画")
+	UPROPERTY(EditDefaultsOnly, Category = "动画", meta = (DisplayName = "向前翻滚"))
 	FARPG_MontageParameter DodgeForwardAnim;
-	UPROPERTY(EditDefaultsOnly, Category = "动画")
+	UPROPERTY(EditDefaultsOnly, Category = "动画", meta = (DisplayName = "向后翻滚"))
 	FARPG_MontageParameter DodgeBackAnim;
-	UPROPERTY(EditDefaultsOnly, Category = "动画")
+	UPROPERTY(EditDefaultsOnly, Category = "动画", meta = (DisplayName = "向左翻滚"))
 	FARPG_MontageParameter DodgeLeftAnim;
-	UPROPERTY(EditDefaultsOnly, Category = "动画")
+	UPROPERTY(EditDefaultsOnly, Category = "动画", meta = (DisplayName = "向右翻滚"))
 	FARPG_MontageParameter DodgeRightAnim;
 };

@@ -11,6 +11,8 @@
 #include "CharacterDamageType.h"
 #include "ARPG_BattleType.h"
 #include "GameplayTagContainer.h"
+#include "ARPG_CharacterAnimType.h"
+#include "XD_MovementAnimNotify.h"
 #include "ARPG_AnimNotify.generated.h"
 /**
  * 
@@ -33,18 +35,12 @@ public:
 		bIsNativeBranchingPoint = true;
 	}
 
-	UPROPERTY(EditAnywhere, Category = "动画", meta = (DisplayName = "跳转的蒙太奇"))
-	class UAnimMontage* Montage;
+	UPROPERTY(EditAnywhere, Category = "动画", meta = (ShowOnlyInnerProperties = true, DisplayName = "跳转动画配置"))
+	FARPG_MontageParameter MontageParameter;
 
-	UPROPERTY(EditAnywhere, Category = "动画", meta = (DisplayName = "跳转片段名"))
-	FName StartSectionName;
+	void Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation) override;
 
-	UPROPERTY(EditAnywhere, Category = "动画", meta = (DisplayName = "客户端主导"))
-	uint8 bClientMaster : 1;
-
-	virtual void Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation) override;
-
-	virtual FString GetNotifyName_Implementation() const override;
+	FString GetNotifyName_Implementation() const override;
 };
 
 UCLASS(meta = (DisplayName = "条件_动画跳转"))
@@ -54,17 +50,8 @@ class ARPG_API UARPG_PlayMontageCheckState : public UAnimNotifyState
 public:
 	UARPG_PlayMontageCheckState() = default;
 
-	UPROPERTY(EditAnywhere, Category = "动画")
-	TSubclassOf<class UARPG_AnimPlayCondition> Condition;
-
-	UPROPERTY(EditAnywhere, Category = "动画", meta = (DisplayName = "跳转的蒙太奇"))
-	class UAnimMontage* Montage;
-
-	UPROPERTY(EditAnywhere, Category = "动画", meta = (DisplayName = "跳转片段名"))
-	FName StartSectionName;
-
-	UPROPERTY(EditAnywhere, Category = "动画", meta = (DisplayName = "客户端主导"))
-	uint8 bClientMaster : 1;
+	UPROPERTY(EditAnywhere, Category = "动画", meta = (ShowOnlyInnerProperties = true, DisplayName = "跳转动画配置"))
+	FARPG_MontageParameter MontageParameter;
 
 	virtual void NotifyTick(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, float FrameDeltaTime) override;
 
@@ -76,9 +63,7 @@ class ARPG_API UARPG_PlayMontageByInput : public UAnimNotifyState
 {
 	GENERATED_BODY()
 public:
-	UARPG_PlayMontageByInput()
-		:bClientMaster(true)
-	{}
+	UARPG_PlayMontageByInput() = default;
 
 	UPROPERTY(EditAnywhere, Category = "动画", meta = (DisplayName = "判断松开状态"))
 	uint8 bIsReleased : 1;
@@ -86,14 +71,8 @@ public:
 	UPROPERTY(EditAnywhere, meta = (Bitmask, BitmaskEnum = "EARPG_InputType"), Category = "动画", meta = (DisplayName = "输入类型"))
 	int32 InputType;
 
-	UPROPERTY(EditAnywhere, Category = "动画", meta = (DisplayName = "跳转的蒙太奇"))
-	class UAnimMontage* Montage;
-	
-	UPROPERTY(EditAnywhere, Category = "动画", meta = (DisplayName = "跳转片段名"))
-	FName StartSectionName;
-
-	UPROPERTY(EditAnywhere, Category = "动画", meta = (DisplayName = "客户端主导"))
-	uint8 bClientMaster : 1;
+	UPROPERTY(EditAnywhere, Category = "动画", meta = (ShowOnlyInnerProperties = true, DisplayName = "跳转动画配置"))
+	FARPG_MontageParameter MontageParameter;
 
 	virtual void NotifyBegin(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, float TotalDuration) override;
 	virtual void NotifyTick(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, float FrameDeltaTime) override;
@@ -447,4 +426,18 @@ public:
 	virtual void NotifyEnd(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation) override;
 
 	FString GetNotifyName_Implementation() const override;
+};
+
+UCLASS(meta = (DisplayName = "移动_设置根骨骼位移时旋转速度"))
+class ARPG_API UARPG_SetRootMotionRotationSpeed : public USetRootMotionRotationSpeed
+{
+	GENERATED_BODY()
+public:
+};
+
+UCLASS(meta = (DisplayName = "移动_修正地面移动速度"))
+class ARPG_API UARPG_SetGroundMoveSpeedMultiplier : public USetGroundMoveSpeedMultiplier
+{
+	GENERATED_BODY()
+public:
 };
