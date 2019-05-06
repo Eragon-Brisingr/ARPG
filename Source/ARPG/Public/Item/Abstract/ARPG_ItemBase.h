@@ -8,6 +8,10 @@
 #include "ARPG_InteractInterface.h"
 #include "ARPG_ItemBase.generated.h"
 
+class ACharacterBase;
+class UXD_ItemCoreBase;
+class UARPG_ItemCoreBase;
+
 /**
  * 
  */
@@ -18,7 +22,7 @@ class ARPG_API AARPG_ItemBase : public AXD_ItemBase, public IARPG_InteractInterf
 public:
 	//Begin IARPG_InteractInterface
 	virtual void WhenExecuteInteract_Implementation(ACharacterBase* InteractInvoker) override;
-	virtual bool CanInteract_Implementation(const class ACharacterBase* InteractInvoker) const override;
+	virtual bool CanInteract_Implementation(const ACharacterBase* InteractInvoker) const override;
 	//End IARPG_InteractInterface
 public:
 	AARPG_ItemBase(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
@@ -42,36 +46,43 @@ public:
 	FText GetItemTypeDesc() const { return GetItemTypeDescImpl(InnerItemCore); }
 	
 	UFUNCTION(BlueprintNativeEvent, Category = "物品|基础")
-	float GetWeightImpl(const class UXD_ItemCoreBase* ItemCore) const;
-	virtual float GetWeightImpl_Implementation(const class UXD_ItemCoreBase* ItemCore) const { return Weight; }
+	float GetWeightImpl(const UXD_ItemCoreBase* ItemCore) const;
+	virtual float GetWeightImpl_Implementation(const UXD_ItemCoreBase* ItemCore) const { return Weight; }
 
 	UFUNCTION(BlueprintNativeEvent, Category = "物品|基础")
-	float GetPriceImpl(const class UXD_ItemCoreBase* ItemCore) const;
-	virtual float GetPriceImpl_Implementation(const class UXD_ItemCoreBase* ItemCore) const { return Price; }
+	float GetPriceImpl(const UXD_ItemCoreBase* ItemCore) const;
+	virtual float GetPriceImpl_Implementation(const UXD_ItemCoreBase* ItemCore) const { return Price; }
 
 	UFUNCTION(BlueprintNativeEvent, Category = "物品|基础")
-	FText GetItemTypeDescImpl(const class UXD_ItemCoreBase* ItemCore) const;
-	virtual FText GetItemTypeDescImpl_Implementation(const class UXD_ItemCoreBase* ItemCore) const;
+	FText GetItemTypeDescImpl(const UXD_ItemCoreBase* ItemCore) const;
+	virtual FText GetItemTypeDescImpl_Implementation(const UXD_ItemCoreBase* ItemCore) const;
 
 	UFUNCTION(BlueprintCallable, Category = "物品|基础")
-	class ACharacterBase* GetItemOwner() const;
+	ACharacterBase* GetItemOwner() const;
 
 	UFUNCTION(BlueprintCallable, Category = "物品|基础")
 	void SetItemOwner(ACharacterBase* ItemOwner);
 public:
 	UFUNCTION(BlueprintNativeEvent, Category = "物品|基础")
-	void UseItemImpl(class UARPG_ItemCoreBase* ItemCore, class ACharacterBase* ItemOwner, EUseItemInput UseItemInput) const;
-	virtual void UseItemImpl_Implementation(class UARPG_ItemCoreBase* ItemCore, class ACharacterBase* ItemOwner, EUseItemInput UseItemInput) const{}
+	void UseItemImpl(class UARPG_ItemCoreBase* ItemCore, ACharacterBase* ItemOwner, EUseItemInput UseItemInput) const;
+	virtual void UseItemImpl_Implementation(class UARPG_ItemCoreBase* ItemCore, ACharacterBase* ItemOwner, EUseItemInput UseItemInput) const;
 
-	virtual void WhenUse(class ACharacterBase* ItemOwner);
+	virtual void WhenUse(ACharacterBase* ItemOwner);
 
 	//子类使用时发生的事件
 	UFUNCTION(BlueprintImplementableEvent, Category = "物品|基础", meta = (DisplayName = "WhenUse"))
-	void ReceiveWhenUse(class ACharacterBase* ItemOwner);
+	void ReceiveWhenUse(ACharacterBase* ItemOwner);
 
-	virtual void WhenNotUse(class ACharacterBase* ItemOwner);
+	virtual void WhenNotUse(ACharacterBase* ItemOwner);
 	//子类停止使用时发生的事件
 	UFUNCTION(BlueprintImplementableEvent, Category = "物品|基础", meta = (DisplayName = "WhenNotUse"))
-	void ReceiveWhenNotUse(class ACharacterBase* ItemOwner);
+	void ReceiveWhenNotUse(ACharacterBase* ItemOwner);
 
+public:
+	UPROPERTY(EditDefaultsOnly, Category = "物品")
+	UAnimMontage* UseItemMontage;
+	UPROPERTY(EditDefaultsOnly, Category = "物品")
+	FName UseItemAttachSocketName;
+
+	void PlayUseItemMontage(const UARPG_ItemCoreBase* ItemCore, ACharacterBase* ItemOwner) const;
 };

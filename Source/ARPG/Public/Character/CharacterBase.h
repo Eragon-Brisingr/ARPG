@@ -196,7 +196,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "角色|动作")
 	void TryPlayMontage(const FARPG_MontageParameter& Montage);
 
-	void PlayMontageWithBlendingOutDelegate(UAnimMontage* Montage, const FOnMontageBlendingOutStarted& OnMontageBlendingOutStarted, float InPlayRate = 1.f, FName StartSectionName = NAME_None);
+	void PlayMontageWithBlendingOutDelegate(UAnimMontage* Montage, const FOnMontageBlendingOutStarted& OnMontageBlendingOutStarted, float InPlayRate = 1.f, FName StartSectionName = NAME_None, bool ClientMaster = false);
 	void ClearMontageBlendingOutDelegate(UAnimMontage* Montage);
 
 	UPROPERTY(EditDefaultsOnly, Category = "角色|动作")
@@ -253,12 +253,13 @@ public:
 
 	//使用道具相关
 public:
-	UFUNCTION(BlueprintCallable, Category = "角色|物品", Reliable, WithValidation, Server)
-	void InvokeUseItem(const class UARPG_ItemCoreBase* ItemCore, EUseItemInput UseItemInput);
-	virtual void InvokeUseItem_Implementation(const class UARPG_ItemCoreBase* ItemCore, EUseItemInput UseItemInput);
-	bool InvokeUseItem_Validate(const class UARPG_ItemCoreBase* ItemCore, EUseItemInput UseItemInput) { return true; }
+	UFUNCTION(BlueprintCallable, Category = "角色|物品")
+	void InvokeUseItem(const class UARPG_ItemCoreBase* ItemCore, EUseItemInput UseItemInput = EUseItemInput::LeftMouse);
+	UFUNCTION(Reliable, WithValidation, Server)
+	void InvokeUseItem_Server(const class UARPG_ItemCoreBase* ItemCore, EUseItemInput UseItemInput);
+	void InvokeUseItem_Server_Implementation(const class UARPG_ItemCoreBase* ItemCore, EUseItemInput UseItemInput);
+	bool InvokeUseItem_Server_Validate(const class UARPG_ItemCoreBase* ItemCore, EUseItemInput UseItemInput) { return true; }
 
-	UFUNCTION(BlueprintCallable, Category = "角色|物品", BlueprintAuthorityOnly)
 	void UseItemImmediately(const class UARPG_ItemCoreBase* ItemCore, EUseItemInput UseItemInput = EUseItemInput::LeftMouse);
 
 	UFUNCTION(BlueprintNativeEvent, Category = "角色|物品")
@@ -285,6 +286,9 @@ public:
 	UPROPERTY(BlueprintAssignable, Category = "角色|物品")
 	FOnNotEquip OnNotEquip;
 
+	//使用物品时显示的物品
+	UPROPERTY(BlueprintReadOnly, Category = "角色|物品")
+	AARPG_ItemBase* PendingUseItem;
 	//战斗相关
 public:
 	//卡刀效果

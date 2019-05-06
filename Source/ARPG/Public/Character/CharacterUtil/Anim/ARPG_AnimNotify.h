@@ -441,3 +441,37 @@ class ARPG_API UARPG_SetGroundMoveSpeedMultiplier : public USetGroundMoveSpeedMu
 	GENERATED_BODY()
 public:
 };
+
+UCLASS(meta = (DisplayName = "事件_使用道具"))
+class ARPG_API UARPG_UsePendingItem : public UAnimNotify
+{
+	GENERATED_BODY()
+public:
+	UARPG_UsePendingItem()
+		:bDestroyItem(true)
+	{
+		bIsNativeBranchingPoint = true;
+	}
+
+	void Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation) override;
+
+	UPROPERTY(EditAnywhere, Category = "道具")
+	uint8 bDestroyItem : 1;
+
+	FString GetNotifyName_Implementation() const override;
+};
+
+UCLASS(meta = (DisplayName = "事件_显示正在使用的道具"))
+class ARPG_API UARPG_ShowUsePendingItem : public UAnimNotify
+{
+	GENERATED_BODY()
+public:
+	UARPG_ShowUsePendingItem()
+	{
+		bIsNativeBranchingPoint = true;
+	}
+
+	void Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation) override;
+
+	FString GetNotifyName_Implementation() const override;
+};

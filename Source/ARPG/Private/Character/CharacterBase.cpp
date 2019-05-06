@@ -32,6 +32,7 @@
 #include "ARPG_PlayerControllerBase.h"
 #include "XD_DispatchableActionBase.h"
 #include "ARPG_AD_CharacterInteract.h"
+#include "ARPG_ItemBase.h"
 
 
 // Sets default values
@@ -583,9 +584,9 @@ bool ACharacterBase::ForceSetClientWorldLocationAndRotationImpl_Validate(const F
 	return true;
 }
 
-void ACharacterBase::PlayMontageWithBlendingOutDelegate(UAnimMontage* Montage, const FOnMontageBlendingOutStarted& OnMontageBlendingOutStarted, float InPlayRate /*= 1.f*/, FName StartSectionName /*= NAME_None*/)
+void ACharacterBase::PlayMontageWithBlendingOutDelegate(UAnimMontage* Montage, const FOnMontageBlendingOutStarted& OnMontageBlendingOutStarted, float InPlayRate /*= 1.f*/, FName StartSectionName /*= NAME_None*/, bool ClientMaster /*= false*/)
 {
-	PlayMontage(Montage, InPlayRate, StartSectionName);
+	PlayMontage(Montage, InPlayRate, StartSectionName, ClientMaster);
 	GetMesh()->GetAnimInstance()->Montage_SetBlendingOutDelegate(const_cast<FOnMontageBlendingOutStarted&>(OnMontageBlendingOutStarted), Montage);
 }
 
@@ -614,11 +615,27 @@ void ACharacterBase::TradeItem_Implementation(class UARPG_InventoryComponent* Tr
 	}
 }
 
-void ACharacterBase::InvokeUseItem_Implementation(const class UARPG_ItemCoreBase* ItemCore, EUseItemInput UseItemInput)
+void ACharacterBase::InvokeUseItem(const class UARPG_ItemCoreBase* ItemCore, EUseItemInput UseItemInput /*= EUseItemInput::LeftMouse*/)
 {
 	if (ARPG_MovementComponent->IsMovingOnGround() && CanPlayFullBodyMontage())
 	{
-		UseItemImmediately(ItemCore, UseItemInput);
+		InvokeUseItem_Server(ItemCore, UseItemInput);
+	}
+}
+
+void ACharacterBase::InvokeUseItem_Server_Implementation(const class UARPG_ItemCoreBase* ItemCore, EUseItemInput UseItemInput)
+{
+	if (ARPG_MovementComponent->IsMovingOnGround() && CanPlayFullBodyMontage())
+	{
+		const AARPG_ItemBase* Item = ItemCore->GetItemDefaultActor<AARPG_ItemBase>();
+		if (Item->UseItemMontage)
+		{
+			Item->PlayUseItemMontage(ItemCore, this);
+		}
+		else
+		{
+			UseItemImmediately(ItemCore, UseItemInput);
+		}
 	}
 }
 
