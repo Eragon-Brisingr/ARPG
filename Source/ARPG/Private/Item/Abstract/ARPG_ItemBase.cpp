@@ -6,6 +6,8 @@
 #include "ARPG_ItemCoreBase.h"
 #include "ARPG_CollisionType.h"
 #include "ARPG_InventoryComponent.h"
+#include "XD_DebugFunctionLibrary.h"
+#include "ARPG_Item_Log.h"
 
 
 #define LOCTEXT_NAMESPACE "ARPG_Item"
@@ -17,7 +19,7 @@ void AARPG_ItemBase::WhenExecuteInteract_Implementation(ACharacterBase* Interact
 	Destroy();
 }
 
-bool AARPG_ItemBase::CanInteract_Implementation(const class ACharacterBase* InteractInvoker) const
+bool AARPG_ItemBase::CanInteract_Implementation(const ACharacterBase* InteractInvoker) const
 {
 	return GetItemOwner() == nullptr;
 }
@@ -33,7 +35,7 @@ FText AARPG_ItemBase::GetItemTypeDescImpl_Implementation(const class UXD_ItemCor
 	return LOCTEXT("ARPG_ItemBase ItemTypeDesc", "物品");
 }
 
-class ACharacterBase* AARPG_ItemBase::GetItemOwner() const
+ACharacterBase* AARPG_ItemBase::GetItemOwner() const
 {
 	return Cast<ACharacterBase>(Instigator);
 }
@@ -43,7 +45,12 @@ void AARPG_ItemBase::SetItemOwner(ACharacterBase* ItemOwner)
 	Instigator = ItemOwner;
 }
 
-void AARPG_ItemBase::WhenUse(class ACharacterBase* ItemOwner)
+void AARPG_ItemBase::UseItemImpl_Implementation(class UARPG_ItemCoreBase* ItemCore, ACharacterBase* ItemOwner, EUseItemInput UseItemInput) const
+{
+
+}
+
+void AARPG_ItemBase::WhenUse(ACharacterBase* ItemOwner)
 {
 	bNetUseOwnerRelevancy = true;
 	SetOwner(ItemOwner);
@@ -59,9 +66,33 @@ void AARPG_ItemBase::WhenUse(class ACharacterBase* ItemOwner)
 	ReceiveWhenUse(ItemOwner);
 }
 
-void AARPG_ItemBase::WhenNotUse(class ACharacterBase* ItemOwner)
+void AARPG_ItemBase::WhenNotUse(ACharacterBase* ItemOwner)
 {
 	ReceiveWhenNotUse(ItemOwner);
+}
+
+void AARPG_ItemBase::PlayUseItemMontage(const UARPG_ItemCoreBase* ItemCore, ACharacterBase* ItemOwner) const
+{
+	AARPG_ItemBase* PendingUseItem = CastChecked<AARPG_ItemBase>(ItemCore->SpawnItemActorForOwner(ItemOwner, ItemOwner));
+	PendingUseItem->SetItemSimulatePhysics(false);
+	PendingUseItem->SetActorHiddenInGame(true);
+	PendingUseItem->AttachToComponent(ItemOwner->GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, UseItemAttachSocketName);
+	ItemOwner->PendingUseItem = PendingUseItem;
+	ItemOwner->PlayMontageWithBlendingOutDelegate(UseItemMontage, FOnMontageBlendingOutStarted::CreateWeakLambda(ItemOwner, [=](UAnimMontage* Montage, bool bInterrupted)
+		{
+			if (ItemOwner->PendingUseItem)
+			{
+				if (bInterrupted)
+				{
+					ItemOwner->PendingUseItem->Destroy();
+				}
+				else
+				{
+					Item_Warning_LOG("%s的动画%s已经播放完，但是角色还引用该道具，执行销毁", *UXD_DebugFunctionLibrary::GetDebugName(this), *UXD_DebugFunctionLibrary::GetDebugName(Montage));
+					ItemOwner->PendingUseItem->Destroy();
+				}
+			}
+		}), 1.f, NAME_None, false);
 }
 
 #undef LOCTEXT_NAMESPACE

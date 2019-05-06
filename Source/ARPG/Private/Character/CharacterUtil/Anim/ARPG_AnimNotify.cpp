@@ -10,6 +10,8 @@
 #include "ARPG_DebugFunctionLibrary.h"
 #include "ReceiveDamageActionBase.h"
 #include "XD_MacrosLibrary.h"
+#include "ARPG_ItemBase.h"
+#include "ARPG_ItemCoreBase.h"
 
 
 void UARPG_PlayMontageByState::Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation)
@@ -472,4 +474,41 @@ void UARPG_InteractEventNotifyState::NotifyEnd(USkeletalMeshComponent* MeshComp,
 FString UARPG_InteractEventNotifyState::GetNotifyName_Implementation() const
 {
 	return FString::Printf(TEXT("交互_事件[%s]"), *EventTag.ToString());
+}
+
+void UARPG_UsePendingItem::Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation)
+{
+	if (ACharacterBase* Character = Cast<ACharacterBase>(MeshComp->GetOwner()))
+	{
+		if (Character->PendingUseItem)
+		{
+			Character->UseItemImmediately(CastChecked<UARPG_ItemCoreBase>(Character->PendingUseItem->GetItemCore()));
+			if (bDestroyItem)
+			{
+				Character->PendingUseItem->Destroy();
+				Character->PendingUseItem = nullptr;
+			}
+		}
+	}
+}
+
+FString UARPG_UsePendingItem::GetNotifyName_Implementation() const
+{
+	return TEXT("事件_使用道具");
+}
+
+void UARPG_ShowUsePendingItem::Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation)
+{
+	if (ACharacterBase* Character = Cast<ACharacterBase>(MeshComp->GetOwner()))
+	{
+		if (Character->PendingUseItem)
+		{
+			Character->PendingUseItem->SetActorHiddenInGame(false);
+		}
+	}
+}
+
+FString UARPG_ShowUsePendingItem::GetNotifyName_Implementation() const
+{
+	return TEXT("事件_显示正在使用的道具");
 }
