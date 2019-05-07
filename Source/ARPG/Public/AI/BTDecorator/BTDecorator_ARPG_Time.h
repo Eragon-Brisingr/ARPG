@@ -16,6 +16,8 @@ class ARPG_API UBTDecorator_ARPG_TimeBase : public UBTDecorator
 	GENERATED_BODY()
 public:
 	UBTDecorator_ARPG_TimeBase();
+
+	static const TCHAR TimeDescFormat[];
 private:
 	FString GetStaticDescription() const override;
 	void TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds) override;
