@@ -78,6 +78,7 @@ public:
 	UFUNCTION(BlueprintImplementableEvent, Category = "物品|基础", meta = (DisplayName = "WhenNotUse"))
 	void ReceiveWhenNotUse(ACharacterBase* ItemOwner);
 
+	//使用物品动画
 public:
 	UPROPERTY(EditDefaultsOnly, Category = "物品")
 	UAnimMontage* UseItemMontage;

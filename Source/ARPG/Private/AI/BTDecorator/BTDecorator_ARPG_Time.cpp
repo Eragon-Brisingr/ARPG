@@ -4,7 +4,7 @@
 #include "ARPG_TimeManager.h"
 #include "BlueprintNodeHelpers.h"
 
-const TCHAR TimeDescFormat[] = TEXT("[%s]至[%s]");
+const TCHAR UBTDecorator_ARPG_TimeBase::TimeDescFormat[] = TEXT("[%s]至[%s]");
 
 UBTDecorator_ARPG_TimeBase::UBTDecorator_ARPG_TimeBase()
 {
