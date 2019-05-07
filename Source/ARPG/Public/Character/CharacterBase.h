@@ -372,6 +372,8 @@ public:
 	void ExecuteOtherToServer_Implementation(ACharacterBase* ExecuteTarget, const FVector& TargetLocation, const FRotator& TargetRotation, UAnimMontage* ExecuteMontage, UAnimMontage* BeExecutedMontage);
 	bool ExecuteOtherToServer_Validate(ACharacterBase* ExecuteTarget, const FVector& TargetLocation, const FRotator& TargetRotation, UAnimMontage* ExecuteMontage, UAnimMontage* BeExecutedMontage) { return true; }
 
+	void WhenExecuteEnd();
+
 	//通知
 public:
 	virtual void WhenKillOther(ACharacterBase* WhoBeKilled, UObject* KillInstigator);

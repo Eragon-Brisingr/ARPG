@@ -745,9 +745,34 @@ void ACharacterBase::ExecuteOtherToServer_Implementation(ACharacterBase* Execute
 	{
 		ExecuteTargetCharacter = ExecuteTarget;
 		ExecuteTarget->ExecuteFromCharacter = this;
+		Battle_Display_LOG("%s对%s进行处决", *UXD_DebugFunctionLibrary::GetDebugName(this), *UXD_DebugFunctionLibrary::GetDebugName(ExecuteTarget));
 		UARPG_ActorMoveUtils::MoveActorTo(ExecuteTarget, TargetLocation, TargetRotation);
-		PlayMontage(ExecuteMontage);
-		ExecuteTarget->PlayMontage(BeExecutedMontage);
+		PlayMontageWithBlendingOutDelegate(ExecuteMontage, FOnMontageBlendingOutStarted::CreateWeakLambda(ExecuteTarget, [=](UAnimMontage* Montage, bool bInterrupted)
+			{
+				if (bInterrupted)
+				{
+					ExecuteTarget->StopMontage(BeExecutedMontage);
+				}
+				WhenExecuteEnd();
+			}), 1.f, NAME_None, true);
+		ExecuteTarget->PlayMontageWithBlendingOutDelegate(BeExecutedMontage, FOnMontageBlendingOutStarted::CreateWeakLambda(this, [=](UAnimMontage* Montage, bool bInterrupted)
+			{
+				if (bInterrupted)
+				{
+					StopMontage(ExecuteMontage);
+				}
+				WhenExecuteEnd();
+			}), 1.f, NAME_None, true);
+	}
+}
+
+void ACharacterBase::WhenExecuteEnd()
+{
+	if (ExecuteTargetCharacter)
+	{
+		Battle_Display_LOG("%s对%s处决结束", *UXD_DebugFunctionLibrary::GetDebugName(this), *UXD_DebugFunctionLibrary::GetDebugName(ExecuteTargetCharacter));
+		ExecuteTargetCharacter->ExecuteFromCharacter = this;
+		ExecuteTargetCharacter = nullptr;
 	}
 }
 
