@@ -42,7 +42,7 @@ public:
 	FRotator RelativeRotation;
 
 	UPROPERTY(EditAnywhere, Category = "配置")
-	FVector BoxExtent;
+	FVector BoxExtent = FVector(100.f, 100.f, 100.f);
 
 #if WITH_EDITORONLY_DATA
 	UPROPERTY(EditAnywhere, Category = "配置")
