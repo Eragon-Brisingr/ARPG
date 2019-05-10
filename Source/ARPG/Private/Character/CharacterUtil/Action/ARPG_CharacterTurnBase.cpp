@@ -70,3 +70,8 @@ UAnimMontage* UCA_TurnNormal::GetTurnMontage(ACharacterBase* Executer, const FRo
 {
 	return GetTurnMontageFourDirection(Executer->GetActorRotation(), TargetWorldRotation, TurnLeft90, TurnRight90, TurnLeft180, TurnRight180);
 }
+
+UAnimMontage* UCA_TurnSimple::GetTurnMontage(ACharacterBase* Executer, const FRotator& TargetWorldRotation)
+{
+	return GetTurnMontageFourDirection(Executer->GetActorRotation(), TargetWorldRotation, TurnLeft90, TurnRight90, TurnLeft90, TurnRight90);
+}
