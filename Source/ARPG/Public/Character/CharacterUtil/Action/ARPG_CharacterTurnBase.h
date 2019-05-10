@@ -57,3 +57,17 @@ public:
 
 	UAnimMontage* GetTurnMontage(ACharacterBase* Executer, const FRotator& TargetWorldRotation) override;
 };
+
+UCLASS(meta = (DisplayName = "转身_简易"))
+class ARPG_API UCA_TurnSimple : public UCA_CharacterTurnBase
+{
+	GENERATED_BODY()
+public:
+	UPROPERTY(EditAnywhere, Category = "转身")
+	UAnimMontage* TurnLeft90;
+	UPROPERTY(EditAnywhere, Category = "转身")
+	UAnimMontage* TurnRight90;
+
+	UAnimMontage* GetTurnMontage(ACharacterBase* Executer, const FRotator& TargetWorldRotation) override;
+};
+
