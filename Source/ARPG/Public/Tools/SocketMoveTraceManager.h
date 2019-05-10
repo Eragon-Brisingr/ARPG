@@ -44,13 +44,15 @@ class ARPG_API USocketMoveTracer : public UObject, public FTickableGameObject
 public:
 	USocketMoveTracer();
 
-	virtual void Tick(float DeltaTime) override;
+	void Tick(float DeltaTime) override;
 
-	virtual TStatId GetStatId() const override { RETURN_QUICK_DECLARE_CYCLE_STAT(USocketMoveTracer, STATGROUP_Tickables); }
+	TStatId GetStatId() const override { RETURN_QUICK_DECLARE_CYCLE_STAT(USocketMoveTracer, STATGROUP_Tickables); }
 
-	virtual bool IsTickable() const override { return bEnableTrace; }
+	bool IsTickable() const override { return bEnableTrace; }
 
-	virtual UWorld* GetTickableGameObjectWorld() const;
+	UWorld* GetTickableGameObjectWorld() const override;
+
+	UWorld* GetWorld() const override;
 public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "攻击检测")
 	uint8 bEnableTrace : 1;

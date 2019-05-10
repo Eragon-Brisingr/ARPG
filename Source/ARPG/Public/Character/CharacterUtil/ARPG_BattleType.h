@@ -21,7 +21,7 @@ public:
 	FVector Offset;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "角色|行为")
-	float Radius;
+	float Radius = 100.f;
 
 	const bool operator==(const FARPG_AttackInfo& AttackInfo) const { return SocketName == AttackInfo.SocketName && Radius == AttackInfo.Radius && Offset == AttackInfo.Offset; }
 
