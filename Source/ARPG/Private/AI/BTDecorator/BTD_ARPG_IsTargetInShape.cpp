@@ -9,6 +9,19 @@
 #include "DrawDebugHelpers.h"
 #include "Kismet/KismetMathLibrary.h"
 
+UBTD_ARPG_InShapeBase::UBTD_ARPG_InShapeBase()
+{
+	bNotifyTick = true;
+}
+
+void UBTD_ARPG_InShapeBase::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds)
+{
+	if (!CalculateRawConditionValue(OwnerComp, NodeMemory))
+	{
+		OwnerComp.RequestExecution(this);
+	}
+}
+
 bool UBTD_ARPG_InSphere::CalculateRawConditionValue(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) const
 {
 	AAIController* AIOwner = OwnerComp.GetAIOwner();

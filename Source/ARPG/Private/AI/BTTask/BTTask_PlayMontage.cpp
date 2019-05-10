@@ -31,12 +31,20 @@ EBTNodeResult::Type UBTTask_PlayMontage::AbortTask(UBehaviorTreeComponent& Owner
 		AAIController* MyController = OwnerComp.GetAIOwner();
 		if (ACharacterBase* Character = Cast<ACharacterBase>(MyController->GetPawn()))
 		{
-			FOnMontageBlendingOutStarted OnMontageBlendingOutStarted = FOnMontageBlendingOutStarted::CreateWeakLambda(this, [=, P_OwnerComp = &OwnerComp](UAnimMontage* Montage, bool bInterrupted)
-				{
-					FinishLatentAbort(*P_OwnerComp);
-				});
-			Character->GetMesh()->GetAnimInstance()->Montage_SetBlendingOutDelegate(const_cast<FOnMontageBlendingOutStarted&>(OnMontageBlendingOutStarted), MontageToPlay);
-			return EBTNodeResult::InProgress;
+			if (bStopMontageWhenAborted)
+			{
+				Character->StopMontage(MontageToPlay);
+				return EBTNodeResult::Aborted;
+			}
+			else
+			{
+				FOnMontageBlendingOutStarted OnMontageBlendingOutStarted = FOnMontageBlendingOutStarted::CreateWeakLambda(this, [=, P_OwnerComp = &OwnerComp](UAnimMontage* Montage, bool bInterrupted)
+					{
+						FinishLatentAbort(*P_OwnerComp);
+					});
+				Character->GetMesh()->GetAnimInstance()->Montage_SetBlendingOutDelegate(const_cast<FOnMontageBlendingOutStarted&>(OnMontageBlendingOutStarted), MontageToPlay);
+				return EBTNodeResult::InProgress;
+			}
 		}
 	}
 	return EBTNodeResult::Aborted;

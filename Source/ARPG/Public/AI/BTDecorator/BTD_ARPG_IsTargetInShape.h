@@ -9,8 +9,17 @@
 /**
  * 
  */
+UCLASS(abstract)
+class ARPG_API UBTD_ARPG_InShapeBase : public UBTDecorator_BlackboardBase
+{
+	GENERATED_BODY()
+public:
+	UBTD_ARPG_InShapeBase();
+	void TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds) override;
+};
+
 UCLASS(meta = (DisplayName = "目标在球形中"))
-class ARPG_API UBTD_ARPG_InSphere : public UBTDecorator_BlackboardBase
+class ARPG_API UBTD_ARPG_InSphere : public UBTD_ARPG_InShapeBase
 {
 	GENERATED_BODY()
 public:
@@ -31,7 +40,7 @@ public:
 };
 
 UCLASS(meta = (DisplayName = "目标在矩形中"))
-class ARPG_API UBTD_ARPG_InBox : public UBTDecorator_BlackboardBase
+class ARPG_API UBTD_ARPG_InBox : public UBTD_ARPG_InShapeBase
 {
 	GENERATED_BODY()
 public:

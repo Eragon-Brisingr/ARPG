@@ -33,7 +33,7 @@ FString UBTDecorator_ARPG_TimeBase::GetStaticDescription() const
 
 void UBTDecorator_ARPG_TimeBase::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds)
 {
-	if (FlowAbortMode != EBTFlowAbortMode::None && !CalculateRawConditionValue(OwnerComp, NodeMemory))
+	if (!CalculateRawConditionValue(OwnerComp, NodeMemory))
 	{
 		OwnerComp.RequestExecution(this);
 	}

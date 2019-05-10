@@ -19,6 +19,9 @@ public:
 	UPROPERTY(EditAnywhere, Category = "动画")
 	UAnimMontage* MontageToPlay;
 
+	UPROPERTY(EditAnywhere, Category = "动画")
+	uint8 bStopMontageWhenAborted : 1;
+
 	EBTNodeResult::Type ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) override;
 	EBTNodeResult::Type AbortTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) override;
 };
