@@ -28,7 +28,7 @@ class UMPC_WeaponAttackNormal : public UARPG_AnimPlayCondition
 {
 	GENERATED_BODY()
 public:
-	virtual bool CanPlayMontage_Implementation(class ACharacterBase* Character) const { return true; }
+	bool CanPlayMontage_Implementation(class ACharacterBase* Character) const override { return true; }
 };
 
 UCLASS(meta = (DisplayName = "能在下落时播放"))
