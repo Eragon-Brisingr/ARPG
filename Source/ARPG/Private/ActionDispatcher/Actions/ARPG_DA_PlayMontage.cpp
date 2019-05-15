@@ -12,10 +12,17 @@ void UARPG_DA_PlayMontage::WhenActionActived()
 {
 	RegisterEntity(Pawn.Get());
 	ACharacterBase* Character = Cast<ACharacterBase>(Pawn.Get());
-	Character->PlayMontage(MontageToPlay);
-
-	FOnMontageBlendingOutStarted OnMontageBlendingOutStarted = FOnMontageBlendingOutStarted::CreateUObject(this, &UARPG_DA_PlayMontage::WhenMontagePlayFinished);
-	Character->GetMesh()->GetAnimInstance()->Montage_SetBlendingOutDelegate(OnMontageBlendingOutStarted, MontageToPlay);
+	Character->PlayMontageWithBlendingOutDelegate(MontageToPlay, FOnMontageBlendingOutStarted::CreateWeakLambda(this, [=](UAnimMontage* Montage, bool bInterrupted)
+		{
+			if (bInterrupted == false)
+			{
+				ExecuteEventAndFinishAction(WhenPlayFinished);
+			}
+			else
+			{
+				AbortDispatcher(true);
+			}
+		}));
 }
 
 void UARPG_DA_PlayMontage::WhenActionAborted()
@@ -23,10 +30,10 @@ void UARPG_DA_PlayMontage::WhenActionAborted()
 	if (WhenAbortedMontage)
 	{
 		ACharacterBase* Character = Cast<ACharacterBase>(Pawn.Get());
-		Character->PlayMontage(WhenAbortedMontage);
-		
-		FOnMontageBlendingOutStarted OnMontageBlendingOutStarted = FOnMontageBlendingOutStarted::CreateUObject(this, &UARPG_DA_PlayMontage::WhenAbortPlayFinished);
-		Character->GetMesh()->GetAnimInstance()->Montage_SetBlendingOutDelegate(OnMontageBlendingOutStarted, WhenAbortedMontage);
+		Character->PlayMontageWithBlendingOutDelegate(WhenAbortedMontage, FOnMontageBlendingOutStarted::CreateWeakLambda(this, [=](UAnimMontage* Montage, bool bInterrupted)
+			{
+				DeactiveAction();
+			}));
 	}
 	else
 	{
@@ -43,21 +50,4 @@ void UARPG_DA_PlayMontage::WhenActionDeactived()
 void UARPG_DA_PlayMontage::WhenActionFinished()
 {
 	UnregisterEntity(Pawn.Get());
-}
-
-void UARPG_DA_PlayMontage::WhenMontagePlayFinished(UAnimMontage* Montage, bool bInterrupted)
-{
-	if (bInterrupted == false)
-	{
-		ExecuteEventAndFinishAction(WhenPlayFinished);
-	}
-	else
-	{
-		AbortDispatcher(true);
-	}
-}
-
-void UARPG_DA_PlayMontage::WhenAbortPlayFinished(UAnimMontage* Montage, bool bInterrupted)
-{
-	DeactiveAction();
 }

@@ -15,7 +15,7 @@ UARPG_AD_CharacterBase* FARPG_NavPathPoint::GetBehavior(ACharacterBase* Invoker)
 	UARPG_AD_CharacterBase*& Behavior = BehaviorMap.FindOrAdd(Invoker);
 	if (Behavior == nullptr)
 	{
-		Behavior = DuplicateObject(BehaviorTemplate, Invoker);
+		Behavior = ::DuplicateObject(BehaviorTemplate, Invoker);
 		Behavior->Character = Invoker;
 		Behavior->InitLeader(Invoker);
 	}

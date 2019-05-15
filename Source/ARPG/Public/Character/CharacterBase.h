@@ -443,7 +443,7 @@ public:
 	UPROPERTY(BlueprintReadOnly, Category = "角色|交互", Replicated)
 	uint8 bIsInteractingWithActor : 1;
 
-	uint8 bIsInBTreeInteracting : 1;
+	uint8 bIsInBTreeDispatching : 1;
 
 	//交互前的处理，可能由任务之类的附加的操作，会打断之后的交互行为
 	DECLARE_DELEGATE(FOnPreInteractEvent);

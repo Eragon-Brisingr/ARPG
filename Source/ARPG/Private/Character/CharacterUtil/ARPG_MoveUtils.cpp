@@ -440,6 +440,26 @@ UARPG_CharacterMove_AsyncAction* UARPG_CharacterMove_AsyncAction::BP_ARPG_MoveTo
 	return nullptr;
 }
 
+UARPG_CharacterMove_AsyncAction* UARPG_CharacterMove_AsyncAction::BP_MoveToActorAndTurn(class ACharacterBase* Character, AActor* Goal, AActor* TurnToActor, float AcceptanceRadius /*= 5.f*/, bool bStopOnOverlap /*= true*/, bool bUsePathfinding /*= true*/, bool bCanStrafe /*= true*/, TSubclassOf<class UNavigationQueryFilter> FilterClass /*= nullptr*/, bool bAllowPartialPaths /*= true*/)
+{
+	if (Character && Character->GetController())
+	{
+		FPathFollowingRequestResult ResultData = UARPG_MoveUtils::ARPG_MoveToActorImpl(Character, Goal, AcceptanceRadius, bStopOnOverlap, bUsePathfinding, bCanStrafe, FilterClass, bAllowPartialPaths);
+		return UARPG_CharacterMove_AsyncAction::SettingRequest(Character, ResultData);
+	}
+	return nullptr;
+}
+
+UARPG_CharacterMove_AsyncAction* UARPG_CharacterMove_AsyncAction::BP_MoveToLocationAndTurn(class ACharacterBase* Character, const FVector& Dest, const FRotator& TurnRotation, float AcceptanceRadius /*= 5.f*/, bool bStopOnOverlap /*= true*/, bool bUsePathfinding /*= true*/, bool bProjectDestinationToNavigation /*= false*/, bool bCanStrafe /*= true*/, TSubclassOf<UNavigationQueryFilter> FilterClass /*= nullptr*/, bool bAllowPartialPaths /*= true*/)
+{
+	if (Character && Character->GetController())
+	{
+		FPathFollowingRequestResult ResultData = UARPG_MoveUtils::ARPG_MoveToLocationImpl(Character, Dest, AcceptanceRadius, bStopOnOverlap, bUsePathfinding, bProjectDestinationToNavigation, bCanStrafe, FilterClass, bAllowPartialPaths);
+		return UARPG_CharacterMove_AsyncAction::SettingRequest(Character, ResultData);
+	}
+	return nullptr;
+}
+
 void UARPG_CharacterMove_AsyncAction::OnMoveCompletedCheckedId(FAIRequestID RequestID, const FPathFollowingResult& Result, UPathFollowingComponent* PathFollowingComponent, FAIRequestID InvokeRequestID)
 {
 	if (RequestID.IsEquivalent(InvokeRequestID) && Character)

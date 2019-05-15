@@ -21,11 +21,11 @@ EBTNodeResult::Type UBTTask_InteractWithActor::ExecuteTask(UBehaviorTreeComponen
 			if (Character->CanInteractWithTarget(InteractableActor.Get()))
 			{
 				AI_Display_VLog(Character, "请求与%s进行交互", *UXD_DebugFunctionLibrary::GetDebugName(InteractableActor.Get()));
-				Character->bIsInBTreeInteracting = true;
+				Character->bIsInBTreeDispatching = true;
 				Character->InvokeInteractWithEndEvent(InteractableActor.Get(), FOnInteractEnd::CreateWeakLambda(this, [=, P_OwnerComp = &OwnerComp](EInteractEndResult Result)
 					{
 						AI_Display_VLog(Character, "与%s进行交互结束，结果为%s", *UXD_DebugFunctionLibrary::GetDebugName(InteractableActor.Get()), Result == EInteractEndResult::Succeed ? TEXT("成功") : TEXT("失败"));
-						Character->bIsInBTreeInteracting = false;
+						Character->bIsInBTreeDispatching = false;
 						FinishLatentTask(*P_OwnerComp, Result == EInteractEndResult::Succeed ? EBTNodeResult::Succeeded : EBTNodeResult::Failed);
 					}));
 				return EBTNodeResult::InProgress;
@@ -45,7 +45,7 @@ EBTNodeResult::Type UBTTask_InteractWithActor::AbortTask(UBehaviorTreeComponent&
 			AI_Display_VLog(Character, "中断与%s进行交互", *UXD_DebugFunctionLibrary::GetDebugName(InteractableActor.Get()));
 			Character->InvokeAbortInteractWithAbortEvent(FOnInteractAbortEnd::CreateWeakLambda(this, [=, P_OwnerComp = &OwnerComp]()
 				{
-					Character->bIsInBTreeInteracting = false;
+					Character->bIsInBTreeDispatching = false;
 					FinishLatentAbort(*P_OwnerComp);
 				}));
 		}
