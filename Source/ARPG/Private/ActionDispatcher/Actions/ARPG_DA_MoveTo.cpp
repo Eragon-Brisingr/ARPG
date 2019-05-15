@@ -73,7 +73,7 @@ void UARPG_DA_MoveToActor::WhenActionActived()
 
 bool UARPG_DA_MoveToLocation::IsActionValid() const
 {
-	return Super::CanActiveAction() && IsExistValidPath(Mover->GetActorLocation(), Destination);
+	return Super::IsActionValid() && IsExistValidPath(Mover->GetActorLocation(), Destination);
 }
 
 void UARPG_DA_MoveToLocation::WhenActionActived()

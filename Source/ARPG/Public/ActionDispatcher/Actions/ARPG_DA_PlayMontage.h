@@ -35,8 +35,4 @@ public:
 protected:
 	UPROPERTY(SaveGame, meta = (DisplayName = "当播放结束"))
 	FOnDispatchableActionFinishedEvent WhenPlayFinished;
-
-	void WhenMontagePlayFinished(UAnimMontage* Montage, bool bInterrupted);
-
-	void WhenAbortPlayFinished(UAnimMontage* Montage, bool bInterrupted);
 };

@@ -21,28 +21,28 @@ public:
 	void TurnTo(ACharacterBase* Executer, const FRotator& TargetWorldRotation, const FOnCharacterBehaviorFinished& OnCharacterTurnFinished);
 
 	void AbortTurnTo(ACharacterBase* Executer, const FOnCharacterBehaviorAbortFinished& OnCharacterBehaviorAbortFinished);
+
+	virtual bool CanTurnTo(const ACharacterBase* Executer) const { return false; }
 protected:
 	UPROPERTY(EditAnywhere, Category = "行为")
 	FRotator TurnToRotation;
-
-	void WhenBehaviorExecuted(class ACharacterBase* Executer) override;
-	void WhenBehaviorAborted(ACharacterBase* Executer) override;
-
-	virtual UAnimMontage* GetTurnMontage(ACharacterBase* Executer, const FRotator& TargetWorldRotation) { return ReceiveGetTurnMontage(Executer, TargetWorldRotation); }
-	UFUNCTION(BlueprintImplementableEvent, Category = "角色|动作", meta = (DisplayName = "GetTurnMontage"))
-	UAnimMontage* ReceiveGetTurnMontage(ACharacterBase* Executer, const FRotator& TargetWorldRotation);
-
-	void WhenMontageBlendOutStart(UAnimMontage* Montage, bool bInterrupted);
-
-	UFUNCTION(BlueprintCallable, Category = "角色|动作")
-	UAnimMontage* GetTurnMontageFourDirection(const FRotator& CurrentWorldRotation, const FRotator& TargetWorldRotation, UAnimMontage* TurnLeft90, UAnimMontage* TurnRight90, UAnimMontage* TurnLeft180, UAnimMontage* TurnRight180);
-
-	UPROPERTY()
-	UAnimMontage* CurrentTurnMontage;
 };
 
-UCLASS(meta = (DisplayName = "转身_普通"))
-class ARPG_API UCA_TurnNormal : public UCA_CharacterTurnBase
+UCLASS(abstract, const, Blueprintable)
+class ARPG_API UCA_TurnMontageConfigBase : public UObject
+{
+	GENERATED_BODY()
+public:
+	virtual UAnimMontage* GetTurnMontage(ACharacterBase* Executer, const FRotator& TargetWorldRotation) const { return ReceiveGetTurnMontage(Executer, TargetWorldRotation); }
+	UFUNCTION(BlueprintImplementableEvent, Category = "角色|动作", meta = (DisplayName = "GetTurnMontage"))
+	UAnimMontage* ReceiveGetTurnMontage(ACharacterBase* Executer, const FRotator& TargetWorldRotation) const;
+	
+	UFUNCTION(BlueprintCallable, Category = "角色|动作")
+	UAnimMontage* GetTurnMontageFourDirection(const FRotator& CurrentWorldRotation, const FRotator& TargetWorldRotation, UAnimMontage* TurnLeft90, UAnimMontage* TurnRight90, UAnimMontage* TurnLeft180, UAnimMontage* TurnRight180) const;
+};
+
+UCLASS(abstract, meta = (DisplayName = "转身配置_普通"))
+class ARPG_API UCA_TurnMontageConfigNormal : public UCA_TurnMontageConfigBase
 {
 	GENERATED_BODY()
 public:
@@ -55,19 +55,21 @@ public:
 	UPROPERTY(EditAnywhere, Category = "转身")
 	UAnimMontage* TurnRight180;
 
-	UAnimMontage* GetTurnMontage(ACharacterBase* Executer, const FRotator& TargetWorldRotation) override;
+	UAnimMontage* GetTurnMontage(ACharacterBase* Executer, const FRotator& TargetWorldRotation) const override;
 };
 
-UCLASS(meta = (DisplayName = "转身_简易"))
-class ARPG_API UCA_TurnSimple : public UCA_CharacterTurnBase
+UCLASS(meta = (DisplayName = "转身_普通"))
+class ARPG_API UCA_TurnByMontage : public UCA_CharacterTurnBase
 {
 	GENERATED_BODY()
 public:
-	UPROPERTY(EditAnywhere, Category = "转身")
-	UAnimMontage* TurnLeft90;
-	UPROPERTY(EditAnywhere, Category = "转身")
-	UAnimMontage* TurnRight90;
+	void WhenBehaviorExecuted(class ACharacterBase* Executer) override;
+	void WhenBehaviorAborted(ACharacterBase* Executer) override;
+	bool CanTurnTo(const ACharacterBase* Executer) const override;
 
-	UAnimMontage* GetTurnMontage(ACharacterBase* Executer, const FRotator& TargetWorldRotation) override;
+	UPROPERTY(EditAnywhere, Category = "配置")
+	TSubclassOf<UCA_TurnMontageConfigBase> TurnMontageConfig;
+
+	UPROPERTY()
+	UAnimMontage* CurrentTurnMontage;
 };
-

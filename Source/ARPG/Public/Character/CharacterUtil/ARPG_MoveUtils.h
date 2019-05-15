@@ -56,10 +56,18 @@ class ARPG_API UARPG_CharacterMove_AsyncAction : public UBlueprintAsyncActionBas
 	GENERATED_BODY()
 public:
 	UFUNCTION(BlueprintCallable, Category = "角色|移动", meta = (BlueprintInternalUseOnly = "true", DisplayName = "ARPG Move To Actor", AdvancedDisplay = "bStopOnOverlap,bCanStrafe,bAllowPartialPaths"))
-	static class UARPG_CharacterMove_AsyncAction* BP_ARPG_MoveToActor(class ACharacterBase* Character, AActor* Goal, float AcceptanceRadius = 5.f, bool bStopOnOverlap = true, bool bUsePathfinding = true, bool bCanStrafe = true, TSubclassOf<class UNavigationQueryFilter> FilterClass = nullptr, bool bAllowPartialPaths = true);
+	static UARPG_CharacterMove_AsyncAction* BP_ARPG_MoveToActor(class ACharacterBase* Character, AActor* Goal, float AcceptanceRadius = 5.f, bool bStopOnOverlap = true, bool bUsePathfinding = true, bool bCanStrafe = true, TSubclassOf<class UNavigationQueryFilter> FilterClass = nullptr, bool bAllowPartialPaths = true);
 
 	UFUNCTION(BlueprintCallable, Category = "角色|移动", meta = (BlueprintInternalUseOnly = "true", DisplayName = "ARPG Move To Location", AdvancedDisplay = "bStopOnOverlap,bCanStrafe,bAllowPartialPaths,bProjectDestinationToNavigation"))
-	static class UARPG_CharacterMove_AsyncAction* BP_ARPG_MoveToLocation(class ACharacterBase* Character, const FVector& Dest, float AcceptanceRadius = 5.f, bool bStopOnOverlap = true, bool bUsePathfinding = true, bool bProjectDestinationToNavigation = false, bool bCanStrafe = true, TSubclassOf<UNavigationQueryFilter> FilterClass = nullptr, bool bAllowPartialPaths = true);
+	static UARPG_CharacterMove_AsyncAction* BP_ARPG_MoveToLocation(class ACharacterBase* Character, const FVector& Dest, float AcceptanceRadius = 5.f, bool bStopOnOverlap = true, bool bUsePathfinding = true, bool bProjectDestinationToNavigation = false, bool bCanStrafe = true, TSubclassOf<UNavigationQueryFilter> FilterClass = nullptr, bool bAllowPartialPaths = true);
+
+	//TODO 尚未完成Turn
+	UFUNCTION(BlueprintCallable, Category = "角色|移动", meta = (BlueprintInternalUseOnly = "true", DisplayName = "ARPG Move To Location", AdvancedDisplay = "bStopOnOverlap,bCanStrafe,bAllowPartialPaths,bProjectDestinationToNavigation"))
+	static UARPG_CharacterMove_AsyncAction* BP_MoveToActorAndTurn(class ACharacterBase* Character, AActor* Goal, AActor* TurnToActor, float AcceptanceRadius = 5.f, bool bStopOnOverlap = true, bool bUsePathfinding = true, bool bCanStrafe = true, TSubclassOf<class UNavigationQueryFilter> FilterClass = nullptr, bool bAllowPartialPaths = true);
+
+	//TODO 尚未完成Turn
+	UFUNCTION(BlueprintCallable, Category = "角色|移动", meta = (BlueprintInternalUseOnly = "true", DisplayName = "ARPG Move To Location", AdvancedDisplay = "bStopOnOverlap,bCanStrafe,bAllowPartialPaths,bProjectDestinationToNavigation"))
+	static UARPG_CharacterMove_AsyncAction* BP_MoveToLocationAndTurn(class ACharacterBase* Character, const FVector& Dest, const FRotator& TurnRotation, float AcceptanceRadius = 5.f, bool bStopOnOverlap = true, bool bUsePathfinding = true, bool bProjectDestinationToNavigation = false, bool bCanStrafe = true, TSubclassOf<UNavigationQueryFilter> FilterClass = nullptr, bool bAllowPartialPaths = true);
 public:
 	UPROPERTY()
 	class ACharacterBase* Character;

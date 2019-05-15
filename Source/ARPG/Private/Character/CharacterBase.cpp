@@ -63,7 +63,7 @@ ACharacterBase::ACharacterBase(const FObjectInitializer& ObjectInitializer)
 
 	SneakSystem = CreateDefaultSubobject<UARPG_SneakSystemNormal>(GET_MEMBER_NAME_CHECKED(ACharacterBase, SneakSystem));
 
-	CharacterTurnAction = CreateDefaultSubobject<UCA_TurnNormal>(GET_MEMBER_NAME_CHECKED(ACharacterBase, CharacterTurnAction));
+	CharacterTurnAction = CreateDefaultSubobject<UCA_TurnByMontage>(GET_MEMBER_NAME_CHECKED(ACharacterBase, CharacterTurnAction));
 
 	GetMesh()->VisibilityBasedAnimTickOption = EVisibilityBasedAnimTickOption::AlwaysTickPoseAndRefreshBones;
 
@@ -517,18 +517,15 @@ UARPG_CharacterBehaviorBase* ACharacterBase::EnterReleaseState(const FOnCharacte
 
 bool ACharacterBase::CanTurnTo() const
 {
-	return GetMesh()->GetAnimInstance()->GetSlotMontageGlobalWeight(TurnSlotName) < 0.5f && IsPlayingRootMotion() == false;
+	return GetMesh()->GetAnimInstance()->GetSlotMontageGlobalWeight(TurnSlotName) < 0.5f && IsPlayingRootMotion() == false && CharacterTurnAction && CharacterTurnAction->CanTurnTo(this);
 }
 
 bool ACharacterBase::TurnTo(const FRotator& TargetWorldRotation, const FOnCharacterBehaviorFinished& OnCharacterBehaviorFinished)
 {
-	if (CharacterTurnAction)
+	if (CanTurnTo())
 	{
-		if (CanTurnTo())
-		{
-			CharacterTurnAction->TurnTo(this, TargetWorldRotation, OnCharacterBehaviorFinished);
-			return true;
-		}
+		CharacterTurnAction->TurnTo(this, TargetWorldRotation, OnCharacterBehaviorFinished);
+		return true;
 	}
 	else
 	{
@@ -1175,7 +1172,7 @@ EAlertState ACharacterBase::GetAlertState() const
 bool ACharacterBase::CanInDailyBehavior() const
 {
 	return GetAlertState() == EAlertState::None && (CurrentActions.Num() == 0 
-		|| bIsInBTreeInteracting
+		|| bIsInBTreeDispatching
 		|| CurrentActions.ContainsByPredicate([](auto Action)
 			{
 				return Action->State != EDispatchableActionState::Deactive;
