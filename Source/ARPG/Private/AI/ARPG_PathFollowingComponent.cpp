@@ -16,3 +16,13 @@ void UARPG_PathFollowingComponent::UpdatePathSegment()
 {
 	Super::UpdatePathSegment();
 }
+
+void UARPG_PathFollowingComponent::StartUsingCustomLink(INavLinkCustomInterface* CustomNavLink, const FVector& DestPoint)
+{
+	Super::StartUsingCustomLink(CustomNavLink, DestPoint);
+}
+
+void UARPG_PathFollowingComponent::FinishUsingCustomLink(INavLinkCustomInterface* CustomNavLink)
+{
+	Super::FinishUsingCustomLink(CustomNavLink);
+}
