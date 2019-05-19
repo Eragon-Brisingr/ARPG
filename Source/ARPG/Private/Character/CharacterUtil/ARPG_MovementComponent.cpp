@@ -5,11 +5,25 @@
 #include <AIController.h>
 #include <Kismet/KismetMathLibrary.h>
 #include "ARPG_PlayerControllerBase.h"
+#include "CharacterBase.h"
 
 
+
+void UARPG_MovementComponent::OnRegister()
+{
+	Super::OnRegister();
+
+	ARPG_Character = Cast<ACharacterBase>(GetOwner());
+}
 
 void UARPG_MovementComponent::TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction *ThisTickFunction)
 {
+// 	if (ARPG_Character->IsPlayingRootMotion())
+// 	{
+// 		RootMotionParams.bHasRootMotion = true;
+// 		RootMotionParams.RootMotionTransform.SetScale3D(ARPG_Character->RootMotionScale);
+// 	}
+
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
 	//锁定时旋转输入一直朝向锁定目标，除非有移动输入

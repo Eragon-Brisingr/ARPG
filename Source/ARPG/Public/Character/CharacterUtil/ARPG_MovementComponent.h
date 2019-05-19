@@ -6,6 +6,8 @@
 #include "XD_CharacterMovementComponent.h"
 #include "ARPG_MovementComponent.generated.h"
 
+class ACharacterBase;
+
 /**
  * 
  */
@@ -14,6 +16,11 @@ class ARPG_API UARPG_MovementComponent : public UXD_CharacterMovementComponent
 {
 	GENERATED_BODY()
 public:
+	UPROPERTY()
+	ACharacterBase* ARPG_Character;
+
+	virtual void OnRegister() override;
+
 	virtual void TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction *ThisTickFunction) override;
 	
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnMovementModeChanged, UARPG_MovementComponent*, MovementComponent, EMovementMode, PreviousMovementMode, uint8, PreviousCustomMode);

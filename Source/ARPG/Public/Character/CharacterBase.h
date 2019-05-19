@@ -236,6 +236,13 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "角色|动作")
 	bool CanDodge() const;
 
+	//RootMotion的距离比例
+	UPROPERTY(Replicated)
+	FVector RootMotionScale = FVector::OneVector;
+	UFUNCTION(BlueprintCallable, Category = "角色|动作")
+	void SetRootMotionTranslationScale(const FVector& Scale);
+	UFUNCTION(BlueprintCallable, Category = "角色|动作")
+	FVector GetRootMotionTranslationScale() const;
 	//背包相关
 public:
 	UFUNCTION(BlueprintCallable, Category = "角色|物品", Reliable, WithValidation, Server)
