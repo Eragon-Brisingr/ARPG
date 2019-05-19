@@ -133,6 +133,7 @@ void ACharacterBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLi
 
 	DOREPLIFETIME(ACharacterBase, bIsLockingOther);
 	DOREPLIFETIME_CONDITION(ACharacterBase, bIsInteractingWithActor, COND_OwnerOnly);
+	DOREPLIFETIME_CONDITION(ACharacterBase, RootMotionScale, COND_SimulatedOnly);
 }
 
 void ACharacterBase::OnConstruction(const FTransform& Transform)
@@ -499,6 +500,17 @@ void ACharacterBase::InvokeDodgeByDirection(EDodgeDirection Direction)
 bool ACharacterBase::CanDodge() const
 {
 	return DodgeAnimSet->CanDodge(this);
+}
+
+void ACharacterBase::SetRootMotionTranslationScale(const FVector& Scale)
+{
+	SetAnimRootMotionTranslationScale(Scale.GetAbsMax());
+	RootMotionScale = Scale;
+}
+
+FVector ACharacterBase::GetRootMotionTranslationScale() const
+{
+	return RootMotionScale;
 }
 
 UARPG_CharacterBehaviorBase* ACharacterBase::EnterReleaseState(const FOnCharacterBehaviorFinished& OnBehaviorFinished)
