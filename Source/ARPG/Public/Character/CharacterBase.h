@@ -22,6 +22,7 @@
 #include "ARPG_CharacterBehaviorType.h"
 #include "ARPG_AI_BattleInterface.h"
 #include "XD_DispatchableEntityInterface.h"
+#include "ARPG_NavAreaType.h"
 #include "CharacterBase.generated.h"
 
 class UCA_EnterReleaseStateBase;
@@ -568,6 +569,11 @@ public:
 	FBehaviorTreeWithSubTree MainBehaviorTree;
 
 	bool CanInDailyBehavior() const;
+
+	//NavLink
+	UFUNCTION(BlueprintNativeEvent, Category = "角色|AI|寻路")
+	void WhenStartNavLink(EARPG_NavAreaFlag NavAreaFlag, const FVector& StartLocation, const FVector& EndLocation);
+	virtual void WhenStartNavLink_Implementation(EARPG_NavAreaFlag NavAreaFlag, const FVector& StartLocation, const FVector& EndLocation);
 
 	//CharacterBehavior接口
 public:

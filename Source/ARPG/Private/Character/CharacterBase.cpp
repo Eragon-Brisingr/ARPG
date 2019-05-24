@@ -33,6 +33,7 @@
 #include "XD_DispatchableActionBase.h"
 #include "ARPG_AD_CharacterInteract.h"
 #include "ARPG_ItemBase.h"
+#include "DrawDebugHelpers.h"
 
 
 // Sets default values
@@ -1189,4 +1190,10 @@ bool ACharacterBase::CanInDailyBehavior() const
 			{
 				return Action->State != EDispatchableActionState::Deactive;
 			}) == false);
+}
+
+void ACharacterBase::WhenStartNavLink_Implementation(EARPG_NavAreaFlag NavAreaFlag, const FVector& StartLocation, const FVector& EndLocation)
+{
+	DrawDebugSphere(GetWorld(), StartLocation, 100.f, 32, FColor::Red, true, 2.f);
+	DrawDebugSphere(GetWorld(), EndLocation, 100.f, 32, FColor::Red, true, 2.f);
 }
