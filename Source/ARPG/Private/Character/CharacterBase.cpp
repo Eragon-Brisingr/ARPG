@@ -7,6 +7,8 @@
 #include <Kismet/GameplayStatics.h>
 #include <TimerManager.h>
 #include <Kismet/KismetMathLibrary.h>
+#include <AIController.h>
+#include <Perception/AIPerceptionComponent.h>
 #include <Perception/AISenseConfig_Sight.h>
 
 #include "ARPG_MovementComponent.h"
@@ -34,6 +36,8 @@
 #include "ARPG_AD_CharacterInteract.h"
 #include "ARPG_ItemBase.h"
 #include "DrawDebugHelpers.h"
+#include "AIPerceptionExLibrary.h"
+#include "ARPG_RelationshipFunctionLibrary.h"
 
 
 // Sets default values
@@ -901,7 +905,11 @@ void ACharacterBase::InvokeInteractWithEndEvent(AActor* InteractTarget, const FO
 
 bool ACharacterBase::CanInteractWithTarget(AActor* InteractTarget) const
 {
-	return InvokeInteractTarget == nullptr && InteractTarget && CanPlayFullBodyMontage() && InteractTarget->Implements<UARPG_InteractInterface>() && IARPG_InteractInterface::CanInteract(InteractTarget, this);
+	return InvokeInteractTarget == nullptr && 
+		InteractTarget && 
+		CanPlayFullBodyMontage() && 
+		InteractTarget->Implements<UARPG_InteractInterface>() && 
+		IARPG_InteractInterface::CanInteract(InteractTarget, this);
 }
 
 void ACharacterBase::InvokeAbortInteract()
@@ -982,6 +990,10 @@ bool ACharacterBase::CanInteract_Implementation(const class ACharacterBase* Inte
 		return false;
 	}
 	if (CurrentMainDispatcher && CurrentMainDispatcher->bInteractable == false && CurrentMainDispatcher->State != EActionDispatcherState::Deactive)
+	{
+		return false;
+	}
+	if (GetRelationshipTowards(InteractInvoker) == ECharacterRelationship::Hostile)
 	{
 		return false;
 	}
@@ -1109,6 +1121,37 @@ void ACharacterBase::WhenReceivedMoveRequest()
 
 }
 
+TArray<ACharacterBase*> ACharacterBase::GetSeeingCharacters() const
+{
+	if (AAIController* AIController = Cast<AAIController>(GetController()))
+	{
+		if (UAIPerceptionComponent* PerceptionComponent = AIController->GetPerceptionComponent())
+		{
+			TArray<ACharacterBase*> CurrentlyPerceivedCharacters = UAIPerceptionExLibrary::GetCurrentlyPerceivedActorsEx<ACharacterBase>(PerceptionComponent, UAISense_Sight::StaticClass());
+			return CurrentlyPerceivedCharacters;
+		}
+	}
+	return {};
+}
+
+TArray<ACharacterBase*> ACharacterBase::GetSeeingTraceCharacters() const
+{
+	if (AAIController * AIController = Cast<AAIController>(GetController()))
+	{
+		if (UAIPerceptionComponent * PerceptionComponent = AIController->GetPerceptionComponent())
+		{
+			TArray<ACharacterBase*> KnowPerceivedCharacters = UAIPerceptionExLibrary::GetKnownPerceivedActorsEx<ACharacterBase>(PerceptionComponent, UAISense_Sight::StaticClass());
+			return UAIPerceptionExLibrary::FilterPerceivedActorsByMaxAge(PerceptionComponent, KnowPerceivedCharacters, UAISense_Sight::StaticClass(), SightMaxTraceTime);
+		}
+	}
+	return {};
+}
+
+TArray<ACharacterBase*> ACharacterBase::GetSeeingTraceEnemies() const
+{
+	return UARPG_RelationshipFunctionLibrary::FilterByRelationshipLE_Towards(this, ACharacterBase::GetSeeingTraceCharacters(), MaxAlertRelationship);
+}
+
 void ACharacterBase::AddAlertValue(float AddValue)
 {
 	if (AddValue > 0.f)
@@ -1194,6 +1237,19 @@ bool ACharacterBase::CanInDailyBehavior() const
 
 void ACharacterBase::WhenStartNavLink_Implementation(EARPG_NavAreaFlag NavAreaFlag, const FVector& StartLocation, const FVector& EndLocation)
 {
-	DrawDebugSphere(GetWorld(), StartLocation, 100.f, 32, FColor::Red, true, 2.f);
-	DrawDebugSphere(GetWorld(), EndLocation, 100.f, 32, FColor::Red, true, 2.f);
+	if (NavAreaFlag == EARPG_NavAreaFlag::Jump)
+	{
+		TurnTo((EndLocation - GetActorLocation()).Rotation(), FOnCharacterBehaviorFinished::CreateWeakLambda(this, [=](bool Succeed)
+			{
+				if (Succeed)
+				{
+					LaunchCharacter((EndLocation - GetActorLocation()) * 7.f, true, true);
+				}
+			}));
+	}
+	else
+	{
+		DrawDebugSphere(GetWorld(), StartLocation, 100.f, 32, FColor::Red, true, 2.f);
+		DrawDebugSphere(GetWorld(), EndLocation, 100.f, 32, FColor::Red, true, 2.f);
+	}
 }
