@@ -18,8 +18,10 @@ void UARPG_PathFollowingComponent::SetMoveSegment(int32 SegmentStartIndex)
 	const FNavPathPoint& SegmentEnd = Path->GetPathPoints()[MoveSegmentStartIndex + 1];
 	if (FARPG_NavAreaFlagHelper::IsSet(SegmentStart, EARPG_NavAreaFlag::Jump))
 	{
-		ACharacterBase* Character = Cast<ACharacterBase>(MovementComp->GetOwner());
-		Character->WhenStartNavLink(EARPG_NavAreaFlag::Jump, SegmentStart.Location, SegmentEnd.Location);
+		if (ACharacterBase * Character = Cast<ACharacterBase>(MovementComp->GetOwner()))
+		{
+			Character->WhenStartNavLink(EARPG_NavAreaFlag::Jump, SegmentStart.Location, SegmentEnd.Location);
+		}
 	}
 }
 

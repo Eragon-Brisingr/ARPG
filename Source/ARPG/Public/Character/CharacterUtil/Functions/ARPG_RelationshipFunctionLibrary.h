@@ -7,6 +7,8 @@
 #include "CharacterType.h"
 #include "ARPG_RelationshipFunctionLibrary.generated.h"
 
+class ACharacterBase;
+
 /**
  * 
  */
@@ -22,14 +24,14 @@ public:
 	bool LessEqual_Relationship(ECharacterRelationship LHS, ECharacterRelationship RHS) { return LHS <= RHS; }
 
 	UFUNCTION(BlueprintCallable, Category = "角色|关系", meta = (DeterminesOutputType = "FilterCharacters"))
-	static TArray<class ACharacterBase*> FilterByRelationshipTowards(class ACharacterBase* Character, const TArray<class ACharacterBase*>& FilterCharacters, ECharacterRelationship Relationship);
+	static TArray<ACharacterBase*> FilterByRelationshipTowards(const ACharacterBase* Character, const TArray<ACharacterBase*>& FilterCharacters, ECharacterRelationship Relationship);
 
 	UFUNCTION(BlueprintCallable, Category = "角色|关系", meta = (DeterminesOutputType = "FilterCharacters"))
-	static TArray<class ACharacterBase*> FilterByRelationshipsTowards(class ACharacterBase* Character, const TArray<class ACharacterBase*>& FilterCharacters, TArray<ECharacterRelationship> Relationships);
+	static TArray<ACharacterBase*> FilterByRelationshipsTowards(const ACharacterBase* Character, const TArray<ACharacterBase*>& FilterCharacters, TArray<ECharacterRelationship> Relationships);
 
 	UFUNCTION(BlueprintCallable, Category = "角色|关系", meta = (DeterminesOutputType = "FilterCharacters"))
-	static TArray<class ACharacterBase*> FilterByRelationshipGE_Towards(class ACharacterBase* Character, const TArray<class ACharacterBase*>& FilterCharacters, ECharacterRelationship GE_Relationship);
+	static TArray<ACharacterBase*> FilterByRelationshipGE_Towards(const ACharacterBase* Character, const TArray<ACharacterBase*>& FilterCharacters, ECharacterRelationship GE_Relationship);
 
 	UFUNCTION(BlueprintCallable, Category = "角色|关系", meta = (DeterminesOutputType = "FilterCharacters"))
-	static TArray<class ACharacterBase*> FilterByRelationshipLE_Towards(class ACharacterBase* Character, const TArray<class ACharacterBase*>& FilterCharacters, ECharacterRelationship LE_Relationship);
+	static TArray<ACharacterBase*> FilterByRelationshipLE_Towards(const ACharacterBase* Character, const TArray<ACharacterBase*>& FilterCharacters, ECharacterRelationship LE_Relationship);
 };

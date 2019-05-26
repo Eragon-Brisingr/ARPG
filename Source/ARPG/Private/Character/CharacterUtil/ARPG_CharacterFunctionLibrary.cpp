@@ -9,24 +9,19 @@
 
 
 
-bool UARPG_CharacterFunctionLibrary::IsInDangerousArea(class ACharacterBase* Asker, float TraceRadius /*= 500.f*/)
+bool UARPG_CharacterFunctionLibrary::IsInDangerousArea(class ACharacterBase* Asker, float TraceRadius)
 {
 	if (Asker)
 	{
-		TArray<AActor*> OverlapedActors;
-		if (UKismetSystemLibrary::SphereOverlapActors(Asker, Asker->GetActorLocation(), TraceRadius, { FARPG_CollisionObjectType::Pawn }, {}, { Asker }, OverlapedActors))
+		for (ACharacterBase* Character : Asker->GetSeeingTraceEnemies())
 		{
-			for (AActor* Actor : OverlapedActors)
+			for (const FARPG_AttackInfo& AttackInfo : Character->AttackInfos)
 			{
-				if (ACharacterBase* Character = Cast<ACharacterBase>(Actor))
+				float Distance = (Asker->GetActorLocation() - Character->GetMesh()->GetSocketTransform(AttackInfo.SocketName).TransformPosition(AttackInfo.Offset)).Size();
+				float Radius = AttackInfo.Radius + Asker->GetCapsuleComponent()->GetScaledCapsuleRadius();
+				if (Distance < Radius)
 				{
-					for (const FARPG_AttackInfo& AttackInfo : Character->AttackInfos)
-					{
-						if ((Asker->GetActorLocation() - Character->GetMesh()->GetSocketTransform(AttackInfo.SocketName).TransformPosition(AttackInfo.Offset)).Size() < Asker->GetCapsuleComponent()->GetScaledCapsuleRadius())
-						{
-							return true;
-						}
-					}
+					return true;
 				}
 			}
 		}

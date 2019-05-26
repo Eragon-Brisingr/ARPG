@@ -512,12 +512,6 @@ public:
 	virtual bool CanBeSeenFrom(const FVector& ObserverLocation, FVector& OutSeenLocation, int32& NumberOfLoSChecksPerformed, float& OutSightStrength, const AActor* IgnoreActor = NULL) const override;
 	//AISightTargetInterface End
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "角色|AI|配置")
-	TSubclassOf<class UNavigationQueryFilter> NavigationQueryFilter;
-
-	//接收到寻路请求时的处理
-	void WhenReceivedMoveRequest();
-
 	//子系统
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "角色|AI|配置", Instanced)
@@ -574,6 +568,29 @@ public:
 	UFUNCTION(BlueprintNativeEvent, Category = "角色|AI|寻路")
 	void WhenStartNavLink(EARPG_NavAreaFlag NavAreaFlag, const FVector& StartLocation, const FVector& EndLocation);
 	virtual void WhenStartNavLink_Implementation(EARPG_NavAreaFlag NavAreaFlag, const FVector& StartLocation, const FVector& EndLocation);
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "角色|AI|配置")
+	TSubclassOf<class UNavigationQueryFilter> NavigationQueryFilter;
+
+	//接收到寻路请求时的处理
+	void WhenReceivedMoveRequest();
+
+
+	//感知
+
+	//获得当前看到的角色
+	UFUNCTION(BlueprintCallable, BlueprintPure = false , Category = "角色|AI|感知")
+	TArray<ACharacterBase*> GetSeeingCharacters() const;
+
+	//AI在看不见玩家后并不会立即丢失玩家（考虑玩家通过拐角），AI视觉追踪最大时长
+	UPROPERTY(EditAnywhere, Category = "角色|AI|配置")
+	float SightMaxTraceTime = 5.f;
+	//获得还在AI视觉追踪时间内的角色
+	UFUNCTION(BlueprintCallable, BlueprintPure = false, Category = "角色|AI|感知")
+	TArray<ACharacterBase*> GetSeeingTraceCharacters() const;
+	//获得还在AI视觉追踪时间内的敌人
+	UFUNCTION(BlueprintCallable, BlueprintPure = false, Category = "角色|AI|感知")
+	TArray<ACharacterBase*> GetSeeingTraceEnemies() const;
 
 	//CharacterBehavior接口
 public:

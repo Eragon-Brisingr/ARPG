@@ -9,6 +9,11 @@
 
 
 
+UARPG_MovementComponent::UARPG_MovementComponent()
+{
+	RotationMode = ECharacterRotationMode::VelocityDirection;
+}
+
 void UARPG_MovementComponent::OnRegister()
 {
 	Super::OnRegister();

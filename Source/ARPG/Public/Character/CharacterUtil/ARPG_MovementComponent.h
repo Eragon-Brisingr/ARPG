@@ -16,6 +16,8 @@ class ARPG_API UARPG_MovementComponent : public UXD_CharacterMovementComponent
 {
 	GENERATED_BODY()
 public:
+	UARPG_MovementComponent();
+
 	UPROPERTY()
 	ACharacterBase* ARPG_Character;
 

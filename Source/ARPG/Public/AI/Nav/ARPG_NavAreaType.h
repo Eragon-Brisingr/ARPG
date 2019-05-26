@@ -27,10 +27,10 @@ namespace FARPG_NavAreaFlagHelper
 	FORCEINLINE bool IsNavLink(const FNavPathPoint& PathVert) { return (FNavMeshNodeFlags(PathVert.Flags).PathFlags & RECAST_STRAIGHTPATH_OFFMESH_CONNECTION) != 0; }
 }
 
-UCLASS()
-class ARPG_API UARPG_NavArea_Jump : public UNavArea
+UCLASS(hidedropdown)
+class ARPG_API UARPG_NavArea_JumpBase : public UNavArea
 {
 	GENERATED_BODY()
 public:
-	UARPG_NavArea_Jump();
+	UARPG_NavArea_JumpBase();
 };

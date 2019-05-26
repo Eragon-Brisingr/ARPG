@@ -4,10 +4,10 @@
 #include "CharacterBase.h"
 
 template<typename TPredicate>
-static TArray<class ACharacterBase*> FilterCharacterByPredicate(const TArray<class ACharacterBase*>& FilterCharacters, const TPredicate& Predicate)
+static TArray<ACharacterBase*> FilterCharacterByPredicate(const TArray<ACharacterBase*>& FilterCharacters, const TPredicate& Predicate)
 {
-	TArray<class ACharacterBase*> Res;
-	for (class ACharacterBase* Element : FilterCharacters)
+	TArray<ACharacterBase*> Res;
+	for (ACharacterBase* Element : FilterCharacters)
 	{
 		if (Element && Predicate(Element))
 		{
@@ -17,22 +17,22 @@ static TArray<class ACharacterBase*> FilterCharacterByPredicate(const TArray<cla
 	return Res;
 }
 
-TArray<class ACharacterBase*> UARPG_RelationshipFunctionLibrary::FilterByRelationshipTowards(class ACharacterBase* Character, const TArray<class ACharacterBase*>& FilterCharacters, ECharacterRelationship Relationship)
+TArray<ACharacterBase*> UARPG_RelationshipFunctionLibrary::FilterByRelationshipTowards(const ACharacterBase* Character, const TArray<ACharacterBase*>& FilterCharacters, ECharacterRelationship Relationship)
 {
-	return Character ? FilterCharacterByPredicate(FilterCharacters, [&](ACharacterBase* Element) {return Character->GetRelationshipTowards(Element) == Relationship; }) : TArray<class ACharacterBase*>();
+	return Character ? FilterCharacterByPredicate(FilterCharacters, [&](ACharacterBase* Element) {return Character->GetRelationshipTowards(Element) == Relationship; }) : TArray<ACharacterBase*>();
 }
 
-TArray<class ACharacterBase*> UARPG_RelationshipFunctionLibrary::FilterByRelationshipsTowards(class ACharacterBase* Character, const TArray<class ACharacterBase*>& FilterCharacters, TArray<ECharacterRelationship> Relationships)
+TArray<ACharacterBase*> UARPG_RelationshipFunctionLibrary::FilterByRelationshipsTowards(const ACharacterBase* Character, const TArray<ACharacterBase*>& FilterCharacters, TArray<ECharacterRelationship> Relationships)
 {
-	return Character ? FilterCharacterByPredicate(FilterCharacters, [&](ACharacterBase* Element) {return Relationships.Contains(Character->GetRelationshipTowards(Element)); }) : TArray<class ACharacterBase*>();
+	return Character ? FilterCharacterByPredicate(FilterCharacters, [&](ACharacterBase* Element) {return Relationships.Contains(Character->GetRelationshipTowards(Element)); }) : TArray<ACharacterBase*>();
 }
 
-TArray<class ACharacterBase*> UARPG_RelationshipFunctionLibrary::FilterByRelationshipGE_Towards(class ACharacterBase* Character, const TArray<class ACharacterBase*>& FilterCharacters, ECharacterRelationship GE_Relationship)
+TArray<ACharacterBase*> UARPG_RelationshipFunctionLibrary::FilterByRelationshipGE_Towards(const ACharacterBase* Character, const TArray<ACharacterBase*>& FilterCharacters, ECharacterRelationship GE_Relationship)
 {
-	return Character ? FilterCharacterByPredicate(FilterCharacters, [&](ACharacterBase* Element) {return Character->GetRelationshipTowards(Element) >= GE_Relationship; }) : TArray<class ACharacterBase*>();
+	return Character ? FilterCharacterByPredicate(FilterCharacters, [&](ACharacterBase* Element) {return Character->GetRelationshipTowards(Element) >= GE_Relationship; }) : TArray<ACharacterBase*>();
 }
 
-TArray<class ACharacterBase*> UARPG_RelationshipFunctionLibrary::FilterByRelationshipLE_Towards(class ACharacterBase* Character, const TArray<class ACharacterBase*>& FilterCharacters, ECharacterRelationship LE_Relationship)
+TArray<ACharacterBase*> UARPG_RelationshipFunctionLibrary::FilterByRelationshipLE_Towards(const ACharacterBase* Character, const TArray<ACharacterBase*>& FilterCharacters, ECharacterRelationship LE_Relationship)
 {
-	return Character ? FilterCharacterByPredicate(FilterCharacters, [&](ACharacterBase* Element) {return Character->GetRelationshipTowards(Element) <= LE_Relationship; }) : TArray<class ACharacterBase*>();
+	return Character ? FilterCharacterByPredicate(FilterCharacters, [&](ACharacterBase* Element) {return Character->GetRelationshipTowards(Element) <= LE_Relationship; }) : TArray<ACharacterBase*>();
 }
