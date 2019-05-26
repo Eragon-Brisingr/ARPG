@@ -87,12 +87,12 @@ public:
 	//DispatchableEntityInterface
 public:
 	FXD_DispatchableActionList GetCurrentDispatchableActions_Implementation() override;
-	UPROPERTY(BlueprintReadOnly, Category = "行为")
+	UPROPERTY(BlueprintReadOnly, Category = "角色|行为")
 	TArray<UXD_DispatchableActionBase*> CurrentActions;
 
 	UARPG_ActionDispatcherBase* GetCurrentMainDispatcher_Implementation() const override;
 	void SetCurrentMainDispatcher_Implementation(UXD_ActionDispatcherBase* Dispatcher) override;
-	UPROPERTY(BlueprintReadOnly, Category = "行为")
+	UPROPERTY(BlueprintReadOnly, Category = "角色|行为")
 	UARPG_ActionDispatcherBase* CurrentMainDispatcher;
 
 	bool CanExecuteDispatcher_Implementation() const override;
@@ -365,7 +365,7 @@ public:
 	//处决
 public:
 	//处决受击方
-	UPROPERTY(BlueprintReadWrite, Category = "游戏|行为")
+	UPROPERTY(BlueprintReadWrite, Category = "角色|行为")
 	ACharacterBase* ExecuteTargetCharacter;
 	//处决攻击方
 	UPROPERTY(BlueprintReadWrite, Category = "角色|行为")
@@ -574,7 +574,6 @@ public:
 
 	//接收到寻路请求时的处理
 	void WhenReceivedMoveRequest();
-
 
 	//感知
 
