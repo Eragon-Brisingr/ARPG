@@ -17,4 +17,5 @@ public:
 	UBTDecorator_ARPG_IsAllowedAttack();
 
 	bool CalculateRawConditionValue(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) const override;
+	void TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds) override;
 };

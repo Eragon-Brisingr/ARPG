@@ -6,6 +6,7 @@
 #include "CharacterBase.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "Animation/AnimInstance.h"
+#include "XD_DebugFunctionLibrary.h"
 
 EBTNodeResult::Type UBTTask_PlayMontage::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
 {
@@ -48,4 +49,9 @@ EBTNodeResult::Type UBTTask_PlayMontage::AbortTask(UBehaviorTreeComponent& Owner
 		}
 	}
 	return EBTNodeResult::Aborted;
+}
+
+FString UBTTask_PlayMontage::GetStaticDescription() const
+{
+	return FString::Printf(TEXT("播放%s"), *UXD_DebugFunctionLibrary::GetDebugName(MontageToPlay));
 }
