@@ -393,25 +393,7 @@ void UARPG_MoveUtils::OnTurnCompleted(bool Result, ACharacterBase* Character, FR
 {
 	if (Result)
 	{
-		if (FMath::Abs(Character->GetActorRotation().Yaw - TurnToRotation.Yaw) > 2.f)
-		{
-			UARPG_ActorMoveUtils::MoveCharacterToRotationFitGround(Character, TurnToRotation, FOnActorMoveFinished::CreateLambda([=](bool bIsAborted) mutable
-				{
-					if (bIsAborted)
-					{
-						PathFollowingResult.Code = EPathFollowingResult::Aborted;
-						OnARPG_MoveFinish.ExecuteIfBound(PathFollowingResult);
-					}
-					else
-					{
-						OnARPG_MoveFinish.ExecuteIfBound(PathFollowingResult);
-					}
-				}), 0.1f);
-		}
-		else
-		{
-			OnARPG_MoveFinish.ExecuteIfBound(PathFollowingResult);
-		}
+		OnARPG_MoveFinish.ExecuteIfBound(PathFollowingResult);
 	}
 	else
 	{

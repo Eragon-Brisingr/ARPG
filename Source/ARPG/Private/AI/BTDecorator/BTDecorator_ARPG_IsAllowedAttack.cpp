@@ -9,6 +9,7 @@
 UBTDecorator_ARPG_IsAllowedAttack::UBTDecorator_ARPG_IsAllowedAttack()
 {
 	NodeName = TEXT("是否允许攻击");
+	bNotifyTick = true;
 }
 
 bool UBTDecorator_ARPG_IsAllowedAttack::CalculateRawConditionValue(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) const
@@ -27,4 +28,12 @@ bool UBTDecorator_ARPG_IsAllowedAttack::CalculateRawConditionValue(UBehaviorTree
 		}
 	}
 	return false;
+}
+
+void UBTDecorator_ARPG_IsAllowedAttack::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds)
+{
+	if (!CalculateRawConditionValue(OwnerComp, NodeMemory))
+	{
+		OwnerComp.RequestExecution(this);
+	}
 }

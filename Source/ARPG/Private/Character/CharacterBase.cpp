@@ -537,25 +537,46 @@ bool ACharacterBase::CanTurnTo() const
 	return GetMesh()->GetAnimInstance()->GetSlotMontageGlobalWeight(TurnSlotName) < 0.5f && IsPlayingRootMotion() == false && CharacterTurnAction && CharacterTurnAction->CanTurnTo(this);
 }
 
-bool ACharacterBase::TurnTo(const FRotator& TargetWorldRotation, const FOnCharacterBehaviorFinished& OnCharacterBehaviorFinished)
+void ACharacterBase::TurnTo(const FRotator& TargetWorldRotation, const FOnCharacterBehaviorFinished& OnCharacterBehaviorFinished, bool ForceSnapRotation)
 {
+	auto SnapAction = [=]()
+	{
+		if (FMath::Abs(GetActorRotation().Yaw - TargetWorldRotation.Yaw) > 2.f)
+		{
+			UARPG_ActorMoveUtils::MoveCharacterToRotationFitGround(this, TargetWorldRotation, FOnActorMoveFinished::CreateLambda([=](bool bIsAborted) mutable
+				{
+					OnCharacterBehaviorFinished.ExecuteIfBound(!bIsAborted);
+				}), 0.1f);
+		}
+		else
+		{
+			OnCharacterBehaviorFinished.ExecuteIfBound(true);
+		}
+	};
 	if (CanTurnTo())
 	{
-		CharacterTurnAction->TurnTo(this, TargetWorldRotation, OnCharacterBehaviorFinished);
-		return true;
+		FOnCharacterBehaviorFinished OnFinish = ForceSnapRotation ? FOnCharacterBehaviorFinished::CreateWeakLambda(this, [=](bool Succeed)
+			{
+				if (Succeed)
+				{
+					SnapAction();
+				}
+				else
+				{
+					OnCharacterBehaviorFinished.ExecuteIfBound(false);
+				}
+			}) : OnCharacterBehaviorFinished;
+		CharacterTurnAction->TurnTo(this, TargetWorldRotation, OnFinish);
 	}
 	else
 	{
-		UARPG_ActorMoveUtils::MoveCharacterToRotationFitGround(this, TargetWorldRotation);
-		OnCharacterBehaviorFinished.ExecuteIfBound(true);
-		return true;
+		SnapAction();
 	}
-	return false;
 }
 
-bool ACharacterBase::TurnTo(const FRotator& TargetWorldRotation)
+void ACharacterBase::TurnTo(const FRotator& TargetWorldRotation, bool ForceSnapRotation)
 {
-	return TurnTo(TargetWorldRotation, {});
+	TurnTo(TargetWorldRotation, {}, ForceSnapRotation);
 }
 
 void ACharacterBase::ForceSetClientWorldLocation(const FVector& Location)

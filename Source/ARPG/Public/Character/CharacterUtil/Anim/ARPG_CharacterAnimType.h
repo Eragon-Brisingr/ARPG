@@ -7,18 +7,21 @@
 #include <SubclassOf.h>
 #include <Animation/AnimMetaData.h>
 #include "CharacterType.h"
+#include "ARPG_CharacterConditionBase.h"
 #include "ARPG_CharacterAnimType.generated.h"
 
 /**
  * 
  */
 
-UCLASS(const, Abstract, Blueprintable, BlueprintType)
-class UARPG_AnimPlayCondition : public UObject
+UCLASS(const, Abstract, Blueprintable, BlueprintType, hidedropdown)
+class UARPG_AnimPlayCondition : public UARPG_CharacterConditionBase
 {
 	GENERATED_BODY()
 public:
-	UFUNCTION(BlueprintNativeEvent, Category = "条件")
+	bool CalculateConditionValue_Implementation(class ACharacterBase* Character) const override;
+
+	UFUNCTION(BlueprintNativeEvent, Category = "动画条件")
 	bool CanPlayMontage(class ACharacterBase* Character) const;
 	virtual bool CanPlayMontage_Implementation(class ACharacterBase* Character) const { return false; }
 };

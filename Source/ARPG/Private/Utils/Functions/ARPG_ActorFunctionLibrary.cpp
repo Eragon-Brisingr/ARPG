@@ -306,7 +306,8 @@ void UARPG_ActorMoveUtils::MoveCharacterToRotationFitGround(ACharacterBase* Char
 {
 	if (Character)
 	{
-		MoveActorToRotation(Character, Rotator, OnMoveFinished, OverTime, Sweep);
+		FRotator TargetRotation = FRotator(0.f, Rotator.Yaw, 0.f);
+		MoveActorToRotation(Character, TargetRotation, OnMoveFinished, OverTime, Sweep);
 	}
 }
 

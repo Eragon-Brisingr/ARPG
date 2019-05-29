@@ -609,9 +609,9 @@ public:
 	FName TurnSlotName = TEXT("TurnInPlace");
 
 	bool CanTurnTo() const;
-	bool TurnTo(const FRotator& TargetWorldRotation, const FOnCharacterBehaviorFinished& OnCharacterBehaviorFinished);
+	void TurnTo(const FRotator& TargetWorldRotation, const FOnCharacterBehaviorFinished& OnCharacterBehaviorFinished, bool ForceSnapRotation = true);
 	UFUNCTION(BlueprintCallable, Category = "角色|动作")
-	bool TurnTo(const FRotator& TargetWorldRotation);
+	void TurnTo(const FRotator& TargetWorldRotation, bool ForceSnapRotation = true);
 
 public:
 	void ForceSetClientWorldLocation(const FVector& Location);

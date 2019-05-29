@@ -7,7 +7,10 @@
 #include "ARPG_DebugFunctionLibrary.h"
 #include <Package.h>
 
-
+bool UARPG_AnimPlayCondition::CalculateConditionValue_Implementation(class ACharacterBase* Character) const
+{
+	return CanPlayMontage(Character);
+}
 
 void UARPG_AnimFunctionLibrary::CheckAndFixAnimData(UAnimMontage* Montage, TSubclassOf<class UAnimMetaData> AnimMetaType)
 {
