@@ -66,7 +66,7 @@ FString UARPG_Human_TakeWeaponPos::GetNotifyName_Implementation() const
 
 AARPG_WeaponBase* UARPG_Human_WeaponNotifyStateBase::GetWeapon(AHumanBase* Human) const
 {
-	return (bIsLeftWeapon ^ (bInheritMirrorMontage && Human->bMirrorFullBodyMontage)) ? Human->LeftWeapon : Human->RightWeapon;
+	return (bIsLeftWeapon ^ (Human->bMirrorFullBodyMontage)) ? Human->LeftWeapon : Human->RightWeapon;
 }
 
 void UARPG_Human_WeaponNotifyStateBase::RecrodWeapon(AHumanBase* Human, AARPG_WeaponBase* Weapon)
