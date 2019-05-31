@@ -12,6 +12,20 @@ bool UARPG_AnimPlayCondition::CalculateConditionValue_Implementation(class AChar
 	return CanPlayMontage(Character);
 }
 
+void FARPG_MontageParameterMirrorable::PlayLeftMontage(ACharacterBase* Character) const
+{
+	FARPG_MontagePlayConfig Config;
+	Config.bMirrorMontage = !bNotMirrorFromRight;
+	Character->TryPlayMontage(bNotMirrorFromRight ? LeftMontage : RightMontage, Config);
+}
+
+void FARPG_MontageParameterMirrorable::PlayRightMontage(ACharacterBase* Character) const
+{
+	FARPG_MontagePlayConfig Config;
+	Config.bMirrorMontage = !bNotMirrorFromLeft;
+	Character->TryPlayMontage(bNotMirrorFromLeft ? RightMontage : LeftMontage, Config);
+}
+
 void UARPG_AnimFunctionLibrary::CheckAndFixAnimData(UAnimMontage* Montage, TSubclassOf<class UAnimMetaData> AnimMetaType)
 {
 	if (Montage)
@@ -56,43 +70,43 @@ void UARPG_AttackAnimSetNormal::InvokePlay_Implementation(class ACharacterBase* 
 				{
 					if (IsSprinting)
 					{
-						Character->TryPlayMontage(LeftSprintAttack);
+						SprintAttack.PlayLeftMontage(Character);
 					}
 					else if (IsFalling)
 					{
 						UARPG_AnimFunctionLibrary::CheckAndFixAnimData(LeftFallingAttack.Montage, UAMD_CanPlayWhenFalling::StaticClass());
 
-						Character->TryPlayMontage(LeftFallingAttack);
+						FallingAttack.PlayLeftMontage(Character);
 					}
 					else
 					{
-						Character->TryPlayMontage(LeftLightAttack);
+						LightAttack.PlayLeftMontage(Character);
 					}
 				}
 				else if (Character->ARPG_InputIsPressed(1 << (uint8)EARPG_InputType::LeftHeavyAttack))
 				{
-					Character->TryPlayMontage(LeftHeavyAttack);
+					HeavyAttack.PlayLeftMontage(Character);
 				}
 				else if (Character->ARPG_InputIsPressed(1 << (uint8)EARPG_InputType::RightLightAttack))
 				{
 					if (IsSprinting)
 					{
-   						Character->TryPlayMontage(RightSprintAttack);
+						SprintAttack.PlayRightMontage(Character);
 					}
 					else if (IsFalling)
 					{
 						UARPG_AnimFunctionLibrary::CheckAndFixAnimData(RightFallingAttack.Montage, UAMD_CanPlayWhenFalling::StaticClass());
 
-						Character->TryPlayMontage(RightFallingAttack);
+						FallingAttack.PlayRightMontage(Character);
 					}
 					else
 					{
-						Character->TryPlayMontage(RightLightAttack);
+						LightAttack.PlayRightMontage(Character);
 					}
 				}
 				else if (Character->ARPG_InputIsPressed(1 << (uint8)EARPG_InputType::RightHeavyAttack))
 				{
-					Character->TryPlayMontage(RightHeavyAttack);
+					HeavyAttack.PlayRightMontage(Character);
 				}
 			}
 		}
@@ -109,11 +123,11 @@ void UARPG_AttackAnimSetNormal::InvokePlayDodgeAnim_Implementation(class ACharac
 	case EMovementMode::MOVE_NavWalking:
 		if (Character->ARPG_AnyInputIsPressed(ARPG_InputType::ToBitMask(EARPG_InputType::LeftLightAttack) | ARPG_InputType::ToBitMask(EARPG_InputType::LeftHeavyAttack)))
 		{
-			Character->TryPlayMontage(DodogeForwardLeftAttack);
+			DodogeForwardAttack.PlayLeftMontage(Character);
 		}
 		else if (Character->ARPG_AnyInputIsPressed(ARPG_InputType::ToBitMask(EARPG_InputType::RightLightAttack) | ARPG_InputType::ToBitMask(EARPG_InputType::RightHeavyAttack)))
 		{
-			Character->TryPlayMontage(DodogeForwardRightAttack);
+			DodogeForwardAttack.PlayRightMontage(Character);
 		}
 	}
 }
@@ -125,16 +139,16 @@ void UARPG_DodgeAnimSetNormal::InvokeDodge(class ACharacterBase* Character, EDod
 		switch (Direction)
 		{
 		case EDodgeDirection::Forward:
-			Character->TryPlayMontage(DodgeForwardAnim);
+			Character->TryPlayMontage(DodgeForwardAnim, {});
 			break;
 		case EDodgeDirection::Backword:
-			Character->TryPlayMontage(DodgeBackAnim);
+			Character->TryPlayMontage(DodgeBackAnim, {});
 			break;
 		case EDodgeDirection::Left:
-			Character->TryPlayMontage(DodgeLeftAnim);
+			Character->TryPlayMontage(DodgeLeftAnim, {});
 			break;
 		case EDodgeDirection::Right:
-			Character->TryPlayMontage(DodgeRightAnim);
+			Character->TryPlayMontage(DodgeRightAnim, {});
 			break;
 		}
 	}

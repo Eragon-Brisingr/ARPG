@@ -32,7 +32,11 @@ ENUM_CLASS_FLAGS(EARPG_InputType);
 
 namespace ARPG_InputType
 {
-	constexpr int32 ToBitMask(EARPG_InputType InputType) { return 1 << (uint8)InputType; }
+	ARPG_API constexpr int32 ToBitMask(EARPG_InputType InputType) { return 1 << (uint8)InputType; }
+
+	ARPG_API constexpr EARPG_InputType GetMirroredAttackType(EARPG_InputType InputType);
+	ARPG_API constexpr int32 MirrorAttackBitMask(int32 InputType);
+	ARPG_API constexpr int32 SwapBitMask(int32 BitMask, uint8 FirstIndexToSwap, uint8 SecondIndexToSwap);
 }
 
 USTRUCT(BlueprintType)

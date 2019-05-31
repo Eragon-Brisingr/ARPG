@@ -63,6 +63,38 @@ public:
 	uint8 bClientMaster : 1;
 };
 
+USTRUCT(BlueprintType)
+struct FARPG_MontagePlayConfig
+{
+	GENERATED_BODY()
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "动画")
+	uint8 bMirrorMontage : 1;
+};
+
+USTRUCT(BlueprintType)
+struct FARPG_MontageParameterMirrorable
+{
+	GENERATED_BODY()
+public:
+	FARPG_MontageParameterMirrorable()
+		:bNotMirrorFromRight(false), bNotMirrorFromLeft(true)
+	{}
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "动画", meta = (DisplayName = "不使用右手镜像动画"))
+	uint8 bNotMirrorFromRight : 1;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "动画", meta = (EditCondition = bNotMirrorFromRight))
+	FARPG_MontageParameter LeftMontage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "动画", meta = (DisplayName = "不使用左手镜像动画"))
+	uint8 bNotMirrorFromLeft : 1;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "动画", meta = (EditCondition = bNotMirrorFromLeft))
+	FARPG_MontageParameter RightMontage;
+
+	void PlayLeftMontage(ACharacterBase* Character) const;
+	void PlayRightMontage(ACharacterBase* Character) const;
+};
+
 UCLASS()
 class ARPG_API UARPG_AnimFunctionLibrary : public UBlueprintFunctionLibrary
 {
@@ -123,6 +155,21 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, Category = "动画", meta = (DisplayName = "右手翻滚攻击"))
 	FARPG_MontageParameter DodogeForwardRightAttack;
+
+	UPROPERTY(EditAnywhere, Category = "动画", meta = (DisplayName = "轻攻击"))
+	FARPG_MontageParameterMirrorable LightAttack;
+
+	UPROPERTY(EditAnywhere, Category = "动画", meta = (DisplayName = "重攻击"))
+	FARPG_MontageParameterMirrorable HeavyAttack;
+
+	UPROPERTY(EditAnywhere, Category = "动画", meta = (DisplayName = "冲刺攻击"))
+	FARPG_MontageParameterMirrorable SprintAttack;
+
+	UPROPERTY(EditAnywhere, Category = "动画", meta = (DisplayName = "下落攻击"))
+	FARPG_MontageParameterMirrorable FallingAttack;
+
+	UPROPERTY(EditAnywhere, Category = "动画", meta = (DisplayName = "翻滚攻击"))
+	FARPG_MontageParameterMirrorable DodogeForwardAttack;
 };
 
 UCLASS(editinlinenew, Abstract, collapseCategories)

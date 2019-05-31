@@ -441,7 +441,7 @@ class AARPG_WeaponBase* AHumanBase::EquipSingleRightWeapon(class UARPG_ItemCoreB
 	RightWeaponInWeaponBack();
 	if (UseWeaponState != EUseWeaponState::NoneWeapon_Default)
 	{
-		PlayMontage(PullOutWeaponMontage);
+		PlayMontage(PullOutWeaponMontage, {});
 	}
 
 	return RightWeapon;
@@ -480,7 +480,7 @@ class AARPG_WeaponBase* AHumanBase::EquipSingleLeftWeapon(class UARPG_ItemCoreBa
 	LeftWeaponInWeaponBack();
 	if (UseWeaponState != EUseWeaponState::NoneWeapon_Default)
 	{
-		PlayMontage(PullOutWeaponMontage);
+		PlayMontage(PullOutWeaponMontage, {});
 	}
 
 	return LeftWeapon;
@@ -542,7 +542,7 @@ void AHumanBase::InvokePullOutWeapon()
 	{
 		if (UseWeaponState == EUseWeaponState::NoneWeapon_Default && CanPlayFullBodyMontage())
 		{
-			PlayMontage(PullOutWeaponMontage);
+			PlayMontage(PullOutWeaponMontage, {});
 		}
 	}
 }
@@ -551,7 +551,7 @@ void AHumanBase::InvokeTakeBackWeapon()
 {
 	if (UseWeaponState == EUseWeaponState::UsingWeapon_Defalut && CanPlayFullBodyMontage())
 	{
-		PlayMontage(TakeBackWeaponMontage);
+		PlayMontage(TakeBackWeaponMontage, {});
 	}
 }
 
