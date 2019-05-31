@@ -52,12 +52,11 @@ class ARPG_API UARPG_Human_WeaponNotifyStateBase : public UAnimNotifyState
 {
 	GENERATED_BODY()
 public:
+	UARPG_Human_WeaponNotifyStateBase() = default;
+
 	UPROPERTY(EditAnywhere, Category = "攻击", meta = (DisplayName = "为左手武器"))
 	uint8 bIsLeftWeapon : 1;
 	
-	UPROPERTY(EditAnywhere, Category = "武器位置", meta = (DisplayName = "拔出武器"))
-	uint8 bInheritMirrorMontage : 1;
-
 	UPROPERTY(Transient)
 	TMap<AHumanBase*, AARPG_WeaponBase*> ActiveWeaponMap;
 
