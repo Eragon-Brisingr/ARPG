@@ -31,12 +31,16 @@ class ARPG_API UARPG_PlayMontageByState : public UAnimNotify
 	GENERATED_BODY()
 public:
 	UARPG_PlayMontageByState()
+		:bInheritMirrorMontage(true)
 	{
 		bIsNativeBranchingPoint = true;
 	}
 
 	UPROPERTY(EditAnywhere, Category = "动画", meta = (ShowOnlyInnerProperties = true, DisplayName = "跳转动画配置"))
 	FARPG_MontageParameter MontageParameter;
+
+	UPROPERTY(EditAnywhere, Category = "动画")
+	uint8 bInheritMirrorMontage : 1;
 
 	void Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation) override;
 
@@ -48,10 +52,15 @@ class ARPG_API UARPG_PlayMontageCheckState : public UAnimNotifyState
 {
 	GENERATED_BODY()
 public:
-	UARPG_PlayMontageCheckState() = default;
+	UARPG_PlayMontageCheckState()
+		:bInheritMirrorMontage(true)
+	{}
 
 	UPROPERTY(EditAnywhere, Category = "动画", meta = (ShowOnlyInnerProperties = true, DisplayName = "跳转动画配置"))
 	FARPG_MontageParameter MontageParameter;
+
+	UPROPERTY(EditAnywhere, Category = "动画")
+	uint8 bInheritMirrorMontage : 1;
 
 	virtual void NotifyTick(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, float FrameDeltaTime) override;
 
@@ -63,7 +72,9 @@ class ARPG_API UARPG_PlayMontageByInput : public UAnimNotifyState
 {
 	GENERATED_BODY()
 public:
-	UARPG_PlayMontageByInput() = default;
+	UARPG_PlayMontageByInput()
+		:bInheritMirrorMontage(true)
+	{}
 
 	UPROPERTY(EditAnywhere, Category = "动画", meta = (DisplayName = "判断松开状态"))
 	uint8 bIsReleased : 1;
@@ -73,6 +84,9 @@ public:
 
 	UPROPERTY(EditAnywhere, Category = "动画", meta = (ShowOnlyInnerProperties = true, DisplayName = "跳转动画配置"))
 	FARPG_MontageParameter MontageParameter;
+
+	UPROPERTY(EditAnywhere, Category = "动画")
+	uint8 bInheritMirrorMontage : 1;
 
 	virtual void NotifyBegin(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, float TotalDuration) override;
 	virtual void NotifyTick(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, float FrameDeltaTime) override;

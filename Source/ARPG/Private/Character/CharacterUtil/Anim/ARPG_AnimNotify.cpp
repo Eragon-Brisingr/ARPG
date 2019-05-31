@@ -18,7 +18,12 @@ void UARPG_PlayMontageByState::Notify(USkeletalMeshComponent* MeshComp, UAnimSeq
 {
 	if (ACharacterBase * Character = Cast<ACharacterBase>(MeshComp->GetOwner()))
 	{
-		Character->TryPlayMontage(MontageParameter);
+		FARPG_MontagePlayConfig Config;						
+		if (bInheritMirrorMontage)
+		{
+			Config.bMirrorMontage = Character->bMirrorFullBodyMontage;
+		}
+		Character->TryPlayMontage(MontageParameter, Config);
 	}
 }
 
@@ -35,7 +40,12 @@ void UARPG_PlayMontageCheckState::NotifyTick(USkeletalMeshComponent* MeshComp, U
 		{
 			if (MeshComp->GetAnimInstance()->Montage_IsPlaying(CurPlayingMontage))
 			{
-				Character->TryPlayMontage(MontageParameter);
+				FARPG_MontagePlayConfig Config;
+				if (bInheritMirrorMontage)
+				{
+					Config.bMirrorMontage = Character->bMirrorFullBodyMontage;
+				}
+				Character->TryPlayMontage(MontageParameter, Config);
 			}
 		}
 	}
@@ -57,13 +67,19 @@ void UARPG_PlayMontageByInput::NotifyTick(USkeletalMeshComponent* MeshComp, UAni
 	{
 		if (Character->IsLocallyControlled())
 		{
-			if (bIsReleased ? Character->ARPG_InputIsReleased(InputType) : Character->ARPG_InputIsPressed(InputType))
+			int32 CheckedInputType = bInheritMirrorMontage && Character->bMirrorFullBodyMontage ? ARPG_InputType::MirrorAttackBitMask(InputType) : InputType;
+			if (bIsReleased ? Character->ARPG_InputIsReleased(CheckedInputType) : Character->ARPG_InputIsPressed(CheckedInputType))
 			{
 				if (UAnimMontage* CurPlayingMontage = Cast<UAnimMontage>(Animation))
 				{
 					if (MeshComp->GetAnimInstance()->Montage_IsPlaying(CurPlayingMontage))
 					{
-						Character->TryPlayMontage(MontageParameter);
+						FARPG_MontagePlayConfig Config;
+						if (bInheritMirrorMontage)
+						{
+							Config.bMirrorMontage = Character->bMirrorFullBodyMontage;
+						}
+						Character->TryPlayMontage(MontageParameter, Config);
 					}
 				}
 			}

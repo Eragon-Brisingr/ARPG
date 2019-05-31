@@ -139,6 +139,7 @@ void ACharacterBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLi
 	DOREPLIFETIME(ACharacterBase, bIsLockingOther);
 	DOREPLIFETIME_CONDITION(ACharacterBase, bIsInteractingWithActor, COND_OwnerOnly);
 	DOREPLIFETIME_CONDITION(ACharacterBase, RootMotionScale, COND_SimulatedOnly);
+	DOREPLIFETIME(ACharacterBase, bMirrorFullBodyMontage);
 }
 
 void ACharacterBase::OnConstruction(const FTransform& Transform)
@@ -341,13 +342,13 @@ bool ACharacterBase::CanLockingOnTarget_Implementation(AController* Invoker, con
 	return false;
 }
 
-float ACharacterBase::PlayMontage(UAnimMontage * MontageToPlay, float InPlayRate /*= 1.f*/, FName StartSectionName /*= NAME_None*/, bool ClientMaster /*= true*/)
+float ACharacterBase::PlayMontage(UAnimMontage* MontageToPlay, const FARPG_MontagePlayConfig& Config, float InPlayRate /*= 1.f*/, FName StartSectionName /*= NAME_None*/, bool ClientMaster /*= true*/)
 {
 	if (MontageToPlay)
 	{
 		if (HasAuthority())
 		{
-			MulticastPlayMontage(MontageToPlay, InPlayRate, StartSectionName);
+			MulticastPlayMontage(MontageToPlay, Config, InPlayRate, StartSectionName);
 		}
 		else if (ClientMaster)
 		{
@@ -355,13 +356,13 @@ float ACharacterBase::PlayMontage(UAnimMontage * MontageToPlay, float InPlayRate
 			{
 				if (GetController() && GetController()->IsLocalController())
 				{
-					MulticastPlayMontage(MontageToPlay, InPlayRate, StartSectionName);
+					MulticastPlayMontage(MontageToPlay, Config, InPlayRate, StartSectionName);
 				}
 			}
 			else
 			{
-				PlayMontageImpl(MontageToPlay, InPlayRate, StartSectionName);
-				PlayMontageToServer(MontageToPlay, InPlayRate, StartSectionName);
+				PlayMontageImpl(MontageToPlay, Config, InPlayRate, StartSectionName);
+				PlayMontageToServer(MontageToPlay, Config, InPlayRate, StartSectionName);
 			}
 		}
 		return MontageToPlay->GetPlayLength();
@@ -369,13 +370,20 @@ float ACharacterBase::PlayMontage(UAnimMontage * MontageToPlay, float InPlayRate
 	return 0.f;
 }
 
-float ACharacterBase::PlayMontageImpl(UAnimMontage * MontageToPlay, float InPlayRate /*= 1.f*/, FName StartSectionName /*= NAME_None*/)
+float ACharacterBase::PlayMontageImpl(UAnimMontage * MontageToPlay, const FARPG_MontagePlayConfig& Config, float InPlayRate /*= 1.f*/, FName StartSectionName /*= NAME_None*/)
 {
 	UAnimInstance * AnimInstance = GetMesh()->GetAnimInstance();
 	if (MontageToPlay && AnimInstance)
 	{
 		float const Duration = AnimInstance->Montage_Play(MontageToPlay, InPlayRate, EMontagePlayReturnType::MontageLength, 0.f, true);
-
+		if (Config.bMirrorMontage)
+		{
+			SetMirrorFullBodyMontage(true);
+			AddMontageWithBlendingOutDelegate(MontageToPlay, FOnMontageBlendingOutStarted::CreateWeakLambda(this, [=](UAnimMontage* Montage, bool bInterrupted)
+			{
+				SetMirrorFullBodyMontage(false);
+			}));
+		}
 		if (Duration > 0.f)
 		{
 			// Start at a given Section.
@@ -391,16 +399,16 @@ float ACharacterBase::PlayMontageImpl(UAnimMontage * MontageToPlay, float InPlay
 	return 0.f;
 }
 
-void ACharacterBase::MulticastPlayMontage_Implementation(UAnimMontage * MontageToPlay, float InPlayRate /*= 1.f*/, FName StartSectionName /*= NAME_None*/)
+void ACharacterBase::MulticastPlayMontage_Implementation(UAnimMontage* MontageToPlay, const FARPG_MontagePlayConfig& Config, float InPlayRate /*= 1.f*/, FName StartSectionName /*= NAME_None*/)
 {
-	PlayMontageImpl(MontageToPlay, InPlayRate, StartSectionName);
+	PlayMontageImpl(MontageToPlay, Config, InPlayRate, StartSectionName);
 }
 
-void ACharacterBase::MulticastPlayMontageSkipOwner_Implementation(UAnimMontage * MontageToPlay, float InPlayRate /*= 1.f*/, FName StartSectionName /*= NAME_None*/)
+void ACharacterBase::MulticastPlayMontageSkipOwner_Implementation(UAnimMontage* MontageToPlay, const FARPG_MontagePlayConfig& Config, float InPlayRate /*= 1.f*/, FName StartSectionName /*= NAME_None*/)
 {
 	if (IsLocallyControlled() == false || GetMesh()->GetAnimInstance()->Montage_IsPlaying(MontageToPlay) == false)
 	{
-		PlayMontageImpl(MontageToPlay, InPlayRate, StartSectionName);
+		PlayMontageImpl(MontageToPlay, Config, InPlayRate, StartSectionName);
 	}
 }
 
@@ -409,16 +417,16 @@ void ACharacterBase::StopMontage_Implementation(UAnimMontage* MontageToStop)
 	StopAnimMontage(MontageToStop);
 }
 
-void ACharacterBase::PlayMontageToServer_Implementation(UAnimMontage * MontageToPlay, float InPlayRate /*= 1.f*/, FName StartSectionName /*= NAME_None*/)
+void ACharacterBase::PlayMontageToServer_Implementation(UAnimMontage* MontageToPlay, const FARPG_MontagePlayConfig& Config, float InPlayRate /*= 1.f*/, FName StartSectionName /*= NAME_None*/)
 {
-	MulticastPlayMontageSkipOwner(MontageToPlay, InPlayRate, StartSectionName);
+	MulticastPlayMontageSkipOwner(MontageToPlay, Config, InPlayRate, StartSectionName);
 }
 
-void ACharacterBase::TryPlayMontage(const FARPG_MontageParameter& Montage)
+void ACharacterBase::TryPlayMontage(const FARPG_MontageParameter& Montage, const FARPG_MontagePlayConfig& Config)
 {
 	if (Montage.Condition == nullptr || Montage.Condition.GetDefaultObject()->CanPlayMontage(this))
 	{
-		PlayMontage(Montage.Montage, 1.f, Montage.StartSectionName, Montage.bClientMaster);
+		PlayMontage(Montage.Montage, Config, 1.f, Montage.StartSectionName, Montage.bClientMaster);
 	}
 }
 
@@ -619,10 +627,28 @@ bool ACharacterBase::ForceSetClientWorldLocationAndRotationImpl_Validate(const F
 	return true;
 }
 
-void ACharacterBase::PlayMontageWithBlendingOutDelegate(UAnimMontage* Montage, const FOnMontageBlendingOutStarted& OnMontageBlendingOutStarted, float InPlayRate /*= 1.f*/, FName StartSectionName /*= NAME_None*/, bool ClientMaster /*= false*/)
+void ACharacterBase::PlayMontageWithBlendingOutDelegate(UAnimMontage* Montage, const FOnMontageBlendingOutStarted& OnMontageBlendingOutStarted, const FARPG_MontagePlayConfig& Config, float InPlayRate /*= 1.f*/, FName StartSectionName /*= NAME_None*/, bool ClientMaster /*= false*/)
 {
-	PlayMontage(Montage, InPlayRate, StartSectionName, ClientMaster);
-	GetMesh()->GetAnimInstance()->Montage_SetBlendingOutDelegate(const_cast<FOnMontageBlendingOutStarted&>(OnMontageBlendingOutStarted), Montage);
+	PlayMontage(Montage, Config, InPlayRate, StartSectionName, ClientMaster);
+	AddMontageWithBlendingOutDelegate(Montage, OnMontageBlendingOutStarted);
+}
+
+void ACharacterBase::AddMontageWithBlendingOutDelegate(UAnimMontage* Montage, const FOnMontageBlendingOutStarted& OnMontageBlendingOutStarted)
+{
+	FOnMontageBlendingOutStarted* P_PreOnMontageBlendingOutStarted = GetMesh()->GetAnimInstance()->Montage_GetBlendingOutDelegate(Montage);
+	if (P_PreOnMontageBlendingOutStarted && P_PreOnMontageBlendingOutStarted->IsBound())
+	{
+		FOnMontageBlendingOutStarted OnMontageBlendingOutStartedCombined = FOnMontageBlendingOutStarted::CreateWeakLambda(this, [=, PreOnMontageBlendingOutStarted = *P_PreOnMontageBlendingOutStarted](UAnimMontage* Montage, bool bInterrupted)
+		{
+			PreOnMontageBlendingOutStarted.Execute(Montage, bInterrupted);
+			OnMontageBlendingOutStarted.Execute(Montage, bInterrupted);
+		});
+		GetMesh()->GetAnimInstance()->Montage_SetBlendingOutDelegate(OnMontageBlendingOutStartedCombined, Montage);
+	}
+	else
+	{
+		GetMesh()->GetAnimInstance()->Montage_SetBlendingOutDelegate(const_cast<FOnMontageBlendingOutStarted&>(OnMontageBlendingOutStarted), Montage);
+	}
 }
 
 void ACharacterBase::ClearMontageBlendingOutDelegate(UAnimMontage* Montage)
@@ -631,6 +657,13 @@ void ACharacterBase::ClearMontageBlendingOutDelegate(UAnimMontage* Montage)
 	{
 		OnMontageBlendingOutStarted->Unbind();
 	}
+}
+
+void ACharacterBase::SetMirrorFullBodyMontage(bool IsMirror)
+{
+	MirrorFullBodyMontageCounter += IsMirror ? 1 : -1;
+	bMirrorFullBodyMontage = MirrorFullBodyMontageCounter > 0;
+	check(MirrorFullBodyMontageCounter >= 0 && MirrorFullBodyMontageCounter <= 2);
 }
 
 void ACharacterBase::MoveItem_Implementation(class UARPG_InventoryComponent* SourceInventory, class UARPG_InventoryComponent* TargetInventory, class UARPG_ItemCoreBase* ItemCore, int32 Number /*= 1*/)
@@ -789,7 +822,7 @@ void ACharacterBase::ExecuteOtherToServer_Implementation(ACharacterBase* Execute
 					ExecuteTarget->StopMontage(BeExecutedMontage);
 				}
 				WhenExecuteEnd();
-			}), 1.f, NAME_None, true);
+			}), {}, 1.f, NAME_None, true);
 		ExecuteTarget->PlayMontageWithBlendingOutDelegate(BeExecutedMontage, FOnMontageBlendingOutStarted::CreateWeakLambda(this, [=](UAnimMontage* Montage, bool bInterrupted)
 			{
 				if (bInterrupted)
@@ -797,7 +830,7 @@ void ACharacterBase::ExecuteOtherToServer_Implementation(ACharacterBase* Execute
 					StopMontage(ExecuteMontage);
 				}
 				WhenExecuteEnd();
-			}), 1.f, NAME_None, true);
+			}), {}, 1.f, NAME_None, true);
 	}
 }
 

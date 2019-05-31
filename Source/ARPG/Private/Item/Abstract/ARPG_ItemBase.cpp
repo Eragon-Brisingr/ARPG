@@ -92,7 +92,7 @@ void AARPG_ItemBase::PlayUseItemMontage(const UARPG_ItemCoreBase* ItemCore, ACha
 					ItemOwner->PendingUseItem->Destroy();
 				}
 			}
-		}), 1.f, NAME_None, false);
+		}), {}, 1.f, NAME_None, false);
 }
 
 #undef LOCTEXT_NAMESPACE

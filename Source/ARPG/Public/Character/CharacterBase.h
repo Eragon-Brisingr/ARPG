@@ -169,36 +169,43 @@ public:
 	}
 	//动画
 public:
-	UFUNCTION(BlueprintCallable, Category = "角色|动作")
-	float PlayMontage(UAnimMontage * MontageToPlay, float InPlayRate = 1.f, FName StartSectionName = NAME_None, bool ClientMaster = true);
+	UFUNCTION(BlueprintCallable, Category = "角色|动作", meta = (AdvancedDisplay = Config, AutoCreateRefTerm = Config))
+	float PlayMontage(UAnimMontage* MontageToPlay, const FARPG_MontagePlayConfig& Config, float InPlayRate = 1.f, FName StartSectionName = NAME_None, bool ClientMaster = true);
 
-	float PlayMontageImpl(UAnimMontage * MontageToPlay, float InPlayRate = 1.f, FName StartSectionName = NAME_None);
-
-	UFUNCTION(Unreliable, WithValidation, NetMulticast)
-	void MulticastPlayMontage(UAnimMontage * MontageToPlay, float InPlayRate = 1.f, FName StartSectionName = NAME_None);
-	virtual void MulticastPlayMontage_Implementation(UAnimMontage * MontageToPlay, float InPlayRate = 1.f, FName StartSectionName = NAME_None);
-	bool MulticastPlayMontage_Validate(UAnimMontage * MontageToPlay, float InPlayRate = 1.f, FName StartSectionName = NAME_None) { return true; }
+protected:
+	float PlayMontageImpl(UAnimMontage* MontageToPlay, const FARPG_MontagePlayConfig& Config, float InPlayRate = 1.f, FName StartSectionName = NAME_None);
 
 	UFUNCTION(Unreliable, WithValidation, NetMulticast)
-	void MulticastPlayMontageSkipOwner(UAnimMontage * MontageToPlay, float InPlayRate = 1.f, FName StartSectionName = NAME_None);
-	virtual void MulticastPlayMontageSkipOwner_Implementation(UAnimMontage * MontageToPlay, float InPlayRate = 1.f, FName StartSectionName = NAME_None);
-	bool MulticastPlayMontageSkipOwner_Validate(UAnimMontage * MontageToPlay, float InPlayRate = 1.f, FName StartSectionName = NAME_None) { return true; }
+	void MulticastPlayMontage(UAnimMontage* MontageToPlay, const FARPG_MontagePlayConfig& Config, float InPlayRate = 1.f, FName StartSectionName = NAME_None);
+	virtual void MulticastPlayMontage_Implementation(UAnimMontage* MontageToPlay, const FARPG_MontagePlayConfig& Config, float InPlayRate = 1.f, FName StartSectionName = NAME_None);
+	bool MulticastPlayMontage_Validate(UAnimMontage* MontageToPlay, const FARPG_MontagePlayConfig& Config, float InPlayRate = 1.f, FName StartSectionName = NAME_None) { return true; }
 
+	UFUNCTION(Unreliable, WithValidation, NetMulticast)
+	void MulticastPlayMontageSkipOwner(UAnimMontage* MontageToPlay, const FARPG_MontagePlayConfig& Config, float InPlayRate = 1.f, FName StartSectionName = NAME_None);
+	virtual void MulticastPlayMontageSkipOwner_Implementation(UAnimMontage* MontageToPlay, const FARPG_MontagePlayConfig& Config, float InPlayRate = 1.f, FName StartSectionName = NAME_None);
+	bool MulticastPlayMontageSkipOwner_Validate(UAnimMontage* MontageToPlay, const FARPG_MontagePlayConfig& Config, float InPlayRate = 1.f, FName StartSectionName = NAME_None) { return true; }
+
+	UFUNCTION(Reliable, WithValidation, Server)
+	void PlayMontageToServer(UAnimMontage* MontageToPlay, const FARPG_MontagePlayConfig& Config, float InPlayRate = 1.f, FName StartSectionName = NAME_None);
+	virtual void PlayMontageToServer_Implementation(UAnimMontage* MontageToPlay, const FARPG_MontagePlayConfig& Config, float InPlayRate = 1.f, FName StartSectionName = NAME_None);
+	bool PlayMontageToServer_Validate(UAnimMontage* MontageToPlay, const FARPG_MontagePlayConfig& Config, float InPlayRate = 1.f, FName StartSectionName = NAME_None) { return true; }
+public:
 	UFUNCTION(BlueprintCallable, Category = "角色|动作", Reliable, WithValidation, NetMulticast)
 	void StopMontage(UAnimMontage* MontageToStop = nullptr);
 	virtual void StopMontage_Implementation(UAnimMontage* MontageToStop = nullptr);
 	bool StopMontage_Validate(UAnimMontage* MontageToStop = nullptr) { return true; }
 
-	UFUNCTION(Reliable, WithValidation, Server)
-	void PlayMontageToServer(UAnimMontage * MontageToPlay, float InPlayRate = 1.f, FName StartSectionName = NAME_None);
-	virtual void PlayMontageToServer_Implementation(UAnimMontage * MontageToPlay, float InPlayRate = 1.f, FName StartSectionName = NAME_None);
-	bool PlayMontageToServer_Validate(UAnimMontage * MontageToPlay, float InPlayRate = 1.f, FName StartSectionName = NAME_None) { return true; }
-	
 	UFUNCTION(BlueprintCallable, Category = "角色|动作")
-	void TryPlayMontage(const FARPG_MontageParameter& Montage);
+	void TryPlayMontage(const FARPG_MontageParameter& Montage, const FARPG_MontagePlayConfig& Config);
 
-	void PlayMontageWithBlendingOutDelegate(UAnimMontage* Montage, const FOnMontageBlendingOutStarted& OnMontageBlendingOutStarted, float InPlayRate = 1.f, FName StartSectionName = NAME_None, bool ClientMaster = false);
+	void PlayMontageWithBlendingOutDelegate(UAnimMontage* Montage, const FOnMontageBlendingOutStarted& OnMontageBlendingOutStarted, const FARPG_MontagePlayConfig& Config = FARPG_MontagePlayConfig(), float InPlayRate = 1.f, FName StartSectionName = NAME_None, bool ClientMaster = false);
+	void AddMontageWithBlendingOutDelegate(UAnimMontage* Montage, const FOnMontageBlendingOutStarted& OnMontageBlendingOutStarted);
 	void ClearMontageBlendingOutDelegate(UAnimMontage* Montage);
+
+	UPROPERTY(BlueprintReadOnly, Category = "角色|动作", Replicated)
+	uint8 bMirrorFullBodyMontage : 1;
+	uint8 MirrorFullBodyMontageCounter : 2;
+	void SetMirrorFullBodyMontage(bool IsMirror);
 
 	UPROPERTY(EditDefaultsOnly, Category = "角色|动作")
 	FName FullBodySlotName = TEXT("DefaultSlot");
