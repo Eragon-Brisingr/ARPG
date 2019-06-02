@@ -121,7 +121,7 @@ public:
 	void OnRep_Arrow(class AARPG_ArrowBase* PreArrow);
 
 	UPROPERTY(EditDefaultsOnly, Category = "角色|配置")
-	FName QuiverSocketName = TEXT("Quiver");
+	FName QuiverSocketName = TEXT("dorlach_01");
 
 	UPROPERTY(EditDefaultsOnly, Category = "角色|配置")
 	FName LeftHandHoldingArrowSocketName = TEXT("HoldingArrow_l");

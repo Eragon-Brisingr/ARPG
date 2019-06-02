@@ -11,6 +11,7 @@
 			"AdditionalDependencies": [
 				"Engine",
 				"CoreUObject",
+				"AnimMirroring",
 				"XD_MovementComponentPlugin",
 				"XD_SaveGameSystem",
 				"XD_EnvironmentSystem",
