@@ -179,17 +179,29 @@ float ACharacterBase::TakeDamage(float DamageAmount, FDamageEvent const& DamageE
 
 void ACharacterBase::WhenGameInit_Implementation()
 {
+	Inventory->AddItemArray(GetInitItemList());
+	Inventory->OnRep_ItemList();
+
+	//初始化角色坐标
+	{
+		BornLocation = GetActorLocation();
+		BornWorldOrigin = UGameplayStatics::GetWorldOriginLocation(this);
+	}
+}
+
+void ACharacterBase::Reset()
+{
 	//初始化道具和使用中的道具
 	{
 		TArray<UARPG_ItemCoreBase*> RemoveItems;
-		TArray<FARPG_Item> FinalInitItemList = GetInitItemList();
+		TArray<FARPG_Item> FinalInitItemList = GetReInitItemList();
 		//对已存在的进行数量修改
 		for (UARPG_ItemCoreBase* ItemCore : Inventory->GetItemCoreList())
 		{
-			if (const FARPG_Item* Item = FinalInitItemList.FindByPredicate([ItemCore](const FARPG_Item& E_Item) {return ItemCore->IsEqualWithItemCore(E_Item.ItemCore); }))
+			if (const FARPG_Item * Item = FinalInitItemList.FindByPredicate([ItemCore](const FARPG_Item & E_Item) {return ItemCore->IsEqualWithItemCore(E_Item.ItemCore); }))
 			{
 				ItemCore->Number = Item->ItemCore->Number;
-				FinalInitItemList.RemoveAll([&](const FARPG_Item& E) {return E->IsEqualWithItemCore(ItemCore); });
+				FinalInitItemList.RemoveAll([&](const FARPG_Item & E) {return E->IsEqualWithItemCore(ItemCore); });
 			}
 			else
 			{
@@ -205,19 +217,18 @@ void ACharacterBase::WhenGameInit_Implementation()
 		Inventory->AddItemArray(FinalInitItemList);
 		Inventory->OnRep_ItemList();
 	}
+}
 
-	//初始化角色坐标
-	{
-		BornLocation = GetActorLocation();
-		BornWorldOrigin = UGameplayStatics::GetWorldOriginLocation(this);
-	}
+TArray<struct FARPG_Item> ACharacterBase::GetReInitItemList() const
+{
+	TArray<FARPG_Item> Res = GetInitItemList();
+	Res.Append(ArrayCast<FARPG_Item>(Inventory->InitItems));
+	return Res;
 }
 
 TArray<struct FARPG_Item> ACharacterBase::GetInitItemList() const
 {
-	TArray<FARPG_Item> Res = ReceivedGetInitItemList();
-	Res.Append(ArrayCast<FARPG_Item>(Inventory->InitItems));
-	return Res;
+	return ReceivedGetInitItemList();
 }
 
 FXD_DispatchableActionList ACharacterBase::GetCurrentDispatchableActions_Implementation()
