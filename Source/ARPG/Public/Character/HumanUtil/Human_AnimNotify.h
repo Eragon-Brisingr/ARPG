@@ -62,8 +62,8 @@ public:
 
 	AARPG_WeaponBase* GetWeapon(AHumanBase* Human) const;
 
-	void RecrodWeapon(AHumanBase* Human, AARPG_WeaponBase* Weapon);
-	AARPG_WeaponBase* FindWeapon(const AHumanBase* Human) const;
+	void CacheWeapon(AHumanBase* Human, AARPG_WeaponBase* Weapon);
+	AARPG_WeaponBase* FindCachedWeapon(const AHumanBase* Human) const;
 	void ClearWeapon(AHumanBase* Human);
 };
 
@@ -121,7 +121,9 @@ class ARPG_API UARPG_Human_PullBow : public UARPG_Human_WeaponNotifyStateBase
 {
 	GENERATED_BODY()
 public:
-	void NotifyTick(USkeletalMeshComponent * MeshComp, UAnimSequenceBase * Animation, float FrameDeltaTime) override;
+	void NotifyBegin(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, float TotalDuration) override;
+	void NotifyTick(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, float FrameDeltaTime) override;
+	void NotifyEnd(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation) override;
 };
 
 UCLASS(meta = (DisplayName = "人类_射出箭"))

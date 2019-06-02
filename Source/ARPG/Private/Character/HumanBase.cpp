@@ -43,6 +43,7 @@ void AHumanBase::GetLifetimeReplicatedProps(TArray< class FLifetimeProperty > & 
 
 	DOREPLIFETIME(AHumanBase, LeftWeapon);
 	DOREPLIFETIME(AHumanBase, RightWeapon);
+	DOREPLIFETIME(AHumanBase, Arrow);
 	DOREPLIFETIME(AHumanBase, EquipmentList);
 
 	DOREPLIFETIME(AHumanBase, UseWeaponState);

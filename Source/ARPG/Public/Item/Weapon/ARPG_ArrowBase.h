@@ -46,4 +46,11 @@ public:
 
 	virtual void OnRep_AttachmentReplication() override;
 
+public:
+	UPROPERTY(EditDefaultsOnly, Category = "武器", meta = (DisplayName = "箭袋"))
+	UStaticMesh* Dorlach;
+
+	void WhenUse(class ACharacterBase* ItemOwner) override;
+
+	void ToEquippedDorlachMode();
 };
