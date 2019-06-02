@@ -80,6 +80,10 @@ public:
 public:
 	virtual void WhenGameInit_Implementation() override;
 
+	void Reset() override;
+
+	TArray<struct FARPG_Item> GetReInitItemList() const;
+
 	virtual TArray<struct FARPG_Item> GetInitItemList() const;
 	UFUNCTION(BlueprintImplementableEvent, Category = "角色|初始化", meta = (DisplayName = "GetInitItemList"))
 	TArray<struct FARPG_Item> ReceivedGetInitItemList() const;
