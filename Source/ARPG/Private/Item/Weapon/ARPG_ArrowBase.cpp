@@ -4,6 +4,7 @@
 #include "ARPG_ArrowCoreBase.h"
 #include <AssertionMacros.h>
 #include <Components/SkeletalMeshComponent.h>
+#include <Components/StaticMeshComponent.h>
 #include "ARPG_CollisionType.h"
 #include "CharacterBase.h"
 #include "ARPG_ActorFunctionLibrary.h"
@@ -178,5 +179,24 @@ void AARPG_ArrowBase::OnRep_AttachmentReplication()
 	if (GetAttachmentReplication().AttachParent)
 	{
 		ClientArrowStop();
+	}
+}
+
+void AARPG_ArrowBase::WhenUse(class ACharacterBase* ItemOwner)
+{
+	Super::WhenUse(ItemOwner);
+	ToEquippedDorlachMode();
+}
+
+void AARPG_ArrowBase::ToEquippedDorlachMode()
+{
+	if (Dorlach)
+	{
+		if (UStaticMeshComponent* StaticMeshComponent = Cast<UStaticMeshComponent>(GetRootComponent()))
+		{
+			StaticMeshComponent->SetStaticMesh(Dorlach);
+		}
+		//太Hack了
+		ItemMesh = Dorlach;
 	}
 }

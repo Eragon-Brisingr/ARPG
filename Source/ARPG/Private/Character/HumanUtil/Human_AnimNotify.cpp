@@ -69,12 +69,12 @@ AARPG_WeaponBase* UARPG_Human_WeaponNotifyStateBase::GetWeapon(AHumanBase* Human
 	return (bIsLeftWeapon ^ (Human->bMirrorFullBodyMontage)) ? Human->LeftWeapon : Human->RightWeapon;
 }
 
-void UARPG_Human_WeaponNotifyStateBase::RecrodWeapon(AHumanBase* Human, AARPG_WeaponBase* Weapon)
+void UARPG_Human_WeaponNotifyStateBase::CacheWeapon(AHumanBase* Human, AARPG_WeaponBase* Weapon)
 {
 	ActiveWeaponMap.Add(Human, Weapon);
 }
 
-AARPG_WeaponBase* UARPG_Human_WeaponNotifyStateBase::FindWeapon(const AHumanBase* Human) const
+AARPG_WeaponBase* UARPG_Human_WeaponNotifyStateBase::FindCachedWeapon(const AHumanBase* Human) const
 {
 	AARPG_WeaponBase* const* P_Weapon = ActiveWeaponMap.Find(Human);
 	return P_Weapon ? *P_Weapon : nullptr;
@@ -93,7 +93,7 @@ void UARPG_Human_WeaponTrace::NotifyBegin(USkeletalMeshComponent * MeshComp, UAn
 		{
 			Weapon->SetActorEnableCollision(true);
 			Weapon->EnableNearAttackTrace(PointDamageParameter, bClearIgnoreList);
-			RecrodWeapon(Human, Weapon);
+			CacheWeapon(Human, Weapon);
 		}
 	}
 }
@@ -102,7 +102,7 @@ void UARPG_Human_WeaponTrace::NotifyEnd(USkeletalMeshComponent * MeshComp, UAnim
 {
 	if (AHumanBase* Human = Cast<AHumanBase>(MeshComp->GetOwner()))
 	{
- 		if (AARPG_WeaponBase* Weapon = FindWeapon(Human))
+ 		if (AARPG_WeaponBase* Weapon = FindCachedWeapon(Human))
  		{
  			Weapon->SetActorEnableCollision(false);
  			Weapon->DisableNearAttackTrace();
@@ -123,7 +123,7 @@ void UARPG_Human_FallingAttackTrace::NotifyBegin(USkeletalMeshComponent * MeshCo
 		if (AARPG_WeaponBase* Weapon = GetWeapon(Human))
 		{
 			Weapon->EnableFallingAttackTrace(PointDamageParameter, bClearIgnoreList);
-			RecrodWeapon(Human, Weapon);
+			CacheWeapon(Human, Weapon);
 		}
 	}
 }
@@ -132,7 +132,7 @@ void UARPG_Human_FallingAttackTrace::NotifyEnd(USkeletalMeshComponent * MeshComp
 {
 	if (AHumanBase* Human = Cast<AHumanBase>(MeshComp->GetOwner()))
 	{
-		if (AARPG_WeaponBase* Weapon = FindWeapon(Human))
+		if (AARPG_WeaponBase* Weapon = FindCachedWeapon(Human))
 		{
 			Weapon->DisableFallingAttackTrace();
 			ClearWeapon(Human);
@@ -150,7 +150,7 @@ void UARPG_Human_PullOutArrow::NotifyBegin(USkeletalMeshComponent * MeshComp, UA
 			{
 				Bow->SpawnArrowInHand();
 				Bow->HoldingTime = 0.f;
-				RecrodWeapon(Human, Weapon);
+				CacheWeapon(Human, Weapon);
 			}
 		}
 	}
@@ -160,7 +160,7 @@ void UARPG_Human_PullOutArrow::NotifyEnd(USkeletalMeshComponent * MeshComp, UAni
 {
 	if (AHumanBase* Human = Cast<AHumanBase>(MeshComp->GetOwner()))
 	{
-		if (AARPG_WeaponBase* Weapon = FindWeapon(Human))
+		if (AARPG_WeaponBase* Weapon = FindCachedWeapon(Human))
 		{
 			if (AARPG_BowBase* Bow = Cast<AARPG_BowBase>(Weapon))
 			{
@@ -175,16 +175,38 @@ void UARPG_Human_PullOutArrow::NotifyEnd(USkeletalMeshComponent * MeshComp, UAni
 	}
 }
 
+void UARPG_Human_PullBow::NotifyBegin(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, float TotalDuration)
+{
+	if (AHumanBase * Human = Cast<AHumanBase>(MeshComp->GetOwner()))
+	{
+		if (AARPG_WeaponBase * Weapon = GetWeapon(Human))
+		{
+			CacheWeapon(Human, Weapon);
+		}
+	}
+}
+
 void UARPG_Human_PullBow::NotifyTick(USkeletalMeshComponent * MeshComp, UAnimSequenceBase * Animation, float FrameDeltaTime)
 {
 	if (AHumanBase* Human = Cast<AHumanBase>(MeshComp->GetOwner()))
 	{
-		if (AARPG_WeaponBase* Weapon = FindWeapon(Human))
+		if (AARPG_WeaponBase* Weapon = FindCachedWeapon(Human))
 		{
 			if (AARPG_BowBase* Bow = Cast<AARPG_BowBase>(Weapon))
 			{
 				Bow->HoldingTime += FrameDeltaTime;
 			}
+		}
+	}
+}
+
+void UARPG_Human_PullBow::NotifyEnd(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation)
+{
+	if (AHumanBase * Human = Cast<AHumanBase>(MeshComp->GetOwner()))
+	{
+		if (AARPG_WeaponBase * Weapon = FindCachedWeapon(Human))
+		{
+			ClearWeapon(Human);
 		}
 	}
 }
