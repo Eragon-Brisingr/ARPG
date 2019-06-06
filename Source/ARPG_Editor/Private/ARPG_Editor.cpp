@@ -11,6 +11,7 @@
 #include "XD_CampConfig_Customization.h"
 #include "VisualizerRegister.h"
 #include "ARPG_AI_Config.h"
+#include "ARPG_GameConfigs.h"
 
 #define LOCTEXT_NAMESPACE "ARPG_Editor"
 
@@ -45,6 +46,12 @@ void FARPG_EditorModule::StartupModule()
 				LOCTEXT("ARPG_AI_Settings", "ARPG_AI_Settings"),
 				LOCTEXT("ARPG_AI_SettingsDescription", "Configure the ARPG_AI_Settings."),
 				GetMutableDefault<UARPG_AI_Config>()
+			);
+
+			SettingsModule->RegisterSettings("Project", "ARPG", "ARPG_Game_Settings",
+				LOCTEXT("ARPG_Game_Settings", "ARPG_Game_Settings"),
+				LOCTEXT("ARPG_Game_SettingsDescription", "Configure the ARPG_Game_Settings."),
+				GetMutableDefault<UARPG_GameConfigs>()
 			);
 		}
 	}
