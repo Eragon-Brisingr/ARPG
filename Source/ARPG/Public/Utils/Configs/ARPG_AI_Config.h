@@ -26,6 +26,9 @@ public:
 	UPROPERTY(EditAnywhere, Category = "AI", Config)
 	TSoftObjectPtr<UCurveFloat> DefaultNoseAlertCurve;
 
-	UPROPERTY(EditAnywhere, Category = "物品", Config)
+	UPROPERTY(EditAnywhere, Category = "寻路", Config)
 	TSoftClassPtr<UARPG_AD_CharacterBase> PathFollowDefaultActionClass;
+
+	UPROPERTY(EditAnywhere, Category = "感官", Config)
+	TSoftObjectPtr<UStaticMesh> LightDetectorMesh;
 };
