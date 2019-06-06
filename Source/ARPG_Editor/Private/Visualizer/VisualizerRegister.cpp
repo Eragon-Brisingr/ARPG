@@ -5,8 +5,6 @@
 #include "Editor/UnrealEdEngine.h"
 #include "ARPG_NavPath.h"
 #include "NavPathVisualizer.h"
-#include "ARPG_AttackAreaManager.h"
-#include "AttackAreaManagerVisualizer.h"
 
 template<typename UComponent, typename FVisualizer>
 void RegisterComponentVisualizer()
@@ -27,7 +25,6 @@ void FVisualizerRegister::RegisterVisualizer()
 	if (GUnrealEd)
 	{
 		RegisterComponentVisualizer<UARPG_NavPathVisualHelper, FNavPathVisualizer>();
-		RegisterComponentVisualizer<UARPG_AttackAreaManager, FAttackAreaManagerVisualizer>();
 	}
 }
 
@@ -36,6 +33,5 @@ void FVisualizerRegister::UnregisterVisualizer()
 	if (GUnrealEd)
 	{
 		UnregisterComponentVisualizer<UARPG_NavPathVisualHelper>();
-		UnregisterComponentVisualizer<UARPG_AttackAreaManager>();
 	}
 }
