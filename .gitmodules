@@ -43,3 +43,6 @@ url=https://gitlab.com/eragon.xuduo/RawAssets.git
 [submodule "Plugins/AnimMirroring"]
 	path = Plugins/AnimMirroring
 	url = https://github.com/Eragon-Brisingr/AnimMirroring.git
+[submodule "Plugins/XD_AnimNodes"]
+	path = Plugins/XD_AnimNodes
+	url = https://github.com/Eragon-Brisingr/XD_AnimNodes.git
