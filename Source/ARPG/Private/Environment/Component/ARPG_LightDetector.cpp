@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 
 #include "ARPG_LightDetector.h"
@@ -29,7 +29,7 @@ AARPG_LightDetector::AARPG_LightDetector()
 	{
 		TopLightRenderTarget->LODGroup = TextureGroup::TEXTUREGROUP_Pixels2D;
 		TopLightRenderTarget->RenderTargetFormat = ETextureRenderTargetFormat::RTF_RGB10A2;
-		TopLightRenderTarget->InitAutoFormat(4, 4);
+		TopLightRenderTarget->InitAutoFormat(SamplePixelSize, SamplePixelSize);
 		TopLightRenderTarget->UpdateResourceImmediate(true);
 	}
 
@@ -66,6 +66,7 @@ float AARPG_LightDetector::SampleLightBrightness()
 {
 	QUICK_SCOPE_CYCLE_COUNTER(AARPG_LightDetector_SampleLightBrightness);
 	SetActorHiddenInGame(false);
+	//这个开销挺大的，考虑用CaptureSceneDeferred代替
 	TopLightCapture->CaptureScene();
 	SetActorHiddenInGame(true);
 	TArray<FColor> Pixels;

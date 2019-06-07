@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+ï»¿// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -40,6 +40,8 @@ public:
 
 	float SampleLightBrightness();
 
+	uint32 SamplePixelSize = 4;
+
 	float SampleInterval = 0.2f;
 
 	UPROPERTY(Transient)
@@ -58,9 +60,9 @@ public:
 	static TWeakObjectPtr<AARPG_LightDetector> CachedLightDetector;
 	static AARPG_LightDetector* GetLightDetector(const UObject* WorldContextObject);
 
-	UFUNCTION(BlueprintCallable, Category = "AI|¸Ð¹Ù")
+	UFUNCTION(BlueprintCallable, Category = "AI|æ„Ÿå®˜")
 	static float SampleActorBrightness(AActor* Actor);
 
-	UFUNCTION(BlueprintCallable, Category = "AI|¸Ð¹Ù", meta = (WorldContext = WorldContextObject))
+	UFUNCTION(BlueprintCallable, Category = "AI|æ„Ÿå®˜", meta = (WorldContext = WorldContextObject))
 	static float SampleLocalBrightness(const UObject* WorldContextObject, const FVector& Location);
 };
