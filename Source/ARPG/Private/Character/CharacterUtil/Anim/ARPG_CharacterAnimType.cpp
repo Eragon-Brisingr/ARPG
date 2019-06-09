@@ -1,11 +1,13 @@
 ﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 #include "ARPG_CharacterAnimType.h"
-#include "CharacterBase.h"
+#include <Package.h>
 #include "ARPG_MovementComponent.h"
+#include "CharacterBase.h"
 #include "ARPG_Anim_Log.h"
 #include "ARPG_DebugFunctionLibrary.h"
-#include <Package.h>
+#include "HumanBase.h"
+#include "HumanType.h"
 
 bool UARPG_AnimPlayCondition::CalculateConditionValue_Implementation(class ACharacterBase* Character) const
 {
@@ -51,6 +53,14 @@ void UARPG_AttackAnimSetNormal::InvokePlay_Implementation(class ACharacterBase* 
 {
 	if (Character && Character->CanPlayFullBodyMontage())
 	{
+		if (AHumanBase* Human = Cast<AHumanBase>(Character))
+		{
+			if (Human->UseWeaponState == EUseWeaponState::NoneWeapon_Default)
+			{
+				return;
+			}
+		}
+
 		switch (Character->ARPG_MovementComponent->MovementMode)
 		{
 		case EMovementMode::MOVE_Walking:
