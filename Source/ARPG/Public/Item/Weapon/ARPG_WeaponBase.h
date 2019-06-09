@@ -20,6 +20,7 @@ enum class EWeaponUseType : uint8
 	SingleHand UMETA(DisplayName = "单持"),
 	SingleHandForLeft UMETA(DisplayName = "单持左手"),
 	SingleHandForRight UMETA(DisplayName = "单持右手"),
+	BothHand UMETA(DisplayName = "双持"),
 	BothHandForLeft UMETA(DisplayName = "双持左手"),
 	BothHandForRight UMETA(DisplayName = "双持右手")
 };
@@ -57,14 +58,18 @@ public:
 	void FinishAttack(FBP_OnAttackFinished OnAttackFinished);
 
 public:
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "武器", meta = (DisplayName = "持武器模式"))
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "武器", meta = (DisplayName = "持武器模式"))
 	EWeaponUseType WeaponUseType = EWeaponUseType::SingleHand;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "武器", meta = (DisplayName = "基础削韧"))
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "武器", meta = (DisplayName = "基础削韧"))
 	float BaseAddHitStunValue = 10.f;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "武器", meta = (DisplayName = "基础物理攻击"))
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "武器", meta = (DisplayName = "基础物理攻击"))
 	float BasePhysicsAttack = 100.f;
+
+	//只有双手武器可以起效
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "武器", meta = (DisplayName = "移动动作覆盖"))
+	TSubclassOf<UAnimInstance> MoveAnimInstanceOverride;
 
 	UPROPERTY()
 	class USocketMoveTracer* SocketMoveTracer;
@@ -118,4 +123,6 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "动画", Instanced)
 	class UARPG_AttackAnimSetBase* AttackAnimSet;
+
+	bool IsBothHandWeapon() const;
 };

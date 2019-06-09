@@ -7,6 +7,8 @@
 #include "HumanType.h"
 #include "HumanBase.generated.h"
 
+class UAnimInstance;
+
 /**
  * 
  */
@@ -28,6 +30,10 @@ public:
 	TArray<struct FARPG_Item> GetInitItemList() const override;
 
 	class AARPG_WeaponBase* EquipWaepon_Implementation(class UARPG_WeaponCoreBase* WeaponCore, EUseItemInput UseItemInput) override;
+
+	class AARPG_WeaponBase* UseBothHandWeaponImpl(EUseItemInput UseItemInput, class UARPG_WeaponCoreBase* WeaponCore);
+
+	class AARPG_WeaponBase* UseSingleWeaponImpl(EUseItemInput UseItemInput, class UARPG_WeaponCoreBase* WeaponCore);
 
 	class AARPG_ArrowBase* EquipArrow_Implementation(class UARPG_ArrowCoreBase* ArrowCore, EUseItemInput UseItemInput) override;
 
@@ -138,6 +144,11 @@ public:
 
 private:
 	void WhenTakeBackWeaponFinished(UAnimMontage* AnimMontage, bool bInterrupted, FOnCharacterBehaviorFinished OnBehaviorFinished);
+
+	//动画
+public:
+	UPROPERTY(BlueprintReadOnly, Category = "角色|动画")
+	TSubclassOf<UAnimInstance> MoveAnimInstanceOverride;
 };
 
 template<typename EquipType>

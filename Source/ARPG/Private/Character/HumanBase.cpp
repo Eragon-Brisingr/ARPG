@@ -135,48 +135,80 @@ class AARPG_WeaponBase* AHumanBase::EquipWaepon_Implementation(class UARPG_Weapo
 	const AARPG_WeaponBase* Weapon = WeaponCore->GetItemDefaultActor<AARPG_WeaponBase>();
 	switch (Weapon->WeaponUseType)
 	{
-	//左手双手武器写这，卸下右手武器，别忘了写卸下左手双手武器代码
 	case EWeaponUseType::BothHandForLeft:
+		return UseBothHandWeaponImpl(EUseItemInput::LeftMouse, WeaponCore);
+	case EWeaponUseType::SingleHandForLeft:
+		return UseSingleWeaponImpl(EUseItemInput::LeftMouse, WeaponCore);
+	case EWeaponUseType::BothHandForRight:
+		return UseBothHandWeaponImpl(EUseItemInput::RightMouse, WeaponCore);
+	case EWeaponUseType::SingleHandForRight:
+		return UseSingleWeaponImpl(EUseItemInput::RightMouse, WeaponCore);
+	case EWeaponUseType::BothHand:
+		return UseBothHandWeaponImpl(UseItemInput, WeaponCore);
+	case EWeaponUseType::SingleHand:
+		return UseSingleWeaponImpl(UseItemInput, WeaponCore);
+	default:
+		check(0);
+	}
+	return nullptr;
+}
+
+class AARPG_WeaponBase* AHumanBase::UseBothHandWeaponImpl(EUseItemInput UseItemInput, class UARPG_WeaponCoreBase* WeaponCore)
+{
+	switch (UseItemInput)
+	{
+	case EUseItemInput::LeftMouse:
 		if (RightWeapon)
 		{
 			SetRightWeapon(nullptr);
 		}
-	case EWeaponUseType::SingleHandForLeft:
 		return EquipSingleLeftWeapon(WeaponCore);
-	//右手双持武器逻辑写这，卸下左手武器，别忘了写卸下右手双手武器代码
-	case EWeaponUseType::BothHandForRight:
+	case EUseItemInput::RightMouse:
 		if (LeftWeapon)
 		{
 			SetLeftWeapon(nullptr);
 		}
-	case EWeaponUseType::SingleHandForRight:
 		return EquipSingleRightWeapon(WeaponCore);
-	//单手武器逻辑
-	default:
-		switch (UseItemInput)
+	}
+	return nullptr;
+}
+
+class AARPG_WeaponBase* AHumanBase::UseSingleWeaponImpl(EUseItemInput UseItemInput, class UARPG_WeaponCoreBase* WeaponCore)
+{
+	switch (UseItemInput)
+	{
+	case EUseItemInput::LeftMouse:
+		if (RightWeapon)
 		{
-		case EUseItemInput::LeftMouse:
-			if (RightWeapon && RightWeapon->IsEqualWithItemCore(WeaponCore))
+			if (RightWeapon->IsBothHandWeapon())
+			{
+				SetRightWeapon(nullptr);
+			}
+			else if (RightWeapon->IsEqualWithItemCore(WeaponCore))
 			{
 				if (Inventory->GetItemNumber(RightWeapon) == 1)
 				{
 					SetRightWeapon(nullptr);
 				}
 			}
-			return EquipSingleLeftWeapon(WeaponCore);
-		case EUseItemInput::RightMouse:
-			if (LeftWeapon && LeftWeapon->IsEqualWithItemCore(WeaponCore))
+		}
+		return EquipSingleLeftWeapon(WeaponCore);
+	case EUseItemInput::RightMouse:
+		if (LeftWeapon)
+		{
+			if (LeftWeapon->IsBothHandWeapon())
+			{
+				SetRightWeapon(nullptr);
+			}
+			else if (LeftWeapon->IsEqualWithItemCore(WeaponCore))
 			{
 				if (Inventory->GetItemNumber(LeftWeapon) == 1)
 				{
-					SetLeftWeapon(nullptr);
+					SetRightWeapon(nullptr);
 				}
 			}
-			return EquipSingleRightWeapon(WeaponCore);
-		default:
-			break;
 		}
-		break;
+		return EquipSingleRightWeapon(WeaponCore);
 	}
 	return nullptr;
 }

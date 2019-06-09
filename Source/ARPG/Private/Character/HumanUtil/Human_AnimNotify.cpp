@@ -144,13 +144,16 @@ void UARPG_Human_PullOutArrow::NotifyBegin(USkeletalMeshComponent * MeshComp, UA
 {
 	if (AHumanBase* Human = Cast<AHumanBase>(MeshComp->GetOwner()))
 	{
-		if (AARPG_WeaponBase* Weapon = GetWeapon(Human))
+		if (Human->HasAuthority())
 		{
-			if (AARPG_BowBase* Bow = Cast<AARPG_BowBase>(Weapon))
+			if (AARPG_WeaponBase * Weapon = GetWeapon(Human))
 			{
-				Bow->SpawnArrowInHand();
-				Bow->HoldingTime = 0.f;
-				CacheWeapon(Human, Weapon);
+				if (AARPG_BowBase * Bow = Cast<AARPG_BowBase>(Weapon))
+				{
+					Bow->SpawnArrowInHand();
+					Bow->HoldingTime = 0.f;
+					CacheWeapon(Human, Weapon);
+				}
 			}
 		}
 	}

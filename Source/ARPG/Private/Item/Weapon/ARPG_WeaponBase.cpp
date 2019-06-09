@@ -41,11 +41,28 @@ void AARPG_WeaponBase::WhenUse(class ACharacterBase* ItemOwner)
 		SocketMoveTracer->OnTraceActorNative.BindUObject(this, &AARPG_WeaponBase::WhenAttackTracedActor);
 		SocketMoveTracer->InitSocketMoveTracer(Root, SocketMoveTracerConfig);
 	}
+
+	if (AHumanBase* Human = Cast<AHumanBase>(ItemOwner))
+	{
+		if (MoveAnimInstanceOverride)
+		{
+			Human->MoveAnimInstanceOverride = MoveAnimInstanceOverride;
+		}
+	}
+
 	Super::WhenUse(ItemOwner);
 }
 
 void AARPG_WeaponBase::WhenNotUse(class ACharacterBase* ItemOwner)
 {
+	if (AHumanBase* Human = Cast<AHumanBase>(ItemOwner))
+	{
+		if (MoveAnimInstanceOverride)
+		{
+			Human->MoveAnimInstanceOverride = nullptr;
+		}
+	}
+
 	Super::WhenNotUse(ItemOwner);
 }
 
@@ -206,6 +223,19 @@ void AARPG_WeaponBase::WhenInWeaponBack()
 void AARPG_WeaponBase::AttachWeaponTo(class USceneComponent* InParent, FName InSocketName)
 {
 	AttachToComponent(InParent, FAttachmentTransformRules::SnapToTargetNotIncludingScale, InSocketName);
+}
+
+bool AARPG_WeaponBase::IsBothHandWeapon() const
+{
+	switch (WeaponUseType)
+	{
+	case EWeaponUseType::BothHand:
+	case EWeaponUseType::BothHandForLeft:
+	case EWeaponUseType::BothHandForRight:
+		return true;
+	default:
+		return false;
+	}
 }
 
 #undef LOCTEXT_NAMESPACE
