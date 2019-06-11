@@ -30,5 +30,10 @@ public:
 	FOnMovementModeChanged OnARPGMovementModeChanged;
 
 	virtual void OnMovementModeChanged(EMovementMode PreviousMovementMode, uint8 PreviousCustomMode) override;
-	
+
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "角色|移动|高级")
+	float SlidableFloorZ = 0.45f;
+
+	void CalcVelocity(float DeltaTime, float Friction, bool bFluid, float BrakingDeceleration) override;
 };

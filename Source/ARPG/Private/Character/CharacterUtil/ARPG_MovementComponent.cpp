@@ -67,3 +67,20 @@ void UARPG_MovementComponent::OnMovementModeChanged(EMovementMode PreviousMoveme
 
 	OnARPGMovementModeChanged.Broadcast(this, PreviousMovementMode, PreviousCustomMode);
 }
+
+void UARPG_MovementComponent::CalcVelocity(float DeltaTime, float Friction, bool bFluid, float BrakingDeceleration)
+{
+	Super::CalcVelocity(DeltaTime, Friction, bFluid, BrakingDeceleration);
+
+	switch (MovementMode)
+	{
+	case MOVE_Walking:
+	case MOVE_NavWalking:
+		Velocity;
+		const FVector& FloorNormal = CurrentFloor.HitResult.Normal;
+		if (FloorNormal.Z > SlidableFloorZ)
+		{
+			(FloorNormal.Z - SlidableFloorZ)
+		}
+	}
+}
