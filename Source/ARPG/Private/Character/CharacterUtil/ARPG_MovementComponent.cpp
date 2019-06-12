@@ -6,12 +6,14 @@
 #include <Kismet/KismetMathLibrary.h>
 #include "ARPG_PlayerControllerBase.h"
 #include "CharacterBase.h"
+#include "DrawDebugHelpers.h"
 
 
 
 UARPG_MovementComponent::UARPG_MovementComponent()
 {
 	RotationMode = ECharacterRotationMode::VelocityDirection;
+	bMaintainHorizontalGroundVelocity = false;
 }
 
 void UARPG_MovementComponent::OnRegister()
@@ -66,21 +68,4 @@ void UARPG_MovementComponent::OnMovementModeChanged(EMovementMode PreviousMoveme
 	Super::OnMovementModeChanged(PreviousMovementMode, PreviousCustomMode);
 
 	OnARPGMovementModeChanged.Broadcast(this, PreviousMovementMode, PreviousCustomMode);
-}
-
-void UARPG_MovementComponent::CalcVelocity(float DeltaTime, float Friction, bool bFluid, float BrakingDeceleration)
-{
-	Super::CalcVelocity(DeltaTime, Friction, bFluid, BrakingDeceleration);
-
-	switch (MovementMode)
-	{
-	case MOVE_Walking:
-	case MOVE_NavWalking:
-		Velocity;
-		const FVector& FloorNormal = CurrentFloor.HitResult.Normal;
-		if (FloorNormal.Z > SlidableFloorZ)
-		{
-			(FloorNormal.Z - SlidableFloorZ)
-		}
-	}
 }
