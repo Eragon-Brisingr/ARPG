@@ -67,11 +67,7 @@ void UARPG_AttackAnimSetNormal::InvokePlay_Implementation(class ACharacterBase* 
 		case EMovementMode::MOVE_NavWalking:
 		case EMovementMode::MOVE_Falling:
 		{
-			if (Character->ARPG_MovementComponent->IsCrouching())
-			{
-
-			}
-			else
+			if (!Character->ARPG_MovementComponent->IsPrepareSliding())
 			{
 				bool IsSprinting = Character->ARPG_MovementComponent->IsSprinting();
 				bool IsFalling = Character->ARPG_MovementComponent->IsFalling();
@@ -118,6 +114,10 @@ void UARPG_AttackAnimSetNormal::InvokePlay_Implementation(class ACharacterBase* 
 				{
 					HeavyAttack.PlayRightMontage(Character);
 				}
+			}
+			else if (Character->ARPG_MovementComponent->IsCrouching())
+			{
+
 			}
 		}
 		break;
@@ -166,5 +166,5 @@ void UARPG_DodgeAnimSetNormal::InvokeDodge(class ACharacterBase* Character, EDod
 
 bool UARPG_DodgeAnimSetNormal::CanDodge(const class ACharacterBase* Character) const
 {
-	return Character->GetCharacterMovement()->IsMovingOnGround() && Character->CanPlayFullBodyMontage();
+	return Character->ARPG_MovementComponent->IsMovingOnGround() && !Character->ARPG_MovementComponent->IsPrepareSliding() && Character->CanPlayFullBodyMontage();
 }
