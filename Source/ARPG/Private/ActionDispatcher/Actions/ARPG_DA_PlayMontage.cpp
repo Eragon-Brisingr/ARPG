@@ -3,6 +3,11 @@
 #include "ARPG_DA_PlayMontage.h"
 #include "CharacterBase.h"
 
+TArray<AActor*> UARPG_DA_PlayMontage::GetAllRegistableEntities() const
+{
+	return { Pawn.Get() };
+}
+
 bool UARPG_DA_PlayMontage::IsActionValid() const
 {
 	return Pawn.Get() != nullptr;
@@ -10,7 +15,6 @@ bool UARPG_DA_PlayMontage::IsActionValid() const
 
 void UARPG_DA_PlayMontage::WhenActionActived()
 {
-	RegisterEntity(Pawn.Get());
 	ACharacterBase* Character = Cast<ACharacterBase>(Pawn.Get());
 	Character->PlayMontageWithBlendingOutDelegate(MontageToPlay, FOnMontageBlendingOutStarted::CreateWeakLambda(this, [=](UAnimMontage* Montage, bool bInterrupted)
 		{
@@ -45,9 +49,4 @@ void UARPG_DA_PlayMontage::WhenActionDeactived()
 {
 	ACharacterBase* Character = Cast<ACharacterBase>(Pawn.Get());
 	Character->StopMontage(MontageToPlay);
-}
-
-void UARPG_DA_PlayMontage::WhenActionFinished()
-{
-	UnregisterEntity(Pawn.Get());
 }

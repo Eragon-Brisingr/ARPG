@@ -4,6 +4,11 @@
 #include "GameFramework/Pawn.h"
 #include "ARPG_TimeManager.h"
 
+TArray<AActor*> UARPG_DA_Wait::GetAllRegistableEntities() const
+{
+	return { Pawn.Get() };
+}
+
 bool UARPG_DA_Wait::IsActionValid() const
 {
 	return Pawn.IsValid();
@@ -11,7 +16,7 @@ bool UARPG_DA_Wait::IsActionValid() const
 
 void UARPG_DA_Wait::WhenActionActived()
 {
-	RegisterEntity(Pawn.Get());
+
 }
 
 void UARPG_DA_Wait::WhenActionDeactived()
@@ -21,7 +26,12 @@ void UARPG_DA_Wait::WhenActionDeactived()
 
 void UARPG_DA_Wait::WhenActionFinished()
 {
-	UnregisterEntity(Pawn.Get());
+
+}
+
+TArray<AActor*> UARPG_DA_WaitGameTime::GetAllRegistableEntities() const
+{
+	return { Pawn.Get() };
 }
 
 bool UARPG_DA_WaitGameTime::IsActionValid() const
@@ -31,7 +41,6 @@ bool UARPG_DA_WaitGameTime::IsActionValid() const
 
 void UARPG_DA_WaitGameTime::WhenActionActived()
 {
-	RegisterEntity(Pawn.Get());
 	UARPG_TimeManager* TimeManager = UARPG_TimeManager::GetARPG_TimeManager(this);
 	APawn* Character = Pawn.Get();
 	GameTimeHandle = TimeManager->AddNativeDelayTimeEvent(GameTimeSpan, FXD_GameTimeNativeDelegate::CreateWeakLambda(Character, [=]()
@@ -48,5 +57,5 @@ void UARPG_DA_WaitGameTime::WhenActionDeactived()
 
 void UARPG_DA_WaitGameTime::WhenActionFinished()
 {
-	UnregisterEntity(Pawn.Get());
+
 }
