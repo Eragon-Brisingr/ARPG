@@ -11,6 +11,13 @@ void UCA_CharacterTurnBase::TurnTo(ACharacterBase* Executer, const FRotator& Tar
 	ExecuteBehavior(Executer, OnCharacterTurnFinished);
 }
 
+UCA_CharacterTurnBase* UCA_TurnMontageConfigBase::CreateInstance(UObject* Outer) const
+{
+	UCA_TurnByMontage* TurnByMontage = NewObject<UCA_TurnByMontage>(Outer);
+	TurnByMontage->TurnMontageConfig = GetClass();
+	return TurnByMontage;
+}
+
 UAnimMontage* UCA_TurnMontageConfigBase::GetTurnMontageFourDirection(const FRotator& CurrentWorldRotation, const FRotator& TargetWorldRotation, UAnimMontage* TurnLeft90, UAnimMontage* TurnRight90, UAnimMontage* TurnLeft180, UAnimMontage* TurnRight180) const
 {
 	float Yaw = (CurrentWorldRotation - TargetWorldRotation).GetNormalized().Yaw;

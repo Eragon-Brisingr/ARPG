@@ -29,10 +29,20 @@ protected:
 };
 
 UCLASS(abstract, const, Blueprintable)
-class ARPG_API UCA_TurnMontageConfigBase : public UObject
+class ARPG_API UCA_TurnConfigBase : public UObject
 {
 	GENERATED_BODY()
 public:
+	virtual UCA_CharacterTurnBase* CreateInstance(UObject* Outer) const { return nullptr; }
+};
+
+UCLASS()
+class ARPG_API UCA_TurnMontageConfigBase : public UCA_TurnConfigBase
+{
+	GENERATED_BODY()
+public:
+	UCA_CharacterTurnBase* CreateInstance(UObject* Outer) const override;
+
 	virtual UAnimMontage* GetTurnMontage(ACharacterBase* Executer, const FRotator& TargetWorldRotation) const { return ReceiveGetTurnMontage(Executer, TargetWorldRotation); }
 	UFUNCTION(BlueprintImplementableEvent, Category = "角色|动作", meta = (DisplayName = "GetTurnMontage"))
 	UAnimMontage* ReceiveGetTurnMontage(ACharacterBase* Executer, const FRotator& TargetWorldRotation) const;
@@ -58,7 +68,7 @@ public:
 	UAnimMontage* GetTurnMontage(ACharacterBase* Executer, const FRotator& TargetWorldRotation) const override;
 };
 
-UCLASS(meta = (DisplayName = "转身_普通"))
+UCLASS(meta = (DisplayName = "转身_播放蒙太奇"))
 class ARPG_API UCA_TurnByMontage : public UCA_CharacterTurnBase
 {
 	GENERATED_BODY()

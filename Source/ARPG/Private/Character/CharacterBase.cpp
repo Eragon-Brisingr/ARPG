@@ -68,8 +68,6 @@ ACharacterBase::ACharacterBase(const FObjectInitializer& ObjectInitializer)
 
 	SneakSystem = CreateDefaultSubobject<UARPG_SneakSystemNormal>(GET_MEMBER_NAME_CHECKED(ACharacterBase, SneakSystem));
 
-	CharacterTurnAction = CreateDefaultSubobject<UCA_TurnByMontage>(GET_MEMBER_NAME_CHECKED(ACharacterBase, CharacterTurnAction));
-
 	GetMesh()->VisibilityBasedAnimTickOption = EVisibilityBasedAnimTickOption::AlwaysTickPoseAndRefreshBones;
 
 	NavigationQueryFilter = UARPG_NavigationQueryFilter::StaticClass();
@@ -84,6 +82,11 @@ void ACharacterBase::BeginPlay()
 	{
 		InteractBehavior->Character = this;
 		InteractBehavior->InitLeader(this);
+	}
+
+	if (TurnConfig)
+	{
+		CharacterTurnAction = TurnConfig.GetDefaultObject()->CreateInstance(this);
 	}
 }
 

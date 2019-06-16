@@ -28,6 +28,8 @@
 class UCA_EnterReleaseStateBase;
 class UARPG_AD_CharacterInteract;
 class UARPG_ActionDispatcherBase;
+class UCA_TurnConfigBase;
+class UCA_CharacterTurnBase;
 
 UENUM()
 enum class EInteractEndResult : uint8
@@ -605,7 +607,7 @@ public:
 	//CharacterBehavior接口
 public:
 	//进入松懈状态
-	UPROPERTY(EditDefaultsOnly, Category = "角色|动画配置", Instanced)
+	UPROPERTY(EditAnywhere, Category = "角色|动画配置", Instanced)
 	UCA_EnterReleaseStateBase* EnterReleaseStateAction;
 
 	virtual bool IsInReleaseState() const { return true; }
@@ -613,8 +615,10 @@ public:
 	UARPG_CharacterBehaviorBase* EnterReleaseState(const FOnCharacterBehaviorFinished& OnBehaviorFinished);
 	
 	//转身
-	UPROPERTY(EditDefaultsOnly, Category = "角色|动画配置", Instanced)
-	class UCA_CharacterTurnBase* CharacterTurnAction;
+	UPROPERTY(EditDefaultsOnly, Category = "角色|动画配置")
+	TSubclassOf<UCA_TurnConfigBase> TurnConfig;
+	UPROPERTY()
+	UCA_CharacterTurnBase* CharacterTurnAction;
 
 	UPROPERTY(EditDefaultsOnly, Category = "角色|动作")
 	FName TurnSlotName = TEXT("TurnInPlace");
