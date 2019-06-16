@@ -16,6 +16,7 @@ class ARPG_API UARPG_DA_MoveToBase : public UXD_DispatchableActionBase
 {
 	GENERATED_BODY()
 public:
+	TArray<AActor*> GetAllRegistableEntities() const override;
 	bool IsActionValid() const override;
 	void WhenActionActived() override;
 	void WhenActionDeactived() override;

@@ -5,6 +5,11 @@
 #include "ARPG_MoveUtils.h"
 #include "NavigationSystem.h"
 
+TArray<AActor*> UARPG_DA_MoveToBase::GetAllRegistableEntities() const
+{
+	return { Mover.Get() };
+}
+
 bool UARPG_DA_MoveToBase::IsActionValid() const
 {
 	APawn* Pawn = Mover.Get();
@@ -13,7 +18,7 @@ bool UARPG_DA_MoveToBase::IsActionValid() const
 
 void UARPG_DA_MoveToBase::WhenActionActived()
 {
-	RegisterEntity(Mover.Get());
+
 }
 
 void UARPG_DA_MoveToBase::WhenActionDeactived()
@@ -24,7 +29,7 @@ void UARPG_DA_MoveToBase::WhenActionDeactived()
 
 void UARPG_DA_MoveToBase::WhenActionFinished()
 {
-	UnregisterEntity(Mover.Get());
+
 }
 
 void UARPG_DA_MoveToBase::WhenRequestFinished(const FPathFollowingResult& Result)
