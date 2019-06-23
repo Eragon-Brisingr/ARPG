@@ -82,3 +82,6 @@ DerivedDataCache/*
 
 # 打包目录
 Package/*
+
+# 编译临时文件
+enc_temp_folder/*
