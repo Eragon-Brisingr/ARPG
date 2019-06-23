@@ -402,7 +402,7 @@ float ACharacterBase::PlayMontageImpl(UAnimMontage * MontageToPlay, const FARPG_
 	UAnimInstance * AnimInstance = GetMesh()->GetAnimInstance();
 	if (MontageToPlay && AnimInstance)
 	{
-		float const Duration = AnimInstance->Montage_Play(MontageToPlay, InPlayRate, EMontagePlayReturnType::MontageLength, 0.f, true);
+		float const Duration = AnimInstance->Montage_Play(MontageToPlay, InPlayRate, EMontagePlayReturnType::MontageLength, 0.f, false);
 		if (Config.bMirrorMontage)
 		{
 			SetMirrorFullBodyMontage(true);

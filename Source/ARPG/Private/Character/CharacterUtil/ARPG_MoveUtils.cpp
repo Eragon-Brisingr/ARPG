@@ -426,8 +426,14 @@ UARPG_CharacterMove_AsyncAction* UARPG_CharacterMove_AsyncAction::BP_MoveToActor
 {
 	if (Character && Character->GetController())
 	{
-		FPathFollowingRequestResult ResultData = UARPG_MoveUtils::ARPG_MoveToActorImpl(Character, Goal, AcceptanceRadius, bStopOnOverlap, bUsePathfinding, bCanStrafe, FilterClass, bAllowPartialPaths);
-		return UARPG_CharacterMove_AsyncAction::SettingRequest(Character, ResultData);
+		UARPG_CharacterMove_AsyncAction* CharacterMove_AsyncAction = NewObject<UARPG_CharacterMove_AsyncAction>(Character);
+		CharacterMove_AsyncAction->Character = Character;
+		UARPG_MoveUtils::ARPG_MoveToActorAndTurn(Character, Goal, TurnToActor, FOnARPG_MoveFinished::CreateWeakLambda(Character, [=](const FPathFollowingResult& Result)
+			{
+				Character->GetWorld()->GetTimerManager().SetTimerForNextTick(FTimerDelegate::CreateUObject(CharacterMove_AsyncAction, &UARPG_CharacterMove_AsyncAction::OnMoveCompleted, Result));
+			}), AcceptanceRadius, bStopOnOverlap, bUsePathfinding, bCanStrafe, FilterClass, bAllowPartialPaths);
+
+		return CharacterMove_AsyncAction;
 	}
 	return nullptr;
 }
@@ -436,8 +442,14 @@ UARPG_CharacterMove_AsyncAction* UARPG_CharacterMove_AsyncAction::BP_MoveToLocat
 {
 	if (Character && Character->GetController())
 	{
-		FPathFollowingRequestResult ResultData = UARPG_MoveUtils::ARPG_MoveToLocationImpl(Character, Dest, AcceptanceRadius, bStopOnOverlap, bUsePathfinding, bProjectDestinationToNavigation, bCanStrafe, FilterClass, bAllowPartialPaths);
-		return UARPG_CharacterMove_AsyncAction::SettingRequest(Character, ResultData);
+		UARPG_CharacterMove_AsyncAction* CharacterMove_AsyncAction = NewObject<UARPG_CharacterMove_AsyncAction>(Character);
+		CharacterMove_AsyncAction->Character = Character;
+		UARPG_MoveUtils::ARPG_MoveToLocationAndTurn(Character, Dest, TurnRotation, FOnARPG_MoveFinished::CreateWeakLambda(Character, [=](const FPathFollowingResult& Result)
+			{
+				Character->GetWorld()->GetTimerManager().SetTimerForNextTick(FTimerDelegate::CreateUObject(CharacterMove_AsyncAction, &UARPG_CharacterMove_AsyncAction::OnMoveCompleted, Result));
+			}), AcceptanceRadius, bStopOnOverlap, bUsePathfinding, bProjectDestinationToNavigation, bCanStrafe, FilterClass, bAllowPartialPaths);
+
+		return CharacterMove_AsyncAction;
 	}
 	return nullptr;
 }

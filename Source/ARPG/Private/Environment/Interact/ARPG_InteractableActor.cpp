@@ -31,6 +31,7 @@ void FARPG_InteractSingleConfig::WhenInvokeInteract(AActor* Owner, ACharacterBas
 				if (IARPG_InteractInterface::CanInteract(Owner, InteractInvoker))
 				{
 					AI_Display_LOG("%s开始与%s交互", *UXD_DebugFunctionLibrary::GetDebugName(InteractInvoker), *UXD_DebugFunctionLibrary::GetDebugName(Owner));
+					InteractInvoker->SetInteractingTarget(Owner);
 					InteractDispatcher->StartInteractDispatcher(InteractInvoker,
 						FOnDispatchDeactiveNative::CreateWeakLambda(Owner, [=](bool IsFinishedCompleted)
 							{
