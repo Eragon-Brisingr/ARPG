@@ -46,6 +46,18 @@ public:
 	void WhenAbortInteract(ACharacterBase* InteractInvoker);
 	virtual void WhenAbortInteract_Implementation(ACharacterBase* InteractInvoker) {}
 	static void WhenAbortInteract(UObject* Obj, ACharacterBase* InteractInvoker) { IARPG_InteractInterface::Execute_WhenAbortInteract(Obj, InteractInvoker); }
+
+	//正式开始交互时的事件，客户端也会触发
+	UFUNCTION(BlueprintNativeEvent, Category = "环境|交互")
+	void WhenBeginInteract(ACharacterBase* InteractInvoker);
+	virtual void WhenBeginInteract_Implementation(ACharacterBase* InteractInvoker) {}
+	static void WhenBeginInteract(UObject* Obj, ACharacterBase* InteractInvoker) { IARPG_InteractInterface::Execute_WhenBeginInteract(Obj, InteractInvoker); }
+
+	//正式开始交互时的事件，客户端也会触发
+	UFUNCTION(BlueprintNativeEvent, Category = "环境|交互")
+	void WhenEndInteract(ACharacterBase* InteractInvoker);
+	virtual void WhenEndInteract_Implementation(ACharacterBase* InteractInvoker) {}
+	static void WhenEndInteract(UObject* Obj, ACharacterBase* InteractInvoker) { IARPG_InteractInterface::Execute_WhenEndInteract(Obj, InteractInvoker); }
 public:
 	UFUNCTION(BlueprintNativeEvent, Category = "游戏|交互")
 	void GetHintInfo(ACharacterBase* InteractInvoker);

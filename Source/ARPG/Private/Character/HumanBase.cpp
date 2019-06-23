@@ -198,13 +198,13 @@ class AARPG_WeaponBase* AHumanBase::UseSingleWeaponImpl(EUseItemInput UseItemInp
 		{
 			if (LeftWeapon->IsBothHandWeapon())
 			{
-				SetRightWeapon(nullptr);
+				SetLeftWeapon(nullptr);
 			}
 			else if (LeftWeapon->IsEqualWithItemCore(WeaponCore))
 			{
 				if (Inventory->GetItemNumber(LeftWeapon) == 1)
 				{
-					SetRightWeapon(nullptr);
+					SetLeftWeapon(nullptr);
 				}
 			}
 		}

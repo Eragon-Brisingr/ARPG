@@ -152,6 +152,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "角色|行为")
 	void StopMovement();
 
+	UFUNCTION(BlueprintCallable, Category = "角色|行为")
+	FVector GetMovementInputVector() const;
+
 	//IARPG_LockOnTargetInterface
 public:
 	UPROPERTY(EditDefaultsOnly, Category = "角色|配置")
@@ -461,8 +464,11 @@ public:
 
 	UPROPERTY(BlueprintReadOnly, Category = "角色|交互")
 	AActor* InvokeInteractTarget;
-	UPROPERTY(BlueprintReadOnly, Category = "角色|交互", Replicated)
-	uint8 bIsInteractingWithActor : 1;
+	UPROPERTY(BlueprintReadOnly, Category = "角色|交互", ReplicatedUsing = OnRep_InteractingTarget)
+	AActor* InteractingTarget;
+	UFUNCTION()
+	void OnRep_InteractingTarget(AActor* PreInteractTarget);
+	void SetInteractingTarget(AActor* InInteractingTarget);
 
 	uint8 bIsInBTreeDispatching : 1;
 

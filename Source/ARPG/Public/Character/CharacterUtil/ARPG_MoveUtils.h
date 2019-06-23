@@ -61,12 +61,12 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "角色|移动", meta = (BlueprintInternalUseOnly = "true", DisplayName = "ARPG Move To Location", AdvancedDisplay = "bStopOnOverlap,bCanStrafe,bAllowPartialPaths,bProjectDestinationToNavigation"))
 	static UARPG_CharacterMove_AsyncAction* BP_ARPG_MoveToLocation(class ACharacterBase* Character, const FVector& Dest, float AcceptanceRadius = 5.f, bool bStopOnOverlap = true, bool bUsePathfinding = true, bool bProjectDestinationToNavigation = false, bool bCanStrafe = true, TSubclassOf<UNavigationQueryFilter> FilterClass = nullptr, bool bAllowPartialPaths = true);
 
-	//TODO 尚未完成Turn
-	UFUNCTION(BlueprintCallable, Category = "角色|移动", meta = (BlueprintInternalUseOnly = "true", DisplayName = "ARPG Move To Location", AdvancedDisplay = "bStopOnOverlap,bCanStrafe,bAllowPartialPaths,bProjectDestinationToNavigation"))
+	//TODO 延迟一帧执行可能有风险
+	UFUNCTION(BlueprintCallable, Category = "角色|移动", meta = (BlueprintInternalUseOnly = "true", DisplayName = "ARPG Move To Actor And Turn", AdvancedDisplay = "bStopOnOverlap,bCanStrafe,bAllowPartialPaths,bProjectDestinationToNavigation"))
 	static UARPG_CharacterMove_AsyncAction* BP_MoveToActorAndTurn(class ACharacterBase* Character, AActor* Goal, AActor* TurnToActor, float AcceptanceRadius = 5.f, bool bStopOnOverlap = true, bool bUsePathfinding = true, bool bCanStrafe = true, TSubclassOf<class UNavigationQueryFilter> FilterClass = nullptr, bool bAllowPartialPaths = true);
 
-	//TODO 尚未完成Turn
-	UFUNCTION(BlueprintCallable, Category = "角色|移动", meta = (BlueprintInternalUseOnly = "true", DisplayName = "ARPG Move To Location", AdvancedDisplay = "bStopOnOverlap,bCanStrafe,bAllowPartialPaths,bProjectDestinationToNavigation"))
+	//TODO 延迟一帧执行可能有风险
+	UFUNCTION(BlueprintCallable, Category = "角色|移动", meta = (BlueprintInternalUseOnly = "true", DisplayName = "ARPG Move To Location And Turn", AdvancedDisplay = "bStopOnOverlap,bCanStrafe,bAllowPartialPaths,bProjectDestinationToNavigation"))
 	static UARPG_CharacterMove_AsyncAction* BP_MoveToLocationAndTurn(class ACharacterBase* Character, const FVector& Dest, const FRotator& TurnRotation, float AcceptanceRadius = 5.f, bool bStopOnOverlap = true, bool bUsePathfinding = true, bool bProjectDestinationToNavigation = false, bool bCanStrafe = true, TSubclassOf<UNavigationQueryFilter> FilterClass = nullptr, bool bAllowPartialPaths = true);
 public:
 	UPROPERTY()
