@@ -123,10 +123,7 @@ void ACharacterBase::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 	//TODO 挪入bIsLockingOther与bInvokeSprint的Setter驱动而不是轮询
-	if (IsPlayerControlled())
-	{
-		ARPG_MovementComponent->SetRotationMode(bIsLockingOther && ARPG_MovementComponent->bInvokeSprint == false ? ECharacterRotationMode::LookingDirection : ECharacterRotationMode::VelocityDirection);
-	}
+	ARPG_MovementComponent->SetRotationMode(bIsLockingOther && ARPG_MovementComponent->IsSprinting() == false ? ECharacterRotationMode::LookingDirection : ECharacterRotationMode::VelocityDirection);
 }
 
 // Called to bind functionality to input
