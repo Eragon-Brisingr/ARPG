@@ -211,15 +211,17 @@ void AARPG_LadderBase::PlayLadderMontage(ACharacterBase* Character, UAnimMontage
 void AARPG_LadderBase::WhenEnterLadder(ACharacterBase* Character)
 {
 	Character->GetCharacterMovement()->SetMovementMode(MOVE_Flying);
-	//关闭FootIk
-	Character->GetMesh()->SetDisablePostProcessBlueprint(true);
+
+	Character->bEnableFootIk = false;
+	Character->bEnableAimOffset = false;
 }
 
 void AARPG_LadderBase::WhenLeaveLadder(ACharacterBase* Character)
 {
 	Character->GetCharacterMovement()->SetMovementMode(MOVE_Walking);
-	//关闭FootIk
-	Character->GetMesh()->SetDisablePostProcessBlueprint(false);
+
+	Character->bEnableFootIk = true;
+	Character->bEnableAimOffset = true;
 }
 
 void AARPG_LadderBase::EnterLadderImpl(ACharacterBase* Character, bool IsLowEnter)
