@@ -12,3 +12,8 @@ UARPG_NavArea_JumpBase::UARPG_NavArea_JumpBase()
 
 	DrawColor = FColor(0, 255, 255);
 }
+
+UARPG_NavArea_LadderBase::UARPG_NavArea_LadderBase()
+{
+	DrawColor = FColor(255, 255, 0);
+}
