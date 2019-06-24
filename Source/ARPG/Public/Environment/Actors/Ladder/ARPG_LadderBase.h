@@ -9,6 +9,7 @@
 
 class ACharacterBase;
 class UAnimMontage;
+class UNavLinkCustomComponent;
 
 USTRUCT(BlueprintType, BlueprintInternalUseOnly)
 struct FInLadderData
@@ -82,6 +83,7 @@ public:
 	void OnConstruction(const FTransform& Transform) override;
 
 	void WhenInvokeInteract_Implementation(ACharacterBase* InteractInvoker) override;
+
 	bool CanInteract_Implementation(const ACharacterBase* InteractInvoker) const override;
 	void WhenBeginInteract_Implementation(ACharacterBase* InteractInvoker) override;
 	void WhenEndInteract_Implementation(ACharacterBase* InteractInvoker) override;
@@ -94,6 +96,9 @@ protected:
 
 	void WhenEnterLadder(ACharacterBase* Character);
 	void WhenLeaveLadder(ACharacterBase* Character);
+
+	void EnterLadderImpl(ACharacterBase* Character, bool IsLowEnter);
+
 public:
 	bool CanDownEnter(const ACharacterBase* Character) const;
 	bool CanUpEnter(const ACharacterBase* Character) const;
@@ -110,4 +115,10 @@ public:
 	TMap<TSubclassOf<ACharacterBase>, FClimbLadderConfig> ClimbLadderConfigs;
 
 	const FClimbLadderConfig* GetClimbConfig(const ACharacterBase* Character) const;
+
+public:
+	UPROPERTY(VisibleAnywhere, Category = "梯子")
+	UNavLinkCustomComponent* LadderNavLinkCustomComponent;
+
+	void NotifySmartLinkReached(UNavLinkCustomComponent* LinkComp, UObject* PathingAgent, const FVector& DestPoint);
 };

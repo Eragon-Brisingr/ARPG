@@ -6,6 +6,10 @@
 #include "ARPG_MoveUtils.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "ARPG_ActorFunctionLibrary.h"
+#include "NavLinkCustomComponent.h"
+#include "ARPG_NavAreaType.h"
+#include "GameFramework/Controller.h"
+#include "Navigation/PathFollowingComponent.h"
 
 // Sets default values
 AARPG_LadderBase::AARPG_LadderBase()
@@ -13,6 +17,12 @@ AARPG_LadderBase::AARPG_LadderBase()
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
+	LadderNavLinkCustomComponent = CreateDefaultSubobject<UNavLinkCustomComponent>(GET_MEMBER_NAME_CHECKED(AARPG_LadderBase, LadderNavLinkCustomComponent));
+	{
+		LadderNavLinkCustomComponent->SetNavigationRelevancy(true);
+		LadderNavLinkCustomComponent->SetMoveReachedLink(this, &AARPG_LadderBase::NotifySmartLinkReached);
+		LadderNavLinkCustomComponent->SetEnabledArea(UARPG_NavArea_LadderBase::StaticClass());
+	}
 }
 
 // Called when the game starts or when spawned
@@ -43,7 +53,7 @@ void AARPG_LadderBase::Tick(float DeltaTime)
 				if (Character->GetCurrentMontage() == Config->IdleLoopMontage)
 				{
 					const FInLadderData& InLadderData = Data.Value;
-					if ((Character->GetControlRotation().Vector() | MovementInputVector) > 0.f)
+					if (((Character->IsPlayerControlled() ? Character->GetControlRotation().Vector() : Character->GetActorForwardVector()) | MovementInputVector) > 0.f)
 					{
 						int32 TargetSlot = InLadderData.LadderIndex + Config->ClimbUpSlotNumber;
 						if (CanCharacterInSlot(Character, TargetSlot))
@@ -91,6 +101,7 @@ void AARPG_LadderBase::OnConstruction(const FTransform& Transform)
 {
 	Super::OnConstruction(Transform);
 
+	LadderNavLinkCustomComponent->SetLinkData(FVector(-100.f, 0.f, 0.f), FVector(100.f, 0.f, LadderUnitHeight * LadderLength), ENavLinkDirection::BothWays);
 }
 
 void AARPG_LadderBase::WhenInvokeInteract_Implementation(ACharacterBase* InteractInvoker)
@@ -113,12 +124,7 @@ void AARPG_LadderBase::WhenInvokeInteract_Implementation(ACharacterBase* Interac
 						int32 TargetSlot = IsLowEnter ? Config->DownEnterSlot : LadderLength - Config->UpEnterSlot;
 						if (Succeed && CanCharacterInSlot(InteractInvoker, TargetSlot))
 						{
-							WhenEnterLadder(InteractInvoker);
-							InteractInvoker->SetInteractingTarget(this);
-							FInLadderData InLadderData;
-							InLadderData.LadderIndex = TargetSlot;
-							CharacterInLadderDatas.Add(InteractInvoker, InLadderData);
-							PlayLadderMontage(InteractInvoker, IsLowEnter ? Config->DownEnterMontage : Config->UpEnterMontage, InLadderData.LadderIndex);
+							EnterLadderImpl(InteractInvoker, IsLowEnter);
 						}
 						else
 						{
@@ -216,6 +222,19 @@ void AARPG_LadderBase::WhenLeaveLadder(ACharacterBase* Character)
 	Character->GetMesh()->SetDisablePostProcessBlueprint(false);
 }
 
+void AARPG_LadderBase::EnterLadderImpl(ACharacterBase* Character, bool IsLowEnter)
+{
+	const FClimbLadderConfig* Config = GetClimbConfig(Character);
+	int32 TargetSlot = IsLowEnter ? Config->DownEnterSlot : LadderLength - Config->UpEnterSlot;
+
+	WhenEnterLadder(Character);
+	Character->SetInteractingTarget(this);
+	FInLadderData InLadderData;
+	InLadderData.LadderIndex = TargetSlot;
+	CharacterInLadderDatas.Add(Character, InLadderData);
+	PlayLadderMontage(Character, IsLowEnter ? Config->DownEnterMontage : Config->UpEnterMontage, InLadderData.LadderIndex);
+}
+
 bool AARPG_LadderBase::CanDownEnter(const ACharacterBase* Character) const
 {
 	const FClimbLadderConfig* ClimbLadderConfig = GetClimbConfig(Character);
@@ -238,5 +257,47 @@ const FClimbLadderConfig* AARPG_LadderBase::GetClimbConfig(const ACharacterBase*
 		}
 	}
 	return nullptr;
+}
+
+void AARPG_LadderBase::NotifySmartLinkReached(UNavLinkCustomComponent* LinkComp, UObject* PathingAgent, const FVector& DestPoint)
+{
+	if (UPathFollowingComponent* PathComp = Cast<UPathFollowingComponent>(PathingAgent))
+	{
+		if (AController* Controller = Cast<AController>(PathComp->GetOwner()))
+		{
+			if (ACharacterBase* Character = Cast<ACharacterBase>(Controller->GetPawn()))
+			{
+				//不能直接去交互，因为会调用寻路导至寻路被打断
+				if (Character->CanInteractWithTarget(this))
+				{
+					float LadderHeight = LadderLength * LadderUnitHeight;
+					const FClimbLadderConfig* Config = GetClimbConfig(Character);
+					FVector CharacterLocation = Character->GetActorLocation();
+					FTransform LowEnterLocation = Config->DownEnterLocation * GetActorTransform();
+					FTransform UpEnterLocation = Config->UpEnterLocation * GetActorTransform();
+					bool IsLowEnter = FMath::Abs(CharacterLocation.Z - GetActorLocation().Z) < FMath::Abs(CharacterLocation.Z - (GetActorLocation().Z + LadderHeight));
+					FTransform ClambLocation = IsLowEnter ? LowEnterLocation : UpEnterLocation;
+					FVector MoveLocation = ClambLocation.GetLocation();
+					MoveLocation.Z = GetActorLocation().Z + (IsLowEnter ? 0.f : LadderHeight);
+
+					UARPG_ActorMoveUtils::MoveCharacterToFitGround(Character, MoveLocation, ClambLocation.GetRotation().Rotator(),
+						FOnActorMoveFinished::CreateWeakLambda(this, [=](bool bIsAborted)
+							{
+								if (!bIsAborted)
+								{
+									Character->EnterReleaseState(FOnCharacterBehaviorFinished::CreateWeakLambda(this, [=](bool Succeed)
+										{
+											int32 TargetSlot = IsLowEnter ? Config->DownEnterSlot : LadderLength - Config->UpEnterSlot;
+											if (Succeed && CanCharacterInSlot(Character, TargetSlot))
+											{
+												EnterLadderImpl(Character, IsLowEnter);
+											}
+										}));
+								}
+							}));
+				}
+			}
+		}
+	}
 }
 

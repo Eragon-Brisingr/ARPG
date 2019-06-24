@@ -34,3 +34,11 @@ class ARPG_API UARPG_NavArea_JumpBase : public UNavArea
 public:
 	UARPG_NavArea_JumpBase();
 };
+
+UCLASS(hidedropdown)
+class ARPG_API UARPG_NavArea_LadderBase : public UNavArea
+{
+	GENERATED_BODY()
+public:
+	UARPG_NavArea_LadderBase();
+};
