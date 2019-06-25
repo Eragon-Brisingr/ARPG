@@ -8,6 +8,7 @@
 #include <Animation/AnimMetaData.h>
 #include "CharacterType.h"
 #include "ARPG_CharacterConditionBase.h"
+#include <Engine/DataAsset.h>
 #include "ARPG_CharacterAnimType.generated.h"
 
 /**
@@ -172,8 +173,8 @@ public:
 	FARPG_MontageParameterMirrorable DodogeForwardAttack;
 };
 
-UCLASS(editinlinenew, Abstract, collapseCategories)
-class ARPG_API UARPG_DodgeAnimSetBase : public UObject
+UCLASS(abstract, collapseCategories)
+class ARPG_API UARPG_DodgeAnimSetBase : public UDataAsset
 {
 	GENERATED_BODY()
 public:
@@ -192,7 +193,7 @@ public:
 	bool ReceiveCanDodge(const class ACharacterBase* Character) const;
 };
 
-UCLASS()
+UCLASS(meta = (DisplayName = "翻滚_普通"))
 class ARPG_API UARPG_DodgeAnimSetNormal : public UARPG_DodgeAnimSetBase
 {
 	GENERATED_BODY()

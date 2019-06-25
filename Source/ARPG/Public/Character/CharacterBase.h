@@ -233,7 +233,7 @@ public:
 	FRotator GetLookAtRotation() const;
 
 	//闪避
-	UPROPERTY(VisibleDefaultsOnly, Category = "角色|动画配置", Instanced)
+	UPROPERTY(EditDefaultsOnly, Category = "角色|动画配置")
 	class UARPG_DodgeAnimSetBase* DodgeAnimSet;
 	
 	UFUNCTION(BlueprintCallable, Category = "角色|动作")
