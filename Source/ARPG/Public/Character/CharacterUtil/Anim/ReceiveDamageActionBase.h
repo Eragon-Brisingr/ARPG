@@ -19,6 +19,4 @@ public:
 	UFUNCTION(BlueprintNativeEvent, Category = "受击行为")
 	bool PlayReceiveDamageAction(const FVector& HitFromDirection, class ACharacterBase* ReceivedDamageCharacter, const FHitResult& HitResult, class ACharacterBase* InstigatedBy, AActor* DamageCauser) const;
 	virtual bool PlayReceiveDamageAction_Implementation(const FVector& HitFromDirection, class ACharacterBase* ReceivedDamageCharacter, const FHitResult& HitResult, class ACharacterBase* InstigatedBy, AActor* DamageCauser) const { return false; }
-	
-	
 };

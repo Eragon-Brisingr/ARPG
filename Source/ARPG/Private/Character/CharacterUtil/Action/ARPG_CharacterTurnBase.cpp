@@ -14,7 +14,7 @@ void UCA_CharacterTurnBase::TurnTo(ACharacterBase* Executer, const FRotator& Tar
 UCA_CharacterTurnBase* UCA_TurnMontageConfigBase::CreateInstance(UObject* Outer) const
 {
 	UCA_TurnByMontage* TurnByMontage = NewObject<UCA_TurnByMontage>(Outer);
-	TurnByMontage->TurnMontageConfig = GetClass();
+	TurnByMontage->TurnMontageConfig = this;
 	return TurnByMontage;
 }
 
@@ -55,7 +55,7 @@ void UCA_CharacterTurnBase::AbortTurnTo(ACharacterBase* Executer, const FOnChara
 
 void UCA_TurnByMontage::WhenBehaviorExecuted(class ACharacterBase* Executer)
 {
-	CurrentTurnMontage = TurnMontageConfig.GetDefaultObject()->GetTurnMontage(Executer, TurnToRotation);
+	CurrentTurnMontage = TurnMontageConfig->GetTurnMontage(Executer, TurnToRotation);
 	if (CurrentTurnMontage)
 	{
 		Executer->PlayMontageWithBlendingOutDelegate(CurrentTurnMontage, FOnMontageBlendingOutStarted::CreateWeakLambda(this, [=](UAnimMontage* Montage, bool bInterrupted)

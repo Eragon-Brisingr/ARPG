@@ -39,6 +39,7 @@
 #include "AIPerceptionExLibrary.h"
 #include "ARPG_RelationshipFunctionLibrary.h"
 #include "XD_MovementComponentFunctionLibrary.h"
+#include "ARPG_ReceiveDamageActionBase.h"
 
 
 // Sets default values
@@ -88,7 +89,7 @@ void ACharacterBase::BeginPlay()
 
 	if (TurnConfig)
 	{
-		CharacterTurnAction = TurnConfig.GetDefaultObject()->CreateInstance(this);
+		CharacterTurnAction = TurnConfig->CreateInstance(this);
 	}
 }
 
@@ -395,7 +396,7 @@ float ACharacterBase::PlayMontage(UAnimMontage* MontageToPlay, const FARPG_Monta
 	return 0.f;
 }
 
-float ACharacterBase::PlayMontageImpl(UAnimMontage * MontageToPlay, const FARPG_MontagePlayConfig& Config, float InPlayRate /*= 1.f*/, FName StartSectionName /*= NAME_None*/)
+float ACharacterBase::PlayMontageImpl(UAnimMontage* MontageToPlay, const FARPG_MontagePlayConfig& Config, float InPlayRate /*= 1.f*/, FName StartSectionName /*= NAME_None*/)
 {
 	UAnimInstance * AnimInstance = GetMesh()->GetAnimInstance();
 	if (MontageToPlay && AnimInstance)
@@ -919,24 +920,32 @@ float ACharacterBase::ApplyPointDamage(float BaseDamage, const FVector& HitFromD
 		}
 	}
 
-	if (!(Param.ReceiveDamageAction && Param.ReceiveDamageAction.GetDefaultObject()->PlayReceiveDamageAction(HitFromDirection, this, HitInfo, InstigatorBy, DamageCauser)))
+	if (UARPG_ReceiveDamageActionBase* ReceiveDamageAction = GetReceiveDamageAction())
 	{
-		float HitStunOverflowValue = AddHitStun(Param.AddHitStunValue);
-		if (HitStunOverflowValue >= 0.f)
+		if (!(Param.ReceiveDamageAction && ReceiveDamageAction->PlayReceiveDamageSpecialAction(this, Param.ReceiveDamageAction, HitFromDirection, HitInfo, InstigatorBy, DamageCauser)))
 		{
-			ReceivePlayHitStunMontage(FinalReduceValue, HitStunOverflowValue, HitFromDirection, HitInfo, InstigatorBy, DamageCauser);
-			HitStunOverflowValue = 0.f;
+			float HitStunOverflowValue = AddHitStun(Param.AddHitStunValue);
+			if (HitStunOverflowValue >= 0.f)
+			{
+				ReceiveDamageAction->PlayHitStunMontage(this, BaseDamage, HitStunOverflowValue, HitFromDirection, HitInfo, InstigatorBy, DamageCauser);
+				OnDamageInterrupt.Broadcast();
+				HitStunOverflowValue = 0.f;
+			}
+			else
+			{
+				ReceiveDamageAction->PlayNormalAdditiveDamageMontage(this, BaseDamage, HitFromDirection, HitInfo, InstigatorBy, DamageCauser);
+
+				//击退效果，处于根骨骼位移时不动
+				if (!IsPlayingRootMotion())
+				{
+					FVector BeakBackOffset = HitFromDirection.GetSafeNormal2D() * Param.NormalBeakBackDistance;
+					UARPG_ActorMoveUtils::PushActorTo(this, BeakBackOffset);
+				}
+			}
 		}
 		else
 		{
-			ReceivePlayNormalDamageMontage(FinalReduceValue, HitFromDirection, HitInfo, InstigatorBy, DamageCauser);
-
-			//击退效果，处于根骨骼位移时不动
-			if (!IsPlayingRootMotion())
-			{
-				FVector BeakBackOffset = HitFromDirection.GetSafeNormal2D() * Param.NormalBeakBackDistance;
-				UARPG_ActorMoveUtils::PushActorTo(this, BeakBackOffset);
-			}
+			OnDamageInterrupt.Broadcast();
 		}
 	}
 

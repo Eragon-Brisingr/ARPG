@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "ARPG_CharacterBehaviorBase.h"
 #include "ARPG_CharacterActionType.h"
+#include "Engine/DataAsset.h"
 #include "ARPG_CharacterTurnBase.generated.h"
 
 class UAnimMontage;
@@ -29,14 +30,14 @@ protected:
 };
 
 UCLASS(abstract, const, Blueprintable)
-class ARPG_API UCA_TurnConfigBase : public UObject
+class ARPG_API UCA_TurnConfigBase : public UDataAsset
 {
 	GENERATED_BODY()
 public:
 	virtual UCA_CharacterTurnBase* CreateInstance(UObject* Outer) const { return nullptr; }
 };
 
-UCLASS()
+UCLASS(abstract)
 class ARPG_API UCA_TurnMontageConfigBase : public UCA_TurnConfigBase
 {
 	GENERATED_BODY()
@@ -51,7 +52,7 @@ public:
 	UAnimMontage* GetTurnMontageFourDirection(const FRotator& CurrentWorldRotation, const FRotator& TargetWorldRotation, UAnimMontage* TurnLeft90, UAnimMontage* TurnRight90, UAnimMontage* TurnLeft180, UAnimMontage* TurnRight180) const;
 };
 
-UCLASS(abstract, meta = (DisplayName = "转身配置_普通"))
+UCLASS(meta = (DisplayName = "转身配置_普通"))
 class ARPG_API UCA_TurnMontageConfigNormal : public UCA_TurnMontageConfigBase
 {
 	GENERATED_BODY()
@@ -78,7 +79,7 @@ public:
 	bool CanTurnTo(const ACharacterBase* Executer) const override;
 
 	UPROPERTY(EditAnywhere, Category = "配置")
-	TSubclassOf<UCA_TurnMontageConfigBase> TurnMontageConfig;
+	const UCA_TurnMontageConfigBase* TurnMontageConfig;
 
 	UPROPERTY()
 	UAnimMontage* CurrentTurnMontage;
