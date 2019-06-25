@@ -85,3 +85,4 @@ Package/*
 
 # 编译临时文件
 enc_temp_folder/*
+*.TMP
