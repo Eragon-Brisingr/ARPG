@@ -30,6 +30,7 @@ class UARPG_AD_CharacterInteract;
 class UARPG_ActionDispatcherBase;
 class UCA_TurnConfigBase;
 class UCA_CharacterTurnBase;
+class UARPG_ReceiveDamageActionBase;
 
 UENUM()
 enum class EInteractEndResult : uint8
@@ -216,7 +217,7 @@ public:
 	uint8 MirrorFullBodyMontageCounter : 2;
 	void SetMirrorFullBodyMontage(bool IsMirror);
 
-	UPROPERTY(EditDefaultsOnly, Category = "角色|动作")
+	UPROPERTY(EditDefaultsOnly, Category = "角色|动画配置")
 	FName FullBodySlotName = TEXT("DefaultSlot");
 
 	UFUNCTION(BlueprintCallable, Category = "角色|动作")
@@ -246,14 +247,14 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "角色|动作")
 	bool CanDodge() const;
 
-	//RootMotion的距离比例
+	//RootMotion的距离比例,（现在还无效，需要改MovementComponent）
 	UPROPERTY(Replicated)
 	FVector RootMotionScale = FVector::OneVector;
 	UFUNCTION(BlueprintCallable, Category = "角色|动作")
 	void SetRootMotionTranslationScale(const FVector& Scale);
 	UFUNCTION(BlueprintCallable, Category = "角色|动作")
 	FVector GetRootMotionTranslationScale() const;
-
+	
 	//动画配置
 public:
 	UPROPERTY(BlueprintReadOnly, Category = "角色|动作")
@@ -265,6 +266,15 @@ public:
 	//考虑用动画曲线替代
 	UPROPERTY(BlueprintReadOnly, Category = "角色|动画配置")
 	uint8 bEnableFootIk : 1;
+
+	UPROPERTY(EditDefaultsOnly, Category = "角色|动画配置")
+	UARPG_ReceiveDamageActionBase* ReceiveDamageActionConfig;
+	UPROPERTY()
+	UARPG_ReceiveDamageActionBase* ReceiveDamageActionConfigOverride;
+	UARPG_ReceiveDamageActionBase* GetReceiveDamageAction() const { return ReceiveDamageActionConfigOverride ? ReceiveDamageActionConfigOverride : ReceiveDamageActionConfig; }
+	DECLARE_MULTICAST_DELEGATE(FOnDamageInterrupt);
+	//当伤害中断角色动作时
+	FOnDamageInterrupt OnDamageInterrupt;
 
 	//背包相关
 public:
@@ -434,16 +444,6 @@ public:
 	void AddAttackInfo(const FARPG_AttackInfo& AttackInfo) { AttackInfos.Add(AttackInfo); }
 
 	void RemoveAttackInfo(const FARPG_AttackInfo& AttackInfo) { AttackInfos.RemoveSingle(AttackInfo); }
-
-	//播放动画相关
-public:
-	//硬直动画接口，会打断攻击行为
-	UFUNCTION(BlueprintImplementableEvent, BlueprintAuthorityOnly, Category = "角色|行为", meta = (DisplayName = "PlayHitStunMontage"))
-	void ReceivePlayHitStunMontage(float BaseDamage, float HitStunOverflowValue, const FVector& HitFromDirection, const FHitResult& HitResult, class ACharacterBase* InstigatedBy, AActor* DamageCauser);
-
-	//普通状态下的受击动画接口，不会打断攻击行为
-	UFUNCTION(BlueprintImplementableEvent, BlueprintAuthorityOnly, Category = "角色|行为", meta = (DisplayName = "PlayNormalDamageMontage"))
-	void ReceivePlayNormalDamageMontage(float BaseDamage, const FVector& HitFromDirection, const FHitResult& HitResult, class ACharacterBase* InstigatedBy, AActor* DamageCauser);
 
 	//交互相关
 public:
@@ -628,7 +628,7 @@ public:
 	
 	//转身
 	UPROPERTY(EditDefaultsOnly, Category = "角色|动画配置")
-	TSubclassOf<UCA_TurnConfigBase> TurnConfig;
+	UCA_TurnConfigBase* TurnConfig;
 	UPROPERTY()
 	UCA_CharacterTurnBase* CharacterTurnAction;
 

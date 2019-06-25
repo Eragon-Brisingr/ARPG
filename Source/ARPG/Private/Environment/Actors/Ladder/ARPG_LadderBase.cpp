@@ -63,7 +63,6 @@ void AARPG_LadderBase::Tick(float DeltaTime)
 								Character->PlayMontageWithBlendingOutDelegate(Config->UpLeaveMontage, FOnMontageBlendingOutStarted::CreateWeakLambda(this, [=](class UAnimMontage* Montage, bool bInterrupted)
 									{
 										Character->ExecuteInteractEnd(EInteractEndResult::Succeed);
-										CharacterInLadderDatas.Remove(Character);
 									}), FARPG_MontagePlayConfig());
 							}
 							else
@@ -82,7 +81,6 @@ void AARPG_LadderBase::Tick(float DeltaTime)
 								Character->PlayMontageWithBlendingOutDelegate(Config->DownLeaveMontage, FOnMontageBlendingOutStarted::CreateWeakLambda(this, [=](class UAnimMontage* Montage, bool bInterrupted)
 									{
 										Character->ExecuteInteractEnd(EInteractEndResult::Succeed);
-										CharacterInLadderDatas.Remove(Character);
 									}), FARPG_MontagePlayConfig());
 							}
 							else
@@ -211,9 +209,16 @@ void AARPG_LadderBase::PlayLadderMontage(ACharacterBase* Character, UAnimMontage
 void AARPG_LadderBase::WhenEnterLadder(ACharacterBase* Character)
 {
 	Character->GetCharacterMovement()->SetMovementMode(MOVE_Flying);
+	const FClimbLadderConfig* Config = GetClimbConfig(Character);
 
 	Character->bEnableFootIk = false;
 	Character->bEnableAimOffset = false;
+	Character->ReceiveDamageActionConfigOverride = Config->LadderReceiveDamageAction;
+	Character->OnDamageInterrupt.AddWeakLambda(this, [=]()
+		{
+			Character->StopMovement();
+			Character->ExecuteInteractEnd(EInteractEndResult::Failed);
+		});
 }
 
 void AARPG_LadderBase::WhenLeaveLadder(ACharacterBase* Character)
@@ -222,6 +227,9 @@ void AARPG_LadderBase::WhenLeaveLadder(ACharacterBase* Character)
 
 	Character->bEnableFootIk = true;
 	Character->bEnableAimOffset = true;
+	Character->ReceiveDamageActionConfigOverride = nullptr;
+	CharacterInLadderDatas.Remove(Character);
+	Character->OnDamageInterrupt.RemoveAll(this);
 }
 
 void AARPG_LadderBase::EnterLadderImpl(ACharacterBase* Character, bool IsLowEnter)

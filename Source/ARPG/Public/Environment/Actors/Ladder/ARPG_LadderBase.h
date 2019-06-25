@@ -10,6 +10,7 @@
 class ACharacterBase;
 class UAnimMontage;
 class UNavLinkCustomComponent;
+class UARPG_ReceiveDamageActionBase;
 
 USTRUCT(BlueprintType, BlueprintInternalUseOnly)
 struct FInLadderData
@@ -61,6 +62,9 @@ public:
 	FTransform UpEnterLocation;
 	UPROPERTY(EditAnywhere, meta = (MakeEditWidget = true), Category = "梯子")
 	FVector ClimbingLocation;
+
+	UPROPERTY(EditAnywhere, Category = "梯子")
+	UARPG_ReceiveDamageActionBase* LadderReceiveDamageAction;
 };
 
 UCLASS()
