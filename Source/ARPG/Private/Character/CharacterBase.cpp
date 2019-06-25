@@ -61,8 +61,6 @@ ACharacterBase::ACharacterBase(const FObjectInitializer& ObjectInitializer)
 
 	}
 
-	DodgeAnimSet = CreateDefaultSubobject<UARPG_DodgeAnimSetNormal>(GET_MEMBER_NAME_CHECKED(ACharacterBase, DodgeAnimSet));
-
 	HatredControlSystem = CreateDefaultSubobject<UARPG_HatredControlSystemNormal>(GET_MEMBER_NAME_CHECKED(ACharacterBase, HatredControlSystem));
 
 	BattleStyleSystem = CreateDefaultSubobject<UARPG_BattleStyleSystemNormal>(GET_MEMBER_NAME_CHECKED(ACharacterBase, BattleStyleSystem));
@@ -533,12 +531,15 @@ void ACharacterBase::DodgeByControlRotation(float Direction)
 
 void ACharacterBase::InvokeDodgeByDirection(EDodgeDirection Direction)
 {
-	DodgeAnimSet->InvokeDodge(this, Direction);
+	if (DodgeAnimSet)
+	{
+		DodgeAnimSet->InvokeDodge(this, Direction);
+	}
 }
 
 bool ACharacterBase::CanDodge() const
 {
-	return DodgeAnimSet->CanDodge(this);
+	return DodgeAnimSet && DodgeAnimSet->CanDodge(this);
 }
 
 void ACharacterBase::SetRootMotionTranslationScale(const FVector& Scale)
