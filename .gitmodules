@@ -25,9 +25,6 @@
 [submodule "Plugins/XD_MovementComponentPlugin"]
 	path = Plugins/XD_MovementComponentPlugin
 	url = https://github.com/Eragon-Brisingr/XD_MovementComponentPlugin.git
-[submodule "RawAssets"]
-	path = RawAssets
-	url=https://github.com/Eragon-Brisingr/ARPG_RawAssets.git
 [submodule "Plugins/XD_AI_SystemEx"]
 	path = Plugins/XD_AI_SystemEx
 	url = https://github.com/Eragon-Brisingr/XD_AI_SystemEx
