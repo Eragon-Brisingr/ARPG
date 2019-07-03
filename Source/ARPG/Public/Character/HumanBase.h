@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "CharacterBase.h"
 #include "HumanType.h"
+#include "CustomSkeletonConfig.h"
 #include "HumanBase.generated.h"
 
 class UAnimInstance;
@@ -149,6 +150,9 @@ private:
 public:
 	UPROPERTY(BlueprintReadOnly, Category = "角色|动画")
 	TSubclassOf<UAnimInstance> MoveAnimInstanceOverride;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "角色|配置")
+	FCustomCharacterRuntimeData CustomCharacterData;
 };
 
 template<typename EquipType>
