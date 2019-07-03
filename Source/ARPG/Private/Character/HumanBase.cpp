@@ -47,6 +47,7 @@ void AHumanBase::GetLifetimeReplicatedProps(TArray< class FLifetimeProperty > & 
 	DOREPLIFETIME(AHumanBase, EquipmentList);
 
 	DOREPLIFETIME(AHumanBase, UseWeaponState);
+	DOREPLIFETIME(AHumanBase, CustomCharacterData);
 }
 
 void AHumanBase::WhenGameInit_Implementation()

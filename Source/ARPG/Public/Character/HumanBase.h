@@ -151,7 +151,7 @@ public:
 	UPROPERTY(BlueprintReadOnly, Category = "角色|动画")
 	TSubclassOf<UAnimInstance> MoveAnimInstanceOverride;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "角色|配置")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "角色|配置", Replicated)
 	FCustomCharacterRuntimeData CustomCharacterData;
 };
 
