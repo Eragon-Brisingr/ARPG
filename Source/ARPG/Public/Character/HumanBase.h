@@ -25,6 +25,10 @@ public:
 
 	void PreSave(const class ITargetPlatform* TargetPlatform) override;
 	void PostDuplicate(EDuplicateMode::Type DuplicateMode) override;
+
+#if WITH_EDITOR
+	void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
+#endif
 public:
 	void GetLifetimeReplicatedProps(TArray< class FLifetimeProperty > & OutLifetimeProps) const override;
 
@@ -149,6 +153,7 @@ public:
 
 private:
 #if WITH_EDITORONLY_DATA
+	uint8 bPreviewIsInited : 1;
 	UPROPERTY(Transient)
 	TArray<class AARPG_EquipmentBase*> PreviewEquipmentList;
 	void RefreshPreviewEquipedItem();
@@ -172,7 +177,16 @@ void AHumanBase::SetEquipVariable(EquipType*& CurEquip, EquipType* ToEquip)
 	EquipType* PreEquip = CurEquip;
 	if (PreEquip)
 	{
-		PreEquip->SetLifeSpan(1.f);
+#if WITH_EDITOR
+		if (!GetWorld()->IsGameWorld())
+		{
+			PreEquip->Destroy();
+		}
+		else
+#endif
+		{
+			PreEquip->SetLifeSpan(1.f);
+		}
 		PreEquip->SetActorHiddenInGame(true);
 	}
 	CurEquip = ToEquip;
