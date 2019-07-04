@@ -200,3 +200,13 @@ void AARPG_ArrowBase::ToEquippedDorlachMode()
 		ItemMesh = Dorlach;
 	}
 }
+
+const UARPG_ArrowCoreBase* AARPG_ArrowBase::GetItemCore() const
+{
+	return CastChecked<const UARPG_ArrowCoreBase>(InnerItemCore);
+}
+
+UARPG_ArrowCoreBase* AARPG_ArrowBase::GetItemCore_Careful() const
+{
+	return CastChecked<UARPG_ArrowCoreBase>(InnerItemCore);
+}

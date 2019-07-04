@@ -6,6 +6,8 @@
 #include "Item/Abstract/ARPG_ItemBase.h"
 #include "ARPG_EquipmentBase.generated.h"
 
+class UARPG_EquipmentCoreBase;
+
 /**
  * 
  */
@@ -44,4 +46,7 @@ public:
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "物品|装备", meta = (DisplayName = "装备类型", Bitmask, BitmaskEnum = "EEquipmentType"))
 	int32 EquipmentType;
+
+public:
+	const UARPG_EquipmentCoreBase* GetItemCore() const;
 };

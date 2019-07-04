@@ -37,6 +37,36 @@ AHumanBase::AHumanBase(const FObjectInitializer& PCIP)
 	EnterReleaseStateAction = CreateDefaultSubobject<UHuman_EnterReleaseState>(GET_MEMBER_NAME_CHECKED(ACharacterBase, EnterReleaseStateAction));
 }
 
+void AHumanBase::OnConstruction(const FTransform& Transform)
+{
+	Super::OnConstruction(Transform);
+
+#if WITH_EDITOR
+	if (GetWorld()->IsEditorWorld())
+	{
+		RefreshPreviewEquipedItem();
+	}
+#endif
+}
+
+void AHumanBase::PreSave(const class ITargetPlatform* TargetPlatform)
+{
+	Super::PreSave(TargetPlatform);
+
+#if WITH_EDITOR
+	EquipmentList.Empty();
+#endif
+}
+
+void AHumanBase::PostDuplicate(EDuplicateMode::Type DuplicateMode)
+{
+	Super::PostDuplicate(DuplicateMode);
+
+#if WITH_EDITOR
+	EquipmentList.Empty();
+#endif
+}
+
 void AHumanBase::GetLifetimeReplicatedProps(TArray< class FLifetimeProperty > & OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
@@ -261,6 +291,7 @@ class AARPG_EquipmentBase* AHumanBase::EquipEquipment_Implementation(class UARPG
 		}
 
 		ReturnEquipment = Cast<AARPG_EquipmentBase>(EquipmentCore->SpawnItemActorForOwner(this, this));
+
 		EquipmentList.Add(ReturnEquipment);
 	}
 
@@ -623,3 +654,68 @@ void AHumanBase::OnRep_EquipmentList()
 	}
 	PreEquipmentList = EquipmentList;
 }
+
+#if WITH_EDITOR
+void AHumanBase::RefreshPreviewEquipedItem()
+{
+	if (LeftWeapon)
+	{
+		EquipWaepon(LeftWeapon->GetItemCore(), EUseItemInput::LeftMouse);
+	}
+	if (DefaultLeftWeapon)
+	{
+		EquipWaepon(DefaultLeftWeapon.GetItemCore<UARPG_WeaponCoreBase>(), EUseItemInput::LeftMouse);
+		if (LeftWeapon)
+		{
+			LeftWeapon->SetFlags(RF_Transient);
+		}
+	}
+	if (RightWeapon)
+	{
+		EquipWaepon(RightWeapon->GetItemCore(), EUseItemInput::RightMouse);
+	}
+	if (DefaultRightWeapon)
+	{
+		EquipWaepon(DefaultRightWeapon.GetItemCore<UARPG_WeaponCoreBase>(), EUseItemInput::RightMouse);
+		if (RightWeapon)
+		{
+			RightWeapon->SetFlags(RF_Transient);
+		}
+	}
+	if (Arrow)
+	{
+		EquipArrow(Arrow->GetItemCore(), EUseItemInput::LeftMouse);
+	}
+	if (DefaultArrow)
+	{
+		EquipArrow(DefaultArrow.GetItemCore<UARPG_ArrowCoreBase>(), EUseItemInput::LeftMouse);
+		if (Arrow)
+		{
+			Arrow->SetFlags(RF_Transient);
+		}
+	}
+
+	//Save的时候会清零，这边要恢复
+	EquipmentList = PreviewEquipmentList;
+	for (AARPG_EquipmentBase* Equipment : PreviewEquipmentList)
+	{
+		if (Equipment)
+		{
+			EquipEquipment(Equipment->GetItemCore(), EUseItemInput::LeftMouse);
+		}
+	}
+	PreviewEquipmentList.Empty();
+
+	for (const FARPG_Item& Equipment : DefaultEquipmentList)
+	{
+		if (Equipment)
+		{
+			if (AARPG_EquipmentBase* CurEquipment = EquipEquipment(Equipment.GetItemCore<UARPG_EquipmentCoreBase>(), EUseItemInput::LeftMouse))
+			{
+				CurEquipment->SetFlags(RF_Transient);
+				PreviewEquipmentList.Add(CurEquipment);
+			}
+		}
+	}
+}
+#endif

@@ -6,6 +6,8 @@
 #include "XD_ItemType.h"
 #include "ItemTypeUtils.generated.h"
 
+class UARPG_ItemCoreBase;
+
 /**
  * 
  */
@@ -29,4 +31,10 @@ struct ARPG_API FARPG_Item : public FXD_Item
 	GENERATED_BODY()
 public:
 	FARPG_Item();
+
+	template<typename T = UARPG_ItemCoreBase>
+	T* GetItemCore() const
+	{
+		return Cast<T>(ItemCore);
+	}
 };

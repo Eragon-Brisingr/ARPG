@@ -11,6 +11,8 @@
 #include "ARPG_AI_BattleInterface.h"
 #include "ARPG_WeaponBase.generated.h"
 
+class UARPG_WeaponCoreBase;
+
 /**
  * 
  */
@@ -125,4 +127,8 @@ public:
 	class UARPG_AttackAnimSetBase* AttackAnimSet;
 
 	bool IsBothHandWeapon() const;
+
+public:
+	const UARPG_WeaponCoreBase* GetItemCore() const;
+	UARPG_WeaponCoreBase* GetItemCore_Careful() const;
 };
