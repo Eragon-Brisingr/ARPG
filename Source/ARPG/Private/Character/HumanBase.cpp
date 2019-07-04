@@ -42,8 +42,9 @@ void AHumanBase::OnConstruction(const FTransform& Transform)
 	Super::OnConstruction(Transform);
 
 #if WITH_EDITOR
-	if (GetWorld()->IsEditorWorld())
+	if (!bPreviewIsInited && !GetWorld()->IsGameWorld())
 	{
+		bPreviewIsInited = true;
 		RefreshPreviewEquipedItem();
 	}
 #endif
@@ -64,8 +65,41 @@ void AHumanBase::PostDuplicate(EDuplicateMode::Type DuplicateMode)
 
 #if WITH_EDITOR
 	EquipmentList.Empty();
+	LeftWeapon = nullptr;
+	RightWeapon = nullptr;
+	Arrow = nullptr;
 #endif
 }
+
+#if WITH_EDITOR
+void AHumanBase::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
+{
+	Super::PostEditChangeProperty(PropertyChangedEvent);
+
+	FName PropertyName = (PropertyChangedEvent.Property != NULL) ? PropertyChangedEvent.Property->GetFName() : NAME_None;
+	if (PropertyName == GET_MEMBER_NAME_CHECKED(AHumanBase, DefaultLeftWeapon))
+	{
+		RefreshPreviewEquipedItem();
+	}
+	else if (PropertyName == GET_MEMBER_NAME_CHECKED(AHumanBase, DefaultRightWeapon))
+	{
+		RefreshPreviewEquipedItem();
+	}
+	else if (PropertyName == GET_MEMBER_NAME_CHECKED(AHumanBase, DefaultArrow))
+	{
+		RefreshPreviewEquipedItem();
+	}
+	else if (PropertyName == GET_MEMBER_NAME_CHECKED(AHumanBase, DefaultEquipmentList))
+	{
+		for (FARPG_Item& Equipment : DefaultEquipmentList)
+		{
+			Equipment.bShowNumber = false;
+			Equipment.ShowItemType = AARPG_EquipmentBase::StaticClass();
+		}
+		RefreshPreviewEquipedItem();
+	}
+}
+#endif
 
 void AHumanBase::GetLifetimeReplicatedProps(TArray< class FLifetimeProperty > & OutLifetimeProps) const
 {
@@ -658,6 +692,8 @@ void AHumanBase::OnRep_EquipmentList()
 #if WITH_EDITOR
 void AHumanBase::RefreshPreviewEquipedItem()
 {
+	FEditorScriptExecutionGuard ScriptGuard;
+
 	if (LeftWeapon)
 	{
 		EquipWaepon(LeftWeapon->GetItemCore(), EUseItemInput::LeftMouse);
