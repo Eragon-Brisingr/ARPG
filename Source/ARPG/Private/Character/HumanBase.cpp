@@ -98,6 +98,10 @@ void AHumanBase::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEv
 		}
 		RefreshPreviewEquipedItem();
 	}
+	else if (PropertyName == GET_MEMBER_NAME_CHECKED(AHumanBase, CustomCharacterData))
+	{
+		GetMesh()->InitAnim(false);
+	}
 }
 #endif
 
