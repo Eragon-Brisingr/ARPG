@@ -21,6 +21,10 @@ class ARPG_API AHumanBase : public ACharacterBase
 public:
 	AHumanBase(const FObjectInitializer& PCIP);
 	
+	void OnConstruction(const FTransform& Transform) override;
+
+	void PreSave(const class ITargetPlatform* TargetPlatform) override;
+	void PostDuplicate(EDuplicateMode::Type DuplicateMode) override;
 public:
 	void GetLifetimeReplicatedProps(TArray< class FLifetimeProperty > & OutLifetimeProps) const override;
 
@@ -136,12 +140,19 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = "角色|配置")
 	FName RightHandHoldingArrowSocketName = TEXT("HoldingArrow_r");
 
-	UPROPERTY()
+	UPROPERTY(Transient)
 	TArray<class AARPG_EquipmentBase*> PreEquipmentList;
 	UPROPERTY(ReplicatedUsing = OnRep_EquipmentList, VisibleAnywhere, AdvancedDisplay, BlueprintReadOnly, Category = "角色", SaveGame)
 	TArray<class AARPG_EquipmentBase*> EquipmentList;
 	UFUNCTION()
 	void OnRep_EquipmentList();
+
+private:
+#if WITH_EDITORONLY_DATA
+	UPROPERTY(Transient)
+	TArray<class AARPG_EquipmentBase*> PreviewEquipmentList;
+	void RefreshPreviewEquipedItem();
+#endif
 
 private:
 	void WhenTakeBackWeaponFinished(UAnimMontage* AnimMontage, bool bInterrupted, FOnCharacterBehaviorFinished OnBehaviorFinished);

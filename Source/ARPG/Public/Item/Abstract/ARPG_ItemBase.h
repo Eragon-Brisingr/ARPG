@@ -86,4 +86,12 @@ public:
 	FName UseItemAttachSocketName;
 
 	void PlayUseItemMontage(const UARPG_ItemCoreBase* ItemCore, ACharacterBase* ItemOwner) const;
+
+public:
+	const UARPG_ItemCoreBase* GetItemCore() const;
+	UARPG_ItemCoreBase* GetItemCore_Careful() const;
+
+#if WITH_EDITOR
+	bool IsSelectable() const override;
+#endif
 };

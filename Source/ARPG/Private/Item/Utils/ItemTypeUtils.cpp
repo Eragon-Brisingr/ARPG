@@ -2,6 +2,7 @@
 
 #include "ItemTypeUtils.h"
 #include "ARPG_ItemBase.h"
+#include "ARPG_ItemCoreBase.h"
 
 
 

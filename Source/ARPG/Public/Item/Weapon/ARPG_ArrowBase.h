@@ -7,6 +7,8 @@
 #include "CharacterDamageType.h"
 #include "ARPG_ArrowBase.generated.h"
 
+class UARPG_ArrowCoreBase;
+
 
 /**
  * 
@@ -53,4 +55,8 @@ public:
 	void WhenUse(class ACharacterBase* ItemOwner) override;
 
 	void ToEquippedDorlachMode();
+
+public:
+	const UARPG_ArrowCoreBase* GetItemCore() const;
+	UARPG_ArrowCoreBase* GetItemCore_Careful() const;
 };

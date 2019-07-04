@@ -303,15 +303,15 @@ public:
 	void UseItemImmediately(const class UARPG_ItemCoreBase* ItemCore, EUseItemInput UseItemInput = EUseItemInput::LeftMouse);
 
 	UFUNCTION(BlueprintNativeEvent, Category = "角色|物品")
-	class AARPG_WeaponBase* EquipWaepon(class UARPG_WeaponCoreBase* WeaponCore, EUseItemInput UseItemInput);
+	class AARPG_WeaponBase* EquipWaepon(const class UARPG_WeaponCoreBase* WeaponCore, EUseItemInput UseItemInput);
 	virtual class AARPG_WeaponBase* EquipWaepon_Implementation(class UARPG_WeaponCoreBase* WeaponCore, EUseItemInput UseItemInput) { return nullptr; }
 	
 	UFUNCTION(BlueprintNativeEvent, Category = "角色|物品")
-	class AARPG_ArrowBase* EquipArrow(class UARPG_ArrowCoreBase* ArrowCore, EUseItemInput UseItemInput);
+	class AARPG_ArrowBase* EquipArrow(const class UARPG_ArrowCoreBase* ArrowCore, EUseItemInput UseItemInput);
 	virtual class AARPG_ArrowBase* EquipArrow_Implementation(class UARPG_ArrowCoreBase* ArrowCore, EUseItemInput UseItemInput) { return nullptr; }
 
 	UFUNCTION(BlueprintNativeEvent, Category = "角色|物品")
-	class AARPG_EquipmentBase* EquipEquipment(class UARPG_EquipmentCoreBase* EquipmentCore, EUseItemInput UseItemInput);
+	class AARPG_EquipmentBase* EquipEquipment(const class UARPG_EquipmentCoreBase* EquipmentCore, EUseItemInput UseItemInput);
 	virtual class AARPG_EquipmentBase* EquipEquipment_Implementation(class UARPG_EquipmentCoreBase* EquipmentCore, EUseItemInput UseItemInput) { return nullptr; }
 
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnUseItem, ACharacterBase*, Character, const class UARPG_ItemCoreBase*, ItemCore, EUseItemInput, UseItemInput);

@@ -63,4 +63,9 @@ void AARPG_EquipmentBase::WhenRemoveFromInventory_Implementation(class AActor* I
 	}
 }
 
+const UARPG_EquipmentCoreBase* AARPG_EquipmentBase::GetItemCore() const
+{
+	return CastChecked<UARPG_EquipmentCoreBase>(InnerItemCore);
+}
+
 #undef LOCTEXT_NAMESPACE

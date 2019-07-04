@@ -238,4 +238,14 @@ bool AARPG_WeaponBase::IsBothHandWeapon() const
 	}
 }
 
+const UARPG_WeaponCoreBase* AARPG_WeaponBase::GetItemCore() const
+{
+	return CastChecked<const UARPG_WeaponCoreBase>(InnerItemCore);
+}
+
+UARPG_WeaponCoreBase* AARPG_WeaponBase::GetItemCore_Careful() const
+{
+	return CastChecked<UARPG_WeaponCoreBase>(InnerItemCore);
+}
+
 #undef LOCTEXT_NAMESPACE

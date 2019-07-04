@@ -95,4 +95,21 @@ void AARPG_ItemBase::PlayUseItemMontage(const UARPG_ItemCoreBase* ItemCore, ACha
 		}), {}, 1.f, NAME_None, false);
 }
 
+const UARPG_ItemCoreBase* AARPG_ItemBase::GetItemCore() const
+{
+	return CastChecked<const UARPG_ItemCoreBase>(InnerItemCore);
+}
+
+UARPG_ItemCoreBase* AARPG_ItemBase::GetItemCore_Careful() const
+{
+	return CastChecked<UARPG_ItemCoreBase>(InnerItemCore);
+}
+
+#if WITH_EDITOR
+bool AARPG_ItemBase::IsSelectable() const
+{
+	return !HasAnyFlags(RF_Transient);
+}
+#endif
+
 #undef LOCTEXT_NAMESPACE
