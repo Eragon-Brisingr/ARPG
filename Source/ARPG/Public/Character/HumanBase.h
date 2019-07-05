@@ -9,6 +9,7 @@
 #include "HumanBase.generated.h"
 
 class UAnimInstance;
+class USkeletalMeshComponent;
 
 /**
  * 
@@ -51,6 +52,10 @@ public:
 	bool IsDefenseSucceed_Implementation(const FVector& DamageFromLocation, const FHitResult& HitInfo) const override;
 
 	bool IsInReleaseState() const override;
+
+public:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "角色")
+	USkeletalMeshComponent* Head;
 
 public:
 	//IARPG_AI_BattleInterface
@@ -167,8 +172,10 @@ public:
 	UPROPERTY(BlueprintReadOnly, Category = "角色|动画")
 	TSubclassOf<UAnimInstance> MoveAnimInstanceOverride;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "角色|配置", Replicated)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "角色|配置", ReplicatedUsing = OnRep_CustomCharacterData)
 	FCustomCharacterRuntimeData CustomCharacterData;
+	UFUNCTION()
+	void OnRep_CustomCharacterData();
 };
 
 template<typename EquipType>

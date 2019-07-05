@@ -34,7 +34,12 @@ AHumanBase::AHumanBase(const FObjectInitializer& PCIP)
 #endif
 	}
 
-	EnterReleaseStateAction = CreateDefaultSubobject<UHuman_EnterReleaseState>(GET_MEMBER_NAME_CHECKED(ACharacterBase, EnterReleaseStateAction));
+	EnterReleaseStateAction = CreateDefaultSubobject<UHuman_EnterReleaseState>(GET_MEMBER_NAME_CHECKED(AHumanBase, EnterReleaseStateAction));
+
+	Head = CreateDefaultSubobject<USkeletalMeshComponent>(GET_MEMBER_NAME_CHECKED(AHumanBase, Head));
+	{
+		Head->SetupAttachment(GetMesh(), TEXT("head_root"));
+	}
 }
 
 void AHumanBase::OnConstruction(const FTransform& Transform)
@@ -460,6 +465,24 @@ void AHumanBase::WhenTakeBackWeaponFinished(UAnimMontage* AnimMontage, bool bInt
 		OnMontageBlendingOutStarted->Unbind();
 	}
 	OnBehaviorFinished.ExecuteIfBound(bInterrupted == false);
+}
+
+void AHumanBase::OnRep_CustomCharacterData()
+{
+	for (int32 Idx = 0; Idx < CustomCharacterData.CustomSkeletonValues.Num(); ++Idx)
+	{
+		const FCustomMorphEntry& Entry = CustomCharacterData.CustomConfig->MorphData[Idx];
+		float Value = CustomCharacterData.GetCustomMorphValue(Idx);
+		switch (Entry.MorphType)
+		{
+		case ECustomMorphType::Body:
+			GetMesh()->SetMorphTarget(Entry.MorphTargetName, Value);
+			break;
+		case ECustomMorphType::Head:
+			Head->SetMorphTarget(Entry.MorphTargetName, Value);
+			break;
+		}
+	}
 }
 
 void AHumanBase::OnRep_UseWeaponState()
