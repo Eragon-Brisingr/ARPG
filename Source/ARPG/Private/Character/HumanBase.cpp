@@ -103,9 +103,13 @@ void AHumanBase::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEv
 		}
 		RefreshPreviewEquipedItem();
 	}
-	else if (PropertyName == GET_MEMBER_NAME_CHECKED(AHumanBase, CustomCharacterData))
+	else if (PropertyName == GET_MEMBER_NAME_CHECKED(AHumanBase, CustomCharacterBodyData))
 	{
 		GetMesh()->InitAnim(false);
+	}
+	else if (PropertyName == GET_MEMBER_NAME_CHECKED(AHumanBase, CustomCharacterBodyData))
+	{
+		Head->InitAnim(false);
 	}
 }
 #endif
@@ -120,7 +124,8 @@ void AHumanBase::GetLifetimeReplicatedProps(TArray< class FLifetimeProperty > & 
 	DOREPLIFETIME(AHumanBase, EquipmentList);
 
 	DOREPLIFETIME(AHumanBase, UseWeaponState);
-	DOREPLIFETIME(AHumanBase, CustomCharacterData);
+	DOREPLIFETIME(AHumanBase, CustomCharacterBodyData);
+	DOREPLIFETIME(AHumanBase, CustomCharacterHeadData);
 }
 
 void AHumanBase::WhenGameInit_Implementation()
@@ -467,22 +472,14 @@ void AHumanBase::WhenTakeBackWeaponFinished(UAnimMontage* AnimMontage, bool bInt
 	OnBehaviorFinished.ExecuteIfBound(bInterrupted == false);
 }
 
-void AHumanBase::OnRep_CustomCharacterData()
+void AHumanBase::OnRep_CustomCharacterBodyData()
 {
-	for (int32 Idx = 0; Idx < CustomCharacterData.CustomSkeletonValues.Num(); ++Idx)
-	{
-		const FCustomMorphEntry& Entry = CustomCharacterData.CustomConfig->MorphData[Idx];
-		float Value = CustomCharacterData.GetCustomMorphValue(Idx);
-		switch (Entry.MorphType)
-		{
-		case ECustomMorphType::Body:
-			GetMesh()->SetMorphTarget(Entry.MorphTargetName, Value);
-			break;
-		case ECustomMorphType::Head:
-			Head->SetMorphTarget(Entry.MorphTargetName, Value);
-			break;
-		}
-	}
+	CustomCharacterBodyData.ApplyMorphTarget(GetMesh());
+}
+
+void AHumanBase::OnRep_CustomCharacterHeadData()
+{
+	CustomCharacterHeadData.ApplyMorphTarget(Head);
 }
 
 void AHumanBase::OnRep_UseWeaponState()
