@@ -172,10 +172,14 @@ public:
 	UPROPERTY(BlueprintReadOnly, Category = "角色|动画")
 	TSubclassOf<UAnimInstance> MoveAnimInstanceOverride;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "角色|配置", ReplicatedUsing = OnRep_CustomCharacterData)
-	FCustomCharacterRuntimeData CustomCharacterData;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "角色|配置", ReplicatedUsing = OnRep_CustomCharacterBodyData)
+	FCustomCharacterRuntimeData CustomCharacterBodyData;
 	UFUNCTION()
-	void OnRep_CustomCharacterData();
+	void OnRep_CustomCharacterBodyData();
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "角色|配置", ReplicatedUsing = OnRep_CustomCharacterHeadData)
+	FCustomCharacterRuntimeData CustomCharacterHeadData;
+	UFUNCTION()
+	void OnRep_CustomCharacterHeadData();
 };
 
 template<typename EquipType>
