@@ -43,3 +43,6 @@
 [submodule "Plugins/XD_AnimNodes"]
 	path = Plugins/XD_AnimNodes
 	url = https://github.com/Eragon-Brisingr/XD_AnimNodes.git
+[submodule "ARPG_RawAssets"]
+	path = ARPG_RawAssets
+	url = https://github.com/Eragon-Brisingr/ARPG_RawAssets.git
