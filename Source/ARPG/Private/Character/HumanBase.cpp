@@ -780,6 +780,11 @@ void AHumanBase::OnRep_EquipmentList()
 #if WITH_EDITOR
 void AHumanBase::RefreshPreviewEquipedItem()
 {
+	if (HasAnyFlags(RF_ClassDefaultObject))
+	{
+		return;
+	}		
+	
 	FEditorScriptExecutionGuard ScriptGuard;
 
 	if (LeftWeapon)
@@ -834,7 +839,7 @@ void AHumanBase::RefreshPreviewEquipedItem()
 	{
 		if (Equipment)
 		{
-			if (AARPG_EquipmentBase* CurEquipment = EquipEquipment(Equipment.GetItemCore<UARPG_EquipmentCoreBase>(), EUseItemInput::LeftMouse))
+			if (AARPG_EquipmentBase * CurEquipment = EquipEquipment(Equipment.GetItemCore<UARPG_EquipmentCoreBase>(), EUseItemInput::LeftMouse))
 			{
 				CurEquipment->SetFlags(RF_Transient);
 				PreviewEquipmentList.Add(CurEquipment);
