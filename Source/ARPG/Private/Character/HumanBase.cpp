@@ -550,10 +550,22 @@ void AHumanBase::OnRep_EquipVariable(class AARPG_ItemBase* CurEquip, class AARPG
 void AHumanBase::SetLeftWeapon(class AARPG_WeaponBase* ToLeftWeapon)
 {
 	SetEquipVariable(LeftWeapon, ToLeftWeapon);
+	if (LeftWeapon == nullptr && RightWeapon == nullptr)
+	{
+		SetUseWeaponState(EUseWeaponState::NoneWeapon_Default);
+	}
 }
 
 void AHumanBase::OnRep_LeftWeapon(class AARPG_WeaponBase* PreLeftWeapon)
 {
+	if (LeftWeapon)
+	{
+		bIsLeftWeaponInWeaponBack = LeftWeapon->GetAttachParentSocketName() == LeftWeapon->RightWeaponInWeaponBackSocket;
+	}
+	else
+	{
+		bIsLeftWeaponInWeaponBack = false;
+	}
 	OnRep_EquipVariable(LeftWeapon, PreLeftWeapon);
 }
 
@@ -568,6 +580,14 @@ void AHumanBase::SetRightWeapon(class AARPG_WeaponBase* ToRightWeapon)
 
 void AHumanBase::OnRep_RightWeapon(class AARPG_WeaponBase* PreRightWeapon)
 {
+	if (RightWeapon)
+	{
+		bIsRightWeaponInWeaponBack = RightWeapon->GetAttachParentSocketName() == RightWeapon->RightWeaponInWeaponBackSocket;
+	}
+	else
+	{
+		bIsRightWeaponInWeaponBack = false;
+	}
 	OnRep_EquipVariable(RightWeapon, PreRightWeapon);
 }
 
@@ -651,24 +671,28 @@ class AARPG_WeaponBase* AHumanBase::EquipSingleLeftWeapon(class UARPG_ItemCoreBa
 
 void AHumanBase::RightWeaponInHand()
 {
+	bIsRightWeaponInWeaponBack = false;
 	RightWeapon->AttachWeaponTo(GetMesh(), RightWeapon->RightWeaponInHandSocket);
 	RightWeapon->WhenInHand();
 }
 
 void AHumanBase::LeftWeaponInHand()
 {
+	bIsLeftWeaponInWeaponBack = false;
 	LeftWeapon->AttachWeaponTo(GetMesh(), LeftWeapon->LeftWeaponInHandSocket);
 	LeftWeapon->WhenInHand();
 }
 
 void AHumanBase::RightWeaponInWeaponBack()
 {
+	bIsRightWeaponInWeaponBack = true;
 	RightWeapon->AttachWeaponTo(GetMesh(), RightWeapon->RightWeaponInWeaponBackSocket);
 	RightWeapon->WhenInWeaponBack();
 }
 
 void AHumanBase::LeftWeaponInWeaponBack()
 {
+	bIsLeftWeaponInWeaponBack = true;
 	LeftWeapon->AttachWeaponTo(GetMesh(), LeftWeapon->LeftWeaponInWeaponBackSocket);
 	LeftWeapon->WhenInWeaponBack();
 }

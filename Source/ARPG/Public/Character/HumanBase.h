@@ -118,6 +118,11 @@ public:
 	void RightWeaponInWeaponBack();
 	void LeftWeaponInWeaponBack();
 
+	UPROPERTY(BlueprintReadOnly, Category = "角色|武器")
+	uint8 bIsLeftWeaponInWeaponBack : 1;
+	UPROPERTY(BlueprintReadOnly, Category = "角色|武器")
+	uint8 bIsRightWeaponInWeaponBack : 1;
+
 	void LetTheWeaponInHand();
 	void LetTheWeaponInWeaponBack();
 
@@ -194,6 +199,7 @@ public:
 	void SetHideUnderwear(bool Hide);
 	UFUNCTION(BlueprintImplementableEvent, Category = "角色|定制")
 	void WhenHideUnderwearStateChange(bool Hide);
+
 };
 
 template<typename EquipType>
