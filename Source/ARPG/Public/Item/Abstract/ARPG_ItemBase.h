@@ -21,9 +21,15 @@ class ARPG_API AARPG_ItemBase : public AXD_ItemBase, public IARPG_InteractInterf
 	GENERATED_BODY()
 public:
 	//Begin IARPG_InteractInterface
-	virtual void WhenExecuteInteract_Implementation(ACharacterBase* InteractInvoker) override;
-	virtual bool CanInteract_Implementation(const ACharacterBase* InteractInvoker) const override;
+	void WhenExecuteInteract_Implementation(ACharacterBase* InteractInvoker) override;
+	bool CanInteract_Implementation(const ACharacterBase* InteractInvoker) const override;
 	//End IARPG_InteractInterface
+
+#if WITH_EDITOR
+	//由ARPG_Editor模块发起，GEditor->OnObjectsReplaced()
+	//蓝图编译时会替换Flag，将RF_Transient状态置回
+	void EditorReplacedActor(AActor* OldActor) override;
+#endif
 public:
 	AARPG_ItemBase(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 

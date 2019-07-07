@@ -12,6 +12,7 @@
 #include "VisualizerRegister.h"
 #include "ARPG_AI_Config.h"
 #include "ARPG_GameConfigs.h"
+#include "Editor/EditorEngine.h"
 
 #define LOCTEXT_NAMESPACE "ARPG_Editor"
 
@@ -57,12 +58,30 @@ void FARPG_EditorModule::StartupModule()
 	}
 
 	FVisualizerRegister::RegisterVisualizer();
+
+	//蓝图编译时会替换Flag，认为等价调用EditorReplacedActor，分发给子类实现（比如处理预览用的物品的RF_Transient状态）
+	EditorReplaceItemHandle = GEditor->OnObjectsReplaced().AddStatic([](const TMap<UObject*, UObject*>& InReplacedObjects)
+		{
+			for (auto& Data : InReplacedObjects)
+			{
+				AActor* OldActor = Cast<AActor>(Data.Key);
+				AActor* NewActor = Cast<AActor>(Data.Value);
+				if (OldActor && NewActor)
+				{
+					NewActor->EditorReplacedActor(OldActor);
+				}
+			}
+		});
 }
 
 
 void FARPG_EditorModule::ShutdownModule()
 {
 	FVisualizerRegister::UnregisterVisualizer();
+	if (GEditor)
+	{
+		GEditor->OnObjectsReplaced().Remove(EditorReplaceItemHandle);
+	}
 }
 
 IMPLEMENT_MODULE(FARPG_EditorModule, ARPG_Editor);

@@ -17,6 +17,22 @@ AARPG_EquipmentBase::AARPG_EquipmentBase(const FObjectInitializer& ObjectInitial
 	
 }
 
+#if WITH_EDITOR
+void AARPG_EquipmentBase::EditorReplacedActor(AActor* OldActor)
+{
+	Super::EditorReplacedActor(OldActor);
+	AARPG_EquipmentBase* OldEquipment = Cast<AARPG_EquipmentBase>(OldActor);
+	if (ACharacterBase* ItemOwner = OldEquipment->GetItemOwner())
+	{
+		InitRootMesh();
+		if (USkeletalMeshComponent * SkeletalMeshComponent = Cast<USkeletalMeshComponent>(GetRootComponent()))
+		{
+			SkeletalMeshComponent->SetMasterPoseComponent(ItemOwner->GetMesh());
+		}
+	}
+}
+#endif
+
 void AARPG_EquipmentBase::UseItemImpl_Implementation(class UARPG_ItemCoreBase* ItemCore, class ACharacterBase* ItemOwner, EUseItemInput UseItemInput) const
 {
 	ItemOwner->EquipEquipment(CastChecked<UARPG_EquipmentCoreBase>(ItemCore), UseItemInput);
@@ -40,11 +56,35 @@ void AARPG_EquipmentBase::WhenUse(class ACharacterBase* ItemOwner)
 			SkeletalMeshComponent->SetMasterPoseComponent(ItemOwner->GetMesh());
 		}
 	}
+
+	if (AHumanBase * Human = Cast<AHumanBase>(ItemOwner))
+	{
+		if (bHideShorts)
+		{
+			Human->SetHideShorts(true);
+		}
+		if (bHideUnderwear)
+		{
+			Human->SetHideUnderwear(true);
+		}
+	}
 }
 
 void AARPG_EquipmentBase::WhenNotUse(class ACharacterBase* ItemOwner)
 {
 	Super::WhenNotUse(ItemOwner);
+
+	if (AHumanBase * Human = Cast<AHumanBase>(ItemOwner))
+	{
+		if (bHideShorts)
+		{
+			Human->SetHideShorts(false);
+		}
+		if (bHideUnderwear)
+		{
+			Human->SetHideUnderwear(false);
+		}
+	}
 }
 
 void AARPG_EquipmentBase::WhenRemoveFromInventory_Implementation(class AActor* ItemOwner, class UXD_ItemCoreBase* ItemCore, int32 RemoveNumber, int32 ExistNumber) const
