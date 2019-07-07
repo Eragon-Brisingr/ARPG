@@ -172,6 +172,8 @@ public:
 	UPROPERTY(BlueprintReadOnly, Category = "角色|动画")
 	TSubclassOf<UAnimInstance> MoveAnimInstanceOverride;
 
+	//角色定制
+public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "角色|配置", ReplicatedUsing = OnRep_CustomCharacterBodyData)
 	FCustomCharacterRuntimeData CustomCharacterBodyData;
 	UFUNCTION()
@@ -180,6 +182,18 @@ public:
 	FCustomCharacterRuntimeData CustomCharacterHeadData;
 	UFUNCTION()
 	void OnRep_CustomCharacterHeadData();
+
+	uint8 HideShortsCounter : 4;
+	uint8 HideUnderwearCounter : 4;
+
+	bool IsHideShorts() const { return static_cast<bool>(HideShortsCounter); }
+	void SetHideShorts(bool Hide);
+	UFUNCTION(BlueprintImplementableEvent, Category = "角色|定制")
+	void WhenHideShortStateChange(bool Hide);
+	bool IsHideUnderwear() const { return static_cast<bool>(HideUnderwearCounter); }
+	void SetHideUnderwear(bool Hide);
+	UFUNCTION(BlueprintImplementableEvent, Category = "角色|定制")
+	void WhenHideUnderwearStateChange(bool Hide);
 };
 
 template<typename EquipType>

@@ -31,15 +31,20 @@ class ARPG_API AARPG_EquipmentBase : public AARPG_ItemBase
 public:
 	AARPG_EquipmentBase(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
-	virtual void UseItemImpl_Implementation(class UARPG_ItemCoreBase* ItemCore, class ACharacterBase* ItemOwner, EUseItemInput UseItemInput) const override;
+#if WITH_EDITOR
+	//蓝图编译时会替换Master会丢失，将Master置回
+	void EditorReplacedActor(AActor* OldActor) override;
+#endif
 
-	virtual FText GetItemTypeDescImpl_Implementation(const class UXD_ItemCoreBase* ItemCore) const override;
+	void UseItemImpl_Implementation(class UARPG_ItemCoreBase* ItemCore, class ACharacterBase* ItemOwner, EUseItemInput UseItemInput) const override;
 
-	virtual void WhenUse(class ACharacterBase* ItemOwner) override;
+	FText GetItemTypeDescImpl_Implementation(const class UXD_ItemCoreBase* ItemCore) const override;
 
-	virtual void WhenNotUse(class ACharacterBase* ItemOwner) override;
+	void WhenUse(class ACharacterBase* ItemOwner) override;
 
-	virtual void WhenRemoveFromInventory_Implementation(class AActor* ItemOwner, class UXD_ItemCoreBase* ItemCore, int32 RemoveNumber, int32 ExistNumber) const override;
+	void WhenNotUse(class ACharacterBase* ItemOwner) override;
+
+	void WhenRemoveFromInventory_Implementation(class AActor* ItemOwner, class UXD_ItemCoreBase* ItemCore, int32 RemoveNumber, int32 ExistNumber) const override;
 public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "物品|装备", meta = (DisplayName = "装备插槽名"))
 	FName EquipSocketName;
@@ -47,6 +52,11 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "物品|装备", meta = (DisplayName = "装备类型", Bitmask, BitmaskEnum = "EEquipmentType"))
 	int32 EquipmentType;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "物品|装备", meta = (DisplayName = "隐藏内裤"))
+	uint8 bHideShorts : 1;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "物品|装备", meta = (DisplayName = "隐藏内衣"))
+	uint8 bHideUnderwear : 1;
 public:
 	const UARPG_EquipmentCoreBase* GetItemCore() const;
 };

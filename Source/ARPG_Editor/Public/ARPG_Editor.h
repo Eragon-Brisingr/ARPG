@@ -14,7 +14,10 @@ class FARPG_EditorModule : public IModuleInterface
 public:
 	static uint32 ARPG_AssetCategory;
 
-	virtual void StartupModule() override;
-	virtual void ShutdownModule() override;
+	void StartupModule() override;
+	void ShutdownModule() override;
+
+private:
+	FDelegateHandle EditorReplaceItemHandle;
 };
 

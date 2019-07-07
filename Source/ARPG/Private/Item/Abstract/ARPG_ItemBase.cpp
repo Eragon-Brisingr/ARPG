@@ -9,7 +9,6 @@
 #include "XD_DebugFunctionLibrary.h"
 #include "ARPG_Item_Log.h"
 
-
 #define LOCTEXT_NAMESPACE "ARPG_Item"
 
 void AARPG_ItemBase::WhenExecuteInteract_Implementation(ACharacterBase* InteractInvoker)
@@ -24,10 +23,22 @@ bool AARPG_ItemBase::CanInteract_Implementation(const ACharacterBase* InteractIn
 	return GetItemOwner() == nullptr;
 }
 
+#if WITH_EDITOR
+void AARPG_ItemBase::EditorReplacedActor(AActor* OldActor)
+{
+	Super::EditorReplacedActor(OldActor);
+
+	if (OldActor->HasAnyFlags(RF_Transient))
+	{
+		SetFlags(RF_Transient);
+	}
+}
+#endif
+
 AARPG_ItemBase::AARPG_ItemBase(const FObjectInitializer& ObjectInitializer /*= FObjectInitializer::Get()*/)
 	:Super(ObjectInitializer.SetDefaultSubobjectClass<UARPG_ItemCoreBase>(GET_MEMBER_NAME_CHECKED(AARPG_ItemBase, InnerItemCore)))
 {
-	
+
 }
 
 FText AARPG_ItemBase::GetItemTypeDescImpl_Implementation(const class UXD_ItemCoreBase* ItemCore) const
@@ -37,7 +48,8 @@ FText AARPG_ItemBase::GetItemTypeDescImpl_Implementation(const class UXD_ItemCor
 
 ACharacterBase* AARPG_ItemBase::GetItemOwner() const
 {
-	return Cast<ACharacterBase>(Instigator);
+	ACharacterBase* ItemOwner = Cast<ACharacterBase>(Instigator);
+	return ItemOwner ? ItemOwner : Cast<ACharacterBase>(GetOwner());
 }
 
 void AARPG_ItemBase::SetItemOwner(ACharacterBase* ItemOwner)

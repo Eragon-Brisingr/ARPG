@@ -328,7 +328,7 @@ class AARPG_EquipmentBase* AHumanBase::EquipEquipment_Implementation(class UARPG
 		TArray<AARPG_EquipmentBase*> NeedRemoveEquipment;
 		for (AARPG_EquipmentBase* E_Equipment : EquipmentList)
 		{
-			if (E_Equipment->EquipmentType & Equipment->EquipmentType)
+			if (E_Equipment && E_Equipment->EquipmentType & Equipment->EquipmentType)
 			{
 				NeedRemoveEquipment.Add(E_Equipment);
 			}
@@ -480,6 +480,46 @@ void AHumanBase::OnRep_CustomCharacterBodyData()
 void AHumanBase::OnRep_CustomCharacterHeadData()
 {
 	CustomCharacterHeadData.ApplyMorphTarget(Head);
+}
+
+void AHumanBase::SetHideShorts(bool Hide)
+{
+#if DO_CHECK
+	if (GetWorld()->IsGameWorld())
+	{
+		if (!((Hide && HideShortsCounter < 7) || (!Hide && HideShortsCounter > 0)))
+		{
+			check(0);
+			return;
+		}
+	}
+#endif
+
+	HideShortsCounter += Hide ? 1 : -1;
+	if (HideShortsCounter <= 1)
+	{
+		WhenHideShortStateChange(IsHideShorts());
+	}
+}
+
+void AHumanBase::SetHideUnderwear(bool Hide)
+{
+#if DO_CHECK
+	if (GetWorld()->IsGameWorld())
+	{
+		if (!((Hide && HideUnderwearCounter < 7) || (!Hide && HideUnderwearCounter > 0)))
+		{
+			check(0);
+			return;
+		}
+	}
+#endif
+
+	HideUnderwearCounter += Hide ? 1 : -1;
+	if (HideUnderwearCounter <= 1)
+	{
+		WhenHideUnderwearStateChange(IsHideUnderwear());
+	}
 }
 
 void AHumanBase::OnRep_UseWeaponState()
