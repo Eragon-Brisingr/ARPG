@@ -61,8 +61,9 @@ public:
 
 protected:
 	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
+	void BeginPlay() override;
 
+	void Destroyed() override;
 	void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
 	virtual bool NeedSave_Implementation() const override;
