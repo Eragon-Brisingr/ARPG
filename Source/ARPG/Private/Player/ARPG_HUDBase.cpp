@@ -5,24 +5,40 @@
 #include <GameFramework/PlayerController.h>
 #include "ARPG_InteractInterface.h"
 #include "CharacterBase.h"
+#include "Kismet/KismetSystemLibrary.h"
+#include "ARPG_CollisionType.h"
 
 
+AARPG_HUDBase::AARPG_HUDBase()
+{
+
+}
 
 void AARPG_HUDBase::BeginPlay()
 {
 	Super::BeginPlay();
-	AttachToActor(GetOwningPlayerController()->GetPawn(), FAttachmentTransformRules::KeepRelativeTransform);
 }
 
 void AARPG_HUDBase::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 
-	if (ACharacterBase* Character = Cast<ACharacterBase>(GetOwningPlayerController()->GetPawn()))
+	if (ACharacterBase * Character = Cast<ACharacterBase>(GetOwningPlayerController()->GetPawn()))
 	{
-		if ((OldCharacterLocation - Character->GetActorLocation()).Size2D() >= InteractableActorsUpdateDistance)
+		TArray<FHitResult> HitResults;
+		UKismetSystemLibrary::SphereTraceMulti(GetWorld(), Character->GetActorLocation(), Character->GetActorLocation() + FVector::UpVector, MaxInteractTraceRadius, FARPG_TraceQueryType::Visibility, false, { Character }, EDrawDebugTrace::None, HitResults, false);
+
+		TArray<AActor*> PotentialInteractableActors;
+		for (const FHitResult& HitResult : HitResults)
 		{
-			Algo::Sort(PotentialInteractableActors, [&](AActor* LHS, AActor* RHS)
+			AActor* OtherActor = HitResult.GetActor();
+			if (OtherActor && OtherActor->Implements<UARPG_InteractInterface>() && IARPG_InteractInterface::CanShowHintInfo(OtherActor, Character) && !PotentialInteractableActors.Contains(OtherActor))
+			{
+				PotentialInteractableActors.Add(OtherActor);
+			}
+		}
+
+		Algo::Sort(PotentialInteractableActors, [&](AActor* LHS, AActor* RHS)
 			{
 				if (!Character->CanInteractWithTarget(RHS))
 				{
@@ -30,17 +46,12 @@ void AARPG_HUDBase::Tick(float DeltaSeconds)
 				}
 				return Character->GetHorizontalDistanceTo(LHS) < Character->GetHorizontalDistanceTo(RHS);
 			});
-			OldCharacterLocation = Character->GetActorLocation();
-		}
 
 		TSet<AActor*> PreShowHintActors(ShowHintActors);
 		ShowHintActors.Empty();
 		for (AActor* PotentialInteractableActor : PotentialInteractableActors)
 		{
-			if (IARPG_InteractInterface::CanShowHintInfo(PotentialInteractableActor, Character))
-			{
-				ShowHintActors.Add(PotentialInteractableActor);
-			}
+			ShowHintActors.Add(PotentialInteractableActor);
 		}
 
 		for (AActor* EnableInteractActor : TSet<AActor*>(ShowHintActors).Difference(PreShowHintActors))
@@ -51,32 +62,6 @@ void AARPG_HUDBase::Tick(float DeltaSeconds)
 		{
 			OnActorDisableHint.Broadcast(DisableInteractActor);
 		}
-	}
-}
-
-AARPG_HUDBase::AARPG_HUDBase()
-{
-	HintInfoCollector = CreateDefaultSubobject<USphereComponent>(GET_MEMBER_NAME_CHECKED(AARPG_HUDBase, HintInfoCollector));
-	{
-		HintInfoCollector->SetSphereRadius(400.f);
-		HintInfoCollector->OnComponentBeginOverlap.AddDynamic(this, &AARPG_HUDBase::WhenHintInfoCollectorBeginOverlap);
-		HintInfoCollector->OnComponentEndOverlap.AddDynamic(this, &AARPG_HUDBase::WhenHintInfoCollectorEndOverlap);
-	}
-}
-
-void AARPG_HUDBase::WhenHintInfoCollectorBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
-{
-	if (OtherActor->Implements<UARPG_InteractInterface>())
-	{
-		PotentialInteractableActors.Add(OtherActor);
-	}
-}
-
-void AARPG_HUDBase::WhenHintInfoCollectorEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
-{
-	if (OtherActor->Implements<UARPG_InteractInterface>())
-	{
-		PotentialInteractableActors.Remove(OtherActor);
 	}
 }
 
