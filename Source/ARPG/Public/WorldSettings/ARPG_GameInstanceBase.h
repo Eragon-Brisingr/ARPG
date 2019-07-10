@@ -7,6 +7,8 @@
 #include "XD_SaveGameSystemInterface.h"
 #include "ARPG_GameInstanceBase.generated.h"
 
+class UARPG_SaveGameSystem;
+
 /**
  * 
  */
@@ -15,8 +17,10 @@ class ARPG_API UARPG_GameInstanceBase : public UGameInstance, public IXD_SaveGam
 {
 	GENERATED_BODY()
 public:
+	UARPG_GameInstanceBase();
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "游戏|读档", Instanced)
-	class UXD_SaveGameSystemBase* SaveGameSystem;
+	UARPG_SaveGameSystem* SaveGameSystem;
 	
-	virtual class UXD_SaveGameSystemBase* GetSaveGameSystem_Implementation() const override { return SaveGameSystem; }
+	virtual class UXD_SaveGameSystemBase* GetSaveGameSystem_Implementation() const override;
 };
