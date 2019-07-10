@@ -200,6 +200,10 @@ public:
 	UFUNCTION(BlueprintImplementableEvent, Category = "角色|定制")
 	void WhenHideUnderwearStateChange(bool Hide);
 
+	UFUNCTION(BlueprintCallable, Category = "角色|定制")
+	void NetForceSyncCustomCharacterData();
+	UFUNCTION(Reliable, Server, WithValidation)
+	void SyncCustomCharacterData_ToServer(const FCustomCharacterRuntimeData& SyncCustomCharacterBodyData, const FCustomCharacterRuntimeData& SyncCustomCharacterHeadData);
 };
 
 template<typename EquipType>
