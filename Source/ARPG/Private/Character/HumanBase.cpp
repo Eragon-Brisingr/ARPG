@@ -522,6 +522,22 @@ void AHumanBase::SetHideUnderwear(bool Hide)
 	}
 }
 
+void AHumanBase::NetForceSyncCustomCharacterData()
+{
+	SyncCustomCharacterData_ToServer(CustomCharacterBodyData, CustomCharacterHeadData);
+}
+
+void AHumanBase::SyncCustomCharacterData_ToServer_Implementation(const FCustomCharacterRuntimeData& SyncCustomCharacterBodyData, const FCustomCharacterRuntimeData& SyncCustomCharacterHeadData)
+{
+	CustomCharacterBodyData = SyncCustomCharacterBodyData;
+	CustomCharacterHeadData = SyncCustomCharacterHeadData;
+}
+
+bool AHumanBase::SyncCustomCharacterData_ToServer_Validate(const FCustomCharacterRuntimeData& SyncCustomCharacterBodyData, const FCustomCharacterRuntimeData& SyncCustomCharacterHeadData)
+{
+	return true;
+}
+
 void AHumanBase::OnRep_UseWeaponState()
 {
 	ARPG_MovementComponent->bAiming = (UseWeaponState != EUseWeaponState::NoneWeapon_Default);
