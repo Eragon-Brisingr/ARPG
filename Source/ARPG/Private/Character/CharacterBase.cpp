@@ -91,10 +91,8 @@ void ACharacterBase::BeginPlay()
 	}
 }
 
-void ACharacterBase::EndPlay(const EEndPlayReason::Type EndPlayReason)
+void ACharacterBase::Destroyed()
 {
-	Super::EndPlay(EndPlayReason);
-
 	//删除角色身上的东西
 	TArray<AActor*> AttachedActors;
 	GetAttachedActors(AttachedActors);
@@ -102,6 +100,13 @@ void ACharacterBase::EndPlay(const EEndPlayReason::Type EndPlayReason)
 	{
 		Actor->Destroy();
 	}
+
+	Super::Destroyed();
+}
+
+void ACharacterBase::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	Super::EndPlay(EndPlayReason);
 }
 
 bool ACharacterBase::NeedSave_Implementation() const
