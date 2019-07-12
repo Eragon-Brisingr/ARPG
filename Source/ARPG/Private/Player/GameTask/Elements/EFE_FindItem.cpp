@@ -139,7 +139,7 @@ void UEFE_FindItem_ByType::GetLifetimeReplicatedProps(TArray<class FLifetimeProp
 
 bool UEFE_FindItem_ByType::IsNeedFindItem(UXD_ItemCoreBase* ItemCore) const
 {
-	return TargetItemType && ItemCore->ItemClass->IsChildOf(TargetItemType);
+	return TargetItemType && ItemCore->GetItemClass()->IsChildOf(TargetItemType);
 }
 
 EEventFlowCompileMessageType UEFE_FindItem_ByType::GetCompileMessage_Implementation(FString& Message) const

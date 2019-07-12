@@ -16,6 +16,13 @@
 #include "ARPG_ArrowBase.h"
 #include "ARPG_ArrowCoreBase.h"
 #include "Human_EnterReleaseState.h"
+#if WITH_EDITOR
+#include "MessageLog.h"
+#include "UObjectToken.h"
+#include "MapErrors.h"
+#endif
+
+#define LOCTEXT_NAMESPACE "ARPG_Human"
 
 AHumanBase::AHumanBase(const FObjectInitializer& PCIP)
 	:Super(PCIP)
@@ -81,7 +88,7 @@ void AHumanBase::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEv
 {
 	Super::PostEditChangeProperty(PropertyChangedEvent);
 
-	FName PropertyName = (PropertyChangedEvent.Property != NULL) ? PropertyChangedEvent.Property->GetFName() : NAME_None;
+	FName PropertyName = (PropertyChangedEvent.Property != nullptr) ? PropertyChangedEvent.Property->GetFName() : NAME_None;
 	if (PropertyName == GET_MEMBER_NAME_CHECKED(AHumanBase, DefaultLeftWeapon))
 	{
 		RefreshPreviewEquipedItem();
@@ -112,6 +119,19 @@ void AHumanBase::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEv
 		Head->InitAnim(false);
 	}
 }
+
+void AHumanBase::CheckForErrors()
+{
+	Super::CheckForErrors();
+
+	FFormatNamedArguments Arguments;
+	Arguments.Add(TEXT("ActorName"), FText::FromString(GetPathName()));
+	FMessageLog("MapCheck").Warning()
+		->AddToken(FUObjectToken::Create(this))
+		->AddToken(FTextToken::Create(FText::Format(LOCTEXT("MapCheck_Message_DefalutEquip", "{ActorName} : 默认装备中类型不匹配"), Arguments)))
+		->AddToken(FMapErrorToken::Create(FMapErrors::StaticPhysNone));
+}
+
 #endif
 
 void AHumanBase::GetLifetimeReplicatedProps(TArray< class FLifetimeProperty > & OutLifetimeProps) const
@@ -864,3 +884,5 @@ void AHumanBase::RefreshPreviewEquipedItem()
 	}
 }
 #endif
+
+#undef LOCTEXT_NAMESPACE
