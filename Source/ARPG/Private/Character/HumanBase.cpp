@@ -124,12 +124,20 @@ void AHumanBase::CheckForErrors()
 {
 	Super::CheckForErrors();
 
-	FFormatNamedArguments Arguments;
-	Arguments.Add(TEXT("ActorName"), FText::FromString(GetPathName()));
-	FMessageLog("MapCheck").Warning()
-		->AddToken(FUObjectToken::Create(this))
-		->AddToken(FTextToken::Create(FText::Format(LOCTEXT("MapCheck_Message_DefalutEquip", "{ActorName} : 默认装备中类型不匹配"), Arguments)))
-		->AddToken(FMapErrorToken::Create(FMapErrors::StaticPhysNone));
+	for (int32 Idx = 0; Idx < DefaultEquipmentList.Num(); ++Idx)
+	{
+		const FARPG_Item& Item = DefaultEquipmentList[Idx];
+		if (!Item)
+		{
+			FFormatNamedArguments Arguments;
+			Arguments.Add(TEXT("ActorName"), FText::FromString(GetPathName()));
+			Arguments.Add(TEXT("Idx"), FText::AsNumber(Idx));
+			FMessageLog("MapCheck").Error()
+				->AddToken(FUObjectToken::Create(this))
+				->AddToken(FTextToken::Create(FText::Format(LOCTEXT("MapCheck_Message_DefalutEquip", "{ActorName} : 默认装备[{Idx}]存在错误"), Arguments)))
+				->AddToken(FMapErrorToken::Create(FName("ItemError")));
+		}
+	}
 }
 
 #endif
