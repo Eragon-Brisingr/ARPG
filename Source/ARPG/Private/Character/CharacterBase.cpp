@@ -475,17 +475,17 @@ void ACharacterBase::EnableAutoUpdateLookAtRotation(bool Enable)
 
 void ACharacterBase::SetLookAtRotation(const FRotator& LookAtRotation)
 {
-	ARPG_MovementComponent->LookingRotation = LookAtRotation;
+	ARPG_MovementComponent->ControlRotation = LookAtRotation;
 }
 
 void ACharacterBase::SetLookAtLocation(const FVector& WorldLocation)
 {
-	ARPG_MovementComponent->LookingRotation = (WorldLocation - GetPawnViewLocation()).Rotation();
+	ARPG_MovementComponent->ControlRotation = (WorldLocation - GetPawnViewLocation()).Rotation();
 }
 
 FRotator ACharacterBase::GetLookAtRotation() const
 {
-	return ARPG_MovementComponent->LookingRotation;
+	return ARPG_MovementComponent->ControlRotation;
 }
 
 void ACharacterBase::InvokeDodge()
@@ -1166,17 +1166,20 @@ ETeamAttitude::Type ACharacterBase::GetRelationshipTowards(const AActor* Actor) 
 {
 	if (const ACharacterBase* Character = Cast<ACharacterBase>(Actor))
 	{
-		EXD_CampRelationship CampRelationship = GetCampInfo()->GetCampRelationship(this, Character->GetCampInfo());
-		switch (CampRelationship)
+		if (UARPG_CampInfo* SelfCampInfo = GetCampInfo())
 		{
-		case EXD_CampRelationship::SelfCamp:
-			return ETeamAttitude::Friendly;
-		case EXD_CampRelationship::Friend:
-			return ETeamAttitude::Friendly;
-		case EXD_CampRelationship::Neutral:
-			return ETeamAttitude::Neutral;
-		case EXD_CampRelationship::Hostile:
-			return ETeamAttitude::Hostile;
+			EXD_CampRelationship CampRelationship = SelfCampInfo->GetCampRelationship(this, Character->GetCampInfo());
+			switch (CampRelationship)
+			{
+			case EXD_CampRelationship::SelfCamp:
+				return ETeamAttitude::Friendly;
+			case EXD_CampRelationship::Friend:
+				return ETeamAttitude::Friendly;
+			case EXD_CampRelationship::Neutral:
+				return ETeamAttitude::Neutral;
+			case EXD_CampRelationship::Hostile:
+				return ETeamAttitude::Hostile;
+			}
 		}
 	}
 	return ETeamAttitude::Neutral;
