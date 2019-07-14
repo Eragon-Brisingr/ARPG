@@ -31,6 +31,7 @@ class UARPG_ActionDispatcherBase;
 class UCA_TurnConfigBase;
 class UCA_CharacterTurnBase;
 class UARPG_ReceiveDamageActionBase;
+class UARPG_InventoryComponent;
 
 UENUM()
 enum class EInteractEndResult : uint8
@@ -280,17 +281,17 @@ public:
 	//背包相关
 public:
 	UFUNCTION(BlueprintCallable, Category = "角色|物品", Reliable, WithValidation, Server)
-	void MoveItem(class UARPG_InventoryComponent* SourceInventory, class UARPG_InventoryComponent* TargetInventory, class UARPG_ItemCoreBase* ItemCore, int32 Number = 1);
-	virtual void MoveItem_Implementation(class UARPG_InventoryComponent* SourceInventory, class UARPG_InventoryComponent* TargetInventory, class UARPG_ItemCoreBase* ItemCore, int32 Number = 1);
-	bool MoveItem_Validate(class UARPG_InventoryComponent* SourceInventory, class UARPG_InventoryComponent* TargetInventory, class UARPG_ItemCoreBase* ItemCore, int32 Number = 1) { return true; }
+	void MoveItem(UARPG_InventoryComponent* SourceInventory, UARPG_InventoryComponent* TargetInventory, class UARPG_ItemCoreBase* ItemCore, int32 Number = 1);
+	virtual void MoveItem_Implementation(UARPG_InventoryComponent* SourceInventory, UARPG_InventoryComponent* TargetInventory, class UARPG_ItemCoreBase* ItemCore, int32 Number = 1);
+	bool MoveItem_Validate(UARPG_InventoryComponent* SourceInventory, UARPG_InventoryComponent* TargetInventory, class UARPG_ItemCoreBase* ItemCore, int32 Number = 1) { return true; }
 
 	UFUNCTION(BlueprintCallable, Category = "角色|物品", Reliable, WithValidation, Server)
-	void TradeItem(class UARPG_InventoryComponent* TraderInventory, class UARPG_InventoryComponent* BuyerInventory, class UARPG_ItemCoreBase* ItemCore, int32 Number = 1);
-	virtual void TradeItem_Implementation(class UARPG_InventoryComponent* TraderInventory, class UARPG_InventoryComponent* BuyerInventory, class UARPG_ItemCoreBase* ItemCore, int32 Number = 1);
-	bool TradeItem_Validate(class UARPG_InventoryComponent* TraderInventory, class UARPG_InventoryComponent* BuyerInventory, class UARPG_ItemCoreBase* ItemCore, int32 Number = 1) { return true; }
+	void TradeItem(UARPG_InventoryComponent* TraderInventory, UARPG_InventoryComponent* BuyerInventory, class UARPG_ItemCoreBase* ItemCore, int32 Number = 1);
+	virtual void TradeItem_Implementation(UARPG_InventoryComponent* TraderInventory, UARPG_InventoryComponent* BuyerInventory, class UARPG_ItemCoreBase* ItemCore, int32 Number = 1);
+	bool TradeItem_Validate(UARPG_InventoryComponent* TraderInventory, UARPG_InventoryComponent* BuyerInventory, class UARPG_ItemCoreBase* ItemCore, int32 Number = 1) { return true; }
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "背包")
-	class UARPG_InventoryComponent* Inventory;
+	UARPG_InventoryComponent* Inventory;
 
 	//使用道具相关
 public:
