@@ -72,16 +72,16 @@ public:
 	void FinishAttack(FBP_OnAttackFinished OnAttackFinished);
 
 public:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "角色|配置|常用", meta = (DisplayName = "默认左手武器", ExposeOnSpawn = "True"), SaveGame)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "配置|常用", meta = (DisplayName = "默认左手武器", ExposeOnSpawn = "True"), SaveGame)
 	FARPG_Item DefaultLeftWeapon;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "角色|配置|常用", meta = (DisplayName = "默认右手武器", ExposeOnSpawn = "True"), SaveGame)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "配置|常用", meta = (DisplayName = "默认右手武器", ExposeOnSpawn = "True"), SaveGame)
 	FARPG_Item DefaultRightWeapon;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "角色|配置|常用", meta = (DisplayName = "默认箭", ExposeOnSpawn = "True"), SaveGame)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "配置|常用", meta = (DisplayName = "默认箭", ExposeOnSpawn = "True"), SaveGame)
 	FARPG_Item DefaultArrow;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "角色|配置|常用", meta = (DisplayName = "默认装备列表", ExposeOnSpawn = "True"), SaveGame)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "配置|常用", meta = (DisplayName = "默认装备列表", ExposeOnSpawn = "True"), SaveGame)
 	TArray<FARPG_Item> DefaultEquipmentList;
 	
 	//装备相关
@@ -146,13 +146,13 @@ public:
 	UFUNCTION()
 	void OnRep_Arrow(class AARPG_ArrowBase* PreArrow);
 
-	UPROPERTY(EditDefaultsOnly, Category = "角色|配置")
+	UPROPERTY(EditDefaultsOnly, Category = "配置")
 	FName QuiverSocketName = TEXT("dorlach_01");
 
-	UPROPERTY(EditDefaultsOnly, Category = "角色|配置")
+	UPROPERTY(EditDefaultsOnly, Category = "配置")
 	FName LeftHandHoldingArrowSocketName = TEXT("HoldingArrow_l");
 
-	UPROPERTY(EditDefaultsOnly, Category = "角色|配置")
+	UPROPERTY(EditDefaultsOnly, Category = "配置")
 	FName RightHandHoldingArrowSocketName = TEXT("HoldingArrow_r");
 
 	UPROPERTY(Transient)
@@ -178,13 +178,15 @@ public:
 	UPROPERTY(BlueprintReadOnly, Category = "角色|动画")
 	TSubclassOf<UAnimInstance> MoveAnimInstanceOverride;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "角色|动画")
+	uint8 bEnableHeadLookAt : 1;
 	//角色定制
 public:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "角色|配置", ReplicatedUsing = OnRep_CustomCharacterBodyData)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "配置", ReplicatedUsing = OnRep_CustomCharacterBodyData, SaveGame)
 	FCustomCharacterRuntimeData CustomCharacterBodyData;
 	UFUNCTION()
 	void OnRep_CustomCharacterBodyData();
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "角色|配置", ReplicatedUsing = OnRep_CustomCharacterHeadData)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "配置", ReplicatedUsing = OnRep_CustomCharacterHeadData, SaveGame)
 	FCustomCharacterRuntimeData CustomCharacterHeadData;
 	UFUNCTION()
 	void OnRep_CustomCharacterHeadData();
@@ -205,6 +207,8 @@ public:
 	void NetForceSyncCustomCharacterData();
 	UFUNCTION(Reliable, Server, WithValidation)
 	void SyncCustomCharacterData_ToServer(const FCustomCharacterRuntimeData& SyncCustomCharacterBodyData, const FCustomCharacterRuntimeData& SyncCustomCharacterHeadData);
+
+	void ApplyCustomCharacterData();
 };
 
 template<typename EquipType>

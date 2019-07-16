@@ -259,7 +259,7 @@ public:
 	
 	//动画配置
 public:
-	UPROPERTY(BlueprintReadOnly, Category = "角色|动作")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "角色|动作")
 	uint8 bEnableAimOffset : 1;
 	//动画瞄准偏移覆盖
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "角色|动作", AdvancedDisplay)

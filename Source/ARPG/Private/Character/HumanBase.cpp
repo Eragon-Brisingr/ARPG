@@ -46,6 +46,7 @@ AHumanBase::AHumanBase(const FObjectInitializer& PCIP)
 	Head = CreateDefaultSubobject<USkeletalMeshComponent>(GET_MEMBER_NAME_CHECKED(AHumanBase, Head));
 	{
 		Head->SetupAttachment(GetMesh(), TEXT("head_root"));
+		GetMesh()->AddTickPrerequisiteComponent(Head);
 	}
 }
 
@@ -58,8 +59,10 @@ void AHumanBase::OnConstruction(const FTransform& Transform)
 	{
 		bPreviewIsInited = true;
 		RefreshPreviewEquipedItem();
+		ApplyCustomCharacterData();
 	}
 #endif
+
 }
 
 void AHumanBase::PreSave(const class ITargetPlatform* TargetPlatform)
@@ -112,10 +115,12 @@ void AHumanBase::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEv
 	}
 	else if (PropertyName == GET_MEMBER_NAME_CHECKED(AHumanBase, CustomCharacterBodyData))
 	{
-		GetMesh()->InitAnim(false);
+		OnRep_CustomCharacterBodyData();
+		GetMesh()->InitAnim(false);	
 	}
-	else if (PropertyName == GET_MEMBER_NAME_CHECKED(AHumanBase, CustomCharacterBodyData))
+	else if (PropertyName == GET_MEMBER_NAME_CHECKED(AHumanBase, CustomCharacterHeadData))
 	{
+		OnRep_CustomCharacterHeadData();
 		Head->InitAnim(false);
 	}
 }
@@ -182,6 +187,8 @@ void AHumanBase::WhenGameInit_Implementation()
 			UseItemImmediately(EquipmentCore);
 		}
 	}
+
+	ApplyCustomCharacterData();
 }
 
 void AHumanBase::WhenPostLoad_Implementation()
@@ -210,6 +217,8 @@ void AHumanBase::WhenPostLoad_Implementation()
 		LetTheWeaponInHand();
 	}
 	OnRep_EquipmentList();
+
+	ApplyCustomCharacterData();
 }
 
 TArray<struct FARPG_Item> AHumanBase::GetInitItemList() const
@@ -503,11 +512,13 @@ void AHumanBase::WhenTakeBackWeaponFinished(UAnimMontage* AnimMontage, bool bInt
 void AHumanBase::OnRep_CustomCharacterBodyData()
 {
 	CustomCharacterBodyData.ApplyMorphTarget(GetMesh());
+	CustomCharacterBodyData.ApplyAllMaterialData(GetMesh());
 }
 
 void AHumanBase::OnRep_CustomCharacterHeadData()
 {
 	CustomCharacterHeadData.ApplyMorphTarget(Head);
+	CustomCharacterHeadData.ApplyAllMaterialData(Head);
 }
 
 void AHumanBase::SetHideShorts(bool Hide)
@@ -553,6 +564,12 @@ void AHumanBase::SetHideUnderwear(bool Hide)
 void AHumanBase::NetForceSyncCustomCharacterData()
 {
 	SyncCustomCharacterData_ToServer(CustomCharacterBodyData, CustomCharacterHeadData);
+}
+
+void AHumanBase::ApplyCustomCharacterData()
+{
+	OnRep_CustomCharacterBodyData();
+	OnRep_CustomCharacterHeadData();
 }
 
 void AHumanBase::SyncCustomCharacterData_ToServer_Implementation(const FCustomCharacterRuntimeData& SyncCustomCharacterBodyData, const FCustomCharacterRuntimeData& SyncCustomCharacterHeadData)
