@@ -46,7 +46,6 @@ AHumanBase::AHumanBase(const FObjectInitializer& PCIP)
 	Head = CreateDefaultSubobject<USkeletalMeshComponent>(GET_MEMBER_NAME_CHECKED(AHumanBase, Head));
 	{
 		Head->SetupAttachment(GetMesh(), TEXT("head_root"));
-		GetMesh()->AddTickPrerequisiteComponent(Head);
 	}
 }
 
