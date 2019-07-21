@@ -470,7 +470,7 @@ bool ACharacterBase::CanPlayFullBodyMontage() const
 
 void ACharacterBase::EnableAutoUpdateLookAtRotation(bool Enable)
 {
-	ARPG_MovementComponent->bAutoUpdateLookingRotation = Enable;
+	ARPG_MovementComponent->bAutoUpdateControlRotation = Enable;
 }
 
 void ACharacterBase::SetLookAtRotation(const FRotator& LookAtRotation)
