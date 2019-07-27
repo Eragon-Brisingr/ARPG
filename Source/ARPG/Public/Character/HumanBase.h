@@ -182,11 +182,11 @@ public:
 	uint8 bEnableHeadLookAt : 1;
 	//角色定制
 public:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "配置", ReplicatedUsing = OnRep_CustomCharacterBodyData, SaveGame)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "配置|定制", ReplicatedUsing = OnRep_CustomCharacterBodyData, SaveGame)
 	FCustomCharacterRuntimeData CustomCharacterBodyData;
 	UFUNCTION()
 	void OnRep_CustomCharacterBodyData();
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "配置", ReplicatedUsing = OnRep_CustomCharacterHeadData, SaveGame)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "配置|定制", ReplicatedUsing = OnRep_CustomCharacterHeadData, SaveGame)
 	FCustomCharacterRuntimeData CustomCharacterHeadData;
 	UFUNCTION()
 	void OnRep_CustomCharacterHeadData();

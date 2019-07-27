@@ -29,7 +29,7 @@ public class ARPG : ModuleRules
             "XD_AI_SystemEx",
             "XD_EventFlowSystem",
             "XD_CharacterActionDispatcher",
-            "XD_AnimNodes",
+            "XD_CustomCharacter",
 
             "XD_DrawGizmoRuntime",
         });

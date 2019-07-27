@@ -46,3 +46,6 @@
 [submodule "ARPG_RawAssets"]
 	path = ARPG_RawAssets
 	url = https://github.com/Eragon-Brisingr/ARPG_RawAssets.git
+[submodule "Plugins/XD_CustomCharacter"]
+	path = Plugins/XD_CustomCharacter
+	url = https://github.com/Eragon-Brisingr/XD_CustomCharacter.git
