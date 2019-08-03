@@ -338,8 +338,11 @@ class AARPG_ArrowBase* AHumanBase::EquipArrow_Implementation(class UARPG_ArrowCo
 	else
 	{
 		AARPG_ArrowBase* CurArrow = Cast<AARPG_ArrowBase>(ArrowCore->SpawnItemActorForOwner(this, this));
-		SetArrow(CurArrow);
-		CurArrow->AttachWeaponTo(GetMesh(), QuiverSocketName);
+		if (CurArrow)
+		{
+			SetArrow(CurArrow);
+			CurArrow->AttachWeaponTo(GetMesh(), QuiverSocketName);
+		}
 		return CurArrow;
 	}
 }
@@ -681,10 +684,13 @@ class AARPG_WeaponBase* AHumanBase::EquipSingleRightWeapon(class UARPG_ItemCoreB
 	}
 	//Spawn武器并装备
 	SetRightWeapon(Cast<AARPG_WeaponBase>(WeaponCore->SpawnItemActorForOwner(this, this)));
-	RightWeaponInWeaponBack();
-	if (UseWeaponState != EUseWeaponState::NoneWeapon_Default)
+	if (RightWeapon)
 	{
-		PlayMontage(PullOutWeaponMontage, {});
+		RightWeaponInWeaponBack();
+		if (UseWeaponState != EUseWeaponState::NoneWeapon_Default)
+		{
+			PlayMontage(PullOutWeaponMontage, {});
+		}
 	}
 
 	return RightWeapon;
@@ -720,10 +726,13 @@ class AARPG_WeaponBase* AHumanBase::EquipSingleLeftWeapon(class UARPG_ItemCoreBa
 	}
 	//Spawn武器并装备
 	SetLeftWeapon(Cast<AARPG_WeaponBase>(WeaponCore->SpawnItemActorForOwner(this, this)));
-	LeftWeaponInWeaponBack();
-	if (UseWeaponState != EUseWeaponState::NoneWeapon_Default)
+	if (LeftWeapon)
 	{
-		PlayMontage(PullOutWeaponMontage, {});
+		LeftWeaponInWeaponBack();
+		if (UseWeaponState != EUseWeaponState::NoneWeapon_Default)
+		{
+			PlayMontage(PullOutWeaponMontage, {});
+		}
 	}
 
 	return LeftWeapon;
