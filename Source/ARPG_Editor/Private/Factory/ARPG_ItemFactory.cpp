@@ -63,6 +63,7 @@ bool UARPG_ItemFactory::ConfigureProperties()
 
 	Options.Mode = EClassViewerMode::ClassPicker;
 	Options.ClassFilter = MakeShareable<FARPG_ItemFilterViewer>(new FARPG_ItemFilterViewer);
+	Options.NameTypeToDisplay = EClassViewerNameTypeToDisplay::Dynamic;
 
 	const FText TitleText = LOCTEXT("选择创造道具类型", "选择创造道具类型");
 	UClass* ChosenClass = nullptr;
