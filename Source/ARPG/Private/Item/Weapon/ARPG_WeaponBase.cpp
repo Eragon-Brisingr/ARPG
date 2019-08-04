@@ -46,7 +46,7 @@ void AARPG_WeaponBase::WhenUse(class ACharacterBase* ItemOwner)
 	{
 		if (MoveAnimInstanceOverride)
 		{
-			Human->MoveAnimInstanceOverride = MoveAnimInstanceOverride;
+			Human->SetMoveAnimInstanceOverride(MoveAnimInstanceOverride);
 		}
 	}
 
@@ -59,7 +59,7 @@ void AARPG_WeaponBase::WhenNotUse(class ACharacterBase* ItemOwner)
 	{
 		if (MoveAnimInstanceOverride)
 		{
-			Human->MoveAnimInstanceOverride = nullptr;
+			Human->SetMoveAnimInstanceOverride(nullptr);
 		}
 	}
 

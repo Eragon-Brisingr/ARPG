@@ -175,8 +175,13 @@ private:
 
 	//动画
 public:
-	UPROPERTY(BlueprintReadOnly, Category = "角色|动画")
-	TSubclassOf<UAnimInstance> MoveAnimInstanceOverride;
+	UPROPERTY(EditDefaultsOnly, Category = "角色|动画")
+	TSubclassOf<UAnimInstance> DefualtMoveAnimBp;
+
+	UPROPERTY(EditDefaultsOnly, Category = "角色|动画")
+	FName MoveAnimInstanceOverrideTagName = TEXT("Move");
+
+	void SetMoveAnimInstanceOverride(TSubclassOf<UAnimInstance> MoveAnimInstanceOverride);
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "角色|动画")
 	uint8 bEnableHeadLookAt : 1;

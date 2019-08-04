@@ -62,6 +62,7 @@ void AHumanBase::OnConstruction(const FTransform& Transform)
 	}
 #endif
 
+	GetMesh()->GetAnimInstance()->SetSubInstanceClassByTag(MoveAnimInstanceOverrideTagName, DefualtMoveAnimBp);
 }
 
 void AHumanBase::PreSave(const class ITargetPlatform* TargetPlatform)
@@ -509,6 +510,11 @@ void AHumanBase::WhenTakeBackWeaponFinished(UAnimMontage* AnimMontage, bool bInt
 		OnMontageBlendingOutStarted->Unbind();
 	}
 	OnBehaviorFinished.ExecuteIfBound(bInterrupted == false);
+}
+
+void AHumanBase::SetMoveAnimInstanceOverride(TSubclassOf<UAnimInstance> MoveAnimInstanceOverride)
+{
+	GetMesh()->GetAnimInstance()->SetSubInstanceClassByTag(MoveAnimInstanceOverrideTagName, MoveAnimInstanceOverride ? MoveAnimInstanceOverride : DefualtMoveAnimBp);
 }
 
 void AHumanBase::OnRep_CustomCharacterBodyData()
