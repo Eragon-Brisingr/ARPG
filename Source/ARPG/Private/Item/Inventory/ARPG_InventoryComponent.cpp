@@ -63,6 +63,7 @@ bool UARPG_InventoryComponent::SpendMoney(int32 SpandStandardMoney, TArray<class
 	{
 		while (SpandStandardMoney > 0)
 		{
+			//TODO: 游戏性相关，应该允许金钱使用的排序策略
 			for (UXD_ItemCoreBase* ItemCore : ItemCoreList)
 			{
 				if (const AARPG_MoneyBase* Money = Cast<AARPG_MoneyBase>(ItemCore->GetItemDefaultActor()))
@@ -74,7 +75,7 @@ bool UARPG_InventoryComponent::SpendMoney(int32 SpandStandardMoney, TArray<class
 						Temp = ItemCore->Number * Money->GetPrice();
 					}
 					SpendedMoneys.Add(Cast<UARPG_ItemCoreBase>(Money->GetItemCore_Careful()));
-					RemoveItemCore(ItemCore, FMath::FloorToInt(Temp / Money->GetPrice()));
+					RemoveItemCore(ItemCore, FMath::CeilToInt(Temp / Money->GetPrice()));
 					break;
 				}
 			}

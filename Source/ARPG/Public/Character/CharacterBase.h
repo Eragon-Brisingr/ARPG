@@ -32,6 +32,9 @@ class UCA_TurnConfigBase;
 class UCA_CharacterTurnBase;
 class UARPG_ReceiveDamageActionBase;
 class UARPG_InventoryComponent;
+class AARPG_ItemBase;
+class UARPG_MovementComponent;
+class UARPG_ItemCoreBase;
 
 UENUM()
 enum class EInteractEndResult : uint8
@@ -87,11 +90,11 @@ public:
 
 	void Reset() override;
 
-	TArray<struct FARPG_Item> GetReInitItemList() const;
+	TArray<FARPG_Item> GetReInitItemList() const;
 
-	virtual TArray<struct FARPG_Item> GetInitItemList() const;
+	virtual TArray<FARPG_Item> GetInitItemList() const;
 	UFUNCTION(BlueprintImplementableEvent, Category = "角色|初始化", meta = (DisplayName = "GetInitItemList"))
-	TArray<struct FARPG_Item> ReceivedGetInitItemList() const;
+	TArray<FARPG_Item> ReceivedGetInitItemList() const;
 
 	//DispatchableEntityInterface
 public:
@@ -281,28 +284,36 @@ public:
 	//背包相关
 public:
 	UFUNCTION(BlueprintCallable, Category = "角色|物品", Reliable, WithValidation, Server)
-	void MoveItem(UARPG_InventoryComponent* SourceInventory, UARPG_InventoryComponent* TargetInventory, class UARPG_ItemCoreBase* ItemCore, int32 Number = 1);
-	virtual void MoveItem_Implementation(UARPG_InventoryComponent* SourceInventory, UARPG_InventoryComponent* TargetInventory, class UARPG_ItemCoreBase* ItemCore, int32 Number = 1);
-	bool MoveItem_Validate(UARPG_InventoryComponent* SourceInventory, UARPG_InventoryComponent* TargetInventory, class UARPG_ItemCoreBase* ItemCore, int32 Number = 1) { return true; }
+	void InvokeMoveItem(UARPG_InventoryComponent* SourceInventory, UARPG_InventoryComponent* TargetInventory, UARPG_ItemCoreBase* ItemCore, int32 Number = 1);
 
 	UFUNCTION(BlueprintCallable, Category = "角色|物品", Reliable, WithValidation, Server)
-	void TradeItem(UARPG_InventoryComponent* TraderInventory, UARPG_InventoryComponent* BuyerInventory, class UARPG_ItemCoreBase* ItemCore, int32 Number = 1);
-	virtual void TradeItem_Implementation(UARPG_InventoryComponent* TraderInventory, UARPG_InventoryComponent* BuyerInventory, class UARPG_ItemCoreBase* ItemCore, int32 Number = 1);
-	bool TradeItem_Validate(UARPG_InventoryComponent* TraderInventory, UARPG_InventoryComponent* BuyerInventory, class UARPG_ItemCoreBase* ItemCore, int32 Number = 1) { return true; }
+	void InvokeBuyItem(UARPG_InventoryComponent* BuyFromInventory, UARPG_ItemCoreBase* ItemCore, int32 Number = 1);
+
+	UFUNCTION(BlueprintCallable, Category = "角色|物品", Reliable, WithValidation, Server)
+	void InvokeSellItem(UARPG_InventoryComponent* SellToInventory, UARPG_ItemCoreBase* ItemCore, int32 Number = 1);
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "背包")
 	UARPG_InventoryComponent* Inventory;
 
+	UFUNCTION(Reliable, WithValidation, Client)
+	void OpenMoveItemPanel(UARPG_InventoryComponent* OtherInventory);
+	UFUNCTION(Reliable, WithValidation, Client)
+	void CloseMoveItemPanel();
+
+	UFUNCTION(Reliable, WithValidation, Client)
+	void OpenTradeItemPanel(UARPG_InventoryComponent* OtherInventory);
+	UFUNCTION(Reliable, WithValidation, Client)
+	void CloseTradeItemPanel();
 	//使用道具相关
 public:
 	UFUNCTION(BlueprintCallable, Category = "角色|物品")
-	void InvokeUseItem(const class UARPG_ItemCoreBase* ItemCore, EUseItemInput UseItemInput = EUseItemInput::LeftMouse);
+	void InvokeUseItem(const UARPG_ItemCoreBase* ItemCore, EUseItemInput UseItemInput = EUseItemInput::LeftMouse);
 	UFUNCTION(Reliable, WithValidation, Server)
-	void InvokeUseItem_Server(const class UARPG_ItemCoreBase* ItemCore, EUseItemInput UseItemInput);
-	void InvokeUseItem_Server_Implementation(const class UARPG_ItemCoreBase* ItemCore, EUseItemInput UseItemInput);
-	bool InvokeUseItem_Server_Validate(const class UARPG_ItemCoreBase* ItemCore, EUseItemInput UseItemInput) { return true; }
+	void InvokeUseItem_Server(const UARPG_ItemCoreBase* ItemCore, EUseItemInput UseItemInput);
+	void InvokeUseItem_Server_Implementation(const UARPG_ItemCoreBase* ItemCore, EUseItemInput UseItemInput);
+	bool InvokeUseItem_Server_Validate(const UARPG_ItemCoreBase* ItemCore, EUseItemInput UseItemInput) { return true; }
 
-	void UseItemImmediately(const class UARPG_ItemCoreBase* ItemCore, EUseItemInput UseItemInput = EUseItemInput::LeftMouse);
+	void UseItemImmediately(const UARPG_ItemCoreBase* ItemCore, EUseItemInput UseItemInput = EUseItemInput::LeftMouse);
 
 	UFUNCTION(BlueprintNativeEvent, Category = "角色|物品")
 	class AARPG_WeaponBase* EquipWaepon(const class UARPG_WeaponCoreBase* WeaponCore, EUseItemInput UseItemInput);
@@ -316,15 +327,15 @@ public:
 	class AARPG_EquipmentBase* EquipEquipment(const class UARPG_EquipmentCoreBase* EquipmentCore, EUseItemInput UseItemInput);
 	virtual class AARPG_EquipmentBase* EquipEquipment_Implementation(class UARPG_EquipmentCoreBase* EquipmentCore, EUseItemInput UseItemInput) { return nullptr; }
 
-	DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnUseItem, ACharacterBase*, Character, const class UARPG_ItemCoreBase*, ItemCore, EUseItemInput, UseItemInput);
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnUseItem, ACharacterBase*, Character, const UARPG_ItemCoreBase*, ItemCore, EUseItemInput, UseItemInput);
 	UPROPERTY(BlueprintAssignable)
 	FOnUseItem OnUseItem;
 
-	DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnEquip, ACharacterBase*, Character, class AARPG_ItemBase*, EquipItem);
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnEquip, ACharacterBase*, Character, AARPG_ItemBase*, EquipItem);
 	UPROPERTY(BlueprintAssignable, Category = "角色|物品")
 	FOnEquip OnEquip;
 	 
-	DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnNotEquip, ACharacterBase*, Character, class AARPG_ItemBase*, NotEquipItem);
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnNotEquip, ACharacterBase*, Character, AARPG_ItemBase*, NotEquipItem);
 	UPROPERTY(BlueprintAssignable, Category = "角色|物品")
 	FOnNotEquip OnNotEquip;
 
@@ -345,10 +356,10 @@ public:
 	uint8 bIsDodging : 1;
 
 	//闪避
-	virtual void WhenDodgeSucceed(float BaseDamage, class ACharacterBase* InstigatedBy, const FHitResult& HitResult);
+	virtual void WhenDodgeSucceed(float BaseDamage, ACharacterBase* InstigatedBy, const FHitResult& HitResult);
 	UFUNCTION(BlueprintImplementableEvent, Category = "角色|行为")
-	void ReceiveWhenDodgeSucceed(float BaseDamage, class ACharacterBase* InstigatedBy, const FHitResult& HitResult);
-	DECLARE_DYNAMIC_MULTICAST_DELEGATE_FourParams(FOnDodgeSucceed, ACharacterBase*, Character, float, BaseDamage, class ACharacterBase*, InstigatedBy, const FHitResult&, HitResult);
+	void ReceiveWhenDodgeSucceed(float BaseDamage, ACharacterBase* InstigatedBy, const FHitResult& HitResult);
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE_FourParams(FOnDodgeSucceed, ACharacterBase*, Character, float, BaseDamage, ACharacterBase*, InstigatedBy, const FHitResult&, HitResult);
 	UPROPERTY(BlueprintAssignable, Category = "角色|事件")
 	FOnDodgeSucceed OnDodgeSucceed;
 
@@ -359,10 +370,10 @@ public:
 	bool IsDefenseSucceed(const FVector& DamageFromLocation, const FHitResult& HitInfo) const;
 	virtual bool IsDefenseSucceed_Implementation(const FVector& DamageFromLocation, const FHitResult& HitInfo) const;
 
-	void WhenDefenseSucceed(float BaseDamage, class ACharacterBase* InstigatedBy, const FVector& HitFromDirection, float DefenseBeakBackDistance, const FHitResult& HitResult);
+	void WhenDefenseSucceed(float BaseDamage, ACharacterBase* InstigatedBy, const FVector& HitFromDirection, float DefenseBeakBackDistance, const FHitResult& HitResult);
 	UFUNCTION(BlueprintImplementableEvent, BlueprintAuthorityOnly, Category = "角色|行为")
-	void ReceiveWhenDefenseSucceed(float BaseDamage, class ACharacterBase* InstigatedBy, const FVector& HitFromDirection, float DefenseBeakBackDistance, const FHitResult& HitResult);
-	DECLARE_DYNAMIC_MULTICAST_DELEGATE_FourParams(FOnDefenseSucceed, ACharacterBase*, Character, float, BaseDamage, class ACharacterBase*, InstigatedBy, const FHitResult&, HitResult);
+	void ReceiveWhenDefenseSucceed(float BaseDamage, ACharacterBase* InstigatedBy, const FVector& HitFromDirection, float DefenseBeakBackDistance, const FHitResult& HitResult);
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE_FourParams(FOnDefenseSucceed, ACharacterBase*, Character, float, BaseDamage, ACharacterBase*, InstigatedBy, const FHitResult&, HitResult);
 	UPROPERTY(BlueprintAssignable, Category = "角色|事件")
 	FOnDefenseSucceed OnDefenseSucceed;
 
@@ -432,7 +443,7 @@ public:
 	UFUNCTION(BlueprintImplementableEvent, BlueprintAuthorityOnly, meta = (DisplayName = "WhenDamagedOther"), Category = "角色|行为")
 	void ReceiveWhenDamagedOther(ACharacterBase* WhoBeDamaged, float DamageValue, UObject* DamageInstigator);
 
-	float ApplyPointDamage(float BaseDamage, const FVector& HitFromDirection, const FHitResult& HitInfo, class ACharacterBase* InstigatorBy, AActor* DamageCauser, TSubclassOf<class UDamageType> DamageTypeClass, const FApplyPointDamageParameter& Param);
+	float ApplyPointDamage(float BaseDamage, const FVector& HitFromDirection, const FHitResult& HitInfo, ACharacterBase* InstigatorBy, AActor* DamageCauser, TSubclassOf<class UDamageType> DamageTypeClass, const FApplyPointDamageParameter& Param);
 
 	//潜行相关
 public:
@@ -485,7 +496,7 @@ public:
 	TArray<FOnPreInteractEvent> OnPreInteractEvents;
 
 	void WhenExecuteInteract_Implementation(ACharacterBase* InteractInvoker) override;
-	bool CanInteract_Implementation(const class ACharacterBase* InteractInvoker) const override;
+	bool CanInteract_Implementation(const ACharacterBase* InteractInvoker) const override;
 
 	UPROPERTY(EditAnywhere, Category = "角色|交互", Instanced)
 	UARPG_AD_CharacterInteract* InteractBehavior;
@@ -502,7 +513,7 @@ private:
 	FOnInteractAbortEnd OnInteractAbortEnd;
 public:
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "Character")
-	class UARPG_MovementComponent* ARPG_MovementComponent;
+	UARPG_MovementComponent* ARPG_MovementComponent;
 
 	//关系相关
 public:

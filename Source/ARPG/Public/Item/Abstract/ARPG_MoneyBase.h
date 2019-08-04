@@ -9,7 +9,7 @@
 /**
  * 
  */
-UCLASS(Abstract)
+UCLASS(Abstract, meta = (DisplayName = "金钱"))
 class ARPG_API AARPG_MoneyBase : public AARPG_ItemBase
 {
 	GENERATED_BODY()

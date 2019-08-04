@@ -6,6 +6,8 @@
 #include "GameFramework/HUD.h"
 #include "ARPG_HUDBase.generated.h"
 
+class UARPG_InventoryComponent;
+
 /**
  * 
  */
@@ -38,4 +40,16 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "交互提示系统")
 	AActor* GetNearestShowHintActor() const;
+
+	//背包系统
+public:
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "面板事件")
+	void OpenMoveItemPanel(UARPG_InventoryComponent* OtherInventory);
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "面板事件")
+	void CloseMoveItemPanel();
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "面板事件")
+	void OpenTradeItemPanel(UARPG_InventoryComponent* OtherInventory);
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "面板事件")
+	void CloseTradeItemPanel();
 };

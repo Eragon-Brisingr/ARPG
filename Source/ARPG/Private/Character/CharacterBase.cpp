@@ -10,10 +10,14 @@
 #include <AIController.h>
 #include <Perception/AIPerceptionComponent.h>
 #include <Perception/AISenseConfig_Sight.h>
+#include <Engine/Engine.h>
+#include <DrawDebugHelpers.h>
+#include <GameFramework/PlayerController.h>
 
-#include "ARPG_MovementComponent.h"
-#include "ARPG_InventoryComponent.h"
+#include "ARPG_ItemBase.h"
 #include "ARPG_ItemCoreBase.h"
+#include "ARPG_InventoryComponent.h"
+#include "ARPG_MovementComponent.h"
 #include "ARPG_Battle_Log.h"
 #include "ReceiveDamageActionBase.h"
 #include "ARPG_DebugFunctionLibrary.h"
@@ -29,18 +33,15 @@
 #include "ARPG_SneakSystemNormal.h"
 #include "ARPG_NavigationQueryFilter.h"
 #include "ARPG_CharacterTurnBase.h"
-#include "Engine/Engine.h"
 #include "ARPG_EnterReleaseStateBase.h"
 #include "ARPG_PlayerControllerBase.h"
 #include "XD_DispatchableActionBase.h"
 #include "ARPG_AD_CharacterInteract.h"
-#include "ARPG_ItemBase.h"
-#include "DrawDebugHelpers.h"
 #include "AIPerceptionExLibrary.h"
 #include "ARPG_RelationshipFunctionLibrary.h"
 #include "XD_MovementComponentFunctionLibrary.h"
 #include "ARPG_ReceiveDamageActionBase.h"
-
+#include "ARPG_HUDBase.h"
 
 // Sets default values
 ACharacterBase::ACharacterBase(const FObjectInitializer& ObjectInitializer)
@@ -698,21 +699,117 @@ void ACharacterBase::SetMirrorFullBodyMontage(bool IsMirror)
 	check(MirrorFullBodyMontageCounter >= 0 && MirrorFullBodyMontageCounter <= 2);
 }
 
-void ACharacterBase::MoveItem_Implementation(class UARPG_InventoryComponent* SourceInventory, class UARPG_InventoryComponent* TargetInventory, class UARPG_ItemCoreBase* ItemCore, int32 Number /*= 1*/)
+void ACharacterBase::InvokeMoveItem_Implementation(UARPG_InventoryComponent* SourceInventory, UARPG_InventoryComponent* TargetInventory, class UARPG_ItemCoreBase* ItemCore, int32 Number /*= 1*/)
 {
-	TargetInventory->GetItemFromOther(SourceInventory, ItemCore, Number);
+	if (SourceInventory && TargetInventory)
+	{
+		TargetInventory->GetItemFromOther(SourceInventory, ItemCore, Number);
+	}
 }
 
-void ACharacterBase::TradeItem_Implementation(class UARPG_InventoryComponent* TraderInventory, class UARPG_InventoryComponent* BuyerInventory, class UARPG_ItemCoreBase* ItemCore, int32 Number /*= 1*/)
+bool ACharacterBase::InvokeMoveItem_Validate(UARPG_InventoryComponent* SourceInventory, UARPG_InventoryComponent* TargetInventory, class UARPG_ItemCoreBase* ItemCore, int32 Number /*= 1*/)
 {
-	if (BuyerInventory == Inventory)
+	return true;
+}
+
+void ACharacterBase::InvokeBuyItem_Implementation(UARPG_InventoryComponent* BuyFromInventory, class UARPG_ItemCoreBase* ItemCore, int32 Number /*= 1*/)
+{
+	if (ItemCore)
 	{
-		Inventory->BuyItemFromOther(TraderInventory, ItemCore, Number);
+		Inventory->BuyItemFromOther(BuyFromInventory, ItemCore, Number);
 	}
-	else
+}
+
+bool ACharacterBase::InvokeBuyItem_Validate(UARPG_InventoryComponent* BuyFromInventory, class UARPG_ItemCoreBase* ItemCore, int32 Number /*= 1*/)
+{
+	return true;
+}
+
+void ACharacterBase::InvokeSellItem_Implementation(UARPG_InventoryComponent* SellToInventory, class UARPG_ItemCoreBase* ItemCore, int32 Number /*= 1*/)
+{
+	if (ItemCore)
 	{
-		Inventory->SellItemToOther(TraderInventory, ItemCore, Number);
+		Inventory->SellItemToOther(SellToInventory, ItemCore, Number);
 	}
+}
+
+bool ACharacterBase::InvokeSellItem_Validate(UARPG_InventoryComponent* SellToInventory, class UARPG_ItemCoreBase* ItemCore, int32 Number /*= 1*/)
+{
+	return true;
+}
+
+void ACharacterBase::OpenMoveItemPanel_Implementation(UARPG_InventoryComponent* OtherInventory)
+{
+	if (OtherInventory == nullptr)
+	{
+		return;
+	}
+
+	if (APlayerController* PlayerController = Cast<APlayerController>(GetController()))
+	{
+		if (AARPG_HUDBase* HUD = Cast<AARPG_HUDBase>(PlayerController->GetHUD()))
+		{
+			HUD->OpenMoveItemPanel(OtherInventory);
+		}
+	}
+}
+
+bool ACharacterBase::OpenMoveItemPanel_Validate(UARPG_InventoryComponent* OtherInventory)
+{
+	return true;
+}
+
+void ACharacterBase::OpenTradeItemPanel_Implementation(UARPG_InventoryComponent* OtherInventory)
+{
+	if (OtherInventory == nullptr)
+	{
+		return;
+	}
+
+	if (APlayerController* PlayerController = Cast<APlayerController>(GetController()))
+	{
+		if (AARPG_HUDBase* HUD = Cast<AARPG_HUDBase>(PlayerController->GetHUD()))
+		{
+			HUD->OpenTradeItemPanel(OtherInventory);
+		}
+	}
+}
+
+bool ACharacterBase::OpenTradeItemPanel_Validate(UARPG_InventoryComponent* OtherInventory)
+{
+	return true;
+}
+
+void ACharacterBase::CloseMoveItemPanel_Implementation()
+{
+	if (APlayerController* PlayerController = Cast<APlayerController>(GetController()))
+	{
+		if (AARPG_HUDBase* HUD = Cast<AARPG_HUDBase>(PlayerController->GetHUD()))
+		{
+			HUD->CloseMoveItemPanel();
+		}
+	}
+}
+
+bool ACharacterBase::CloseMoveItemPanel_Validate()
+{
+	return true;
+}
+
+void ACharacterBase::CloseTradeItemPanel_Implementation()
+{
+	if (APlayerController* PlayerController = Cast<APlayerController>(GetController()))
+	{
+		if (AARPG_HUDBase* HUD = Cast<AARPG_HUDBase>(PlayerController->GetHUD()))
+		{
+			HUD->CloseTradeItemPanel();
+		}
+	}
+}
+
+bool ACharacterBase::CloseTradeItemPanel_Validate()
+{
+	return true;
 }
 
 void ACharacterBase::InvokeUseItem(const class UARPG_ItemCoreBase* ItemCore, EUseItemInput UseItemInput /*= EUseItemInput::LeftMouse*/)
