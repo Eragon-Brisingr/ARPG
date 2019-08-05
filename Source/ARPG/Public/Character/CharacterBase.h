@@ -299,11 +299,19 @@ public:
 	void OpenMoveItemPanel(UARPG_InventoryComponent* OtherInventory);
 	UFUNCTION(Reliable, WithValidation, Client)
 	void CloseMoveItemPanel();
+	DECLARE_MULTICAST_DELEGATE(FOnCloseMoveItemPanelNative);
+	FOnCloseMoveItemPanelNative OnCloseMoveItemPanelNative;
+	UFUNCTION(BlueprintCallable, Category = "角色|物品", Reliable, WithValidation, Server)
+	void WhenCloseMoveItemPanel();
 
 	UFUNCTION(Reliable, WithValidation, Client)
 	void OpenTradeItemPanel(UARPG_InventoryComponent* OtherInventory);
 	UFUNCTION(Reliable, WithValidation, Client)
 	void CloseTradeItemPanel();
+	UFUNCTION(BlueprintCallable, Category = "角色|物品", Reliable, WithValidation, Server)
+	void WhenCloseTardeItemPanel();
+	DECLARE_MULTICAST_DELEGATE(FOnCloseTradeItemPanelNative);
+	FOnCloseTradeItemPanelNative OnCloseTradeItemPanelNative;
 	//使用道具相关
 public:
 	UFUNCTION(BlueprintCallable, Category = "角色|物品")

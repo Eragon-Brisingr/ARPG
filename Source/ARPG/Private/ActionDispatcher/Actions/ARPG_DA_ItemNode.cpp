@@ -16,7 +16,11 @@ void UARPG_DA_MoveItem::WhenActionActived()
 	{
 		Role->OpenMoveItemPanel(Inventory);
 	}
-	ExecuteEventAndFinishAction(WhenMoveItemFinished);
+	Role->OnCloseMoveItemPanelNative.AddWeakLambda(this, [=]()
+		{
+			Role->OnCloseMoveItemPanelNative.RemoveAll(this);
+			ExecuteEventAndFinishAction(WhenMoveItemFinished);
+		});
 }
 
 void UARPG_DA_MoveItem::WhenActionDeactived()
@@ -40,7 +44,11 @@ void UARPG_DA_TradeItem::WhenActionActived()
 	{
 		Role->OpenTradeItemPanel(Inventory);
 	}
-	ExecuteEventAndFinishAction(WhenTradeItemFinished);
+	Role->OnCloseTradeItemPanelNative.AddWeakLambda(this, [=]()
+		{
+			Role->OnCloseTradeItemPanelNative.RemoveAll(this);
+			ExecuteEventAndFinishAction(WhenTradeItemFinished);
+		});
 }
 
 void UARPG_DA_TradeItem::WhenActionDeactived()

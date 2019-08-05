@@ -21,6 +21,7 @@ public:
 	UPROPERTY(BlueprintReadOnly, Category = "交互")
 	TSoftObjectPtr<ACharacterBase> Character;
 
+	// 交互的对象，一般就是主角
 	UPROPERTY(BlueprintReadOnly, Category = "交互")
 	TSoftObjectPtr<ACharacterBase> InteractTarget;
 };

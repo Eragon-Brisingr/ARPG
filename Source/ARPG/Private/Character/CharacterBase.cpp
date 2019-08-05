@@ -796,6 +796,16 @@ bool ACharacterBase::CloseMoveItemPanel_Validate()
 	return true;
 }
 
+void ACharacterBase::WhenCloseMoveItemPanel_Implementation()
+{
+	OnCloseMoveItemPanelNative.Broadcast();
+}
+
+bool ACharacterBase::WhenCloseMoveItemPanel_Validate()
+{
+	return true;
+}
+
 void ACharacterBase::CloseTradeItemPanel_Implementation()
 {
 	if (APlayerController* PlayerController = Cast<APlayerController>(GetController()))
@@ -808,6 +818,16 @@ void ACharacterBase::CloseTradeItemPanel_Implementation()
 }
 
 bool ACharacterBase::CloseTradeItemPanel_Validate()
+{
+	return true;
+}
+
+void ACharacterBase::WhenCloseTardeItemPanel_Implementation()
+{
+	OnCloseTradeItemPanelNative.Broadcast();
+}
+
+bool ACharacterBase::WhenCloseTardeItemPanel_Validate()
 {
 	return true;
 }

@@ -21,9 +21,9 @@ public:
 	UPROPERTY(BlueprintReadOnly, Category = "行为|交互", meta = (ExposeOnSpawn = true))
 	TSoftObjectPtr<AActor> InteractTarget;
 
+	// 交互的对象，一般就是主角
 	UPROPERTY(BlueprintReadOnly, Category = "行为|交互", meta = (ExposeOnSpawn = true))
  	TSoftObjectPtr<ACharacterBase> InteractInvoker;
-
 public:
 	void InitInteractDispatcher(AActor* InInteractTarget);
 
