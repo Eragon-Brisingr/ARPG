@@ -32,6 +32,7 @@ public:
 	FOnDispatchableActionFinishedEvent WhenMoveItemFinished;
 };
 
+//通过查询RoleAddedItems与RoleRemovedItems获取移动信息
 UCLASS(meta = (DisplayName = "移动物品_记录变化"))
 class ARPG_API UARPG_DA_MoveItem_Record : public UARPG_DA_MoveItem
 {
@@ -71,3 +72,26 @@ public:
 	UPROPERTY(SaveGame, meta = (DisplayName = "当交易道具结束"))
 	FOnDispatchableActionFinishedEvent WhenTradeItemFinished;
 };
+
+//通过查询RoleBoughtItems与RoleSelledItems获取交易信息
+UCLASS(meta = (DisplayName = "交易物品_记录变化"))
+class ARPG_API UARPG_DA_TradeItem_Record : public UARPG_DA_TradeItem
+{
+	GENERATED_BODY()
+public:
+	void WhenActionActived() override;
+	void WhenActionDeactived() override;
+public:
+	UPROPERTY(BlueprintReadOnly, Category = "物品", SaveGame)
+	TArray<UARPG_ItemCoreBase*> RoleBoughtItems;
+
+	UPROPERTY(BlueprintReadOnly, Category = "物品", SaveGame)
+	TArray<UARPG_ItemCoreBase*> RoleSelledItems;
+
+	UFUNCTION()
+	void WhenBuyItem(UXD_ItemCoreBase* ItemCore, int32 AddNumber, int32 ExistNumber);
+
+	UFUNCTION()
+	void WhenSellItem(UXD_ItemCoreBase* ItemCore, int32 RemoveNumber, int32 ExistNumber);
+};
+
