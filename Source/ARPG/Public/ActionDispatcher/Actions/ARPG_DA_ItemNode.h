@@ -41,6 +41,12 @@ public:
 	void WhenActionActived() override;
 	void WhenActionDeactived() override;
 public:
+	UPROPERTY(SaveGame, meta = (DisplayName = "当移入道具"))
+	FDispatchableActionNormalEvent WhenAddedItem;
+
+	UPROPERTY(SaveGame, meta = (DisplayName = "当移出道具"))
+	FDispatchableActionNormalEvent WhenRemovedItem;
+
 	UPROPERTY(BlueprintReadOnly, Category = "物品", SaveGame)
 	TArray<UARPG_ItemCoreBase*> RoleAddedItems;
 
@@ -82,6 +88,12 @@ public:
 	void WhenActionActived() override;
 	void WhenActionDeactived() override;
 public:
+	UPROPERTY(SaveGame, meta = (DisplayName = "当买入道具"))
+	FDispatchableActionNormalEvent WhenBoughtItem;
+
+	UPROPERTY(SaveGame, meta = (DisplayName = "当卖出道具"))
+	FDispatchableActionNormalEvent WhenSelledItem;
+
 	UPROPERTY(BlueprintReadOnly, Category = "物品", SaveGame)
 	TArray<UARPG_ItemCoreBase*> RoleBoughtItems;
 
