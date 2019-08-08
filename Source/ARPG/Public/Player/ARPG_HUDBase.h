@@ -11,7 +11,7 @@ class UARPG_InventoryComponent;
 /**
  * 
  */
-UCLASS()
+UCLASS(showcategories=(Input))
 class ARPG_API AARPG_HUDBase : public AHUD
 {
 	GENERATED_BODY()

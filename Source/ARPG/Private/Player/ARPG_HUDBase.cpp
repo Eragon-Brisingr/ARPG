@@ -17,6 +17,8 @@ AARPG_HUDBase::AARPG_HUDBase()
 void AARPG_HUDBase::BeginPlay()
 {
 	Super::BeginPlay();
+
+	EnableInput(GetOwningPlayerController());
 }
 
 void AARPG_HUDBase::Tick(float DeltaSeconds)
