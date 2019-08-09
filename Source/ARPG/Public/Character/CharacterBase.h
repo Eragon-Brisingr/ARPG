@@ -292,6 +292,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "角色|物品", Reliable, WithValidation, Server)
 	void InvokeSellItem(UARPG_InventoryComponent* SellToInventory, UARPG_ItemCoreBase* ItemCore, int32 Number = 1);
 
+	UFUNCTION(BlueprintCallable, Category = "角色|物品", Reliable, WithValidation, Server)
+	void InvokeThrowItem(UARPG_ItemCoreBase* ItemCore, int32 Number = 1);
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "背包")
 	UARPG_InventoryComponent* Inventory;
 

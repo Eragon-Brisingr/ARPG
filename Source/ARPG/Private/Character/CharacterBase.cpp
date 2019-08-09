@@ -559,6 +559,16 @@ FVector ACharacterBase::GetRootMotionTranslationScale() const
 	return RootMotionScale;
 }
 
+void ACharacterBase::InvokeThrowItem_Implementation(UARPG_ItemCoreBase* ItemCore, int32 Number /*= 1*/)
+{
+	Inventory->ThrowItemCore(ItemCore, Number);
+}
+
+bool ACharacterBase::InvokeThrowItem_Validate(UARPG_ItemCoreBase* ItemCore, int32 Number /*= 1*/)
+{
+	return true;
+}
+
 UARPG_CharacterBehaviorBase* ACharacterBase::EnterReleaseState(const FOnCharacterBehaviorFinished& OnBehaviorFinished)
 {
 	if (EnterReleaseStateAction && IsInReleaseState() == false)
