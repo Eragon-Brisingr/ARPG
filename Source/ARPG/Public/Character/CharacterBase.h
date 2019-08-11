@@ -181,10 +181,7 @@ public:
 	UPROPERTY(Replicated)
 	uint8 bIsLockingOther : 1;
 
-	virtual void SetLockedTarget(AActor* NewLockedTarget)
-	{
-		bIsLockingOther = NewLockedTarget ? true : false;
-	}
+	virtual void SetLockedTarget(AActor* NewLockedTarget);
 	//动画
 public:
 	UFUNCTION(BlueprintCallable, Category = "角色|动作", meta = (AdvancedDisplay = Config, AutoCreateRefTerm = Config))

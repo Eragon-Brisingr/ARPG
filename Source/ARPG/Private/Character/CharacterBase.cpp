@@ -375,6 +375,15 @@ bool ACharacterBase::CanLockingOnTarget_Implementation(AController* Invoker, con
 	return false;
 }
 
+void ACharacterBase::SetLockedTarget(AActor* NewLockedTarget)
+{
+	bIsLockingOther = NewLockedTarget ? true : false;
+	if (AAIController* AIController = Cast<AAIController>(GetController()))
+	{
+		AIController->SetFocus(NewLockedTarget);
+	}
+}
+
 float ACharacterBase::PlayMontage(UAnimMontage* MontageToPlay, const FARPG_MontagePlayConfig& Config, float InPlayRate /*= 1.f*/, FName StartSectionName /*= NAME_None*/, bool ClientMaster /*= true*/)
 {
 	if (MontageToPlay)
@@ -702,20 +711,20 @@ bool ACharacterBase::SpeakToAllClient_Validate(USoundBase* Sentence)
 
 UPathFollowingComponent* ACharacterBase::GetPathFollowingComponent()
 {
-	AController* Controller = GetController();
+	AController* OwingController = GetController();
 	if (PathFollowingComponent == nullptr)
 	{
-		if (const AAIController * AIController = Cast<const AAIController>(Controller))
+		if (const AAIController * AIController = Cast<const AAIController>(OwingController))
 		{
 			PathFollowingComponent = AIController->GetPathFollowingComponent();
 		}
-		else if (const AARPG_PlayerControllerBase * PlayerController = Cast<const AARPG_PlayerControllerBase>(Controller))
+		else if (const AARPG_PlayerControllerBase * PlayerController = Cast<const AARPG_PlayerControllerBase>(OwingController))
 		{
 			PathFollowingComponent = (UPathFollowingComponent*)PlayerController->PathFollowingComponent;
 		}
 		else
 		{
-			PathFollowingComponent = Controller->FindComponentByClass<UPathFollowingComponent>();
+			PathFollowingComponent = OwingController->FindComponentByClass<UPathFollowingComponent>();
 		}
 	}
 	return PathFollowingComponent;

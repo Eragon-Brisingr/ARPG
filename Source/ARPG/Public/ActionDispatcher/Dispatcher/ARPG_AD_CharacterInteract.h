@@ -24,4 +24,16 @@ public:
 	// 交互的对象，一般就是主角
 	UPROPERTY(BlueprintReadOnly, Category = "交互")
 	TSoftObjectPtr<ACharacterBase> InteractTarget;
+
+	UFUNCTION(BlueprintCallable, Category = "交互")
+	void StartFaceToInteracter();
+
+	UFUNCTION(BlueprintCallable, Category = "交互")
+	void StopFaceToInteracter();
+
+	UPROPERTY(SaveGame)
+	uint8 FaceToInteracter : 1;
+
+	void WhenActived() override;
+	void WhenDeactived(bool IsFinsihedCompleted) override;
 };
