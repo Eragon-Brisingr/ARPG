@@ -7,7 +7,7 @@
 #include "ARPG_ItemCoreBase.h"
 #include "Utils/XD_ItemFunctionLibrary.h"
 
-TArray<AActor*> UARPG_DA_MoveItem::GetAllRegistableEntities() const
+TSet<AActor*> UARPG_DA_MoveItem::GetAllRegistableEntities() const
 {
 	return { Role.Get(), Other.Get() };
 }
@@ -67,7 +67,7 @@ void UARPG_DA_MoveItem_Record::WhenRemoveItem(UXD_ItemCoreBase* ItemCore, int32 
 	WhenRemovedItem.ExecuteIfBound();
 }
 
-TArray<AActor*> UARPG_DA_TradeItem::GetAllRegistableEntities() const
+TSet<AActor*> UARPG_DA_TradeItem::GetAllRegistableEntities() const
 {
 	return { Role.Get(), Other.Get() };
 }

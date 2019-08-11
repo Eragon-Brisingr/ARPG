@@ -5,5 +5,5 @@
 
 UARPG_AD_CharacterInteract::UARPG_AD_CharacterInteract()
 {
-	bIsMainDispatcher = false;
+	bIsMainDispatcher = true;
 }

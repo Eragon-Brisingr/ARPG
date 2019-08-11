@@ -42,6 +42,7 @@
 #include "XD_MovementComponentFunctionLibrary.h"
 #include "ARPG_ReceiveDamageActionBase.h"
 #include "ARPG_HUDBase.h"
+#include "Components/AudioComponent.h"
 
 // Sets default values
 ACharacterBase::ACharacterBase(const FObjectInitializer& ObjectInitializer)
@@ -198,6 +199,8 @@ void ACharacterBase::WhenGameInit_Implementation()
 
 void ACharacterBase::Reset()
 {
+	Super::Reset();
+
 	//初始化道具和使用中的道具
 	{
 		TArray<UARPG_ItemCoreBase*> RemoveItems;
@@ -628,6 +631,104 @@ void ACharacterBase::TurnTo(const FRotator& TargetWorldRotation, const FOnCharac
 void ACharacterBase::TurnTo(const FRotator& TargetWorldRotation, bool ForceSnapRotation)
 {
 	TurnTo(TargetWorldRotation, {}, ForceSnapRotation);
+}
+
+UAudioComponent* ACharacterBase::GetMouthComponent()
+{
+	if (!MouthComponentRuntime)
+	{
+		MouthComponentRuntime = NewObject<UAudioComponent>(this, TEXT("Mouth"), EObjectFlags::RF_Transient);
+		AddOwnedComponent(MouthComponentRuntime);
+		MouthComponentRuntime->RegisterComponent();
+	}
+	return MouthComponentRuntime;
+}
+
+void ACharacterBase::Speak(USoundBase* Sentence, const FOnCharacterBehaviorFinished& OnSpeakFinished)
+{
+	//绑定事件
+	UAudioComponent* MouthComponent = GetMouthComponent();
+	if (MouthComponent->IsPlaying())
+	{
+		OnSpeakFinishedDelegate.ExecuteIfBound(false);
+	}
+	else
+	{
+		MouthComponent->OnAudioFinishedNative.AddWeakLambda(this, [=](UAudioComponent* AudioComponent)
+			{
+				OnSpeakFinishedDelegate.ExecuteIfBound(true);
+				OnSpeakFinishedDelegate.Unbind();
+			});
+	}
+	OnSpeakFinishedDelegate = OnSpeakFinished;
+
+	//开始说话
+	SpeakToAllClient(Sentence);
+}
+
+void ACharacterBase::StopSpeak()
+{
+	StopSpeakToAllClient();
+}
+
+void ACharacterBase::StopSpeakToAllClient_Implementation()
+{
+	if (MouthComponentRuntime)
+	{
+		MouthComponentRuntime->Stop();
+	}
+}
+
+bool ACharacterBase::StopSpeakToAllClient_Validate()
+{
+	return true;
+}
+
+void ACharacterBase::SpeakToAllClient_Implementation(USoundBase* Sentence)
+{
+	UAudioComponent* MouthComponent = GetMouthComponent();
+	if (MouthComponent->IsPlaying())
+	{
+		MouthComponent->Stop();
+	}
+	MouthComponent->SetSound(Sentence);
+	MouthComponent->Play();
+}
+
+bool ACharacterBase::SpeakToAllClient_Validate(USoundBase* Sentence)
+{
+	return true;
+}
+
+UPathFollowingComponent* ACharacterBase::GetPathFollowingComponent()
+{
+	AController* Controller = GetController();
+	if (PathFollowingComponent == nullptr)
+	{
+		if (const AAIController * AIController = Cast<const AAIController>(Controller))
+		{
+			PathFollowingComponent = AIController->GetPathFollowingComponent();
+		}
+		else if (const AARPG_PlayerControllerBase * PlayerController = Cast<const AARPG_PlayerControllerBase>(Controller))
+		{
+			PathFollowingComponent = (UPathFollowingComponent*)PlayerController->PathFollowingComponent;
+		}
+		else
+		{
+			PathFollowingComponent = Controller->FindComponentByClass<UPathFollowingComponent>();
+		}
+	}
+	return PathFollowingComponent;
+}
+
+void ACharacterBase::PauseMove()
+{
+	GetPathFollowingComponent()->PauseMove(FAIRequestID::CurrentRequest, EPathFollowingVelocityMode::Reset);
+}
+
+void ACharacterBase::ResumeMove()
+{
+	GetPathFollowingComponent()->ResumeMove(FAIRequestID::CurrentRequest);
 }
 
 void ACharacterBase::ForceSetClientWorldLocation(const FVector& Location)
@@ -1239,9 +1340,12 @@ bool ACharacterBase::CanInteract_Implementation(const class ACharacterBase* Inte
 	{
 		return false;
 	}
-	if (CurrentMainDispatcher && CurrentMainDispatcher->bInteractable == false && CurrentMainDispatcher->State != EActionDispatcherState::Deactive)
+	if (CurrentMainDispatcher)
 	{
-		return false;
+		if (CurrentMainDispatcher->bInteractable == false || CurrentMainDispatcher->State != EActionDispatcherState::Deactive)
+		{
+			return false;
+		}
 	}
 	if (GetRelationshipTowards(InteractInvoker) == ECharacterRelationship::Hostile)
 	{

@@ -6,6 +6,7 @@
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "Navigation/PathFollowingComponent.h"
 #include "Kismet/BlueprintAsyncActionBase.h"
+#include "AITypes.h"
 #include "ARPG_MoveUtils.generated.h"
 
 /**
@@ -30,12 +31,9 @@ private:
 	static void FindPathForMoveRequest(const class AController* Controller, const FAIMoveRequest& MoveRequest, FPathFindingQuery& Query, FNavPathSharedPtr& OutPath);
 
 public:
-	static class UPathFollowingComponent* GetPathFollowingComponent(const class AController* Controller);
+	static FAIRequestID ARPG_MoveToActor(class ACharacterBase* Character, AActor* Goal, const FOnARPG_MoveFinished& OnARPG_MoveFinished, float AcceptanceRadius = 5.f, bool bStopOnOverlap = true, bool bUsePathfinding = true, bool bCanStrafe = true, TSubclassOf<class UNavigationQueryFilter> FilterClass = nullptr, bool bAllowPartialPaths = true);
 
-	static void ARPG_MoveToActor(class ACharacterBase* Character, AActor* Goal, const FOnARPG_MoveFinished& OnARPG_MoveFinished, float AcceptanceRadius = 5.f, bool bStopOnOverlap = true, bool bUsePathfinding = true, bool bCanStrafe = true, TSubclassOf<class UNavigationQueryFilter> FilterClass = nullptr, bool bAllowPartialPaths = true);
-
-	static void ARPG_MoveToLocation(class ACharacterBase* Character, const FVector& Dest, const FOnARPG_MoveFinished& OnARPG_MoveFinished, float AcceptanceRadius = 5.f, bool bStopOnOverlap = true, bool bUsePathfinding = true, bool bProjectDestinationToNavigation = false, bool bCanStrafe = true, TSubclassOf<UNavigationQueryFilter> FilterClass = nullptr, bool bAllowPartialPaths = true);
-
+	static FAIRequestID ARPG_MoveToLocation(class ACharacterBase* Character, const FVector& Dest, const FOnARPG_MoveFinished& OnARPG_MoveFinished, float AcceptanceRadius = 5.f, bool bStopOnOverlap = true, bool bUsePathfinding = true, bool bProjectDestinationToNavigation = false, bool bCanStrafe = true, TSubclassOf<UNavigationQueryFilter> FilterClass = nullptr, bool bAllowPartialPaths = true);
 private:
 	static void SettingRequest(FPathFollowingRequestResult &ResultData, class ACharacterBase* Character, const FOnARPG_MoveFinished &OnARPG_MoveFinished, float AcceptanceRadius);
 
@@ -43,9 +41,9 @@ private:
 
 	static void OnSnapMoveFinished(bool bIsAbort, FPathFollowingResult Result, FVector TargetLocation, FOnARPG_MoveFinished OnARPG_MoveFinished);
 public:
-	static void ARPG_MoveToLocationAndTurn(class ACharacterBase* Character, const FVector& Dest, const FRotator& TurnRotation, const FOnARPG_MoveFinished& OnARPG_MoveFinished, float AcceptanceRadius = 5.f, bool bStopOnOverlap = true, bool bUsePathfinding = true, bool bProjectDestinationToNavigation = false, bool bCanStrafe = true, TSubclassOf<UNavigationQueryFilter> FilterClass = nullptr, bool bAllowPartialPaths = true);
+	static FAIRequestID ARPG_MoveToLocationAndTurn(class ACharacterBase* Character, const FVector& Dest, const FRotator& TurnRotation, const FOnARPG_MoveFinished& OnARPG_MoveFinished, float AcceptanceRadius = 5.f, bool bStopOnOverlap = true, bool bUsePathfinding = true, bool bProjectDestinationToNavigation = false, bool bCanStrafe = true, TSubclassOf<UNavigationQueryFilter> FilterClass = nullptr, bool bAllowPartialPaths = true);
 
-	static void ARPG_MoveToActorAndTurn(class ACharacterBase* Character, AActor* Goal, AActor* TurnToActor, const FOnARPG_MoveFinished& OnARPG_MoveFinished, float AcceptanceRadius = 5.f, bool bStopOnOverlap = true, bool bUsePathfinding = true, bool bCanStrafe = true, TSubclassOf<class UNavigationQueryFilter> FilterClass = nullptr, bool bAllowPartialPaths = true);
+	static FAIRequestID ARPG_MoveToActorAndTurn(class ACharacterBase* Character, AActor* Goal, AActor* TurnToActor, const FOnARPG_MoveFinished& OnARPG_MoveFinished, float AcceptanceRadius = 5.f, bool bStopOnOverlap = true, bool bUsePathfinding = true, bool bCanStrafe = true, TSubclassOf<class UNavigationQueryFilter> FilterClass = nullptr, bool bAllowPartialPaths = true);
 private:
 	static void OnTurnCompleted(bool Result, ACharacterBase* Character, FRotator TurnToRotation, FPathFollowingResult PathFollowingResult, FOnARPG_MoveFinished OnARPG_MoveFinish);
 };

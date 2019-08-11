@@ -18,7 +18,7 @@ class ARPG_API UARPG_DA_MoveItem : public UXD_DispatchableActionBase
 {
 	GENERATED_BODY()
 public:
-	TArray<AActor*> GetAllRegistableEntities() const override;
+	TSet<AActor*> GetAllRegistableEntities() const override;
 	void WhenActionActived() override;
 	void WhenActionDeactived() override;
 	void WhenActionFinished() override;
@@ -65,7 +65,7 @@ class ARPG_API UARPG_DA_TradeItem : public UXD_DispatchableActionBase
 {
 	GENERATED_BODY()
 public:
-	TArray<AActor*> GetAllRegistableEntities() const override;
+	TSet<AActor*> GetAllRegistableEntities() const override;
 	void WhenActionActived() override;
 	void WhenActionDeactived() override;
 	void WhenActionFinished() override;

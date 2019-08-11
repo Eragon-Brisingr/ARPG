@@ -5,7 +5,7 @@
 #include "ARPG_MoveUtils.h"
 #include "NavigationSystem.h"
 
-TArray<AActor*> UARPG_DA_MoveToBase::GetAllRegistableEntities() const
+TSet<AActor*> UARPG_DA_MoveToBase::GetAllRegistableEntities() const
 {
 	return { Mover.Get() };
 }
@@ -64,6 +64,18 @@ bool UARPG_DA_MoveToBase::IsExistValidPath(const FVector& Start, const FVector& 
 	return NavSys->TestPathSync(Query);
 }
 
+TSet<AActor*> UARPG_DA_MoveToActor::GetAllRegistableEntities() const
+{
+	if (bTurnTo)
+	{
+		return { Mover.Get(), Goal.Get(), TurnToActor.Get() };
+	}
+	else
+	{
+		return { Mover.Get(), Goal.Get() };
+	}
+}
+
 bool UARPG_DA_MoveToActor::IsActionValid() const
 {
 	return Super::IsActionValid() && Goal.Get() != nullptr && IsExistValidPath(Mover->GetActorLocation(), Goal->GetActorLocation());
@@ -73,7 +85,14 @@ void UARPG_DA_MoveToActor::WhenActionActived()
 {
 	Super::WhenActionActived();
 	ACharacterBase* Character = Cast<ACharacterBase>(Mover.Get());
-	UARPG_MoveUtils::ARPG_MoveToActor(Character, Goal.Get(), FOnARPG_MoveFinished::CreateUObject(this, &UARPG_DA_MoveToActor::WhenRequestFinished), AcceptRadius, false);
+	if (bTurnTo)
+	{
+		UARPG_MoveUtils::ARPG_MoveToActorAndTurn(Character, Goal.Get(), TurnToActor.Get(), FOnARPG_MoveFinished::CreateUObject(this, &UARPG_DA_MoveToActor::WhenRequestFinished), AcceptRadius, false);
+	}
+	else
+	{
+		UARPG_MoveUtils::ARPG_MoveToActor(Character, Goal.Get(), FOnARPG_MoveFinished::CreateUObject(this, &UARPG_DA_MoveToActor::WhenRequestFinished), AcceptRadius, false);
+	}
 }
 
 bool UARPG_DA_MoveToLocation::IsActionValid() const
@@ -85,5 +104,63 @@ void UARPG_DA_MoveToLocation::WhenActionActived()
 {
 	Super::WhenActionActived();
 	ACharacterBase* Character = Cast<ACharacterBase>(Mover.Get());
-	UARPG_MoveUtils::ARPG_MoveToLocation(Character, Destination, FOnARPG_MoveFinished::CreateUObject(this, &UARPG_DA_MoveToLocation::WhenRequestFinished), AcceptRadius, false);
+	if (bTurnTo)
+	{
+		UARPG_MoveUtils::ARPG_MoveToLocationAndTurn(Character, Destination, TurnToRotation, FOnARPG_MoveFinished::CreateUObject(this, &UARPG_DA_MoveToLocation::WhenRequestFinished), AcceptRadius, false);
+	}
+	else
+	{
+		UARPG_MoveUtils::ARPG_MoveToLocation(Character, Destination, FOnARPG_MoveFinished::CreateUObject(this, &UARPG_DA_MoveToLocation::WhenRequestFinished), AcceptRadius, false);
+	}
+}
+
+UARPG_DA_MoveToActor_LeadOther::UARPG_DA_MoveToActor_LeadOther()
+{
+	bTickable = true;
+}
+
+TSet<AActor*> UARPG_DA_MoveToActor_LeadOther::GetAllRegistableEntities() const
+{
+	if (bTurnTo)
+	{
+		return { Mover.Get(), Goal.Get(), TurnToActor.Get(), Follower.Get() };
+	}
+	else
+	{
+		return { Mover.Get(), Goal.Get(), Follower.Get() };
+	}
+}
+
+void UARPG_DA_MoveToActor_LeadOther::WhenTick(float DeltaSeconds)
+{
+	if (Follower->GetDistanceTo(Mover.Get()) > WaitDistance)
+	{
+		Mover->PauseMove();
+	}
+	else
+	{
+		Mover->ResumeMove();
+	}
+}
+
+UARPG_DA_MoveToLocation_LeadOther::UARPG_DA_MoveToLocation_LeadOther()
+{
+	bTickable = true;
+}
+
+TSet<AActor*> UARPG_DA_MoveToLocation_LeadOther::GetAllRegistableEntities() const
+{
+	return { Mover.Get(), Follower.Get() };
+}
+
+void UARPG_DA_MoveToLocation_LeadOther::WhenTick(float DeltaSeconds)
+{
+	if (Follower->GetDistanceTo(Mover.Get()) > WaitDistance)
+	{
+		Mover->PauseMove();
+	}
+	else
+	{
+		Mover->ResumeMove();
+	}
 }

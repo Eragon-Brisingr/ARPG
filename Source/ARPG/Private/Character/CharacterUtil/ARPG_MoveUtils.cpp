@@ -16,7 +16,7 @@ FPathFollowingRequestResult UARPG_MoveUtils::ARPG_MoveToActorImpl(class ACharact
 	Character->WhenReceivedMoveRequest();
 
 	AController* Controller = Character->GetController();
-	UPathFollowingComponent* PathFollowingComponent = GetPathFollowingComponent(Controller);
+	UPathFollowingComponent* PathFollowingComponent = Character->GetPathFollowingComponent();
 
 	if (PathFollowingComponent && PathFollowingComponent->GetStatus() != EPathFollowingStatus::Idle)
 	{
@@ -40,7 +40,7 @@ FPathFollowingRequestResult UARPG_MoveUtils::ARPG_MoveToLocationImpl(class AChar
 	Character->WhenReceivedMoveRequest();
 
 	AController* Controller = Character->GetController();
-	UPathFollowingComponent* PathFollowingComponent = GetPathFollowingComponent(Controller);
+	UPathFollowingComponent* PathFollowingComponent = Character->GetPathFollowingComponent();
 
 	if (PathFollowingComponent && PathFollowingComponent->GetStatus() != EPathFollowingStatus::Idle)
 	{
@@ -218,23 +218,7 @@ void UARPG_MoveUtils::FindPathForMoveRequest(const class AController* Controller
 	}
 }
 
-class UPathFollowingComponent* UARPG_MoveUtils::GetPathFollowingComponent(const class AController* Controller)
-{
-	if (const AAIController* AIController = Cast<const AAIController>(Controller))
-	{
-		return AIController->GetPathFollowingComponent();
-	}
-	else if (const AARPG_PlayerControllerBase* PlayerController = Cast<const AARPG_PlayerControllerBase>(Controller))
-	{
-		return (UPathFollowingComponent*)PlayerController->PathFollowingComponent;
-	}
-	else
-	{
-		return Controller->FindComponentByClass<UPathFollowingComponent>();
-	}
-}
-
-void UARPG_MoveUtils::ARPG_MoveToActor(class ACharacterBase* Character, AActor* Goal, const FOnARPG_MoveFinished& OnARPG_MoveFinished, float AcceptanceRadius, bool bStopOnOverlap, bool bUsePathfinding, bool bCanStrafe, TSubclassOf<class UNavigationQueryFilter> FilterClass, bool bAllowPartialPaths)
+FAIRequestID UARPG_MoveUtils::ARPG_MoveToActor(class ACharacterBase* Character, AActor* Goal, const FOnARPG_MoveFinished& OnARPG_MoveFinished, float AcceptanceRadius, bool bStopOnOverlap, bool bUsePathfinding, bool bCanStrafe, TSubclassOf<class UNavigationQueryFilter> FilterClass, bool bAllowPartialPaths)
 {
 	FPathFollowingRequestResult ResultData = ARPG_MoveToActorImpl(Character, Goal, AcceptanceRadius, bStopOnOverlap, bUsePathfinding, bCanStrafe, FilterClass, bAllowPartialPaths);
 	if (AcceptanceRadius > 0.f)
@@ -271,9 +255,10 @@ void UARPG_MoveUtils::ARPG_MoveToActor(class ACharacterBase* Character, AActor* 
 		});
 		SettingRequest(ResultData, Character, Snap, AcceptanceRadius);
 	}
+	return ResultData.MoveId;
 }
 
-void UARPG_MoveUtils::ARPG_MoveToLocation(class ACharacterBase* Character, const FVector& Dest, const FOnARPG_MoveFinished& OnARPG_MoveFinished, float AcceptanceRadius, bool bStopOnOverlap, bool bUsePathfinding, bool bProjectDestinationToNavigation, bool bCanStrafe, TSubclassOf<UNavigationQueryFilter> FilterClass, bool bAllowPartialPaths)
+FAIRequestID UARPG_MoveUtils::ARPG_MoveToLocation(class ACharacterBase* Character, const FVector& Dest, const FOnARPG_MoveFinished& OnARPG_MoveFinished, float AcceptanceRadius, bool bStopOnOverlap, bool bUsePathfinding, bool bProjectDestinationToNavigation, bool bCanStrafe, TSubclassOf<UNavigationQueryFilter> FilterClass, bool bAllowPartialPaths)
 {
 	FPathFollowingRequestResult ResultData = ARPG_MoveToLocationImpl(Character, Dest, AcceptanceRadius, bStopOnOverlap, bUsePathfinding, bProjectDestinationToNavigation, bCanStrafe, FilterClass, bAllowPartialPaths);
 
@@ -310,6 +295,7 @@ void UARPG_MoveUtils::ARPG_MoveToLocation(class ACharacterBase* Character, const
 		});
 		SettingRequest(ResultData, Character, Snap, AcceptanceRadius);
 	}
+	return ResultData.MoveId;
 }
 
 void UARPG_MoveUtils::SettingRequest(FPathFollowingRequestResult &ResultData, class ACharacterBase* Character, const FOnARPG_MoveFinished &OnARPG_MoveFinished, float AcceptanceRadius)
@@ -318,7 +304,7 @@ void UARPG_MoveUtils::SettingRequest(FPathFollowingRequestResult &ResultData, cl
 	{
 	case EPathFollowingRequestResult::RequestSuccessful:
 	{
-		UPathFollowingComponent* PathFollowingComponent = GetPathFollowingComponent(Character->GetController());
+		UPathFollowingComponent* PathFollowingComponent = Character->GetPathFollowingComponent();
 		PathFollowingComponent->OnRequestFinished.AddUObject(GetDefault<UARPG_MoveUtils>(), &UARPG_MoveUtils::OnMoveCompleted, OnARPG_MoveFinished, PathFollowingComponent, ResultData.MoveId);
 	}
 	break;
@@ -349,7 +335,7 @@ void UARPG_MoveUtils::OnMoveCompleted(FAIRequestID RequestID, const FPathFollowi
 	}
 }
 
-void UARPG_MoveUtils::ARPG_MoveToLocationAndTurn(class ACharacterBase* Character, const FVector& Dest, const FRotator& TurnRotation, const FOnARPG_MoveFinished& OnARPG_MoveFinished, float AcceptanceRadius /*= 5.f*/, bool bStopOnOverlap /*= true*/, bool bUsePathfinding /*= true*/, bool bProjectDestinationToNavigation /*= false*/, bool bCanStrafe /*= true*/, TSubclassOf<UNavigationQueryFilter> FilterClass /*= nullptr*/, bool bAllowPartialPaths /*= true*/)
+FAIRequestID UARPG_MoveUtils::ARPG_MoveToLocationAndTurn(class ACharacterBase* Character, const FVector& Dest, const FRotator& TurnRotation, const FOnARPG_MoveFinished& OnARPG_MoveFinished, float AcceptanceRadius /*= 5.f*/, bool bStopOnOverlap /*= true*/, bool bUsePathfinding /*= true*/, bool bProjectDestinationToNavigation /*= false*/, bool bCanStrafe /*= true*/, TSubclassOf<UNavigationQueryFilter> FilterClass /*= nullptr*/, bool bAllowPartialPaths /*= true*/)
 {
 	FOnARPG_MoveFinished OnMoveFinishedThenTurn = FOnARPG_MoveFinished::CreateLambda([=](const FPathFollowingResult& PathFollowingResult)
 		{
@@ -362,31 +348,24 @@ void UARPG_MoveUtils::ARPG_MoveToLocationAndTurn(class ACharacterBase* Character
 				OnARPG_MoveFinished.ExecuteIfBound(PathFollowingResult);
 			}
 		});
-	ARPG_MoveToLocation(Character, Dest, OnMoveFinishedThenTurn, AcceptanceRadius, bStopOnOverlap, bUsePathfinding, bProjectDestinationToNavigation, bCanStrafe, FilterClass, bAllowPartialPaths);
+	return ARPG_MoveToLocation(Character, Dest, OnMoveFinishedThenTurn, AcceptanceRadius, bStopOnOverlap, bUsePathfinding, bProjectDestinationToNavigation, bCanStrafe, FilterClass, bAllowPartialPaths);
 }
 
-void UARPG_MoveUtils::ARPG_MoveToActorAndTurn(class ACharacterBase* Character, AActor* Goal, AActor* TurnToActor, const FOnARPG_MoveFinished& OnARPG_MoveFinished, float AcceptanceRadius, bool bStopOnOverlap, bool bUsePathfinding, bool bCanStrafe, TSubclassOf<class UNavigationQueryFilter> FilterClass, bool bAllowPartialPaths)
+FAIRequestID UARPG_MoveUtils::ARPG_MoveToActorAndTurn(class ACharacterBase* Character, AActor* Goal, AActor* TurnToActor, const FOnARPG_MoveFinished& OnARPG_MoveFinished, float AcceptanceRadius, bool bStopOnOverlap, bool bUsePathfinding, bool bCanStrafe, TSubclassOf<class UNavigationQueryFilter> FilterClass, bool bAllowPartialPaths)
 {
-	if (TurnToActor)
-	{
-		FOnARPG_MoveFinished OnMoveFinishedThenTurn = FOnARPG_MoveFinished::CreateLambda([=](const FPathFollowingResult& PathFollowingResult)
+	FOnARPG_MoveFinished OnMoveFinishedThenTurn = FOnARPG_MoveFinished::CreateLambda([=](const FPathFollowingResult& PathFollowingResult)
+		{
+			if (TurnToActor && PathFollowingResult.Code == EPathFollowingResult::Success && Character->CanTurnTo())
 			{
-				if (TurnToActor && PathFollowingResult.Code == EPathFollowingResult::Success && Character->CanTurnTo())
-				{
-					FRotator TurnToRotation = UKismetMathLibrary::FindLookAtRotation(Character->GetActorLocation(), TurnToActor->GetActorLocation());
-					Character->TurnTo(TurnToRotation, FOnCharacterBehaviorFinished::CreateStatic(&UARPG_MoveUtils::OnTurnCompleted, Character, TurnToRotation, PathFollowingResult, OnARPG_MoveFinished));
-				}
-				else
-				{
-					OnARPG_MoveFinished.ExecuteIfBound(PathFollowingResult);
-				}
-			});
-		ARPG_MoveToActor(Character, Goal, OnMoveFinishedThenTurn, AcceptanceRadius, bStopOnOverlap, bUsePathfinding, bCanStrafe, FilterClass, bAllowPartialPaths);
-	}
-	else
-	{
-		ARPG_MoveToActor(Character, Goal, OnARPG_MoveFinished, AcceptanceRadius, bStopOnOverlap, bUsePathfinding, bCanStrafe, FilterClass, bAllowPartialPaths);
-	}
+				FRotator TurnToRotation = UKismetMathLibrary::FindLookAtRotation(Character->GetActorLocation(), TurnToActor->GetActorLocation());
+				Character->TurnTo(TurnToRotation, FOnCharacterBehaviorFinished::CreateStatic(&UARPG_MoveUtils::OnTurnCompleted, Character, TurnToRotation, PathFollowingResult, OnARPG_MoveFinished));
+			}
+			else
+			{
+				OnARPG_MoveFinished.ExecuteIfBound(PathFollowingResult);
+			}
+		});
+	return ARPG_MoveToActor(Character, Goal, OnMoveFinishedThenTurn, AcceptanceRadius, bStopOnOverlap, bUsePathfinding, bCanStrafe, FilterClass, bAllowPartialPaths);
 }
 
 void UARPG_MoveUtils::OnTurnCompleted(bool Result, ACharacterBase* Character, FRotator TurnToRotation, FPathFollowingResult PathFollowingResult, FOnARPG_MoveFinished OnARPG_MoveFinish)
@@ -424,7 +403,7 @@ UARPG_CharacterMove_AsyncAction* UARPG_CharacterMove_AsyncAction::BP_ARPG_MoveTo
 
 UARPG_CharacterMove_AsyncAction* UARPG_CharacterMove_AsyncAction::BP_MoveToActorAndTurn(class ACharacterBase* Character, AActor* Goal, AActor* TurnToActor, float AcceptanceRadius /*= 5.f*/, bool bStopOnOverlap /*= true*/, bool bUsePathfinding /*= true*/, bool bCanStrafe /*= true*/, TSubclassOf<class UNavigationQueryFilter> FilterClass /*= nullptr*/, bool bAllowPartialPaths /*= true*/)
 {
-	if (Character && Character->GetController())
+	if (Character && Character->GetController() && TurnToActor)
 	{
 		UARPG_CharacterMove_AsyncAction* CharacterMove_AsyncAction = NewObject<UARPG_CharacterMove_AsyncAction>(Character);
 		CharacterMove_AsyncAction->Character = Character;
@@ -482,7 +461,7 @@ UARPG_CharacterMove_AsyncAction* UARPG_CharacterMove_AsyncAction::SettingRequest
 	{
 	case EPathFollowingRequestResult::RequestSuccessful:
 	{
-		UPathFollowingComponent* PathFollowingComponent = UARPG_MoveUtils::GetPathFollowingComponent(Character->GetController());
+		UPathFollowingComponent* PathFollowingComponent = Character->GetPathFollowingComponent();
 		PathFollowingComponent->OnRequestFinished.AddUObject(CharacterMove_AsyncAction, &UARPG_CharacterMove_AsyncAction::OnMoveCompletedCheckedId, PathFollowingComponent, ResultData.MoveId);
 	}
 	break;

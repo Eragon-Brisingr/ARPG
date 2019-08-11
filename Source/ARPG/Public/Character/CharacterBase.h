@@ -35,6 +35,9 @@ class UARPG_InventoryComponent;
 class AARPG_ItemBase;
 class UARPG_MovementComponent;
 class UARPG_ItemCoreBase;
+class USoundAttenuation;
+class UAudioComponent;
+class UPathFollowingComponent;
 
 UENUM()
 enum class EInteractEndResult : uint8
@@ -664,6 +667,39 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "角色|动作")
 	void TurnTo(const FRotator& TargetWorldRotation, bool ForceSnapRotation = true);
 
+	// 说话
+public:
+	UPROPERTY(EditDefaultsOnly, Category = "角色|说话")
+	FName MouthSocketName = TEXT("Mouth");
+
+	UPROPERTY(EditDefaultsOnly, Category = "角色|说话")
+	USoundAttenuation* SpeakDefaultAttenuationSettings;
+
+	UPROPERTY(Transient, BlueprintReadOnly, BlueprintGetter = GetMouthComponent)
+	UAudioComponent* MouthComponentRuntime;
+
+	UFUNCTION(BlueprintGetter)
+	UAudioComponent* GetMouthComponent();
+
+	void Speak(USoundBase* Sentence, const FOnCharacterBehaviorFinished& OnSpeakFinished);
+	void StopSpeak();
+
+	UFUNCTION(NetMulticast, Unreliable, WithValidation)
+	void SpeakToAllClient(USoundBase* Sentence);
+
+	UFUNCTION(NetMulticast, Unreliable, WithValidation)
+	void StopSpeakToAllClient();
+
+	FOnCharacterBehaviorFinished OnSpeakFinishedDelegate;
+
+	//寻路相关接口
+public:
+	UPROPERTY(Transient)
+	UPathFollowingComponent* PathFollowingComponent;
+	UPathFollowingComponent* GetPathFollowingComponent();
+
+	void PauseMove();
+	void ResumeMove();
 public:
 	void ForceSetClientWorldLocation(const FVector& Location);
 	void ForceSetClientWorldLocationAndRotation(const FVector& Location, const FRotator& Rotation);

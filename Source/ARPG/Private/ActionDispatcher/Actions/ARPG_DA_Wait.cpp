@@ -4,7 +4,7 @@
 #include "GameFramework/Pawn.h"
 #include "ARPG_TimeManager.h"
 
-TArray<AActor*> UARPG_DA_Wait::GetAllRegistableEntities() const
+TSet<AActor*> UARPG_DA_Wait::GetAllRegistableEntities() const
 {
 	return { Pawn.Get() };
 }
@@ -29,7 +29,7 @@ void UARPG_DA_Wait::WhenActionFinished()
 
 }
 
-TArray<AActor*> UARPG_DA_WaitGameTime::GetAllRegistableEntities() const
+TSet<AActor*> UARPG_DA_WaitGameTime::GetAllRegistableEntities() const
 {
 	return { Pawn.Get() };
 }

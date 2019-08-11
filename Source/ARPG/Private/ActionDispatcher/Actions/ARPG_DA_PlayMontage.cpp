@@ -3,7 +3,7 @@
 #include "ARPG_DA_PlayMontage.h"
 #include "CharacterBase.h"
 
-TArray<AActor*> UARPG_DA_PlayMontage::GetAllRegistableEntities() const
+TSet<AActor*> UARPG_DA_PlayMontage::GetAllRegistableEntities() const
 {
 	return { Pawn.Get() };
 }
