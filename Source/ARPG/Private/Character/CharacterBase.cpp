@@ -665,8 +665,14 @@ void ACharacterBase::Speak(USoundBase* Sentence, const FOnCharacterBehaviorFinis
 	{
 		MouthComponent->OnAudioFinishedNative.AddWeakLambda(this, [=](UAudioComponent* AudioComponent)
 			{
-				OnSpeakFinishedDelegate.ExecuteIfBound(true);
-				OnSpeakFinishedDelegate.Unbind();
+				MouthComponent->OnAudioFinishedNative.RemoveAll(this);
+				//最后再执行，否则可能执行流中又向OnAudioFinishedNative绑定了委托
+				if (OnSpeakFinishedDelegate.IsBound())
+				{
+					auto CachedDelegate = OnSpeakFinishedDelegate;
+					OnSpeakFinishedDelegate.Unbind();
+					CachedDelegate.Execute(true);
+				}
 			});
 	}
 	OnSpeakFinishedDelegate = OnSpeakFinished;

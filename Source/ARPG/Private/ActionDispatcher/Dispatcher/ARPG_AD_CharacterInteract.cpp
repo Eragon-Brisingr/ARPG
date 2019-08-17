@@ -9,21 +9,9 @@ UARPG_AD_CharacterInteract::UARPG_AD_CharacterInteract()
 	bIsMainDispatcher = true;
 }
 
-void UARPG_AD_CharacterInteract::StartFaceToInteracter()
-{
-	FaceToInteracter = true;
-	Character->SetLockedTarget(InteractTarget.Get());
-}
-
-void UARPG_AD_CharacterInteract::StopFaceToInteracter()
-{
-	FaceToInteracter = false;
-	Character->SetLockedTarget(nullptr);
-}
-
 void UARPG_AD_CharacterInteract::WhenActived()
 {
-	if (FaceToInteracter)
+	if (bFaceToInteracter)
 	{
 		StartFaceToInteracter();
 	}
@@ -31,8 +19,20 @@ void UARPG_AD_CharacterInteract::WhenActived()
 
 void UARPG_AD_CharacterInteract::WhenDeactived(bool IsFinsihedCompleted)
 {
-	if (FaceToInteracter)
+	if (bFaceToInteracter)
 	{
 		StopFaceToInteracter();
 	}
+}
+
+void UARPG_AD_CharacterInteract::StartFaceToInteracter()
+{
+	bFaceToInteracter = true;
+	Character->SetLockedTarget(InteractTarget.Get());
+}
+
+void UARPG_AD_CharacterInteract::StopFaceToInteracter()
+{
+	bFaceToInteracter = false;
+	Character->SetLockedTarget(nullptr);
 }

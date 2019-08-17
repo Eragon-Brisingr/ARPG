@@ -62,7 +62,10 @@ void AHumanBase::OnConstruction(const FTransform& Transform)
 	}
 #endif
 
-	GetMesh()->GetAnimInstance()->SetSubInstanceClassByTag(MoveAnimInstanceOverrideTagName, DefualtMoveAnimBp);
+	if (UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance())
+	{
+		AnimInstance->SetSubInstanceClassByTag(MoveAnimInstanceOverrideTagName, DefualtMoveAnimBp);
+	}
 }
 
 void AHumanBase::PreSave(const class ITargetPlatform* TargetPlatform)

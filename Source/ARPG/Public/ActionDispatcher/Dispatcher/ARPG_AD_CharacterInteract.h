@@ -25,15 +25,14 @@ public:
 	UPROPERTY(BlueprintReadOnly, Category = "交互")
 	TSoftObjectPtr<ACharacterBase> InteractTarget;
 
-	UFUNCTION(BlueprintCallable, Category = "交互")
-	void StartFaceToInteracter();
-
-	UFUNCTION(BlueprintCallable, Category = "交互")
-	void StopFaceToInteracter();
-
-	UPROPERTY(SaveGame)
-	uint8 FaceToInteracter : 1;
-
 	void WhenActived() override;
 	void WhenDeactived(bool IsFinsihedCompleted) override;
+
+public:
+	UPROPERTY(SaveGame)
+	uint8 bFaceToInteracter : 1;
+	UFUNCTION(BlueprintCallable, Category = "交互")
+	void StartFaceToInteracter();
+	UFUNCTION(BlueprintCallable, Category = "交互")
+	void StopFaceToInteracter();
 };
