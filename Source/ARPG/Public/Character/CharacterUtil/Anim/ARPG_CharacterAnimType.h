@@ -84,12 +84,12 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "动画", meta = (DisplayName = "不使用右手镜像动画"))
 	uint8 bNotMirrorFromRight : 1;
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "动画", meta = (EditCondition = bNotMirrorFromRight))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "动画", meta = (DisplayName = "左手动画", EditCondition = bNotMirrorFromRight))
 	FARPG_MontageParameter LeftMontage;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "动画", meta = (DisplayName = "不使用左手镜像动画"))
 	uint8 bNotMirrorFromLeft : 1;
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "动画", meta = (EditCondition = bNotMirrorFromLeft))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "动画", meta = (DisplayName = "右手动画", EditCondition = bNotMirrorFromLeft))
 	FARPG_MontageParameter RightMontage;
 
 	void PlayLeftMontage(ACharacterBase* Character) const;
@@ -126,36 +126,6 @@ public:
 	virtual void InvokePlay_Implementation(class ACharacterBase* Character) const override;
 
 	virtual void InvokePlayDodgeAnim_Implementation(class ACharacterBase* Character, EDodgeDirection DodgeDirection) const override;
-
-	UPROPERTY(EditAnywhere, Category = "动画", meta = (DisplayName = "左手轻攻击"))
-	FARPG_MontageParameter LeftLightAttack;
-
-	UPROPERTY(EditAnywhere, Category = "动画", meta = (DisplayName = "左手重攻击"))
-	FARPG_MontageParameter LeftHeavyAttack;
-
-	UPROPERTY(EditAnywhere, Category = "动画", meta = (DisplayName = "右手重攻击"))
-	FARPG_MontageParameter RightLightAttack;
-
-	UPROPERTY(EditAnywhere, Category = "动画", meta = (DisplayName = "右手重攻击"))
-	FARPG_MontageParameter RightHeavyAttack;
-
-	UPROPERTY(EditAnywhere, Category = "动画", meta = (DisplayName = "左手冲刺攻击"))
-	FARPG_MontageParameter LeftSprintAttack;
-
-	UPROPERTY(EditAnywhere, Category = "动画", meta = (DisplayName = "右手冲刺攻击"))
-	FARPG_MontageParameter RightSprintAttack;
-
-	UPROPERTY(EditAnywhere, Category = "动画", meta = (DisplayName = "左手下落攻击"))
-	FARPG_MontageParameter LeftFallingAttack;
-
-	UPROPERTY(EditAnywhere, Category = "动画", meta = (DisplayName = "右手下落攻击"))
-	FARPG_MontageParameter RightFallingAttack;
-
-	UPROPERTY(EditDefaultsOnly, Category = "动画", meta = (DisplayName = "左手翻滚攻击"))
-	FARPG_MontageParameter DodogeForwardLeftAttack;
-
-	UPROPERTY(EditDefaultsOnly, Category = "动画", meta = (DisplayName = "右手翻滚攻击"))
-	FARPG_MontageParameter DodogeForwardRightAttack;
 
 	UPROPERTY(EditAnywhere, Category = "动画", meta = (DisplayName = "轻攻击"))
 	FARPG_MontageParameterMirrorable LightAttack;

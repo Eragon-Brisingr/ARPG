@@ -13,18 +13,12 @@ class UARPG_ArrowCoreBase;
 /**
  * 
  */
-UCLASS(Abstract, meta = (DisplayName = "箭"))
+UCLASS(Abstract, meta = (DisplayName = "箭实体"))
 class ARPG_API AARPG_ArrowBase : public AARPG_WeaponBase
 {
 	GENERATED_BODY()
 public:
 	AARPG_ArrowBase(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
-	
-	virtual void PostInitializeComponents() override;
-
-	virtual void UseItemImpl_Implementation(class UARPG_ItemCoreBase* ItemCore, class ACharacterBase* ItemOwner, EUseItemInput UseItemInput) const override;
-
-	virtual void WhenRemoveFromInventory_Implementation(class AActor* ItemOwner, class UXD_ItemCoreBase* ItemCore, int32 RemoveNumber, int32 ExistNumber) const override;
 public:
 	void WhenHitCharacter(USceneComponent* MyComp, AActor* Other, UPrimitiveComponent* OtherComp, const FHitResult& Hit, FApplyPointDamageParameter ApplyPointDamageParameter);
 
@@ -49,14 +43,36 @@ public:
 	virtual void OnRep_AttachmentReplication() override;
 
 public:
-	UPROPERTY(EditDefaultsOnly, Category = "武器", meta = (DisplayName = "箭袋"))
-	UStaticMesh* Dorlach;
-
 	void WhenUse(class ACharacterBase* ItemOwner) override;
-
-	void ToEquippedDorlachMode();
-
 public:
-	const UARPG_ArrowCoreBase* GetItemCore() const;
-	UARPG_ArrowCoreBase* GetItemCore_Careful() const;
+	const UARPG_ArrowCoreBase* GetItemCoreConst() const;
+	UARPG_ArrowCoreBase* GetItemCore() const;
+};
+
+UCLASS()
+class ARPG_API AARPG_Arrow_StaticMesh : public AARPG_ArrowBase
+{
+	GENERATED_BODY()
+public:
+	// Sets default values for this actor's properties
+	AARPG_Arrow_StaticMesh(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
+public:
+	UPROPERTY()
+	UStaticMeshComponent* StaticMeshComponent;
+
+	void InitItemMesh() override { InitStaticMeshComponent(StaticMeshComponent); }
+};
+
+UCLASS()
+class ARPG_API AARPG_Arrow_SkeletalMesh : public AARPG_ArrowBase
+{
+	GENERATED_BODY()
+public:
+	// Sets default values for this actor's properties
+	AARPG_Arrow_SkeletalMesh(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
+public:
+	UPROPERTY()
+	USkeletalMeshComponent* SkeletalMeshComponent;
+
+	void InitItemMesh() override { InitSkeletalMeshComponent(SkeletalMeshComponent); }
 };

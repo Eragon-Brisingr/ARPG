@@ -35,15 +35,7 @@ void UARPG_AnimFunctionLibrary::CheckAndFixAnimData(UAnimMontage* Montage, TSubc
 		if (!Montage->GetMetaData().ContainsByPredicate([&](UAnimMetaData* E) {return E && E->IsA(AnimMetaType); }))
 		{
 			Montage->AddMetaData(NewObject<UAMD_CanPlayWhenFalling>(Montage));
-			if (UPackage* Package = Montage->GetTypedOuter<UPackage>())
-			{
-				const bool bIsDirty = Package->IsDirty();
-				if (!bIsDirty)
-				{
-					Package->SetDirtyFlag(true);
-				}
-				Package->PackageMarkedDirtyEvent.Broadcast(Package, bIsDirty);
-			}
+			Montage->MarkPackageDirty();
 			Anim_Error_Log("%s中不存在%s元数据，自动添加", *UARPG_DebugFunctionLibrary::GetDebugName(Montage), *UARPG_DebugFunctionLibrary::GetDebugName(AnimMetaType));
 		}
 	}
@@ -80,7 +72,7 @@ void UARPG_AttackAnimSetNormal::InvokePlay_Implementation(class ACharacterBase* 
 					}
 					else if (IsFalling)
 					{
-						UARPG_AnimFunctionLibrary::CheckAndFixAnimData(LeftFallingAttack.Montage, UAMD_CanPlayWhenFalling::StaticClass());
+						UARPG_AnimFunctionLibrary::CheckAndFixAnimData(FallingAttack.LeftMontage.Montage, UAMD_CanPlayWhenFalling::StaticClass());
 
 						FallingAttack.PlayLeftMontage(Character);
 					}
@@ -101,7 +93,7 @@ void UARPG_AttackAnimSetNormal::InvokePlay_Implementation(class ACharacterBase* 
 					}
 					else if (IsFalling)
 					{
-						UARPG_AnimFunctionLibrary::CheckAndFixAnimData(RightFallingAttack.Montage, UAMD_CanPlayWhenFalling::StaticClass());
+						UARPG_AnimFunctionLibrary::CheckAndFixAnimData(FallingAttack.RightMontage.Montage, UAMD_CanPlayWhenFalling::StaticClass());
 
 						FallingAttack.PlayRightMontage(Character);
 					}

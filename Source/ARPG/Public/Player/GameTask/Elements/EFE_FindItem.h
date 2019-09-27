@@ -54,8 +54,8 @@ public:
 
 	FText ReceiveGetDescribe_Implementation() const override;
 
-	UPROPERTY(EditAnywhere, Category = "任务目标", Replicated, meta = (DisplayName = "目标物品"), SaveGame)
-	FARPG_Item TargetItem;
+	UPROPERTY(EditAnywhere, Category = "任务目标", Replicated, meta = (DisplayName = "目标物品"), SaveGame, Instanced)
+	UARPG_ItemCoreBase* TargetItem;
 };
 
 UCLASS(meta = (DisplayName = "找到物品（类型）", Category = "物品相关"))
@@ -70,5 +70,5 @@ public:
 	FText ReceiveGetDescribe_Implementation() const override;
 
 	UPROPERTY(EditAnywhere, Category = "任务目标", Replicated, meta = (DisplayName = "目标物品类型"), SaveGame)
-	TSubclassOf<AARPG_ItemBase> TargetItemType;
+	TSubclassOf<UARPG_ItemCoreBase> TargetItemType;
 };

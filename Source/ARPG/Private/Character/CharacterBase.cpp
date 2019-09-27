@@ -43,6 +43,7 @@
 #include "ARPG_ReceiveDamageActionBase.h"
 #include "ARPG_HUDBase.h"
 #include "Components/AudioComponent.h"
+#include "ARPG_Item_Log.h"
 
 // Sets default values
 ACharacterBase::ACharacterBase(const FObjectInitializer& ObjectInitializer)
@@ -204,14 +205,17 @@ void ACharacterBase::Reset()
 	//初始化道具和使用中的道具
 	{
 		TArray<UARPG_ItemCoreBase*> RemoveItems;
-		TArray<FARPG_Item> FinalInitItemList = GetReInitItemList();
+		TArray<UARPG_ItemCoreBase*> FinalInitItemList = GetReInitItemList();
 		//对已存在的进行数量修改
 		for (UARPG_ItemCoreBase* ItemCore : Inventory->GetItemCoreList())
 		{
-			if (const FARPG_Item * Item = FinalInitItemList.FindByPredicate([ItemCore](const FARPG_Item & E_Item) {return ItemCore->IsEqualWithItemCore(E_Item.ItemCore); }))
+			if (UARPG_ItemCoreBase** P_Item = FinalInitItemList.FindByPredicate([ItemCore](const UARPG_ItemCoreBase* E_Item) {return ItemCore->IsEqualWithItemCore(E_Item); }))
 			{
-				ItemCore->Number = Item->ItemCore->Number;
-				FinalInitItemList.RemoveAll([&](const FARPG_Item & E) {return E->IsEqualWithItemCore(ItemCore); });
+				if (UARPG_ItemCoreBase* Item = *P_Item)
+				{
+					ItemCore->Number = Item->Number;
+					FinalInitItemList.RemoveAll([&](const UARPG_ItemCoreBase* E) {return E->IsEqualWithItemCore(ItemCore); });
+				}
 			}
 			else
 			{
@@ -229,14 +233,14 @@ void ACharacterBase::Reset()
 	}
 }
 
-TArray<struct FARPG_Item> ACharacterBase::GetReInitItemList() const
+TArray<UARPG_ItemCoreBase*> ACharacterBase::GetReInitItemList() const
 {
-	TArray<FARPG_Item> Res = GetInitItemList();
-	Res.Append(ArrayCast<FARPG_Item>(Inventory->InitItems));
+	TArray<UARPG_ItemCoreBase*> Res = GetInitItemList();
+	Res.Append(ArrayCast<UARPG_ItemCoreBase*>(Inventory->InitItems));
 	return Res;
 }
 
-TArray<struct FARPG_Item> ACharacterBase::GetInitItemList() const
+TArray<UARPG_ItemCoreBase*> ACharacterBase::GetInitItemList() const
 {
 	return ReceivedGetInitItemList();
 }
@@ -970,10 +974,27 @@ void ACharacterBase::InvokeUseItem_Server_Implementation(const class UARPG_ItemC
 {
 	if (ARPG_MovementComponent->IsMovingOnGround() && CanPlayFullBodyMontage())
 	{
-		const AARPG_ItemBase* Item = ItemCore->GetItemDefaultActor<AARPG_ItemBase>();
-		if (Item->UseItemMontage)
+		if (ItemCore->UseItemMontage)
 		{
-			Item->PlayUseItemMontage(ItemCore, this);
+			PendingUseItem = CastChecked<AARPG_ItemBase>(ItemCore->SpawnItemActorForOwner(this, this));
+			PendingUseItem->SetItemSimulatePhysics(false);
+			PendingUseItem->SetActorHiddenInGame(true);
+			PendingUseItem->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, ItemCore->UseItemAttachSocketName);
+			PlayMontageWithBlendingOutDelegate(ItemCore->UseItemMontage, FOnMontageBlendingOutStarted::CreateWeakLambda(this, [=](UAnimMontage* Montage, bool bInterrupted)
+				{
+					if (PendingUseItem)
+					{
+						if (bInterrupted)
+						{
+							PendingUseItem->Destroy();
+						}
+						else
+						{
+							Item_Warning_LOG("%s的动画%s已经播放完，但是角色还引用该道具，执行销毁", *UXD_DebugFunctionLibrary::GetDebugName(this), *UXD_DebugFunctionLibrary::GetDebugName(Montage));
+							PendingUseItem->Destroy();
+						}
+					}
+				}), {}, 1.f, NAME_None, false);
 		}
 		else
 		{

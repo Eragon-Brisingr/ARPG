@@ -11,14 +11,12 @@
 
 UARPG_InventoryComponent::UARPG_InventoryComponent()
 {
-#if WITH_EDITOR
-	InitItemsType = AARPG_ItemBase::StaticClass();
-#endif
+
 }
 
-void UARPG_InventoryComponent::AddItemArray(const TArray<FARPG_Item>& Items)
+void UARPG_InventoryComponent::AddItemArray(const TArray<UARPG_ItemCoreBase*>& Items)
 {
-	UXD_InventoryComponentBase::AddItemArray(ArrayCast<FXD_Item>(Items));
+	UXD_InventoryComponentBase::AddItemArray(ArrayCast<UXD_ItemCoreBase*>(Items));
 }
 
 bool UARPG_InventoryComponent::TradeItem(int32 DeductMoney, UARPG_InventoryComponent* OtherInventory, class UARPG_ItemCoreBase* ItemCore, int32 Number)
@@ -66,7 +64,7 @@ bool UARPG_InventoryComponent::SpendMoney(int32 SpandStandardMoney, TArray<class
 			//TODO: 游戏性相关，应该允许金钱使用的排序策略
 			for (UXD_ItemCoreBase* ItemCore : ItemCoreList)
 			{
-				if (const AARPG_MoneyBase* Money = Cast<AARPG_MoneyBase>(ItemCore->GetItemDefaultActor()))
+				if (UARPG_MoneyBase* Money = Cast<UARPG_MoneyBase>(ItemCore))
 				{
 					int32 Temp = SpandStandardMoney;
 					SpandStandardMoney -= ItemCore->Number * Money->GetPrice();
@@ -74,7 +72,7 @@ bool UARPG_InventoryComponent::SpendMoney(int32 SpandStandardMoney, TArray<class
 					{
 						Temp = ItemCore->Number * Money->GetPrice();
 					}
-					SpendedMoneys.Add(Cast<UARPG_ItemCoreBase>(Money->GetItemCore_Careful()));
+					SpendedMoneys.Add(Money);
 					RemoveItemCore(ItemCore, FMath::CeilToInt(Temp / Money->GetPrice()));
 					break;
 				}
@@ -90,7 +88,7 @@ float UARPG_InventoryComponent::GetStandardMoneyNumber() const
 	float StandardMoney = 0.f;
 	for (UXD_ItemCoreBase* ItemCore : ItemCoreList)
 	{
-		if (const AARPG_MoneyBase* Money = Cast<AARPG_MoneyBase>(ItemCore->GetItemDefaultActor()))
+		if (const UARPG_MoneyBase* Money = Cast<UARPG_MoneyBase>(ItemCore))
 		{
 			StandardMoney += ItemCore->Number * Money->GetPrice();
 		}

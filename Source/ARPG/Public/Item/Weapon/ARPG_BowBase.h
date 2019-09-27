@@ -9,7 +9,7 @@
 /**
  * 
  */
-UCLASS(Abstract, meta = (DisplayName = "弓"))
+UCLASS(Abstract, meta = (DisplayName = "弓实体"))
 class ARPG_API AARPG_BowBase : public AARPG_WeaponBase
 {
 	GENERATED_BODY()
@@ -34,4 +34,32 @@ public:
 	void AttackingTick_Implementation(class AActor* AttackTarget, float DeltaSecond) override;
 	//
 	void AI_ReleaseArrow(FBP_OnAttackFinished OnAttackFinished);
+};
+
+UCLASS()
+class ARPG_API AARPG_Bow_StaticMesh : public AARPG_BowBase
+{
+	GENERATED_BODY()
+public:
+	// Sets default values for this actor's properties
+	AARPG_Bow_StaticMesh(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
+public:
+	UPROPERTY()
+	UStaticMeshComponent* StaticMeshComponent;
+
+	void InitItemMesh() override { InitStaticMeshComponent(StaticMeshComponent); }
+};
+
+UCLASS()
+class ARPG_API AARPG_Bow_SkeletalMesh : public AARPG_BowBase
+{
+	GENERATED_BODY()
+public:
+	// Sets default values for this actor's properties
+	AARPG_Bow_SkeletalMesh(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
+public:
+	UPROPERTY()
+	USkeletalMeshComponent* SkeletalMeshComponent;
+
+	void InitItemMesh() override { InitSkeletalMeshComponent(SkeletalMeshComponent); }
 };

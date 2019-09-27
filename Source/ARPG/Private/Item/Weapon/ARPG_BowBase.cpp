@@ -2,7 +2,9 @@
 
 #include "ARPG_BowBase.h"
 #include <Components/SkeletalMeshComponent.h>
+#include "Components/StaticMeshComponent.h"
 #include "ARPG_BowCoreBase.h"
+#include "ARPG_ArrowCoreBase.h"
 #include "HumanBase.h"
 #include "ARPG_ArrowBase.h"
 #include "ARPG_InventoryComponent.h"
@@ -12,7 +14,7 @@
 
 
 AARPG_BowBase::AARPG_BowBase(const FObjectInitializer& ObjectInitializer /*= FObjectInitializer::Get()*/)
-	:Super(ObjectInitializer.SetDefaultSubobjectClass<UARPG_BowCoreBase>(GET_MEMBER_NAME_CHECKED(AARPG_BowBase, InnerItemCore)))
+	:Super(ObjectInitializer)
 {
 
 }
@@ -23,7 +25,7 @@ void AARPG_BowBase::SpawnArrowInHand()
 	{
 		if (Human->Arrow)
 		{
-			HoldingArrow = Cast<AARPG_ArrowBase>(Human->Arrow->GetItemCore()->SpawnItemActorForOwner(this, Human));
+			HoldingArrow = Cast<AARPG_ArrowBase>(Human->Arrow->GetItemCoreConst()->SpawnItemActorForOwner(this, Human));
 			HoldingArrow->SetItemSimulatePhysics(false);
 			HoldingArrow->AttachWeaponTo(Human->GetMesh(), Human->LeftWeapon == this ? Human->LeftHandHoldingArrowSocketName : Human->RightHandHoldingArrowSocketName);
 		}
@@ -38,7 +40,7 @@ void AARPG_BowBase::LaunchArrow(float FullBowTime, const FApplyPointDamageParame
 		{
 			if (ACharacterBase* Character = GetItemOwner())
 			{
-				Character->Inventory->RemoveItemCore(HoldingArrow->GetItemCore());
+				Character->Inventory->RemoveItemCore(HoldingArrow->GetItemCoreConst());
 			}
 		}
 
@@ -89,4 +91,20 @@ void AARPG_BowBase::AI_ReleaseArrow(FBP_OnAttackFinished OnAttackFinished)
 		Human->EnableAutoUpdateLookAtRotation(true);
 		OnAttackFinished.ExecuteIfBound(true);
 	}
+}
+
+AARPG_Bow_StaticMesh::AARPG_Bow_StaticMesh(const FObjectInitializer& ObjectInitializer /*= FObjectInitializer::Get()*/)
+	: Super(ObjectInitializer)
+{
+	StaticMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(GET_MEMBER_NAME_CHECKED(AXD_Item_StaticMesh, StaticMeshComponent));
+
+	SetRootComponent(StaticMeshComponent);
+}
+
+AARPG_Bow_SkeletalMesh::AARPG_Bow_SkeletalMesh(const FObjectInitializer& ObjectInitializer /*= FObjectInitializer::Get()*/)
+	: Super(ObjectInitializer)
+{
+	SkeletalMeshComponent = CreateDefaultSubobject<USkeletalMeshComponent>(GET_MEMBER_NAME_CHECKED(AXD_Item_SkeletalMesh, SkeletalMeshComponent));
+
+	SetRootComponent(SkeletalMeshComponent);
 }

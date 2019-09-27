@@ -10,6 +10,10 @@
 
 class UAnimInstance;
 class USkeletalMeshComponent;
+class UARPG_ItemCoreBase;
+class AARPG_WeaponBase;
+class AARPG_ArrowBase;
+class AARPG_EquipmentBase;
 
 /**
  * 
@@ -38,22 +42,21 @@ public:
 
 	void WhenPostLoad_Implementation() override;
 
-	TArray<struct FARPG_Item> GetInitItemList() const override;
+	TArray<UARPG_ItemCoreBase*> GetInitItemList() const override;
 
-	class AARPG_WeaponBase* EquipWaepon_Implementation(class UARPG_WeaponCoreBase* WeaponCore, EUseItemInput UseItemInput) override;
+	AARPG_WeaponBase* EquipWaepon_Implementation(class UARPG_WeaponCoreBase* WeaponCore, EUseItemInput UseItemInput) override;
 
-	class AARPG_WeaponBase* UseBothHandWeaponImpl(EUseItemInput UseItemInput, class UARPG_WeaponCoreBase* WeaponCore);
+	AARPG_WeaponBase* UseBothHandWeaponImpl(EUseItemInput UseItemInput, class UARPG_WeaponCoreBase* WeaponCore);
 
-	class AARPG_WeaponBase* UseSingleWeaponImpl(EUseItemInput UseItemInput, class UARPG_WeaponCoreBase* WeaponCore);
+	AARPG_WeaponBase* UseSingleWeaponImpl(EUseItemInput UseItemInput, class UARPG_WeaponCoreBase* WeaponCore);
 
-	class AARPG_ArrowBase* EquipArrow_Implementation(class UARPG_ArrowCoreBase* ArrowCore, EUseItemInput UseItemInput) override;
+	AARPG_ArrowBase* EquipArrow_Implementation(class UARPG_ArrowCoreBase* ArrowCore, EUseItemInput UseItemInput) override;
 
-	class AARPG_EquipmentBase* EquipEquipment_Implementation(class UARPG_EquipmentCoreBase* EquipmentCore, EUseItemInput UseItemInput) override;
+	AARPG_EquipmentBase* EquipEquipment_Implementation(class UARPG_EquipmentCoreBase* EquipmentCore, EUseItemInput UseItemInput) override;
 
 	bool IsDefenseSucceed_Implementation(const FVector& DamageFromLocation, const FHitResult& HitInfo) const override;
 
 	bool IsInReleaseState() const override;
-
 public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "角色")
 	USkeletalMeshComponent* Head;
@@ -72,17 +75,17 @@ public:
 	void FinishAttack(FBP_OnAttackFinished OnAttackFinished);
 
 public:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "配置|常用", meta = (DisplayName = "默认左手武器", ExposeOnSpawn = "True"), SaveGame)
-	FARPG_Item DefaultLeftWeapon;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Instanced, Category = "配置|常用", meta = (DisplayName = "默认左手武器", ExposeOnSpawn = "True"), SaveGame)
+	UARPG_WeaponCoreBase* DefaultLeftWeapon;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "配置|常用", meta = (DisplayName = "默认右手武器", ExposeOnSpawn = "True"), SaveGame)
-	FARPG_Item DefaultRightWeapon;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Instanced, Category = "配置|常用", meta = (DisplayName = "默认右手武器", ExposeOnSpawn = "True"), SaveGame)
+	UARPG_WeaponCoreBase* DefaultRightWeapon;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "配置|常用", meta = (DisplayName = "默认箭", ExposeOnSpawn = "True"), SaveGame)
-	FARPG_Item DefaultArrow;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Instanced, Category = "配置|常用", meta = (DisplayName = "默认箭", ExposeOnSpawn = "True"), SaveGame)
+	UARPG_ArrowCoreBase* DefaultArrow;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "配置|常用", meta = (DisplayName = "默认装备列表", ExposeOnSpawn = "True"), SaveGame)
-	TArray<FARPG_Item> DefaultEquipmentList;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Instanced, Category = "配置|常用", meta = (DisplayName = "默认装备列表", ExposeOnSpawn = "True"), SaveGame)
+	TArray<UARPG_EquipmentCoreBase*> DefaultEquipmentList;
 	
 	//装备相关
 public:
@@ -92,11 +95,14 @@ public:
 	void OnRep_UseWeaponState();
 	void SetUseWeaponState(EUseWeaponState NewUseWeaponState);
 
+private:
 	template<typename EquipType>
 	void SetEquipVariable(EquipType*& CurEquip, EquipType* ToEquip);
-
 	void OnRep_EquipVariable(class AARPG_ItemBase* CurEquip, class AARPG_ItemBase* PreEquip);
+	void OnRep_UseItemImpl(class AARPG_ItemBase* CurEquip);
+	void OnRep_NotUseImpl(class AARPG_ItemBase* PreEquip);
 
+public:
 	UPROPERTY(ReplicatedUsing = OnRep_LeftWeapon, VisibleAnywhere, AdvancedDisplay, BlueprintReadWrite, BlueprintSetter = "SetLeftWeapon", Category = "角色", SaveGame)
 	class AARPG_WeaponBase* LeftWeapon;
 	UFUNCTION(BlueprintSetter)
@@ -220,20 +226,6 @@ template<typename EquipType>
 void AHumanBase::SetEquipVariable(EquipType*& CurEquip, EquipType* ToEquip)
 {
 	EquipType* PreEquip = CurEquip;
-	if (PreEquip)
-	{
-#if WITH_EDITOR
-		if (!GetWorld()->IsGameWorld())
-		{
-			PreEquip->Destroy();
-		}
-		else
-#endif
-		{
-			PreEquip->SetLifeSpan(1.f);
-		}
-		PreEquip->SetActorHiddenInGame(true);
-	}
 	CurEquip = ToEquip;
 	OnRep_EquipVariable(CurEquip, PreEquip);
 }

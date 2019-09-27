@@ -16,34 +16,9 @@
 
 
 AARPG_ArrowBase::AARPG_ArrowBase(const FObjectInitializer& ObjectInitializer /*= FObjectInitializer::Get()*/)
-	:Super(ObjectInitializer.SetDefaultSubobjectClass<UARPG_ArrowCoreBase>(GET_MEMBER_NAME_CHECKED(AARPG_ArrowBase, InnerItemCore)))
+	: Super(ObjectInitializer)
 {
-	bCanCompositeInInventory = true;
-}
-
-void AARPG_ArrowBase::PostInitializeComponents()
-{
-	Super::PostInitializeComponents();
 	
-}
-
-void AARPG_ArrowBase::UseItemImpl_Implementation(class UARPG_ItemCoreBase* ItemCore, class ACharacterBase* ItemOwner, EUseItemInput UseItemInput) const
-{
-	if (UARPG_ArrowCoreBase* ArrowCore = Cast<UARPG_ArrowCoreBase>(ItemCore))
-	{
-		ItemOwner->EquipArrow(ArrowCore, UseItemInput);
-	}
-}
-
-void AARPG_ArrowBase::WhenRemoveFromInventory_Implementation(class AActor* ItemOwner, class UXD_ItemCoreBase* ItemCore, int32 RemoveNumber, int32 ExistNumber) const
-{
-	if (ExistNumber <= 0)
-	{
-		if (AHumanBase* Human = Cast<AHumanBase>(ItemOwner))
-		{
-			Human->SetArrow(nullptr);
-		}
-	}
 }
 
 void AARPG_ArrowBase::WhenHitCharacter(USceneComponent* MyComp, AActor* Other, UPrimitiveComponent* OtherComp, const FHitResult& Hit, FApplyPointDamageParameter ApplyPointDamageParameter)
@@ -64,10 +39,13 @@ float AARPG_ArrowBase::ApplyDamamgeToCharacter(ACharacterBase* Character, const 
 {
 	Battle_Display_LOG("%s的弓%s所射箭%s的射中%s", *UARPG_DebugFunctionLibrary::GetDebugName(GetItemOwner()), *UARPG_DebugFunctionLibrary::GetDebugName(GetOwner()), *UARPG_DebugFunctionLibrary::GetDebugName(this), *UARPG_DebugFunctionLibrary::GetDebugName(Character));
 
-	FApplyPointDamageParameter Param(ApplyPointDamageParameter);
-	Param.AddHitStunValue = GetHitStunValue(ApplyPointDamageParameter.AddHitStunValue);
-
-	return Character->ApplyPointDamage(GetArrowDamage(), GetVelocity().GetSafeNormal(), Hit, GetItemOwner(), this, nullptr, Param);
+	if (UARPG_ArrowCoreBase* ArrowCore = Cast<UARPG_ArrowCoreBase>(ItemCore))
+	{
+		FApplyPointDamageParameter Param(ApplyPointDamageParameter);
+		Param.AddHitStunValue = ArrowCore->GetHitStunValue(ApplyPointDamageParameter.AddHitStunValue);
+		return Character->ApplyPointDamage(GetArrowDamage(), GetVelocity().GetSafeNormal(), Hit, GetItemOwner(), this, nullptr, Param);
+	}
+	return 0.f;
 }
 
 void AARPG_ArrowBase::WhenArrowHitEnvironment(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
@@ -127,6 +105,7 @@ void AARPG_ArrowBase::WhenArrowHitEnvironment(UPrimitiveComponent* HitComponent,
 
 float AARPG_ArrowBase::GetArrowDamage()
 {
+	// TODO：实现弓箭伤害
 	return 50.f;
 }
 
@@ -185,28 +164,44 @@ void AARPG_ArrowBase::OnRep_AttachmentReplication()
 void AARPG_ArrowBase::WhenUse(class ACharacterBase* ItemOwner)
 {
 	Super::WhenUse(ItemOwner);
-	ToEquippedDorlachMode();
-}
 
-void AARPG_ArrowBase::ToEquippedDorlachMode()
-{
-	if (Dorlach)
+	// 显示箭袋
+	UARPG_ArrowCoreBase* ArrowCore = Cast<UARPG_ArrowCoreBase>(ItemCore);
+	if (ArrowCore && !ArrowCore->Dorlach.IsNull())
 	{
+		// TODO：异步加载
+		UStaticMesh* Dorlach = ArrowCore->Dorlach.LoadSynchronous();
 		if (UStaticMeshComponent* StaticMeshComponent = Cast<UStaticMeshComponent>(GetRootComponent()))
 		{
 			StaticMeshComponent->SetStaticMesh(Dorlach);
 		}
 		//太Hack了
-		ItemMesh = Dorlach;
+		ArrowCore->ItemMesh = Dorlach;
 	}
 }
 
-const UARPG_ArrowCoreBase* AARPG_ArrowBase::GetItemCore() const
+const UARPG_ArrowCoreBase* AARPG_ArrowBase::GetItemCoreConst() const
 {
-	return CastChecked<const UARPG_ArrowCoreBase>(InnerItemCore);
+	return CastChecked<const UARPG_ArrowCoreBase>(ItemCore);
 }
 
-UARPG_ArrowCoreBase* AARPG_ArrowBase::GetItemCore_Careful() const
+UARPG_ArrowCoreBase* AARPG_ArrowBase::GetItemCore() const
 {
-	return CastChecked<UARPG_ArrowCoreBase>(InnerItemCore);
+	return CastChecked<UARPG_ArrowCoreBase>(ItemCore);
+}
+
+AARPG_Arrow_StaticMesh::AARPG_Arrow_StaticMesh(const FObjectInitializer& ObjectInitializer /*= FObjectInitializer::Get()*/)
+	: Super(ObjectInitializer)
+{
+	StaticMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(GET_MEMBER_NAME_CHECKED(AXD_Item_StaticMesh, StaticMeshComponent));
+
+	SetRootComponent(StaticMeshComponent);
+}
+
+AARPG_Arrow_SkeletalMesh::AARPG_Arrow_SkeletalMesh(const FObjectInitializer& ObjectInitializer /*= FObjectInitializer::Get()*/)
+	: Super(ObjectInitializer)
+{
+	SkeletalMeshComponent = CreateDefaultSubobject<USkeletalMeshComponent>(GET_MEMBER_NAME_CHECKED(AXD_Item_SkeletalMesh, SkeletalMeshComponent));
+
+	SetRootComponent(SkeletalMeshComponent);
 }

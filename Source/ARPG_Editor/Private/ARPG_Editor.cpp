@@ -3,7 +3,6 @@
 #include "ARPG_Editor.h"
 #include <PropertyEditorModule.h>
 #include "XD_PropertyCustomizationEx.h"
-#include "ARPG_Item_Customization.h"
 #include "AssetToolsModule.h"
 #include "ISettingsModule.h"
 #include "ISettingsSection.h"
@@ -23,7 +22,6 @@ void FARPG_EditorModule::StartupModule()
 	{
 		FPropertyEditorModule& PropertyModule = FModuleManager::LoadModuleChecked<FPropertyEditorModule>("PropertyEditor");
 
-		RegisterCustomProperty(struct FARPG_Item, FARPG_Item_Customization);
 		RegisterCustomProperty(struct FARPG_CampConfig, FXD_CampConfig_Customization);
 	}
 

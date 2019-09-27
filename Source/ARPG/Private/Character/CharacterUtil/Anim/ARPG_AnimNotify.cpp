@@ -498,7 +498,7 @@ void UARPG_UsePendingItem::Notify(USkeletalMeshComponent* MeshComp, UAnimSequenc
 	{
 		if (Character->PendingUseItem)
 		{
-			Character->UseItemImmediately(CastChecked<UARPG_ItemCoreBase>(Character->PendingUseItem->GetItemCore()));
+			Character->UseItemImmediately(CastChecked<UARPG_ItemCoreBase>(Character->PendingUseItem->GetItemCoreConst()));
 			if (bDestroyItem)
 			{
 				Character->PendingUseItem->Destroy();

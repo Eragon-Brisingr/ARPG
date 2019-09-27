@@ -3,14 +3,14 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "ARPG_ItemBase.h"
+#include "ARPG_ItemCoreBase.h"
 #include "ARPG_MoneyBase.generated.h"
 
 /**
  * 
  */
-UCLASS(Abstract, meta = (DisplayName = "金钱"))
-class ARPG_API AARPG_MoneyBase : public AARPG_ItemBase
+UCLASS(abstract, meta = (DisplayName = "金钱"))
+class ARPG_API UARPG_MoneyBase : public UARPG_ItemCoreBase
 {
 	GENERATED_BODY()
 	
