@@ -7,32 +7,64 @@
 #include "ItemTypeUtils.h"
 #include "ARPG_ItemCoreBase.generated.h"
 
+class UAnimMontage;
+
 /**
  * 
  */
-UCLASS(meta = (DisplayName = "物品核心"))
+UCLASS(abstract, meta = (DisplayName = "物品核心"))
 class ARPG_API UARPG_ItemCoreBase : public UXD_ItemCoreBase
 {
 	GENERATED_BODY()
 public:
-	UARPG_ItemCoreBase();
+	TSubclassOf<AXD_ItemBase> GetStaticMeshActor() const override;
+	TSubclassOf<AXD_ItemBase> GetSkeletalMeshActor() const override;
+public:
+	UARPG_ItemCoreBase(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
+	
+	UPROPERTY(SaveGame, EditDefaultsOnly, BlueprintReadOnly, Category = "物品", meta = (DisplayName = "重量"))
+	float Weight = 0.1f;
 
-	UFUNCTION(BlueprintPure, Category = "物品|基础")
+	UPROPERTY(SaveGame, EditDefaultsOnly, BlueprintReadOnly, Category = "物品", meta = (DisplayName = "价格"))
+	float Price = 1.f;
+
+	UPROPERTY(SaveGame, EditDefaultsOnly, BlueprintReadOnly, Category = "物品", meta = (DisplayName = "描述"))
+	FText Describe;
+
+public:
+	UFUNCTION(BlueprintPure, BlueprintNativeEvent, Category = "物品|基础")
 	float GetWeight() const;
+	virtual float GetWeight_Implementation() const { return Weight; }
 
-	UFUNCTION(BlueprintPure, Category = "物品|基础")
+	UFUNCTION(BlueprintPure, BlueprintNativeEvent, Category = "物品|基础")
 	float GetPrice() const;
+	virtual float GetPrice_Implementation() const { return Price; }
 
-	UFUNCTION(BlueprintPure, Category = "物品|基础")
+	UFUNCTION(BlueprintPure, BlueprintNativeEvent, Category = "物品|基础")
 	FText GetItemTypeDesc() const;
+	virtual FText GetItemTypeDesc_Implementation() const;
 	
 	UFUNCTION(BlueprintPure, Category = "物品|基础")
-	FText GetDescribe() const;
+	FText GetDescribe() const { return Describe; }
 	
 	UFUNCTION(BlueprintPure, Category = "物品|基础")
 	float GetTradePrice(class UXD_InventoryComponentBase* Invoker, class UXD_InventoryComponentBase* Trader, ETradePart InvokerTradePart) const;
-
 public:
-	UFUNCTION(BlueprintCallable, Category = "物品|基础")
-	void UseItem(class ACharacterBase* ItemOwner, EUseItemInput UseItemInput);
+	UFUNCTION(BlueprintNativeEvent, Category = "物品|基础")
+	void UseItem(ACharacterBase* ItemOwner, EUseItemInput UseItemInput);
+	virtual void UseItem_Implementation(ACharacterBase* ItemOwner, EUseItemInput UseItemInput);
+
+	virtual void WhenUse(ACharacterBase* ItemOwner) {}
+	UFUNCTION(BlueprintImplementableEvent, Category = "物品|基础", meta = (DisplayName = "WhenUse"))
+	void ReceiveWhenUse(ACharacterBase* ItemOwner);
+	virtual void WhenNotUse(ACharacterBase* ItemOwner) {}
+	UFUNCTION(BlueprintImplementableEvent, Category = "物品|基础", meta = (DisplayName = "WhenNotUse"))
+	void ReceiveWhenNotUse(ACharacterBase* ItemOwner);
+
+	//使用物品动画
+public:
+	UPROPERTY(EditDefaultsOnly, Category = "物品", meta = (DisplayName = "使用时动画"))
+	UAnimMontage* UseItemMontage;
+	UPROPERTY(EditDefaultsOnly, Category = "物品", meta = (DisplayName = "使用时位置插槽"))
+	FName UseItemAttachSocketName;
 };

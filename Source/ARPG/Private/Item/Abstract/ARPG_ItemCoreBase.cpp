@@ -6,43 +6,38 @@
 #include "ARPG_Item_Log.h"
 #include "ARPG_DebugFunctionLibrary.h"
 
+#define LOCTEXT_NAMESPACE "ARPG_Item"
 
-UARPG_ItemCoreBase::UARPG_ItemCoreBase()
+TSubclassOf<AXD_ItemBase> UARPG_ItemCoreBase::GetStaticMeshActor() const
 {
-	ItemClass = AARPG_ItemBase::StaticClass();
+	return AARPG_Item_StaticMesh::StaticClass();
 }
 
-float UARPG_ItemCoreBase::GetWeight() const
+TSubclassOf<AXD_ItemBase> UARPG_ItemCoreBase::GetSkeletalMeshActor() const
 {
-	return GetItemDefaultActor<AARPG_ItemBase>()->GetWeightImpl(this);
+	return AARPG_Item_SkeletalMesh::StaticClass();
 }
 
-float UARPG_ItemCoreBase::GetPrice() const
+UARPG_ItemCoreBase::UARPG_ItemCoreBase(const FObjectInitializer& ObjectInitializer /*= FObjectInitializer::Get()*/)
+	:Super(ObjectInitializer)
 {
-	return GetItemDefaultActor<AARPG_ItemBase>()->GetPriceImpl(this);
+
 }
 
-FText UARPG_ItemCoreBase::GetItemTypeDesc() const
+FText UARPG_ItemCoreBase::GetItemTypeDesc_Implementation() const
 {
-	return GetItemDefaultActor<AARPG_ItemBase>()->GetItemTypeDescImpl(this);
+	return LOCTEXT("ARPG_ItemBase ItemTypeDesc", "物品");
 }
 
 float UARPG_ItemCoreBase::GetTradePrice(class UXD_InventoryComponentBase* Invoker, class UXD_InventoryComponentBase* Trader, ETradePart InvokerTradePart) const
 {
+	// TODO：根据关系之类的决定价格
 	return GetPrice() * 1.f;
 }
 
-FText UARPG_ItemCoreBase::GetDescribe() const
+void UARPG_ItemCoreBase::UseItem_Implementation(class ACharacterBase* ItemOwner, EUseItemInput UseItemInput)
 {
-	return GetItemDefaultActor<AARPG_ItemBase>()->Describe;
+	unimplemented();
 }
 
-void UARPG_ItemCoreBase::UseItem(class ACharacterBase* ItemOwner, EUseItemInput UseItemInput)
-{
-	if (ItemOwner)
-	{
-		Item_Display_LOG("%s使用道具%s", *UARPG_DebugFunctionLibrary::GetDebugName(ItemOwner), *UARPG_DebugFunctionLibrary::GetDebugName(GetItemDefaultActor()));
-		GetItemDefaultActor<AARPG_ItemBase>()->UseItemImpl(this, ItemOwner, UseItemInput);
-	}
-}
-
+#undef LOCTEXT_NAMESPACE

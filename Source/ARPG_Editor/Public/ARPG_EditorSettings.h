@@ -14,6 +14,4 @@ class ARPG_EDITOR_API UARPG_EditorSettings : public UObject
 {
 	GENERATED_BODY()
 public:
-	UPROPERTY(EditAnywhere, Category = "物品", Config)
-	TSet<TSubclassOf<class AARPG_ItemBase>> AllowedCreateParentClasses;
 };

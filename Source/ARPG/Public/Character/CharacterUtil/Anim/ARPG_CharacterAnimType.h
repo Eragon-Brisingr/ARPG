@@ -133,7 +133,7 @@ public:
 	UPROPERTY(EditAnywhere, Category = "动画", meta = (DisplayName = "左手重攻击"))
 	FARPG_MontageParameter LeftHeavyAttack;
 
-	UPROPERTY(EditAnywhere, Category = "动画", meta = (DisplayName = "右手重攻击"))
+	UPROPERTY(EditAnywhere, Category = "动画", meta = (DisplayName = "右手轻攻击"))
 	FARPG_MontageParameter RightLightAttack;
 
 	UPROPERTY(EditAnywhere, Category = "动画", meta = (DisplayName = "右手重攻击"))

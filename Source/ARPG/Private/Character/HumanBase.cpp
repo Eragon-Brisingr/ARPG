@@ -30,17 +30,6 @@ AHumanBase::AHumanBase(const FObjectInitializer& PCIP)
 	ARPG_MovementComponent->MovementState.bCanCrouch = true;
 	ARPG_MovementComponent->SetIsReplicated(true);
 
-	{
-#if WITH_EDITOR
-		DefaultLeftWeapon.bShowNumber = false;
-		DefaultLeftWeapon.ShowItemType = AARPG_WeaponBase::StaticClass();
-		DefaultRightWeapon.bShowNumber = false;
-		DefaultRightWeapon.ShowItemType = AARPG_WeaponBase::StaticClass();
-
-		DefaultArrow.ShowItemType = AARPG_ArrowBase::StaticClass();
-#endif
-	}
-
 	EnterReleaseStateAction = CreateDefaultSubobject<UHuman_EnterReleaseState>(GET_MEMBER_NAME_CHECKED(AHumanBase, EnterReleaseStateAction));
 
 	Head = CreateDefaultSubobject<USkeletalMeshComponent>(GET_MEMBER_NAME_CHECKED(AHumanBase, Head));
@@ -109,11 +98,6 @@ void AHumanBase::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEv
 	}
 	else if (PropertyName == GET_MEMBER_NAME_CHECKED(AHumanBase, DefaultEquipmentList))
 	{
-		for (FARPG_Item& Equipment : DefaultEquipmentList)
-		{
-			Equipment.bShowNumber = false;
-			Equipment.ShowItemType = AARPG_EquipmentBase::StaticClass();
-		}
 		RefreshPreviewEquipedItem();
 	}
 	else if (PropertyName == GET_MEMBER_NAME_CHECKED(AHumanBase, CustomCharacterBodyData))
@@ -134,7 +118,7 @@ void AHumanBase::CheckForErrors()
 
 	for (int32 Idx = 0; Idx < DefaultEquipmentList.Num(); ++Idx)
 	{
-		const FARPG_Item& Item = DefaultEquipmentList[Idx];
+		const UARPG_EquipmentCoreBase* Item = DefaultEquipmentList[Idx];
 		if (!Item)
 		{
 			FFormatNamedArguments Arguments;
@@ -168,26 +152,26 @@ void AHumanBase::WhenGameInit_Implementation()
 {
 	Super::WhenGameInit_Implementation();
 
-	if (UARPG_ItemCoreBase* WeaponCore = Cast<UARPG_ItemCoreBase>(DefaultLeftWeapon.ItemCore))
+	if (DefaultLeftWeapon)
 	{
-		UseItemImmediately(WeaponCore, EUseItemInput::LeftMouse);
+		UseItemImmediately(DefaultLeftWeapon, EUseItemInput::LeftMouse);
 	}
 
-	if (UARPG_ItemCoreBase* WeaponCore = Cast<UARPG_ItemCoreBase>(DefaultRightWeapon.ItemCore))
+	if (DefaultRightWeapon)
 	{
-		UseItemImmediately(WeaponCore, EUseItemInput::RightMouse);
+		UseItemImmediately(DefaultRightWeapon, EUseItemInput::RightMouse);
 	}
 
-	if (UARPG_ItemCoreBase* ArrowCore = Cast<UARPG_ItemCoreBase>(DefaultArrow.ItemCore))
+	if (DefaultArrow)
 	{
-		UseItemImmediately(ArrowCore);
+		UseItemImmediately(DefaultArrow);
 	}
 
-	for (const FARPG_Item& DefaultEquipment : DefaultEquipmentList)
+	for (const UARPG_ItemCoreBase* DefaultEquipment : DefaultEquipmentList)
 	{
-		if (UARPG_ItemCoreBase* EquipmentCore = Cast<UARPG_ItemCoreBase>(DefaultEquipment.ItemCore))
+		if (DefaultEquipment)
 		{
-			UseItemImmediately(EquipmentCore);
+			UseItemImmediately(DefaultEquipment);
 		}
 	}
 
@@ -224,9 +208,9 @@ void AHumanBase::WhenPostLoad_Implementation()
 	ApplyCustomCharacterData();
 }
 
-TArray<struct FARPG_Item> AHumanBase::GetInitItemList() const
+TArray<UARPG_ItemCoreBase*> AHumanBase::GetInitItemList() const
 {
-	TArray<FARPG_Item> Res = Super::GetInitItemList();
+	TArray<UARPG_ItemCoreBase*> Res = Super::GetInitItemList();
 	if (DefaultLeftWeapon)
 	{
 		Res.Add(DefaultLeftWeapon);
@@ -239,7 +223,7 @@ TArray<struct FARPG_Item> AHumanBase::GetInitItemList() const
 	{
 		Res.Add(DefaultArrow);
 	}
-	for (const FARPG_Item& DefaultEquipment : DefaultEquipmentList)
+	for (UARPG_EquipmentCoreBase* DefaultEquipment : DefaultEquipmentList)
 	{
 		if (DefaultEquipment)
 		{
@@ -251,8 +235,7 @@ TArray<struct FARPG_Item> AHumanBase::GetInitItemList() const
 
 class AARPG_WeaponBase* AHumanBase::EquipWaepon_Implementation(class UARPG_WeaponCoreBase* WeaponCore, EUseItemInput UseItemInput)
 {
-	const AARPG_WeaponBase* Weapon = WeaponCore->GetItemDefaultActor<AARPG_WeaponBase>();
-	switch (Weapon->WeaponUseType)
+	switch (WeaponCore->WeaponUseType)
 	{
 	case EWeaponUseType::BothHandForLeft:
 		return UseBothHandWeaponImpl(EUseItemInput::LeftMouse, WeaponCore);
@@ -353,8 +336,7 @@ class AARPG_ArrowBase* AHumanBase::EquipArrow_Implementation(class UARPG_ArrowCo
 
 class AARPG_EquipmentBase* AHumanBase::EquipEquipment_Implementation(class UARPG_EquipmentCoreBase* EquipmentCore, EUseItemInput UseItemInput)
 {
-	const AARPG_EquipmentBase* Equipment = EquipmentCore->GetItemDefaultActor<AARPG_EquipmentBase>();
-	if (!Equipment->EquipmentType)
+	if (!EquipmentCore->EquipmentType)
 	{
 		return nullptr;
 	}
@@ -371,7 +353,7 @@ class AARPG_EquipmentBase* AHumanBase::EquipEquipment_Implementation(class UARPG
 		TArray<AARPG_EquipmentBase*> NeedRemoveEquipment;
 		for (AARPG_EquipmentBase* E_Equipment : EquipmentList)
 		{
-			if (E_Equipment && E_Equipment->EquipmentType & Equipment->EquipmentType)
+			if (E_Equipment && (E_Equipment->GetItemCoreConst()->EquipmentType & EquipmentCore->EquipmentType))
 			{
 				NeedRemoveEquipment.Add(E_Equipment);
 			}
@@ -632,7 +614,7 @@ void AHumanBase::OnRep_LeftWeapon(class AARPG_WeaponBase* PreLeftWeapon)
 {
 	if (LeftWeapon)
 	{
-		bIsLeftWeaponInWeaponBack = LeftWeapon->GetAttachParentSocketName() == LeftWeapon->RightWeaponInWeaponBackSocket;
+		bIsLeftWeaponInWeaponBack = LeftWeapon->GetAttachParentSocketName() == LeftWeapon->GetItemCoreConst()->RightWeaponInWeaponBackSocket;
 	}
 	else
 	{
@@ -654,7 +636,7 @@ void AHumanBase::OnRep_RightWeapon(class AARPG_WeaponBase* PreRightWeapon)
 {
 	if (RightWeapon)
 	{
-		bIsRightWeaponInWeaponBack = RightWeapon->GetAttachParentSocketName() == RightWeapon->RightWeaponInWeaponBackSocket;
+		bIsRightWeaponInWeaponBack = RightWeapon->GetAttachParentSocketName() == RightWeapon->GetItemCoreConst()->RightWeaponInWeaponBackSocket;
 	}
 	else
 	{
@@ -684,7 +666,7 @@ class AARPG_WeaponBase* AHumanBase::EquipSingleRightWeapon(class UARPG_ItemCoreB
 	}
 	if (LeftWeapon)
 	{
-		switch (LeftWeapon->WeaponUseType)
+		switch (LeftWeapon->GetItemCoreConst()->WeaponUseType)
 		{
 			//卸下左手双手武器
 		case EWeaponUseType::BothHandForLeft:
@@ -726,7 +708,7 @@ class AARPG_WeaponBase* AHumanBase::EquipSingleLeftWeapon(class UARPG_ItemCoreBa
 	}
 	if (RightWeapon)
 	{
-		switch (RightWeapon->WeaponUseType)
+		switch (RightWeapon->GetItemCoreConst()->WeaponUseType)
 		{
 			//卸下右手双手武器
 		case EWeaponUseType::BothHandForRight:
@@ -750,28 +732,28 @@ class AARPG_WeaponBase* AHumanBase::EquipSingleLeftWeapon(class UARPG_ItemCoreBa
 void AHumanBase::RightWeaponInHand()
 {
 	bIsRightWeaponInWeaponBack = false;
-	RightWeapon->AttachWeaponTo(GetMesh(), RightWeapon->RightWeaponInHandSocket);
+	RightWeapon->AttachWeaponTo(GetMesh(), RightWeapon->GetItemCoreConst()->RightWeaponInHandSocket);
 	RightWeapon->WhenInHand();
 }
 
 void AHumanBase::LeftWeaponInHand()
 {
 	bIsLeftWeaponInWeaponBack = false;
-	LeftWeapon->AttachWeaponTo(GetMesh(), LeftWeapon->LeftWeaponInHandSocket);
+	LeftWeapon->AttachWeaponTo(GetMesh(), LeftWeapon->GetItemCoreConst()->LeftWeaponInHandSocket);
 	LeftWeapon->WhenInHand();
 }
 
 void AHumanBase::RightWeaponInWeaponBack()
 {
 	bIsRightWeaponInWeaponBack = true;
-	RightWeapon->AttachWeaponTo(GetMesh(), RightWeapon->RightWeaponInWeaponBackSocket);
+	RightWeapon->AttachWeaponTo(GetMesh(), RightWeapon->GetItemCoreConst()->RightWeaponInWeaponBackSocket);
 	RightWeapon->WhenInWeaponBack();
 }
 
 void AHumanBase::LeftWeaponInWeaponBack()
 {
 	bIsLeftWeaponInWeaponBack = true;
-	LeftWeapon->AttachWeaponTo(GetMesh(), LeftWeapon->LeftWeaponInWeaponBackSocket);
+	LeftWeapon->AttachWeaponTo(GetMesh(), LeftWeapon->GetItemCoreConst()->LeftWeaponInWeaponBackSocket);
 	LeftWeapon->WhenInWeaponBack();
 }
 
@@ -867,11 +849,11 @@ void AHumanBase::RefreshPreviewEquipedItem()
 
 	if (LeftWeapon)
 	{
-		EquipWaepon(LeftWeapon->GetItemCore(), EUseItemInput::LeftMouse);
+		EquipWaepon(LeftWeapon->GetItemCoreConst(), EUseItemInput::LeftMouse);
 	}
 	if (DefaultLeftWeapon)
 	{
-		EquipWaepon(DefaultLeftWeapon.GetItemCore<UARPG_WeaponCoreBase>(), EUseItemInput::LeftMouse);
+		EquipWaepon(DefaultLeftWeapon, EUseItemInput::LeftMouse);
 		if (LeftWeapon)
 		{
 			LeftWeapon->SetFlags(RF_Transient);
@@ -879,11 +861,11 @@ void AHumanBase::RefreshPreviewEquipedItem()
 	}
 	if (RightWeapon)
 	{
-		EquipWaepon(RightWeapon->GetItemCore(), EUseItemInput::RightMouse);
+		EquipWaepon(RightWeapon->GetItemCoreConst(), EUseItemInput::RightMouse);
 	}
 	if (DefaultRightWeapon)
 	{
-		EquipWaepon(DefaultRightWeapon.GetItemCore<UARPG_WeaponCoreBase>(), EUseItemInput::RightMouse);
+		EquipWaepon(DefaultRightWeapon, EUseItemInput::RightMouse);
 		if (RightWeapon)
 		{
 			RightWeapon->SetFlags(RF_Transient);
@@ -891,11 +873,11 @@ void AHumanBase::RefreshPreviewEquipedItem()
 	}
 	if (Arrow)
 	{
-		EquipArrow(Arrow->GetItemCore(), EUseItemInput::LeftMouse);
+		EquipArrow(Arrow->GetItemCoreConst(), EUseItemInput::LeftMouse);
 	}
 	if (DefaultArrow)
 	{
-		EquipArrow(DefaultArrow.GetItemCore<UARPG_ArrowCoreBase>(), EUseItemInput::LeftMouse);
+		EquipArrow(DefaultArrow, EUseItemInput::LeftMouse);
 		if (Arrow)
 		{
 			Arrow->SetFlags(RF_Transient);
@@ -908,16 +890,16 @@ void AHumanBase::RefreshPreviewEquipedItem()
 	{
 		if (Equipment)
 		{
-			EquipEquipment(Equipment->GetItemCore(), EUseItemInput::LeftMouse);
+			EquipEquipment(Equipment->GetItemCoreConst(), EUseItemInput::LeftMouse);
 		}
 	}
 	PreviewEquipmentList.Empty();
 
-	for (const FARPG_Item& Equipment : DefaultEquipmentList)
+	for (UARPG_EquipmentCoreBase* Equipment : DefaultEquipmentList)
 	{
 		if (Equipment)
 		{
-			if (AARPG_EquipmentBase * CurEquipment = EquipEquipment(Equipment.GetItemCore<UARPG_EquipmentCoreBase>(), EUseItemInput::LeftMouse))
+			if (AARPG_EquipmentBase * CurEquipment = EquipEquipment(Equipment, EUseItemInput::LeftMouse))
 			{
 				CurEquipment->SetFlags(RF_Transient);
 				PreviewEquipmentList.Add(CurEquipment);

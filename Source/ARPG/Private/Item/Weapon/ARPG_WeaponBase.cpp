@@ -13,82 +13,57 @@
 #include "ARPG_ActorFunctionLibrary.h"
 #include "ARPG_DebugFunctionLibrary.h"
 #include "TimerManager.h"
+#include "Components/SkeletalMeshComponent.h"
+#include "Components/StaticMeshComponent.h"
 
 #define LOCTEXT_NAMESPACE "ARPG_Item"
 
 AARPG_WeaponBase::AARPG_WeaponBase(const FObjectInitializer& ObjectInitializer)
-	:Super(ObjectInitializer.SetDefaultSubobjectClass<UARPG_WeaponCoreBase>(GET_MEMBER_NAME_CHECKED(AARPG_WeaponBase, InnerItemCore)))
+	:Super(ObjectInitializer)
 {
-	AttackAnimSet = CreateDefaultSubobject<UARPG_AttackAnimSetNormal>(GET_MEMBER_NAME_CHECKED(AARPG_WeaponBase, AttackAnimSet));
-}
-
-void AARPG_WeaponBase::UseItemImpl_Implementation(class UARPG_ItemCoreBase* ItemCore, class ACharacterBase* ItemOwner, EUseItemInput UseItemInput) const
-{
-	ItemOwner->EquipWaepon(CastChecked<UARPG_WeaponCoreBase>(ItemCore), UseItemInput);
-}
-
-FText AARPG_WeaponBase::GetItemTypeDescImpl_Implementation(const class UXD_ItemCoreBase* ItemCore) const
-{
-	return LOCTEXT("ARPG_Weapon", "武器");
+	
 }
 
 void AARPG_WeaponBase::WhenUse(class ACharacterBase* ItemOwner)
 {
 	Item_Display_LOG("%s装备武器%s", *UXD_DebugFunctionLibrary::GetDebugName(ItemOwner), *UXD_DebugFunctionLibrary::GetDebugName(this));
-	if (UPrimitiveComponent* Root = Cast<UPrimitiveComponent>(GetRootComponent()))
+	UARPG_WeaponCoreBase* WeaponCore = Cast<UARPG_WeaponCoreBase>(ItemCore);
+	if (WeaponCore)
 	{
-		SocketMoveTracer = NewObject<USocketMoveTracer>(this, GET_MEMBER_NAME_CHECKED(AARPG_WeaponBase, SocketMoveTracer));
-		SocketMoveTracer->OnTraceActorNative.BindUObject(this, &AARPG_WeaponBase::WhenAttackTracedActor);
-		SocketMoveTracer->InitSocketMoveTracer(Root, SocketMoveTracerConfig);
-	}
-
-	if (AHumanBase* Human = Cast<AHumanBase>(ItemOwner))
-	{
-		if (MoveAnimInstanceOverride)
+		if (UPrimitiveComponent* Root = Cast<UPrimitiveComponent>(GetRootComponent()))
 		{
-			Human->SetMoveAnimInstanceOverride(MoveAnimInstanceOverride);
+			SocketMoveTracer = NewObject<USocketMoveTracer>(this, GET_MEMBER_NAME_CHECKED(AARPG_WeaponBase, SocketMoveTracer));
+			SocketMoveTracer->OnTraceActorNative.BindUObject(this, &AARPG_WeaponBase::WhenAttackTracedActor);
+			SocketMoveTracer->InitSocketMoveTracer(Root, WeaponCore->SocketMoveTracerConfig);
+		}
+
+
+		if (AHumanBase* Human = Cast<AHumanBase>(ItemOwner))
+		{
+			if (WeaponCore->MoveAnimInstanceOverride)
+			{
+				Human->SetMoveAnimInstanceOverride(WeaponCore->MoveAnimInstanceOverride);
+			}
 		}
 	}
-
 	Super::WhenUse(ItemOwner);
 }
 
 void AARPG_WeaponBase::WhenNotUse(class ACharacterBase* ItemOwner)
 {
-	if (AHumanBase* Human = Cast<AHumanBase>(ItemOwner))
+	UARPG_WeaponCoreBase* WeaponCore = Cast<UARPG_WeaponCoreBase>(ItemCore);
+	if (WeaponCore)
 	{
-		if (MoveAnimInstanceOverride)
+		if (AHumanBase* Human = Cast<AHumanBase>(ItemOwner))
 		{
-			Human->SetMoveAnimInstanceOverride(nullptr);
+			if (WeaponCore->MoveAnimInstanceOverride)
+			{
+				Human->SetMoveAnimInstanceOverride(nullptr);
+			}
 		}
 	}
 
 	Super::WhenNotUse(ItemOwner);
-}
-
-void AARPG_WeaponBase::WhenRemoveFromInventory_Implementation(class AActor* ItemOwner, class UXD_ItemCoreBase* ItemCore, int32 RemoveNumber, int32 ExistNumber) const
-{
-	if (AHumanBase* Human = Cast<AHumanBase>(ItemOwner))
-	{
-		if (Human->RightWeapon && Human->RightWeapon->IsEqualWithItemCore(ItemCore))
-		{
-			if (Human->LeftWeapon && Human->LeftWeapon->IsEqualWithItemCore(ItemCore))
-			{
-				if (ExistNumber == 1)
-				{
-					Human->SetLeftWeapon(nullptr);
-				}
-			}
-			if (ExistNumber <= 0)
-			{
-				Human->SetRightWeapon(nullptr);
-			}
-		}
-		else if (ExistNumber == 0 && Human->LeftWeapon && Human->LeftWeapon->IsEqualWithItemCore(ItemCore))
-		{
-			Human->SetLeftWeapon(nullptr);
-		}
-	}
 }
 
 FVector AARPG_WeaponBase::GetAttackMoveLocation_Implementation(class AActor* AttackTarget) const
@@ -168,6 +143,12 @@ void AARPG_WeaponBase::DisableNearAttackTrace()
 
 void AARPG_WeaponBase::WhenAttackTracedActor(UPrimitiveComponent* HitComponent, const FName& SocketName, AActor* OtherActor, UPrimitiveComponent* OtherComp, const FHitResult& TraceResult)
 {
+	UARPG_WeaponCoreBase* WeaponCore = Cast<UARPG_WeaponCoreBase>(ItemCore);
+	if (WeaponCore == nullptr)
+	{
+		return;
+	}
+
 	if (OtherActor && OtherActor != GetItemOwner())
 	{
 		if (ACharacterBase* WeaponOnwer = Cast<ACharacterBase>(GetItemOwner()))
@@ -176,9 +157,9 @@ void AARPG_WeaponBase::WhenAttackTracedActor(UPrimitiveComponent* HitComponent, 
 
 			if (ACharacterBase* ReceiveDamageCharacter = Cast<ACharacterBase>(OtherActor))
 			{
-				PointDamageParameter.AddHitStunValue = GetHitStunValue(PointDamageParameter.AddHitStunValue);
+				PointDamageParameter.AddHitStunValue = WeaponCore->GetHitStunValue(PointDamageParameter.AddHitStunValue);
 
-				if (ReceiveDamageCharacter->ApplyPointDamage(GetPhysicsAttackValue(), (ReceiveDamageCharacter->GetActorLocation() - TraceResult.ImpactPoint).GetSafeNormal2D(), TraceResult, WeaponOnwer, this, nullptr, PointDamageParameter) > 0.f)
+				if (ReceiveDamageCharacter->ApplyPointDamage(WeaponCore->GetPhysicsAttackValue(), (ReceiveDamageCharacter->GetActorLocation() - TraceResult.ImpactPoint).GetSafeNormal2D(), TraceResult, WeaponOnwer, this, nullptr, PointDamageParameter) > 0.f)
 				{
 					WeaponOnwer->NearAttackSuccessTimeDilation(0.2f);
 				}
@@ -189,7 +170,11 @@ void AARPG_WeaponBase::WhenAttackTracedActor(UPrimitiveComponent* HitComponent, 
 
 bool AARPG_WeaponBase::TraceForExecuteOther()
 {
-	return ExecuteActionSet.TraceForExecuteOther(GetItemOwner());
+	if (UARPG_WeaponCoreBase* WeaponCore = Cast<UARPG_WeaponCoreBase>(ItemCore))
+	{
+		return WeaponCore->ExecuteActionSet.TraceForExecuteOther(GetItemOwner());
+	}
+	return false;
 }
 
 void AARPG_WeaponBase::EnableFallingAttackTrace(const FApplyPointDamageParameter& ApplyPointDamageParameter, bool ClearIgnoreList /*= true*/)
@@ -227,25 +212,42 @@ void AARPG_WeaponBase::AttachWeaponTo(class USceneComponent* InParent, FName InS
 
 bool AARPG_WeaponBase::IsBothHandWeapon() const
 {
-	switch (WeaponUseType)
+	if (const UARPG_WeaponCoreBase* WeaponCore = Cast<const UARPG_WeaponCoreBase>(ItemCore))
 	{
-	case EWeaponUseType::BothHand:
-	case EWeaponUseType::BothHandForLeft:
-	case EWeaponUseType::BothHandForRight:
-		return true;
-	default:
-		return false;
+		return WeaponCore->IsBothHandWeapon();
 	}
+	return false;
 }
 
-const UARPG_WeaponCoreBase* AARPG_WeaponBase::GetItemCore() const
+UARPG_AttackAnimSetBase* AARPG_WeaponBase::GetAttackAnimSet() const
 {
-	return CastChecked<const UARPG_WeaponCoreBase>(InnerItemCore);
+	return GetItemCoreConst()->AttackAnimSet;
 }
 
-UARPG_WeaponCoreBase* AARPG_WeaponBase::GetItemCore_Careful() const
+const UARPG_WeaponCoreBase* AARPG_WeaponBase::GetItemCoreConst() const
 {
-	return CastChecked<UARPG_WeaponCoreBase>(InnerItemCore);
+	return CastChecked<const UARPG_WeaponCoreBase>(ItemCore);
+}
+
+UARPG_WeaponCoreBase* AARPG_WeaponBase::GetItemCore() const
+{
+	return CastChecked<UARPG_WeaponCoreBase>(ItemCore);
+}
+
+AARPG_Weapon_StaticMesh::AARPG_Weapon_StaticMesh(const FObjectInitializer& ObjectInitializer /*= FObjectInitializer::Get()*/)
+	: Super(ObjectInitializer)
+{
+	StaticMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(GET_MEMBER_NAME_CHECKED(AXD_Item_StaticMesh, StaticMeshComponent));
+
+	SetRootComponent(StaticMeshComponent);
+}
+
+AARPG_Weapon_SkeletalMesh::AARPG_Weapon_SkeletalMesh(const FObjectInitializer& ObjectInitializer /*= FObjectInitializer::Get()*/)
+	: Super(ObjectInitializer)
+{
+	SkeletalMeshComponent = CreateDefaultSubobject<USkeletalMeshComponent>(GET_MEMBER_NAME_CHECKED(AXD_Item_SkeletalMesh, SkeletalMeshComponent));
+
+	SetRootComponent(SkeletalMeshComponent);
 }
 
 #undef LOCTEXT_NAMESPACE

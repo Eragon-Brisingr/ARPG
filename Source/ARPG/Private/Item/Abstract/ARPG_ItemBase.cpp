@@ -2,6 +2,7 @@
 
 #include "ARPG_ItemBase.h"
 #include <Components/PrimitiveComponent.h>
+#include "Components/StaticMeshComponent.h"
 #include "CharacterBase.h"
 #include "ARPG_ItemCoreBase.h"
 #include "ARPG_CollisionType.h"
@@ -13,7 +14,7 @@
 
 void AARPG_ItemBase::WhenExecuteInteract_Implementation(ACharacterBase* InteractInvoker)
 {
-	InteractInvoker->Inventory->AddItemCore(GetItemCore(), GetItemCore()->Number);
+	InteractInvoker->Inventory->AddItemCore(GetItemCoreConst(), GetItemCoreConst()->Number);
 	InteractInvoker->ExecuteInteractEnd(EInteractEndResult::Succeed);
 	Destroy();
 }
@@ -36,14 +37,45 @@ void AARPG_ItemBase::EditorReplacedActor(AActor* OldActor)
 #endif
 
 AARPG_ItemBase::AARPG_ItemBase(const FObjectInitializer& ObjectInitializer /*= FObjectInitializer::Get()*/)
-	:Super(ObjectInitializer.SetDefaultSubobjectClass<UARPG_ItemCoreBase>(GET_MEMBER_NAME_CHECKED(AARPG_ItemBase, InnerItemCore)))
+	: Super(ObjectInitializer)
 {
 
 }
 
-FText AARPG_ItemBase::GetItemTypeDescImpl_Implementation(const class UXD_ItemCoreBase* ItemCore) const
+float AARPG_ItemBase::GetWeight() const
 {
-	return LOCTEXT("ARPG_ItemBase ItemTypeDesc", "物品");
+	if (UARPG_ItemCoreBase* ARPG_ItemCore = Cast<UARPG_ItemCoreBase>(ItemCore))
+	{
+		return ARPG_ItemCore->GetWeight();
+	}
+	return 0.f;
+}
+
+float AARPG_ItemBase::GetPrice() const
+{
+	if (UARPG_ItemCoreBase* ARPG_ItemCore = Cast<UARPG_ItemCoreBase>(ItemCore))
+	{
+		return ARPG_ItemCore->GetPrice();
+	}
+	return 0.f;
+}
+
+FText AARPG_ItemBase::GetItemTypeDesc() const
+{
+	if (UARPG_ItemCoreBase* ARPG_ItemCore = Cast<UARPG_ItemCoreBase>(ItemCore))
+	{
+		return ARPG_ItemCore->GetItemTypeDesc();
+	}
+	return FText::GetEmpty();
+}
+
+FText AARPG_ItemBase::GetDescribe() const
+{
+	if (UARPG_ItemCoreBase* ARPG_ItemCore = Cast<UARPG_ItemCoreBase>(ItemCore))
+	{
+		return ARPG_ItemCore->GetDescribe();
+	}
+	return FText::GetEmpty();
 }
 
 ACharacterBase* AARPG_ItemBase::GetItemOwner() const
@@ -57,13 +89,9 @@ void AARPG_ItemBase::SetItemOwner(ACharacterBase* ItemOwner)
 	Instigator = ItemOwner;
 }
 
-void AARPG_ItemBase::UseItemImpl_Implementation(class UARPG_ItemCoreBase* ItemCore, ACharacterBase* ItemOwner, EUseItemInput UseItemInput) const
-{
-
-}
-
 void AARPG_ItemBase::WhenUse(ACharacterBase* ItemOwner)
 {
+	GetItemCore()->WhenUse(ItemOwner);
 	bNetUseOwnerRelevancy = true;
 	SetOwner(ItemOwner);
 	SetItemOwner(ItemOwner);
@@ -80,41 +108,18 @@ void AARPG_ItemBase::WhenUse(ACharacterBase* ItemOwner)
 
 void AARPG_ItemBase::WhenNotUse(ACharacterBase* ItemOwner)
 {
+	GetItemCore()->WhenNotUse(ItemOwner);
 	ReceiveWhenNotUse(ItemOwner);
 }
 
-void AARPG_ItemBase::PlayUseItemMontage(const UARPG_ItemCoreBase* ItemCore, ACharacterBase* ItemOwner) const
+const UARPG_ItemCoreBase* AARPG_ItemBase::GetItemCoreConst() const
 {
-	AARPG_ItemBase* PendingUseItem = CastChecked<AARPG_ItemBase>(ItemCore->SpawnItemActorForOwner(ItemOwner, ItemOwner));
-	PendingUseItem->SetItemSimulatePhysics(false);
-	PendingUseItem->SetActorHiddenInGame(true);
-	PendingUseItem->AttachToComponent(ItemOwner->GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, UseItemAttachSocketName);
-	ItemOwner->PendingUseItem = PendingUseItem;
-	ItemOwner->PlayMontageWithBlendingOutDelegate(UseItemMontage, FOnMontageBlendingOutStarted::CreateWeakLambda(ItemOwner, [=](UAnimMontage* Montage, bool bInterrupted)
-		{
-			if (ItemOwner->PendingUseItem)
-			{
-				if (bInterrupted)
-				{
-					ItemOwner->PendingUseItem->Destroy();
-				}
-				else
-				{
-					Item_Warning_LOG("%s的动画%s已经播放完，但是角色还引用该道具，执行销毁", *UXD_DebugFunctionLibrary::GetDebugName(this), *UXD_DebugFunctionLibrary::GetDebugName(Montage));
-					ItemOwner->PendingUseItem->Destroy();
-				}
-			}
-		}), {}, 1.f, NAME_None, false);
+	return CastChecked<const UARPG_ItemCoreBase>(ItemCore);
 }
 
-const UARPG_ItemCoreBase* AARPG_ItemBase::GetItemCore() const
+UARPG_ItemCoreBase* AARPG_ItemBase::GetItemCore() const
 {
-	return CastChecked<const UARPG_ItemCoreBase>(InnerItemCore);
-}
-
-UARPG_ItemCoreBase* AARPG_ItemBase::GetItemCore_Careful() const
-{
-	return CastChecked<UARPG_ItemCoreBase>(InnerItemCore);
+	return CastChecked<UARPG_ItemCoreBase>(ItemCore);
 }
 
 #if WITH_EDITOR
@@ -123,5 +128,21 @@ bool AARPG_ItemBase::IsSelectable() const
 	return !HasAnyFlags(RF_Transient);
 }
 #endif
+
+AARPG_Item_StaticMesh::AARPG_Item_StaticMesh(const FObjectInitializer& ObjectInitializer /*= FObjectInitializer::Get()*/)
+	: Super(ObjectInitializer)
+{
+	StaticMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(GET_MEMBER_NAME_CHECKED(AXD_Item_StaticMesh, StaticMeshComponent));
+
+	SetRootComponent(StaticMeshComponent);
+}
+
+AARPG_Item_SkeletalMesh::AARPG_Item_SkeletalMesh(const FObjectInitializer& ObjectInitializer /*= FObjectInitializer::Get()*/)
+	: Super(ObjectInitializer)
+{
+	SkeletalMeshComponent = CreateDefaultSubobject<USkeletalMeshComponent>(GET_MEMBER_NAME_CHECKED(AXD_Item_SkeletalMesh, SkeletalMeshComponent));
+
+	SetRootComponent(SkeletalMeshComponent);
+}
 
 #undef LOCTEXT_NAMESPACE

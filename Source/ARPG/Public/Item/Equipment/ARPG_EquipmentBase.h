@@ -11,19 +11,6 @@ class UARPG_EquipmentCoreBase;
 /**
  * 
  */
-UENUM(BlueprintType, meta = (Bitflags))
-enum EEquipmentType
-{
-	Equipment_Head UMETA(DisplayName = "头部"),
-	Equipment_UpperBody UMETA(DisplayName = "上身"),
-	Equipment_LowerBody UMETA(DisplayName = "下身"),
-	Equipment_Foot UMETA(DisplayName = "足部"),
-	Equipment_Hand UMETA(DisplayName = "手臂"),
-	Equipment_Cloak UMETA(DisplayName = "披风"),
-	Equipment_Light UMETA(DisplayName = "灯")
-};
-ENUM_CLASS_FLAGS(EEquipmentType);
-
 UCLASS(abstract, meta = (DisplayName = "装备"))
 class ARPG_API AARPG_EquipmentBase : public AARPG_ItemBase
 {
@@ -35,28 +22,37 @@ public:
 	//蓝图编译时会替换Master会丢失，将Master置回
 	void EditorReplacedActor(AActor* OldActor) override;
 #endif
-
-	void UseItemImpl_Implementation(class UARPG_ItemCoreBase* ItemCore, class ACharacterBase* ItemOwner, EUseItemInput UseItemInput) const override;
-
-	FText GetItemTypeDescImpl_Implementation(const class UXD_ItemCoreBase* ItemCore) const override;
-
 	void WhenUse(class ACharacterBase* ItemOwner) override;
 
 	void WhenNotUse(class ACharacterBase* ItemOwner) override;
-
-	void WhenRemoveFromInventory_Implementation(class AActor* ItemOwner, class UXD_ItemCoreBase* ItemCore, int32 RemoveNumber, int32 ExistNumber) const override;
 public:
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "物品|装备", meta = (DisplayName = "装备插槽名"))
-	FName EquipSocketName;
-	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "物品|装备", meta = (DisplayName = "装备类型", Bitmask, BitmaskEnum = "EEquipmentType"))
-	int32 EquipmentType;
+	const UARPG_EquipmentCoreBase* GetItemCoreConst() const;
+};
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "物品|装备", meta = (DisplayName = "隐藏内裤"))
-	uint8 bHideShorts : 1;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "物品|装备", meta = (DisplayName = "隐藏内衣"))
-	uint8 bHideUnderwear : 1;
+UCLASS()
+class ARPG_API AARPG_Equipment_StaticMesh : public AARPG_EquipmentBase
+{
+	GENERATED_BODY()
 public:
-	const UARPG_EquipmentCoreBase* GetItemCore() const;
+	// Sets default values for this actor's properties
+	AARPG_Equipment_StaticMesh(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
+public:
+	UPROPERTY()
+	UStaticMeshComponent* StaticMeshComponent;
+
+	void InitItemMesh() override { InitStaticMeshComponent(StaticMeshComponent); }
+};
+
+UCLASS()
+class ARPG_API AARPG_Equipment_SkeletalMesh : public AARPG_EquipmentBase
+{
+	GENERATED_BODY()
+public:
+	// Sets default values for this actor's properties
+	AARPG_Equipment_SkeletalMesh(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
+public:
+	UPROPERTY()
+	USkeletalMeshComponent* SkeletalMeshComponent;
+
+	void InitItemMesh() override { InitSkeletalMeshComponent(SkeletalMeshComponent); }
 };

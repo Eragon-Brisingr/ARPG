@@ -78,9 +78,7 @@ void UEFE_FindItemBase::WhenRemoveItem(UXD_ItemCoreBase* ItemCore, int32 RemoveN
 
 UEFE_FindItem_ByRef::UEFE_FindItem_ByRef()
 {
-#if WITH_EDITOR
-	TargetItem.bShowNumber = false;
-#endif
+
 }
 
 void UEFE_FindItem_ByRef::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const
@@ -94,7 +92,7 @@ void UEFE_FindItem_ByRef::ReplicatedElementSubobject(bool& WroteSomething, class
 {
 	if (TargetItem)
 	{
-		WroteSomething |= Channel->ReplicateSubobject(TargetItem.ItemCore, *Bunch, *RepFlags);
+		WroteSomething |= Channel->ReplicateSubobject(TargetItem, *Bunch, *RepFlags);
 	}
 }
 
@@ -105,7 +103,7 @@ bool UEFE_FindItem_ByRef::IsNeedFindItem(UXD_ItemCoreBase* ItemCore) const
 
 EEventFlowCompileMessageType UEFE_FindItem_ByRef::GetCompileMessage_Implementation(FString& Message) const
 {
-	if (TargetItem.ItemCore == nullptr)
+	if (TargetItem == nullptr)
 	{
 		Message = TEXT("目标物品不得为空");
 		return EEventFlowCompileMessageType::Error;
@@ -115,7 +113,7 @@ EEventFlowCompileMessageType UEFE_FindItem_ByRef::GetCompileMessage_Implementati
 
 FText UEFE_FindItem_ByRef::ReceiveGetDescribe_Implementation() const
 {
-	if (TargetItem.ItemCore == nullptr)
+	if (TargetItem == nullptr)
 	{
 		return FText::GetEmpty();
 	}
@@ -139,7 +137,7 @@ void UEFE_FindItem_ByType::GetLifetimeReplicatedProps(TArray<class FLifetimeProp
 
 bool UEFE_FindItem_ByType::IsNeedFindItem(UXD_ItemCoreBase* ItemCore) const
 {
-	return TargetItemType && ItemCore->GetItemClass()->IsChildOf(TargetItemType);
+	return TargetItemType && ItemCore->IsA(TargetItemType);
 }
 
 EEventFlowCompileMessageType UEFE_FindItem_ByType::GetCompileMessage_Implementation(FString& Message) const

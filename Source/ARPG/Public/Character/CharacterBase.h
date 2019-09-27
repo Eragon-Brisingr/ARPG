@@ -93,11 +93,11 @@ public:
 
 	void Reset() override;
 
-	TArray<FARPG_Item> GetReInitItemList() const;
-
-	virtual TArray<FARPG_Item> GetInitItemList() const;
+	TArray<UARPG_ItemCoreBase*> GetReInitItemList() const;
+	
+	virtual TArray<UARPG_ItemCoreBase*> GetInitItemList() const;
 	UFUNCTION(BlueprintImplementableEvent, Category = "角色|初始化", meta = (DisplayName = "GetInitItemList"))
-	TArray<FARPG_Item> ReceivedGetInitItemList() const;
+	TArray<UARPG_ItemCoreBase*> ReceivedGetInitItemList() const;
 
 	//DispatchableEntityInterface
 public:

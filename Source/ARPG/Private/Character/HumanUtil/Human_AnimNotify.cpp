@@ -23,14 +23,14 @@ void UARPG_DodgeAttack::NotifyTick(USkeletalMeshComponent* MeshComp, UAnimSequen
 					{
 						if (Human->LeftWeapon)
 						{
-							Human->LeftWeapon->AttackAnimSet->InvokePlayDodgeAnim(Human, DodgeDirection);
+							Human->LeftWeapon->GetAttackAnimSet()->InvokePlayDodgeAnim(Human, DodgeDirection);
 						}
 					}
 					else if (Human->ARPG_AnyInputIsPressed(ARPG_InputType::ToBitMask(EARPG_InputType::RightLightAttack) | ARPG_InputType::ToBitMask(EARPG_InputType::RightHeavyAttack)))
 					{
 						if (Human->RightWeapon)
 						{
-							Human->RightWeapon->AttackAnimSet->InvokePlayDodgeAnim(Human, DodgeDirection);
+							Human->RightWeapon->GetAttackAnimSet()->InvokePlayDodgeAnim(Human, DodgeDirection);
 						}
 					}
 				}

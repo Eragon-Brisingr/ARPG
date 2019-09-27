@@ -6,6 +6,8 @@
 #include "Inventory/XD_InventoryComponentBase.h"
 #include "ARPG_InventoryComponent.generated.h"
 
+class UARPG_ItemCoreBase;
+
 /**
  * 
  */
@@ -18,7 +20,7 @@ public:
 	UARPG_InventoryComponent();
 
 	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly, Category = "背包")
-	void AddItemArray(const TArray<FARPG_Item>& Items);
+	void AddItemArray(const TArray<UARPG_ItemCoreBase*>& Items);
 
 	//金钱相关
 public:

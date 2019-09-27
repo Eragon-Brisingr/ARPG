@@ -10,6 +10,7 @@
 
 class UAnimInstance;
 class USkeletalMeshComponent;
+class UARPG_ItemCoreBase;
 
 /**
  * 
@@ -38,7 +39,7 @@ public:
 
 	void WhenPostLoad_Implementation() override;
 
-	TArray<struct FARPG_Item> GetInitItemList() const override;
+	TArray<UARPG_ItemCoreBase*> GetInitItemList() const override;
 
 	class AARPG_WeaponBase* EquipWaepon_Implementation(class UARPG_WeaponCoreBase* WeaponCore, EUseItemInput UseItemInput) override;
 
@@ -72,17 +73,17 @@ public:
 	void FinishAttack(FBP_OnAttackFinished OnAttackFinished);
 
 public:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "配置|常用", meta = (DisplayName = "默认左手武器", ExposeOnSpawn = "True"), SaveGame)
-	FARPG_Item DefaultLeftWeapon;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Instanced, Category = "配置|常用", meta = (DisplayName = "默认左手武器", ExposeOnSpawn = "True"), SaveGame)
+	UARPG_WeaponCoreBase* DefaultLeftWeapon;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "配置|常用", meta = (DisplayName = "默认右手武器", ExposeOnSpawn = "True"), SaveGame)
-	FARPG_Item DefaultRightWeapon;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Instanced, Category = "配置|常用", meta = (DisplayName = "默认右手武器", ExposeOnSpawn = "True"), SaveGame)
+	UARPG_WeaponCoreBase* DefaultRightWeapon;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "配置|常用", meta = (DisplayName = "默认箭", ExposeOnSpawn = "True"), SaveGame)
-	FARPG_Item DefaultArrow;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Instanced, Category = "配置|常用", meta = (DisplayName = "默认箭", ExposeOnSpawn = "True"), SaveGame)
+	UARPG_ArrowCoreBase* DefaultArrow;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "配置|常用", meta = (DisplayName = "默认装备列表", ExposeOnSpawn = "True"), SaveGame)
-	TArray<FARPG_Item> DefaultEquipmentList;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Instanced, Category = "配置|常用", meta = (DisplayName = "默认装备列表", ExposeOnSpawn = "True"), SaveGame)
+	TArray<UARPG_EquipmentCoreBase*> DefaultEquipmentList;
 	
 	//装备相关
 public:

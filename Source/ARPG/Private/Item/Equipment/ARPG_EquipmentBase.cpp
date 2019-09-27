@@ -7,12 +7,13 @@
 #include "ARPG_Item_Log.h"
 #include "ARPG_DebugFunctionLibrary.h"
 #include <Components/SkeletalMeshComponent.h>
+#include <Components/StaticMeshComponent.h>
 
 
 #define LOCTEXT_NAMESPACE "ARPG_Item"
 
 AARPG_EquipmentBase::AARPG_EquipmentBase(const FObjectInitializer& ObjectInitializer)
-	:Super(ObjectInitializer.SetDefaultSubobjectClass<UARPG_EquipmentCoreBase>(GET_MEMBER_NAME_CHECKED(AARPG_EquipmentBase, InnerItemCore)))
+	:Super(ObjectInitializer)
 {
 	
 }
@@ -24,7 +25,7 @@ void AARPG_EquipmentBase::EditorReplacedActor(AActor* OldActor)
 	AARPG_EquipmentBase* OldEquipment = Cast<AARPG_EquipmentBase>(OldActor);
 	if (ACharacterBase* ItemOwner = OldEquipment->GetItemOwner())
 	{
-		InitRootMesh();
+		InitItemMesh();
 		if (USkeletalMeshComponent * SkeletalMeshComponent = Cast<USkeletalMeshComponent>(GetRootComponent()))
 		{
 			SkeletalMeshComponent->SetMasterPoseComponent(ItemOwner->GetMesh());
@@ -33,39 +34,35 @@ void AARPG_EquipmentBase::EditorReplacedActor(AActor* OldActor)
 }
 #endif
 
-void AARPG_EquipmentBase::UseItemImpl_Implementation(class UARPG_ItemCoreBase* ItemCore, class ACharacterBase* ItemOwner, EUseItemInput UseItemInput) const
-{
-	ItemOwner->EquipEquipment(CastChecked<UARPG_EquipmentCoreBase>(ItemCore), UseItemInput);
-}
-
-FText AARPG_EquipmentBase::GetItemTypeDescImpl_Implementation(const class UXD_ItemCoreBase* ItemCore) const
-{
-	return LOCTEXT("ARPG_Equipment", "装备");
-}
-
 void AARPG_EquipmentBase::WhenUse(class ACharacterBase* ItemOwner)
 {
 	Item_Display_LOG("%s装备装备%s", *UARPG_DebugFunctionLibrary::GetDebugName(ItemOwner), *UARPG_DebugFunctionLibrary::GetDebugName(this));
 	Super::WhenUse(ItemOwner);
 	
-	AttachToComponent(ItemOwner->GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, EquipSocketName);
-	if (EquipSocketName.IsNone())
+	if (UARPG_EquipmentCoreBase* EquipmentCore = Cast<UARPG_EquipmentCoreBase>(ItemCore))
 	{
-		if (USkeletalMeshComponent* SkeletalMeshComponent = Cast<USkeletalMeshComponent>(GetRootComponent()))
+		if (EquipmentCore->EquipSocketName.IsNone())
 		{
-			SkeletalMeshComponent->SetMasterPoseComponent(ItemOwner->GetMesh());
+			if (USkeletalMeshComponent* SkeletalMeshComponent = Cast<USkeletalMeshComponent>(GetRootComponent()))
+			{
+				SkeletalMeshComponent->SetMasterPoseComponent(ItemOwner->GetMesh());
+			}
 		}
-	}
+		else
+		{
+			AttachToComponent(ItemOwner->GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, EquipmentCore->EquipSocketName);
+		}
 
-	if (AHumanBase * Human = Cast<AHumanBase>(ItemOwner))
-	{
-		if (bHideShorts)
+		if (AHumanBase* Human = Cast<AHumanBase>(ItemOwner))
 		{
-			Human->SetHideShorts(true);
-		}
-		if (bHideUnderwear)
-		{
-			Human->SetHideUnderwear(true);
+			if (GetItemCoreConst()->bHideShorts)
+			{
+				Human->SetHideShorts(true);
+			}
+			if (GetItemCoreConst()->bHideUnderwear)
+			{
+				Human->SetHideUnderwear(true);
+			}
 		}
 	}
 }
@@ -74,38 +71,36 @@ void AARPG_EquipmentBase::WhenNotUse(class ACharacterBase* ItemOwner)
 {
 	Super::WhenNotUse(ItemOwner);
 
-	if (AHumanBase * Human = Cast<AHumanBase>(ItemOwner))
+	if (AHumanBase* Human = Cast<AHumanBase>(ItemOwner))
 	{
-		if (bHideShorts)
+		if (GetItemCoreConst()->bHideShorts)
 		{
 			Human->SetHideShorts(false);
 		}
-		if (bHideUnderwear)
+		if (GetItemCoreConst()->bHideUnderwear)
 		{
 			Human->SetHideUnderwear(false);
 		}
 	}
 }
 
-void AARPG_EquipmentBase::WhenRemoveFromInventory_Implementation(class AActor* ItemOwner, class UXD_ItemCoreBase* ItemCore, int32 RemoveNumber, int32 ExistNumber) const
+const UARPG_EquipmentCoreBase* AARPG_EquipmentBase::GetItemCoreConst() const
 {
-	if (ExistNumber <= 0)
-	{
-		if (AHumanBase* Human = Cast<AHumanBase>(ItemOwner))
-		{
-			int32 FindIndex = Human->EquipmentList.IndexOfByPredicate([ItemCore](AARPG_EquipmentBase* E_Equipment) {return E_Equipment->IsEqualWithItemCore(ItemCore); });
-			if (FindIndex != INDEX_NONE)
-			{
-				Human->EquipmentList.RemoveAt(FindIndex);
-				Human->OnRep_EquipmentList();
-			}
-		}
-	}
+	return CastChecked<UARPG_EquipmentCoreBase>(ItemCore);
 }
 
-const UARPG_EquipmentCoreBase* AARPG_EquipmentBase::GetItemCore() const
+AARPG_Equipment_StaticMesh::AARPG_Equipment_StaticMesh(const FObjectInitializer& ObjectInitializer /*= FObjectInitializer::Get()*/)
 {
-	return CastChecked<UARPG_EquipmentCoreBase>(InnerItemCore);
+	StaticMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(GET_MEMBER_NAME_CHECKED(AXD_Item_StaticMesh, StaticMeshComponent));
+
+	SetRootComponent(StaticMeshComponent);
+}
+
+AARPG_Equipment_SkeletalMesh::AARPG_Equipment_SkeletalMesh(const FObjectInitializer& ObjectInitializer /*= FObjectInitializer::Get()*/)
+{
+	SkeletalMeshComponent = CreateDefaultSubobject<USkeletalMeshComponent>(GET_MEMBER_NAME_CHECKED(AXD_Item_SkeletalMesh, SkeletalMeshComponent));
+
+	SetRootComponent(SkeletalMeshComponent);
 }
 
 #undef LOCTEXT_NAMESPACE
