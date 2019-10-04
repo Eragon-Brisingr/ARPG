@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -11,11 +11,13 @@ class ACharacterBase;
 /**
  * 
  */
-UCLASS()
+UCLASS(meta = (DisplayName = "播放定序器"))
 class ARPG_API UARPG_DA_PlaySequence : public UXD_DA_PlaySequenceBase
 {
 	GENERATED_BODY()
 public:
+	UARPG_DA_PlaySequence();
+
 	bool MoveToSequencePlayLocation(APawn* Mover, const FVector& PlayLocation, const FRotator& PlayRotation, int32 MoverIdx) override;
 	void WhenActionDeactived() override;
 

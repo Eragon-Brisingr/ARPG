@@ -44,6 +44,7 @@
 #include "ARPG_HUDBase.h"
 #include "Components/AudioComponent.h"
 #include "ARPG_Item_Log.h"
+#include "ARPG_DA_RoleSelection.h"
 
 // Sets default values
 ACharacterBase::ACharacterBase(const FObjectInitializer& ObjectInitializer)
@@ -263,6 +264,24 @@ void ACharacterBase::SetCurrentMainDispatcher_Implementation(UXD_ActionDispatche
 bool ACharacterBase::CanExecuteDispatcher_Implementation() const
 {
 	return AlertValue == 0.f;
+}
+
+bool ACharacterBase::IsInRoleSelection() const
+{
+	return CurrentActions.ContainsByPredicate([](UXD_DispatchableActionBase* Action) {return Action->IsA<UARPG_DA_RoleSelectionBase>(); });
+}
+
+void ACharacterBase::AbortRoleSelection()
+{
+	check(IsInRoleSelection());
+	for (UXD_DispatchableActionBase* Action : CurrentActions)
+	{
+		if (UARPG_DA_RoleSelectionBase* Selection = Cast<UARPG_DA_RoleSelectionBase>(Action))
+		{
+			Selection->AbortDispatcher();
+			break;
+		}
+	}
 }
 
 void ACharacterBase::SetRebornLocation(const FVector& RebornLocation)
@@ -758,6 +777,21 @@ void ACharacterBase::ForceSetClientWorldLocation(const FVector& Location)
 void ACharacterBase::ForceSetClientWorldLocationAndRotation(const FVector& Location, const FRotator& Rotation)
 {
 	ForceSetClientWorldLocationAndRotationImpl(FRepMovement::RebaseOntoZeroOrigin(Location, this), Rotation);
+}
+
+void ACharacterBase::AddStateTag(FGameplayTag Tag)
+{
+	StateTags.AddTag(Tag);
+}
+
+void ACharacterBase::RemoveStateTag(FGameplayTag Tag)
+{
+	StateTags.RemoveTag(Tag);
+}
+
+bool ACharacterBase::HasStateTag(FGameplayTag Tag) const
+{
+	return StateTags.HasTag(Tag);
 }
 
 void ACharacterBase::ForceSetClientWorldLocationImpl_Implementation(const FVector& Location)

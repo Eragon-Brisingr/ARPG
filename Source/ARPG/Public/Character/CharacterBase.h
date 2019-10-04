@@ -114,6 +114,11 @@ public:
 	UARPG_ActionDispatcherBase* CurrentMainDispatcher;
 
 	bool CanExecuteDispatcher_Implementation() const override;
+	UFUNCTION(BlueprintCallable, Category = "角色|行为")
+	bool IsInRoleSelection() const;
+	UFUNCTION(BlueprintCallable, Category = "角色|行为")
+	void AbortRoleSelection();
+
 	//重生用
 public:
 	UPROPERTY(SaveGame, BlueprintReadOnly, Category = "角色|重生")
@@ -712,4 +717,16 @@ private:
 public:
 	UFUNCTION(Reliable, WithValidation, Client)
 	void ForceSetClientWorldRotation(const FRotator& Rotation);
+
+public:
+	// 持久性的Tag，用于记录角色的特殊状态
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "角色|Tags", SaveGame)
+	FGameplayTagContainer StateTags;
+
+	UFUNCTION(BlueprintCallable, Category = "角色|Tags")
+	void AddStateTag(FGameplayTag Tag);
+	UFUNCTION(BlueprintCallable, Category = "角色|Tags")
+	void RemoveStateTag(FGameplayTag Tag);
+	UFUNCTION(BlueprintCallable, Category = "角色|Tags")
+	bool HasStateTag(FGameplayTag Tag) const;
 };

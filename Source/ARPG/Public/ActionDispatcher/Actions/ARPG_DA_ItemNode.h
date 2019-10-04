@@ -21,12 +21,14 @@ public:
 	TSet<AActor*> GetAllRegistableEntities() const override;
 	void WhenActionActived() override;
 	void WhenActionDeactived() override;
-	void WhenActionFinished() override;
+	bool IsActionValid() const override;
 public:
 	UPROPERTY(SaveGame, BlueprintReadOnly, meta = (ExposeOnSpawn = "true"))
 	TSoftObjectPtr<ACharacterBase> Role;
 	UPROPERTY(SaveGame, BlueprintReadOnly, meta = (ExposeOnSpawn = "true"))
 	TSoftObjectPtr<AActor> Other;
+	UPROPERTY(SaveGame, BlueprintReadOnly, meta = (ExposeOnSpawn = "true"))
+	float ValidDistance = 100.f;
 
 	UPROPERTY(SaveGame, meta = (DisplayName = "当移动道具结束"))
 	FOnDispatchableActionFinishedEvent WhenMoveItemFinished;
@@ -68,12 +70,14 @@ public:
 	TSet<AActor*> GetAllRegistableEntities() const override;
 	void WhenActionActived() override;
 	void WhenActionDeactived() override;
-	void WhenActionFinished() override;
+	bool IsActionValid() const override;
 public:
 	UPROPERTY(SaveGame, BlueprintReadOnly, meta = (ExposeOnSpawn = "true"))
 	TSoftObjectPtr<ACharacterBase> Role;
 	UPROPERTY(SaveGame, BlueprintReadOnly, meta = (ExposeOnSpawn = "true"))
 	TSoftObjectPtr<AActor> Other;
+	UPROPERTY(SaveGame, BlueprintReadOnly, meta = (ExposeOnSpawn = "true"))
+	float ValidDistance = 300.f;
 
 	UPROPERTY(SaveGame, meta = (DisplayName = "当交易道具结束"))
 	FOnDispatchableActionFinishedEvent WhenTradeItemFinished;

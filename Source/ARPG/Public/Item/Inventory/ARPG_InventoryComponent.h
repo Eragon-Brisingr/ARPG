@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Inventory/XD_InventoryComponentBase.h"
+#include "XD_InventoryComponentBase.h"
 #include "ARPG_InventoryComponent.generated.h"
 
 class UARPG_ItemCoreBase;

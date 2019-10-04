@@ -21,8 +21,6 @@ void UARPG_AD_InteractableBase::StartInteractDispatcher(ACharacterBase* InIntera
 	InteractInvoker = InInteractInvoker;
 	OnDispatchDeactiveNative = OnDispatchDeactive;
 
-	CurrentActions.Empty();
-
 	StartDispatch();
 }
 
@@ -42,4 +40,5 @@ void UARPG_AD_InteractableBase::WhenDeactived(bool IsFinsihedCompleted)
 	Super::WhenDeactived(IsFinsihedCompleted);
 
 	InteractInvoker = nullptr;
+	CurrentActions.Empty();
 }

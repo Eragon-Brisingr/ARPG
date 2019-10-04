@@ -23,6 +23,7 @@ void UARPG_AD_CharacterInteract::WhenDeactived(bool IsFinsihedCompleted)
 	{
 		StopFaceToInteracter();
 	}
+	CurrentActions.Empty();
 }
 
 void UARPG_AD_CharacterInteract::StartFaceToInteracter()

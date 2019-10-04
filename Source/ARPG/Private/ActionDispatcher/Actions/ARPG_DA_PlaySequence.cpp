@@ -6,6 +6,13 @@
 #include "ARPG_MoveUtils.h"
 #include "ARPG_ActorFunctionLibrary.h"
 
+UARPG_DA_PlaySequence::UARPG_DA_PlaySequence()
+{
+#if WITH_EDITORONLY_DATA
+	bIsPluginAction = false;
+#endif
+}
+
 bool UARPG_DA_PlaySequence::MoveToSequencePlayLocation(APawn* Mover, const FVector& PlayLocation, const FRotator& PlayRotation, int32 MoverIdx)
 {
 	if (ACharacterBase* Character = Cast<ACharacterBase>(Mover))

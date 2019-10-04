@@ -136,10 +136,12 @@ void UARPG_DA_MoveToActor_LeadOther::WhenTick(float DeltaSeconds)
 	if (Follower->GetDistanceTo(Mover.Get()) > WaitDistance)
 	{
 		Mover->PauseMove();
+		Mover->SetLockedTarget(Follower.Get());
 	}
 	else
 	{
 		Mover->ResumeMove();
+		Mover->SetLockedTarget(nullptr);
 	}
 }
 

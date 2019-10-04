@@ -27,12 +27,14 @@ void UARPG_DA_MoveItem::WhenActionActived()
 
 void UARPG_DA_MoveItem::WhenActionDeactived()
 {
+	Super::WhenActionDeactived();
+
 	Role->CloseMoveItemPanel();
 }
 
-void UARPG_DA_MoveItem::WhenActionFinished()
+bool UARPG_DA_MoveItem::IsActionValid() const
 {
-
+	return Role.IsValid() && Other.IsValid() && Role->GetDistanceTo(Other.Get()) < ValidDistance;
 }
 
 void UARPG_DA_MoveItem_Record::WhenActionActived()
@@ -87,12 +89,15 @@ void UARPG_DA_TradeItem::WhenActionActived()
 
 void UARPG_DA_TradeItem::WhenActionDeactived()
 {
+	Super::WhenActionDeactived();
+
+	Role->OnCloseTradeItemPanelNative.RemoveAll(this);
 	Role->CloseTradeItemPanel();
 }
 
-void UARPG_DA_TradeItem::WhenActionFinished()
+bool UARPG_DA_TradeItem::IsActionValid() const
 {
-
+	return Role.IsValid() && Other.IsValid() && Role->GetDistanceTo(Other.Get()) < ValidDistance;
 }
 
 void UARPG_DA_TradeItem_Record::WhenActionActived()
