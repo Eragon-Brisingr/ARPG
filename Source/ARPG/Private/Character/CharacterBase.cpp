@@ -430,6 +430,11 @@ float ACharacterBase::PlayMontage(UAnimMontage* MontageToPlay, const FARPG_Monta
 				PlayMontageToServer(MontageToPlay, Config, InPlayRate, StartSectionName);
 			}
 		}
+		else
+		{
+			//客户端先行播放
+			PlayMontageImpl(MontageToPlay, Config, InPlayRate, StartSectionName);
+		}
 		return MontageToPlay->GetPlayLength();
 	}
 	return 0.f;
@@ -1130,20 +1135,27 @@ bool ACharacterBase::CanBeBackstab(ACharacterBase* BackstabInvoker) const
 
 void ACharacterBase::ExecuteOther(ACharacterBase* ExecuteTarget, const FVector& TargetLocation, const FRotator& TargetRotation, UAnimMontage* ExecuteMontage, UAnimMontage* BeExecutedMontage)
 {
-	if (!HasAuthority())
+	if (CanPlayFullBodyMontage())
 	{
-		ExecuteOtherToServer_Implementation(ExecuteTarget, TargetLocation, TargetRotation, ExecuteMontage, BeExecutedMontage);
+		if (!HasAuthority())
+		{
+			ExecuteOtherToServer_Implementation(ExecuteTarget, TargetLocation, TargetRotation, ExecuteMontage, BeExecutedMontage);
+		}
+		ExecuteOtherToServer(ExecuteTarget, TargetLocation, TargetRotation, ExecuteMontage, BeExecutedMontage);
 	}
-	ExecuteOtherToServer(ExecuteTarget, TargetLocation, TargetRotation, ExecuteMontage, BeExecutedMontage);
 }
 
 void ACharacterBase::ExecuteOtherToServer_Implementation(ACharacterBase* ExecuteTarget, const FVector& TargetLocation, const FRotator& TargetRotation, UAnimMontage* ExecuteMontage, UAnimMontage* BeExecutedMontage)
 {
-	if (ExecuteTarget)
+	if (ExecuteTarget && CanPlayFullBodyMontage())
 	{
 		ExecuteTargetCharacter = ExecuteTarget;
 		ExecuteTarget->ExecuteFromCharacter = this;
-		Battle_Display_LOG("%s对%s进行处决", *UXD_DebugFunctionLibrary::GetDebugName(this), *UXD_DebugFunctionLibrary::GetDebugName(ExecuteTarget));
+
+		if (HasAuthority())
+		{
+			Battle_Display_LOG("%s对%s进行处决", *UXD_DebugFunctionLibrary::GetDebugName(this), *UXD_DebugFunctionLibrary::GetDebugName(ExecuteTarget));
+		}
 		UARPG_ActorMoveUtils::MoveActorTo(ExecuteTarget, TargetLocation, TargetRotation);
 		PlayMontageWithBlendingOutDelegate(ExecuteMontage, FOnMontageBlendingOutStarted::CreateWeakLambda(ExecuteTarget, [=](UAnimMontage* Montage, bool bInterrupted)
 			{
@@ -1152,7 +1164,7 @@ void ACharacterBase::ExecuteOtherToServer_Implementation(ACharacterBase* Execute
 					ExecuteTarget->StopMontage(BeExecutedMontage);
 				}
 				WhenExecuteEnd();
-			}), {}, 1.f, NAME_None, true);
+			}), {}, 1.f, NAME_None, false);
 		ExecuteTarget->PlayMontageWithBlendingOutDelegate(BeExecutedMontage, FOnMontageBlendingOutStarted::CreateWeakLambda(this, [=](UAnimMontage* Montage, bool bInterrupted)
 			{
 				if (bInterrupted)
@@ -1160,7 +1172,7 @@ void ACharacterBase::ExecuteOtherToServer_Implementation(ACharacterBase* Execute
 					StopMontage(ExecuteMontage);
 				}
 				WhenExecuteEnd();
-			}), {}, 1.f, NAME_None, true);
+			}), {}, 1.f, NAME_None, false);
 	}
 }
 
@@ -1168,8 +1180,11 @@ void ACharacterBase::WhenExecuteEnd()
 {
 	if (ExecuteTargetCharacter)
 	{
-		Battle_Display_LOG("%s对%s处决结束", *UXD_DebugFunctionLibrary::GetDebugName(this), *UXD_DebugFunctionLibrary::GetDebugName(ExecuteTargetCharacter));
-		ExecuteTargetCharacter->ExecuteFromCharacter = this;
+		if (HasAuthority())
+		{
+			Battle_Display_LOG("%s对%s处决结束", *UXD_DebugFunctionLibrary::GetDebugName(this), *UXD_DebugFunctionLibrary::GetDebugName(ExecuteTargetCharacter));
+		}
+		ExecuteTargetCharacter->ExecuteFromCharacter = nullptr;
 		ExecuteTargetCharacter = nullptr;
 	}
 }

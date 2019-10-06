@@ -20,7 +20,7 @@ bool FExecuteActionSet::InvokeExecuteOther(class ACharacterBase* Invoker, class 
 			FRotator CompareRotation = UKismetMathLibrary::FindLookAtRotation(ExecuteTarget->GetActorLocation(), ExecuteTarget->GetActorLocation() + ExecuteTarget->GetActorRotation().RotateVector(ExecuteAnimData->RelationLocation));
 			if (FMath::Abs(FRotator::NormalizeAxis(LookAtRotation.Yaw - CompareRotation.Yaw)) <= ExecuteAnimData->Tolerance)
 			{
-				FVector TargetLocation(Invoker->GetActorLocation() - Invoker->GetActorRotation().RotateVector(ExecuteAnimData->RelationLocation));
+				FVector TargetLocation(Invoker->GetActorLocation() + Invoker->GetActorRotation().RotateVector(ExecuteAnimData->RelationLocation));
 				TargetLocation.Z = Invoker->GetActorLocation().Z;
 				FRotator TargetRotation(Invoker->GetActorRotation().Pitch, LookAtRotation.Yaw + ExecuteAnimData->YawOffset, Invoker->GetActorRotation().Roll);
 
@@ -37,7 +37,7 @@ bool FExecuteActionSet::InvokeExecuteOther(class ACharacterBase* Invoker, class 
 		{
 			if (AttackMontagePair->AttackMontage && AttackMontagePair->BeAttackedMontage)
 			{
-				FVector TargetLocation(Invoker->GetActorLocation() - Invoker->GetActorRotation().RotateVector(AttackMontagePair->RelationLocation));
+				FVector TargetLocation(Invoker->GetActorLocation() + Invoker->GetActorRotation().RotateVector(AttackMontagePair->RelationLocation));
 				TargetLocation.Z = Invoker->GetActorLocation().Z;
 				FRotator TargetRotation(Invoker->GetActorRotation().Pitch, Invoker->GetActorRotation().Yaw, Invoker->GetActorRotation().Roll);
 
