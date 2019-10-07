@@ -20,4 +20,7 @@ public:
 
 	UPROPERTY(BlueprintReadOnly, Category = "行为|交互", meta = (ExposeOnSpawn = true))
 	TSoftObjectPtr<ACharacterBase> Character;
+
+protected:
+	void WhenDeactived(bool IsFinsihedCompleted) override;
 };

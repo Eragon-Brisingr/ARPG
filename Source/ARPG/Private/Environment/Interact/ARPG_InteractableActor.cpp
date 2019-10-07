@@ -23,19 +23,19 @@ bool FARPG_InteractSingleConfig::CanInteract(const ACharacterBase* InteractInvok
 void FARPG_InteractSingleConfig::WhenInvokeInteract(AActor* Owner, ACharacterBase* InteractInvoker)
 {
 	FVector WorldLocation = Owner->GetActorTransform().TransformPosition(InteractLocation.GetLocation());
-	AI_Display_LOG("%s申请与%s交互", *UXD_DebugFunctionLibrary::GetDebugName(InteractInvoker), *UXD_DebugFunctionLibrary::GetDebugName(Owner));
+	AI_Display_VLog(Owner, "%s申请与%s交互", *UXD_DebugFunctionLibrary::GetDebugName(InteractInvoker), *UXD_DebugFunctionLibrary::GetDebugName(Owner));
 	FOnARPG_MoveFinished OnARPG_MoveFinished = FOnARPG_MoveFinished::CreateWeakLambda(Owner, [=](const FPathFollowingResult & Result)
 		{
 			if (Result.Code == EPathFollowingResult::Success)
 			{
 				if (IARPG_InteractInterface::CanInteract(Owner, InteractInvoker))
 				{
-					AI_Display_LOG("%s开始与%s交互", *UXD_DebugFunctionLibrary::GetDebugName(InteractInvoker), *UXD_DebugFunctionLibrary::GetDebugName(Owner));
+					AI_Display_VLog(Owner, "%s开始与%s交互", *UXD_DebugFunctionLibrary::GetDebugName(InteractInvoker), *UXD_DebugFunctionLibrary::GetDebugName(Owner));
 					InteractInvoker->SetInteractingTarget(Owner);
 					InteractDispatcher->StartInteractDispatcher(InteractInvoker,
 						FOnDispatchDeactiveNative::CreateWeakLambda(Owner, [=](bool IsFinishedCompleted)
 							{
-								AI_Display_LOG("%s结束与%s交互", *UXD_DebugFunctionLibrary::GetDebugName(InteractInvoker), *UXD_DebugFunctionLibrary::GetDebugName(Owner));
+								AI_Display_VLog(Owner, "%s结束与%s交互", *UXD_DebugFunctionLibrary::GetDebugName(InteractInvoker), *UXD_DebugFunctionLibrary::GetDebugName(Owner));
 								InteractInvoker->ExecuteInteractEnd(IsFinishedCompleted ? EInteractEndResult::Succeed : EInteractEndResult::Failed);
 							}));
 				}
@@ -63,16 +63,20 @@ void FARPG_InteractSingleConfig::WhenInvokeInteract(AActor* Owner, ACharacterBas
 
 void FARPG_InteractSingleConfig::WhenAbortInteract(AActor* Owner, ACharacterBase* InteractInvoker)
 {
-	AI_Display_LOG("%s中断与%s交互", *UXD_DebugFunctionLibrary::GetDebugName(InteractInvoker), *UXD_DebugFunctionLibrary::GetDebugName(Owner));
 	if (InteractInvoker == GetInteracter())
 	{
-		InteractDispatcher->AbortInteractDispatcher(FOnDispatcherAbortedNative::CreateWeakLambda(Owner, [=]()
-			{
-				InteractInvoker->ExecuteInteractAbortEnd();
-			}));
+		if (InteractDispatcher->State == EActionDispatcherState::Active)
+		{
+			AI_Display_VLog(InteractInvoker, "%s中断与%s交互", *UXD_DebugFunctionLibrary::GetDebugName(InteractInvoker), *UXD_DebugFunctionLibrary::GetDebugName(Owner));
+			InteractDispatcher->AbortInteractDispatcher(FOnDispatcherAbortedNative::CreateWeakLambda(Owner, [=]()
+				{
+					InteractInvoker->ExecuteInteractAbortEnd();
+				}));
+		}
 	}
 	else
 	{
+		AI_Display_VLog(InteractInvoker, "%s中断申请与%s交互", *UXD_DebugFunctionLibrary::GetDebugName(InteractInvoker), *UXD_DebugFunctionLibrary::GetDebugName(Owner));
 		InteractInvoker->StopMovement();
 		InteractInvoker->ExecuteInteractAbortEnd();
 	}

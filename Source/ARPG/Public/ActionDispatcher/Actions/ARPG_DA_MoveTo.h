@@ -58,7 +58,7 @@ public:
 	UPROPERTY(SaveGame, BlueprintReadOnly, meta = (ExposeOnSpawn = "true", DisplayName = "使用到达时朝向"))
 	uint8 bTurnTo : 1;
 
-	UPROPERTY(SaveGame, BlueprintReadOnly, meta = (ExposeOnSpawn = "true", DisplayName = "转向目标"))
+	UPROPERTY(SaveGame, BlueprintReadOnly, meta = (ExposeOnSpawn = "true", DisplayName = "转向目标", AllowEmpty = true))
 	TSoftObjectPtr<AActor> TurnToActor;
 };
 

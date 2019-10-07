@@ -11,7 +11,7 @@ class AActor;
 /**
  * 
  */
-UCLASS(abstract, meta = (DisplayName = "显示选项_交互"))
+UCLASS(abstract)
 class ARPG_API UARPG_DA_RoleSelectionBase : public UXD_DA_RoleSelectionBase
 {
 	GENERATED_BODY()
