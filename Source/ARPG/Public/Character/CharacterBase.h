@@ -729,4 +729,7 @@ public:
 	void RemoveStateTag(FGameplayTag Tag);
 	UFUNCTION(BlueprintCallable, Category = "角色|Tags")
 	bool HasStateTag(FGameplayTag Tag) const;
+private:
+	bool AD_HasStateTag_Implementation(const FGameplayTag& Tag) const override;
+	void AD_AddStateTag_Implementation(const FGameplayTag& Tag) override;
 };

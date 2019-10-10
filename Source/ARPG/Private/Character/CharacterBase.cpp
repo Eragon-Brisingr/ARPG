@@ -799,6 +799,16 @@ bool ACharacterBase::HasStateTag(FGameplayTag Tag) const
 	return StateTags.HasTag(Tag);
 }
 
+bool ACharacterBase::AD_HasStateTag_Implementation(const FGameplayTag& Tag) const
+{
+	return HasStateTag(Tag);
+}
+
+void ACharacterBase::AD_AddStateTag_Implementation(const FGameplayTag& Tag)
+{
+	AddStateTag(Tag);
+}
+
 void ACharacterBase::ForceSetClientWorldLocationImpl_Implementation(const FVector& Location)
 {
 	SetActorLocation(FRepMovement::RebaseOntoLocalOrigin(Location, this));
