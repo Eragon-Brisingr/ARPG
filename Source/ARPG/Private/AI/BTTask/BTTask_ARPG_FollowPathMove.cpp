@@ -147,8 +147,3 @@ void UBTTask_ARPG_FollowPathMove::MoveToNavPoint(const FARPG_NavPathPoint &NavPo
 		UARPG_MoveUtils::ARPG_MoveToLocation(Character, NavPoint.Location, FOnARPG_MoveFinished::CreateUObject(this, &UBTTask_ARPG_FollowPathMove::WhenMoveFinished, &OwnerComp, FollowPathMoveMemory), NavPoint.GetAcceptableRadius(), false, true, true, true, FilterClass, false);
 	}
 }
-
-int32 UARPG_FollowPathMoveConfigBase::GetStartFollowPathMoveIndex(ACharacterBase* Mover, class AARPG_NavPath* Path, int32 RememberIndex) const
-{
-	return RememberIndex != -1 ? RememberIndex : 0;
-}

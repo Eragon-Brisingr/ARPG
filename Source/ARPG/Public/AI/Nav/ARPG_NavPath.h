@@ -12,6 +12,14 @@
 class UARPG_AD_CharacterBase;
 class ACharacterBase;
 
+UCLASS()
+class ARPG_API UARPG_FollowPathMoveConfigBase : public UObject
+{
+	GENERATED_BODY()
+public:
+	virtual int32 GetStartFollowPathMoveIndex(class ACharacterBase* Mover, class AARPG_NavPath* Path, int32 RememberIndex) const;
+};
+
 USTRUCT(BlueprintType)
 struct ARPG_API FARPG_NavPathPoint : public FBehaviorPositionData
 {
@@ -26,7 +34,6 @@ public:
 	float AcceptableRadius = 100.f;
 	float GetAcceptableRadius() const;
 	
-	//TODO 改为动作调度器，并且为多个调用
  	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "行为", Instanced)
 	UARPG_AD_CharacterBase* BehaviorTemplate = nullptr;
 

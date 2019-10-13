@@ -20,6 +20,7 @@ public:
 	TSet<AActor*> GetAllRegistableEntities() const override;
 	bool IsActionValid() const override;
 	void WhenActionActived() override;
+	void WhenActionAborted() override;
 	void WhenActionDeactived() override;
 	void WhenActionFinished() override;
 protected:

@@ -44,11 +44,3 @@ protected:
 	void MoveToNavPoint(const FARPG_NavPathPoint &NavPoint, ACharacterBase* Character, UBehaviorTreeComponent& OwnerComp, FARPG_FollowPathMoveMemory* FollowPathMoveMemory);
 
 };
-
-UCLASS()
-class ARPG_API UARPG_FollowPathMoveConfigBase : public UObject
-{
-	GENERATED_BODY()
-public:
-	virtual int32 GetStartFollowPathMoveIndex(class ACharacterBase* Mover, class AARPG_NavPath* Path, int32 RememberIndex) const;
-};

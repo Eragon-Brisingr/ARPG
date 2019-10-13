@@ -16,5 +16,10 @@ class ARPG_API UARPG_ActionDispatcherBase : public UXD_ActionDispatcherBase
 public:
 	UARPG_ActionDispatcherBase();
 
+	bool ActionIsBothCompatible(UXD_DispatchableActionBase* LHS, UXD_DispatchableActionBase* RHS) const override;
+
+	// 执行该调度的时候能否被交互
+	// e.g. 睡觉时不能交互
+	UPROPERTY(EditDefaultsOnly, Category = "行为")
 	uint8 bInteractable : 1;
 };

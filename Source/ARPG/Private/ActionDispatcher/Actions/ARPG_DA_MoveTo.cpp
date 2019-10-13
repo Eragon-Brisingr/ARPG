@@ -21,10 +21,15 @@ void UARPG_DA_MoveToBase::WhenActionActived()
 
 }
 
-void UARPG_DA_MoveToBase::WhenActionDeactived()
+void UARPG_DA_MoveToBase::WhenActionAborted()
 {
 	ACharacterBase* Character = Cast<ACharacterBase>(Mover.Get());
 	Character->StopMovement();
+}
+
+void UARPG_DA_MoveToBase::WhenActionDeactived()
+{
+
 }
 
 void UARPG_DA_MoveToBase::WhenActionFinished()

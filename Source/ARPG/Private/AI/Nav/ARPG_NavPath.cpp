@@ -5,6 +5,11 @@
 #include "CharacterBase.h"
 #include "ARPG_AI_Config.h"
 
+int32 UARPG_FollowPathMoveConfigBase::GetStartFollowPathMoveIndex(ACharacterBase* Mover, class AARPG_NavPath* Path, int32 RememberIndex) const
+{
+	return RememberIndex != INDEX_NONE ? RememberIndex : 0;
+}
+
 float FARPG_NavPathPoint::GetAcceptableRadius() const
 {
 	return bAttachToLocation ? 0.f : AcceptableRadius;
