@@ -17,9 +17,9 @@ namespace ActionCompatibleMapUtils
 	static TArray<TSubclassOf<UXD_DispatchableActionBase>> ActionIdxs = { UARPG_DA_RoleSelectionBase::StaticClass(), UARPG_DA_PlayMontage::StaticClass(), UARPG_DA_SpeakOneSentence::StaticClass() };
 	static TArray<TArray<bool>> ActionCompatibleMap =
 	{								/*RoleSelectionBase*/	/*PlayMontage*/		/*SpeakOneSentence*/
-		/*RoleSelectionBase*/		{true,					true,				true},
-		/*PlayMontage*/				{						true,				true},
-		/*SpeakOneSentence*/		{											true},
+		/*RoleSelectionBase*/		{false,					true,				true},
+		/*PlayMontage*/				{						false,				true},
+		/*SpeakOneSentence*/		{											false},
 	};
 	int32 GetActionIdx(const UXD_DispatchableActionBase* Action)
 	{
