@@ -38,7 +38,7 @@ public:
 	UPROPERTY(SaveGame, BlueprintReadOnly, meta = (ExposeOnSpawn = "true", DisplayName = "移动者"))
 	TSoftObjectPtr<ACharacterBase> Mover;
 
-	UPROPERTY(SaveGame, BlueprintReadOnly, meta = (ExposeOnSpawn = "true", DisplayName = "有效半径"))
+	UPROPERTY(SaveGame, BlueprintReadOnly, meta = (ExposeOnSpawn = "true", DisplayName = "有效半径"), AdvancedDisplay = true)
 	float AcceptRadius = 5.f;
 };
 
@@ -56,10 +56,10 @@ public:
 	TSoftObjectPtr<AActor> Goal;
 
 	//使用到达时朝向
-	UPROPERTY(SaveGame, BlueprintReadOnly, meta = (ExposeOnSpawn = "true", DisplayName = "使用到达时朝向"))
+	UPROPERTY(SaveGame, BlueprintReadOnly, meta = (ExposeOnSpawn = "true", DisplayName = "使用到达时朝向"), AdvancedDisplay = true)
 	uint8 bTurnTo : 1;
 
-	UPROPERTY(SaveGame, BlueprintReadOnly, meta = (ExposeOnSpawn = "true", DisplayName = "转向目标", AllowEmpty = true))
+	UPROPERTY(SaveGame, BlueprintReadOnly, meta = (ExposeOnSpawn = "true", DisplayName = "转向目标", AllowEmpty = true), AdvancedDisplay = true)
 	TSoftObjectPtr<AActor> TurnToActor;
 };
 
@@ -76,11 +76,11 @@ public:
 	FVector Destination;
 
 	//使用到达时朝向
-	UPROPERTY(SaveGame, BlueprintReadOnly, meta = (ExposeOnSpawn = "true", DisplayName = "使用到达时朝向"))
+	UPROPERTY(SaveGame, BlueprintReadOnly, meta = (ExposeOnSpawn = "true", DisplayName = "使用到达时朝向"), AdvancedDisplay = true)
 	uint8 bTurnTo : 1;
 
 	//到达时朝向
-	UPROPERTY(SaveGame, BlueprintReadOnly, meta = (ExposeOnSpawn = "true", DisplayName = "到达时朝向"))
+	UPROPERTY(SaveGame, BlueprintReadOnly, meta = (ExposeOnSpawn = "true", DisplayName = "到达时朝向"), AdvancedDisplay = true)
 	FRotator TurnToRotation;
 };
 
@@ -96,7 +96,7 @@ public:
 	UPROPERTY(SaveGame, BlueprintReadOnly, meta = (ExposeOnSpawn = "true", DisplayName = "他人"))
 	TSoftObjectPtr<AActor> Follower;
 
-	UPROPERTY(SaveGame, BlueprintReadOnly, meta = (ExposeOnSpawn = "true", DisplayName = "起始等待距离"))
+	UPROPERTY(SaveGame, BlueprintReadOnly, meta = (ExposeOnSpawn = "true", DisplayName = "起始等待距离"), AdvancedDisplay = true)
 	float WaitDistance = 1000.f;
 
 	void WhenTick(float DeltaSeconds) override;
@@ -114,7 +114,7 @@ public:
 	UPROPERTY(SaveGame, BlueprintReadOnly, meta = (ExposeOnSpawn = "true", DisplayName = "他人"))
 	TSoftObjectPtr<AActor> Follower;
 
-	UPROPERTY(SaveGame, BlueprintReadOnly, meta = (ExposeOnSpawn = "true", DisplayName = "起始等待距离"))
+	UPROPERTY(SaveGame, BlueprintReadOnly, meta = (ExposeOnSpawn = "true", DisplayName = "起始等待距离"), AdvancedDisplay = true)
 	float WaitDistance = 1000.f;
 
 	void WhenTick(float DeltaSeconds) override;
