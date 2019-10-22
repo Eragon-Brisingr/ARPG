@@ -11,5 +11,5 @@ void UARPG_AD_CharacterBase::WhenDeactived(bool IsFinsihedCompleted)
 {
 	Super::WhenDeactived(IsFinsihedCompleted);
 
-	CurrentActions.Empty();
+	Reset();
 }

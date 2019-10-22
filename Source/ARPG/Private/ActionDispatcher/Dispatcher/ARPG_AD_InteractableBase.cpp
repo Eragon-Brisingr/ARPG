@@ -40,5 +40,5 @@ void UARPG_AD_InteractableBase::WhenDeactived(bool IsFinsihedCompleted)
 	Super::WhenDeactived(IsFinsihedCompleted);
 
 	InteractInvoker = nullptr;
-	CurrentActions.Empty();
+	Reset();
 }
