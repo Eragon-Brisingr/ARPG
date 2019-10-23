@@ -30,7 +30,7 @@ public:
 	UPROPERTY(SaveGame, BlueprintReadOnly, meta = (ExposeOnSpawn = "true"))
 	float ValidDistance = 100.f;
 
-	UPROPERTY(SaveGame, meta = (DisplayName = "当移动道具结束"))
+	UPROPERTY(SaveGame, BlueprintReadWrite, meta = (DisplayName = "当移动道具结束"))
 	FOnDispatchableActionFinishedEvent WhenMoveItemFinished;
 };
 
@@ -79,7 +79,7 @@ public:
 	UPROPERTY(SaveGame, BlueprintReadOnly, meta = (ExposeOnSpawn = "true"))
 	float ValidDistance = 300.f;
 
-	UPROPERTY(SaveGame, meta = (DisplayName = "当交易道具结束"))
+	UPROPERTY(SaveGame, BlueprintReadWrite, meta = (DisplayName = "当交易道具结束"))
 	FOnDispatchableActionFinishedEvent WhenTradeItemFinished;
 };
 

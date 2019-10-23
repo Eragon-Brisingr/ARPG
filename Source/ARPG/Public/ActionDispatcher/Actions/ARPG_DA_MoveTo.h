@@ -24,10 +24,10 @@ public:
 	void WhenActionDeactived() override;
 	void WhenActionFinished() override;
 protected:
-	UPROPERTY(SaveGame, meta = (DisplayName = "当到达了"))
+	UPROPERTY(SaveGame, BlueprintReadWrite, meta = (DisplayName = "当到达了"))
 	FOnDispatchableActionFinishedEvent WhenReached;
 
-	UPROPERTY(SaveGame, meta = (DisplayName = "当无法到达"))
+	UPROPERTY(SaveGame, BlueprintReadWrite, meta = (DisplayName = "当无法到达"))
 	FOnDispatchableActionFinishedEvent WhenCanNotReached;
 
 	void WhenRequestFinished(const FPathFollowingResult& Result);

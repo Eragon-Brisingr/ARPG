@@ -44,7 +44,7 @@ protected:
 	UPROPERTY(SaveGame, BlueprintReadOnly, meta = (ExposeOnSpawn = "true"))
 	FXD_GameTimeSpan GameTimeSpan;
 
-	UPROPERTY(SaveGame, meta = (DisplayName = "当等待结束"))
+	UPROPERTY(SaveGame, BlueprintReadWrite, meta = (DisplayName = "当等待结束"))
 	FOnDispatchableActionFinishedEvent WhenWaitFinished;
 
 	FXD_NativeSpecialGameTimeHandle GameTimeHandle;

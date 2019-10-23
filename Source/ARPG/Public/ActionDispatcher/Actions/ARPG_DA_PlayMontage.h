@@ -32,6 +32,6 @@ public:
 	UPROPERTY(SaveGame, BlueprintReadOnly, meta = (ExposeOnSpawn = "true"))
 	UAnimMontage* WhenAbortedMontage;
 protected:
-	UPROPERTY(SaveGame, meta = (DisplayName = "当播放结束"))
+	UPROPERTY(SaveGame, BlueprintReadWrite, meta = (DisplayName = "当播放结束"))
 	FOnDispatchableActionFinishedEvent WhenPlayFinished;
 };

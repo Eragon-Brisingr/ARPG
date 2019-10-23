@@ -47,10 +47,10 @@ public:
 	UPROPERTY(SaveGame, BlueprintReadOnly, meta = (ExposeOnSpawn = "true"))
 	TSubclassOf<UNavigationQueryFilter> FilterClass;
 
-	UPROPERTY(SaveGame, meta = (DisplayName = "当到达了终点"))
+	UPROPERTY(SaveGame, BlueprintReadWrite, meta = (DisplayName = "当到达了终点"))
 	FOnDispatchableActionFinishedEvent WhenReached;
 
-	UPROPERTY(SaveGame, meta = (DisplayName = "当无法到达"))
+	UPROPERTY(SaveGame, BlueprintReadWrite, meta = (DisplayName = "当无法到达"))
 	FOnDispatchableActionFinishedEvent WhenCanNotReached;
 private:
 	void MoveToNavPoint(const FARPG_NavPathPoint& NavPoint, ACharacterBase* Character);
@@ -87,7 +87,7 @@ public:
 	UPROPERTY(SaveGame, BlueprintReadOnly, meta = (ExposeOnSpawn = "true"))
 	TSubclassOf<UNavigationQueryFilter> FilterClass;
 
-	UPROPERTY(SaveGame, meta = (DisplayName = "当无法到达"))
+	UPROPERTY(SaveGame, BlueprintReadWrite, meta = (DisplayName = "当无法到达"))
 	FOnDispatchableActionFinishedEvent WhenCanNotReached;
 private:
 	void MoveToNavPoint(const FARPG_NavPathPoint& NavPoint, ACharacterBase* Character);

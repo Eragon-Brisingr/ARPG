@@ -27,6 +27,6 @@ public:
 	UPROPERTY(SaveGame, BlueprintReadOnly, meta = (ExposeOnSpawn = "true", DisplayName = "说的话"))
 	USoundBase* Sentence;
 
-	UPROPERTY(SaveGame, meta = (DisplayName = "当说完了"))
+	UPROPERTY(SaveGame, BlueprintReadWrite, meta = (DisplayName = "当说完了"))
 	FOnDispatchableActionFinishedEvent WhenSpeakFinished;
 };
