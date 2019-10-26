@@ -8,7 +8,7 @@
 /**
  * 
  */
-DECLARE_LOG_CATEGORY_EXTERN(ARPG_AI_Log, Log, All);
+ARPG_API DECLARE_LOG_CATEGORY_EXTERN(ARPG_AI_Log, Log, All);
 
 #define AI_Display_LOG(FMT, ...) UE_LOG(ARPG_AI_Log, Display, TEXT(FMT), ##__VA_ARGS__)
 #define AI_Warning_LOG(FMT, ...) UE_LOG(ARPG_AI_Log, Warning, TEXT(FMT), ##__VA_ARGS__)

@@ -26,7 +26,6 @@ public class ARPG_Editor : ModuleRules
             "XD_SaveGameSystem",
 			"XD_TimeSystem",
 			"XD_MovementComponentPlugin",
-			"XD_GenericGraph",
 			"XD_EnvironmentSystem",
 			"XD_CampSystem",
             "XD_CampSystem_Editor",
