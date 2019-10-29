@@ -40,12 +40,17 @@
 [submodule "Plugins/XD_AnimNodes"]
 	path = Plugins/XD_AnimNodes
 	url = https://github.com/Eragon-Brisingr/XD_AnimNodes.git
-[submodule "ARPG_RawAssets"]
-	path = ARPG_RawAssets
-	url = https://github.com/Eragon-Brisingr/ARPG_RawAssets.git
 [submodule "Plugins/XD_CustomCharacter"]
 	path = Plugins/XD_CustomCharacter
 	url = https://github.com/Eragon-Brisingr/XD_CustomCharacter.git
 [submodule "Plugins/XD_AutoGenSequencer"]
 	path = Plugins/XD_AutoGenSequencer
 	url = https://github.com/Eragon-Brisingr/XD_AutoGenSequencer.git
+[submodule "Content/arpg_game"]
+	path = Content/arpg_game
+	url = http://scarfskiynas.tpddns.cn:10080/Eragon/arpg_game.git
+	path = Content/ARPG_Game
+	url = http://scarfskiynas.tpddns.cn:10080/Eragon/arpg_game.git
+[submodule "RawAssets"]
+	path = RawAssets
+	url = http://scarfskiynas.tpddns.cn:10080/Eragon/arpg_rawassets.git
