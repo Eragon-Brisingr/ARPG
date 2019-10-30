@@ -55,3 +55,6 @@
 [submodule "Content/Developers/Eragon"]
 	path = Content/Developers/Eragon
 	url = http://scarfskiynas.tpddns.cn:10080/Eragon/arpg_developer_eragon.git
+[submodule "Content/Developers/Scarfskiy"]
+	path = Content/Developers/Scarfskiy
+	url = http://scarfskiynas.tpddns.cn:10080/Eragon/arpg_developer_scarfskiy.git
