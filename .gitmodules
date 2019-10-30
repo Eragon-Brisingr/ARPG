@@ -46,7 +46,7 @@
 [submodule "Plugins/XD_AutoGenSequencer"]
 	path = Plugins/XD_AutoGenSequencer
 	url = https://github.com/Eragon-Brisingr/XD_AutoGenSequencer.git
-[submodule "Content/arpg_game"]
+[submodule "Content/ARPG_Game"]
 	path = Content/ARPG_Game
 	url = http://scarfskiynas.tpddns.cn:10080/Eragon/arpg_game.git
 [submodule "RawAssets"]
