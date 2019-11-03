@@ -28,7 +28,7 @@ public:
 };
 
 UCLASS()
-class UMPC_WeaponAttackNormal : public UARPG_AnimPlayCondition
+class UAPC_WeaponAttackNormal : public UARPG_AnimPlayCondition
 {
 	GENERATED_BODY()
 public:
@@ -47,7 +47,7 @@ struct FARPG_MontageParameter
 	GENERATED_BODY()
 public:
 	FARPG_MontageParameter()
-		:Condition(UMPC_WeaponAttackNormal::StaticClass()),
+		:Condition(UAPC_WeaponAttackNormal::StaticClass()),
 		bClientMaster(true)
 	{}
 

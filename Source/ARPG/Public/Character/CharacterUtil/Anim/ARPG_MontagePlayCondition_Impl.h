@@ -16,3 +16,11 @@ class ARPG_API UAPC_FallingAttack_OnLand : public UARPG_AnimPlayCondition
 public:
 	virtual bool CanPlayMontage_Implementation(class ACharacterBase* Character) const override;
 };
+
+UCLASS(meta = (DisplayName = "角色_存活"))
+class ARPG_API UAPC_Character_Alive : public UARPG_AnimPlayCondition
+{
+	GENERATED_BODY()
+public:
+	virtual bool CanPlayMontage_Implementation(class ACharacterBase* Character) const override;
+};

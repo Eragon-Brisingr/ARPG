@@ -63,7 +63,7 @@ public:
 
 	TArray<FVector> PrePosList;
 
-	TArray<FName>& GetTraceSocketList() const { return Config->TraceSocketList; }
+	const TArray<FName>& GetTraceSocketList() const { return Config->TraceSocketList; }
 
 	FORCEINLINE TEnumAsByte<EDrawDebugTrace::Type> GetDebugType() const
 	{

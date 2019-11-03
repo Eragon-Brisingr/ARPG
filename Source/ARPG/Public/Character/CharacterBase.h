@@ -23,6 +23,7 @@
 #include "ARPG_AI_BattleInterface.h"
 #include "XD_DispatchableEntityInterface.h"
 #include "ARPG_NavAreaType.h"
+#include "ARPG_PropertyDef.h"
 #include "CharacterBase.generated.h"
 
 class UCA_EnterReleaseStateBase;
@@ -102,6 +103,31 @@ public:
 	UFUNCTION(BlueprintImplementableEvent, Category = "角色|初始化", meta = (DisplayName = "GetInitItemList"))
 	TArray<UARPG_ItemCoreBase*> ReceivedGetInitItemList() const;
 
+	// 属性
+public:
+	//生命
+
+	UPROPERTY(Replicated, SaveGame)
+	float Health = 1000.f;
+	UPROPERTY(Replicated, SaveGame)
+	FARPG_FloatProperty MaxHelath = 1000.f;
+
+	UFUNCTION(BlueprintCallable, Category = "角色|属性", meta = (CompactNodeTitle = "Health"))
+	float GetHealth() const { return Health; }
+	UFUNCTION(BlueprintCallable, Category = "角色|属性", meta = (CompactNodeTitle = "Health"))
+	float GetMaxHealth() const { return MaxHelath.Value(); }
+	UFUNCTION(BlueprintCallable, Category = "角色|属性")
+	void SetHealth(float InHelath, const UObject* InInstigator);
+
+	UFUNCTION(BlueprintCallable, Category = "角色|状态")
+	bool IsAlive() const { return Health > 0.f; }
+	UFUNCTION(BlueprintCallable, Category = "角色|状态")
+	bool IsDead() const { return Health <= 0.f; }
+
+	virtual void WhenDead();
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "角色|状态")
+	class UARPG_CharacterStateComponent* CharacterStateComponent;
 	//DispatchableEntityInterface
 public:
 	FXD_DispatchableActionList GetCurrentDispatchableActions_Implementation() override;

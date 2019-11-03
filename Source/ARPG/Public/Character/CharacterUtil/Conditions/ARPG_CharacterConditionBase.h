@@ -14,7 +14,7 @@ class ARPG_API UARPG_CharacterConditionBase : public UObject
 {
 	GENERATED_BODY()
 public:
-	UFUNCTION(BlueprintNativeEvent, Category = "Ãıº˛")
+	UFUNCTION(BlueprintNativeEvent, Category = "Êù°‰ª∂")
 	bool CalculateConditionValue(class ACharacterBase* Character) const;
 	virtual bool CalculateConditionValue_Implementation(class ACharacterBase* Character) const { return false; }
 };

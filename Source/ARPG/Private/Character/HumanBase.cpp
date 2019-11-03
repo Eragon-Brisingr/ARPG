@@ -185,29 +185,29 @@ void AHumanBase::WhenPostLoad_Implementation()
 {
 	Super::WhenPostLoad_Implementation();
 
-	if (LeftWeapon)
-	{
-		OnRep_LeftWeapon(nullptr);
-	}
-	if (RightWeapon)
-	{
-		OnRep_RightWeapon(nullptr);
-	}
-	if (Arrow)
-	{
-		OnRep_Arrow(nullptr);
-		Arrow->AttachWeaponTo(GetMesh(), QuiverSocketName);
-	}
-	if (UseWeaponState == EUseWeaponState::NoneWeapon_Default)
-	{
-		LetTheWeaponInWeaponBack();
-	}
-	else
-	{
-		LetTheWeaponInHand();
-	}
-	OnRep_EquipmentList();
-
+ 	if (LeftWeapon)
+ 	{
+ 		OnRep_LeftWeapon(nullptr);
+ 	}
+ 	if (RightWeapon)
+ 	{
+ 		OnRep_RightWeapon(nullptr);
+ 	}
+ 	if (Arrow)
+ 	{
+ 		OnRep_Arrow(nullptr);
+ 		Arrow->AttachWeaponTo(GetMesh(), QuiverSocketName);
+ 	}
+ 	if (UseWeaponState == EUseWeaponState::NoneWeapon_Default)
+ 	{
+ 		LetTheWeaponInWeaponBack();
+ 	}
+ 	else
+ 	{
+ 		LetTheWeaponInHand();
+ 	}
+ 	OnRep_EquipmentList();
+ 
 	ApplyCustomCharacterData();
 }
 

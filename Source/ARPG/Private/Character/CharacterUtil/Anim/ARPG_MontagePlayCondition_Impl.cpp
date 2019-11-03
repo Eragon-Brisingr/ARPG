@@ -10,3 +10,8 @@ bool UAPC_FallingAttack_OnLand::CanPlayMontage_Implementation(class ACharacterBa
 {
 	return Character->ARPG_MovementComponent->IsMovingOnGround();
 }
+
+bool UAPC_Character_Alive::CanPlayMontage_Implementation(class ACharacterBase* Character) const
+{
+	return Character->IsAlive();
+}

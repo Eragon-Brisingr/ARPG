@@ -43,7 +43,7 @@ public:
 
 	//攻击
 public:
-	UPROPERTY()
+	UPROPERTY(VisibleInstanceOnly, Category = "武器")
 	class USocketMoveTracer* SocketMoveTracer;
 
 	void EnableNearAttackTrace(const FApplyPointDamageParameter& ApplyPointDamageParameter, bool ClearIgnoreList = true);

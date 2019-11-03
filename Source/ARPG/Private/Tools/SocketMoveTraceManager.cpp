@@ -47,7 +47,7 @@ void USocketMoveTracer::InitSocketMoveTracer(UPrimitiveComponent* TargetComponen
 		TracedActors.Append({ GetOwner(), GetOwner()->GetOwner() });
 		if (GetTraceSocketList().Num() < 2)
 		{
-			GetTraceSocketList() = TargetSocketMesh->GetAllSocketNames();
+			Config->TraceSocketList = TargetSocketMesh->GetAllSocketNames();
 		}
 		PrePosList.SetNum(GetTraceSocketList().Num());
 	}

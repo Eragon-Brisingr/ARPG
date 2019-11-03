@@ -13,17 +13,16 @@
 #include <Engine/Engine.h>
 #include <DrawDebugHelpers.h>
 #include <GameFramework/PlayerController.h>
+#include <UnrealNetwork.h>
 
 #include "ARPG_ItemBase.h"
 #include "ARPG_ItemCoreBase.h"
 #include "ARPG_InventoryComponent.h"
 #include "ARPG_MovementComponent.h"
-#include "ARPG_Battle_Log.h"
 #include "ReceiveDamageActionBase.h"
 #include "ARPG_DebugFunctionLibrary.h"
 #include "ARPG_LevelFunctionLibrary.h"
 #include "XD_TemplateLibrary.h"
-#include "UnrealNetwork.h"
 #include "ARPG_ActorFunctionLibrary.h"
 #include "ARPG_CampInfo.h"
 #include "ARPG_CampRelationship.h"
@@ -43,8 +42,12 @@
 #include "ARPG_ReceiveDamageActionBase.h"
 #include "ARPG_HUDBase.h"
 #include "Components/AudioComponent.h"
-#include "ARPG_Item_Log.h"
 #include "ARPG_DA_RoleSelection.h"
+#include "ARPG_CharacterStateComponent.h"
+
+#include "ARPG_Battle_Log.h"
+#include "ARPG_Item_Log.h"
+#include "ARPG_Gameplay_Log.h"
 
 // Sets default values
 ACharacterBase::ACharacterBase(const FObjectInitializer& ObjectInitializer)
@@ -54,6 +57,8 @@ ACharacterBase::ACharacterBase(const FObjectInitializer& ObjectInitializer)
 {
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
+
+	CharacterStateComponent = CreateDefaultSubobject<UARPG_CharacterStateComponent>(GET_MEMBER_NAME_CHECKED(ACharacterBase, CharacterStateComponent));
 
 	ARPG_MovementComponent = CastChecked<UARPG_MovementComponent>(GetCharacterMovement());
 	{
@@ -150,6 +155,10 @@ void ACharacterBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLi
 	DOREPLIFETIME(ACharacterBase, InteractingTarget);
 	DOREPLIFETIME_CONDITION(ACharacterBase, RootMotionScale, COND_SimulatedOnly);
 	DOREPLIFETIME(ACharacterBase, bMirrorFullBodyMontage);
+
+	// 属性
+	DOREPLIFETIME(ACharacterBase, Health);
+	DOREPLIFETIME(ACharacterBase, MaxHelath);
 }
 
 void ACharacterBase::OnConstruction(const FTransform& Transform)
@@ -244,6 +253,22 @@ TArray<UARPG_ItemCoreBase*> ACharacterBase::GetReInitItemList() const
 TArray<UARPG_ItemCoreBase*> ACharacterBase::GetInitItemList() const
 {
 	return ReceivedGetInitItemList();
+}
+
+void ACharacterBase::SetHealth(float InHelath, const UObject* InInstigator)
+{
+	bool PrevIsAlive = IsAlive();
+	Health = FMath::Clamp(InHelath, 0.f, GetMaxHealth());
+	if (PrevIsAlive && IsDead())
+	{
+		WhenDead();
+		Gameplay_Display_BLog(this, "%s 死亡，作用方为 %s", *UXD_DebugFunctionLibrary::GetDebugName(this), *UXD_DebugFunctionLibrary::GetDebugName(InInstigator));
+	}
+}
+
+void ACharacterBase::WhenDead()
+{
+	
 }
 
 FXD_DispatchableActionList ACharacterBase::GetCurrentDispatchableActions_Implementation()
@@ -1217,6 +1242,12 @@ void ACharacterBase::WhenDamagedOther(ACharacterBase* WhoBeDamaged, float Damage
 
 float ACharacterBase::ApplyPointDamage(float BaseDamage, const FVector& HitFromDirection, const FHitResult& HitInfo, class ACharacterBase* InstigatorBy, AActor* DamageCauser, TSubclassOf<class UDamageType> DamageTypeClass, const FApplyPointDamageParameter& Param)
 {
+	// 假如角色已经死亡不进入计算流程
+	if (IsDead())
+	{
+		return BaseDamage;
+	}
+
 	float FinalReduceValue = BaseDamage;
 
 	if (!bCanBeDamaged || FinalReduceValue <= 0.f)
@@ -1249,27 +1280,37 @@ float ACharacterBase::ApplyPointDamage(float BaseDamage, const FVector& HitFromD
 		}
 	}
 
+	SetHealth(Health - FinalReduceValue, InstigatorBy);
+
 	if (UARPG_ReceiveDamageActionBase* ReceiveDamageAction = GetReceiveDamageAction())
 	{
-		if (!(Param.ReceiveDamageAction && ReceiveDamageAction->PlayReceiveDamageSpecialAction(this, Param.ReceiveDamageAction, HitFromDirection, HitInfo, InstigatorBy, DamageCauser)))
+		const bool IsNotPlaySpecialAction = !(Param.ReceiveDamageAction && ReceiveDamageAction->PlayReceiveDamageSpecialAction(this, Param.ReceiveDamageAction, HitFromDirection, HitInfo, InstigatorBy, DamageCauser));
+		if (IsNotPlaySpecialAction)
 		{
-			float HitStunOverflowValue = AddHitStun(Param.AddHitStunValue);
-			if (HitStunOverflowValue >= 0.f)
+			if (IsAlive())
 			{
-				ReceiveDamageAction->PlayHitStunMontage(this, BaseDamage, HitStunOverflowValue, HitFromDirection, HitInfo, InstigatorBy, DamageCauser);
-				OnDamageInterrupt.Broadcast();
-				HitStunOverflowValue = 0.f;
+				float HitStunOverflowValue = AddHitStun(Param.AddHitStunValue);
+				if (HitStunOverflowValue >= 0.f)
+				{
+					ReceiveDamageAction->PlayHitStunMontage(this, BaseDamage, HitStunOverflowValue, HitFromDirection, HitInfo, InstigatorBy, DamageCauser);
+					OnDamageInterrupt.Broadcast();
+					HitStunOverflowValue = 0.f;
+				}
+				else
+				{
+					ReceiveDamageAction->PlayNormalAdditiveDamageMontage(this, BaseDamage, HitFromDirection, HitInfo, InstigatorBy, DamageCauser);
+
+					//击退效果，处于根骨骼位移时不动
+					if (!IsPlayingRootMotion())
+					{
+						FVector BeakBackOffset = HitFromDirection.GetSafeNormal2D() * Param.NormalBeakBackDistance;
+						UARPG_ActorMoveUtils::PushActorTo(this, BeakBackOffset);
+					}
+				}
 			}
 			else
 			{
-				ReceiveDamageAction->PlayNormalAdditiveDamageMontage(this, BaseDamage, HitFromDirection, HitInfo, InstigatorBy, DamageCauser);
-
-				//击退效果，处于根骨骼位移时不动
-				if (!IsPlayingRootMotion())
-				{
-					FVector BeakBackOffset = HitFromDirection.GetSafeNormal2D() * Param.NormalBeakBackDistance;
-					UARPG_ActorMoveUtils::PushActorTo(this, BeakBackOffset);
-				}
+				ReceiveDamageAction->PlayNormalPointDamageDeadMontage(this, BaseDamage, HitFromDirection, HitInfo, InstigatorBy, DamageCauser);
 			}
 		}
 		else
