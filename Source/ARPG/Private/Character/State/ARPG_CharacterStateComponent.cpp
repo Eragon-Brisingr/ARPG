@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 
 #include "ARPG_CharacterStateComponent.h"
@@ -85,7 +85,7 @@ void UARPG_CharacterStateComponent::WhenPostLoad_Implementation()
 	for (UARPG_CharacterState_BuffBase* Buff : ActivedBuffes)
 	{
 		Buff->Owner = Owner;
-		Buff->Active();
+		Buff->Active(false);
 	}
 
 	for (UARPG_CharacterState_AccumulationBase* Accumulation : ActivedAccumulations)
@@ -133,7 +133,7 @@ void UARPG_CharacterStateComponent::OnRep_ActivedBuffes()
 		if (AddBuff)
 		{
 			AddBuff->Owner = Owner;
-			AddBuff->Active();
+			AddBuff->Active(true);
 		}
 	}
 
@@ -153,7 +153,7 @@ void UARPG_CharacterStateComponent::ApplyBuff(TSubclassOf<UARPG_CharacterState_B
 	UARPG_CharacterState_BuffBase* Buff = NewObject<UARPG_CharacterState_BuffBase>(this, BuffType);
 	Buff->Owner = CastChecked<ACharacterBase>(GetOwner());
 
-	Buff->Active();
+	Buff->Active(true);
 	ActivedBuffes.Add(Buff);
 }
 

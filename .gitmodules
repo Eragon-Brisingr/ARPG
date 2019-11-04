@@ -15,7 +15,7 @@
 	url = https://github.com/Eragon-Brisingr/XD_TimeSystem.git
 [submodule "Plugins/XD_EnvironmentSystem"]
 	path = Plugins/XD_EnvironmentSystem
-	url = https://github.com/Eragon-Brisingr/XD_EnvironmentSystem.git
+url=http://scarfskiynas.tpddns.cn:10080/arpg_developer/plugins/xd_environmentsystem
 [submodule "Plugins/XD_AssetsLibrary"]
 	path = Plugins/XD_AssetsLibrary
 	url = https://github.com/Eragon-Brisingr/XD_AssetsLibrary.git

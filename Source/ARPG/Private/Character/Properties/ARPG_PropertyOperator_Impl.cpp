@@ -23,3 +23,23 @@ void UARPG_MaxHealth_PropertyOperator::SetValue(UObject* Owner, float InValue, c
 {
 	unimplemented();
 }
+
+void UARPG_MaxHealth_PropertyOperator::PushAdditiveMultipleModifier(UObject* Owner, const FARPG_FloatProperty_ModifyConfig& ModifyConfig)
+{
+	CastChecked<ACharacterBase>(Owner)->MaxHelath.PushAdditiveMultipleModifier(ModifyConfig);
+}
+
+void UARPG_MaxHealth_PropertyOperator::PopAdditiveMultipleModifier(UObject* Owner, const FARPG_FloatProperty_ModifyConfig& ModifyConfig)
+{
+	CastChecked<ACharacterBase>(Owner)->MaxHelath.PopAdditiveMultipleModifier(ModifyConfig);
+}
+
+void UARPG_MaxHealth_PropertyOperator::PushMultipleModifier(UObject* Owner, const FARPG_FloatProperty_ModifyConfig& ModifyConfig)
+{
+	CastChecked<ACharacterBase>(Owner)->MaxHelath.PushMultipleModifier(ModifyConfig);
+}
+
+void UARPG_MaxHealth_PropertyOperator::PopMultipleModifier(UObject* Owner, const FARPG_FloatProperty_ModifyConfig& ModifyConfig)
+{
+	CastChecked<ACharacterBase>(Owner)->MaxHelath.PopMultipleModifier(ModifyConfig);
+}
