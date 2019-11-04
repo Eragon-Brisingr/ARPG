@@ -15,16 +15,16 @@ class ARPG_API UARPG_Health_PropertyOperator : public UARPG_GameplayFloatPropert
 	GENERATED_BODY()
 public:
 	float GetValue(const UObject* Owner) const override;
-	void SetValue(UObject* Owner, float InValue, const UObject* InInstigator) const override;
+	void SetValue(UObject* Owner, float InValue, const TSoftObjectPtr<const UObject>& InInstigator) const override;
 };
 
 UCLASS(meta = (DisplayName = "MaxHealth"))
-class ARPG_API UARPG_MaxHealth_PropertyOperator : public UARPG_GameplayFloatPropertyModifierBase
+class ARPG_API UARPG_MaxHealth_PropertyModifier : public UARPG_GameplayFloatPropertyModifierBase
 {
 	GENERATED_BODY()
 public:
 	float GetValue(const UObject* Owner) const override;
-	void SetValue(UObject* Owner, float InValue, const UObject* InInstigator) const override;
+
 	void PushAdditiveMultipleModifier(UObject* Owner, const FARPG_FloatProperty_ModifyConfig& ModifyConfig) override;
 	void PopAdditiveMultipleModifier(UObject* Owner, const FARPG_FloatProperty_ModifyConfig& ModifyConfig) override;
 	void PushMultipleModifier(UObject* Owner, const FARPG_FloatProperty_ModifyConfig& ModifyConfig) override;

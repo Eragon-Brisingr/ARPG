@@ -255,14 +255,14 @@ TArray<UARPG_ItemCoreBase*> ACharacterBase::GetInitItemList() const
 	return ReceivedGetInitItemList();
 }
 
-void ACharacterBase::SetHealth(float InHelath, const UObject* InInstigator)
+void ACharacterBase::SetHealth(float InHelath, const TSoftObjectPtr<const UObject>& InInstigator)
 {
 	bool PrevIsAlive = IsAlive();
 	Health = FMath::Clamp(InHelath, 0.f, GetMaxHealth());
 	if (PrevIsAlive && IsDead())
 	{
 		WhenDead();
-		Gameplay_Display_BLog(this, "%s 死亡，作用方为 %s", *UXD_DebugFunctionLibrary::GetDebugName(this), *UXD_DebugFunctionLibrary::GetDebugName(InInstigator));
+		Gameplay_Display_BLog(this, "%s 死亡，作用方为 %s", *UXD_DebugFunctionLibrary::GetDebugName(this), *UXD_DebugFunctionLibrary::GetDebugName(InInstigator.Get()));
 	}
 }
 

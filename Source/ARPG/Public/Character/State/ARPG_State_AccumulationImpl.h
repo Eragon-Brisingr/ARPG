@@ -9,9 +9,10 @@
 /**
  * 
  */
-UCLASS()
-class ARPG_API UARPG_State_AccumulationImpl : public UARPG_CharacterState_AccumulationBase
+UCLASS(meta = (DisplayName = "一般积累状态"))
+class ARPG_API UARPG_CS_Accumulation_General : public UARPG_CharacterState_AccumulationBase
 {
 	GENERATED_BODY()
-	
+public:
+
 };

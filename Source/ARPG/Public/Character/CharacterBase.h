@@ -107,9 +107,9 @@ public:
 public:
 	//生命
 
-	UPROPERTY(Replicated, SaveGame)
+	UPROPERTY(EditAnywhere, Category = "角色|属性", Replicated, SaveGame)
 	float Health = 1000.f;
-	UPROPERTY(Replicated, SaveGame)
+	UPROPERTY(EditAnywhere, Category = "角色|属性", Replicated, SaveGame)
 	FARPG_FloatProperty MaxHelath = 1000.f;
 
 	UFUNCTION(BlueprintCallable, Category = "角色|属性", meta = (CompactNodeTitle = "Health"))
@@ -117,7 +117,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "角色|属性", meta = (CompactNodeTitle = "Health"))
 	float GetMaxHealth() const { return MaxHelath.Value(); }
 	UFUNCTION(BlueprintCallable, Category = "角色|属性")
-	void SetHealth(float InHelath, const UObject* InInstigator);
+	void SetHealth(float InHelath, const TSoftObjectPtr<const UObject>& InInstigator);
 
 	UFUNCTION(BlueprintCallable, Category = "角色|状态")
 	bool IsAlive() const { return Health > 0.f; }

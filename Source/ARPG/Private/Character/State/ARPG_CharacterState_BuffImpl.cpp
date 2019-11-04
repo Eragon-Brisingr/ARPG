@@ -7,7 +7,7 @@
 
 void UARPG_CS_Buff_General::WhenActived(bool IsFirstInit)
 {
-	for (FGeneralBuffPropertyConfig& Config : EffectPropertys)
+	for (FGeneralBuffModifierConfig& Config : EffectModifiers)
 	{
 		if (Config.ModifyProperty)
 		{
@@ -18,27 +18,41 @@ void UARPG_CS_Buff_General::WhenActived(bool IsFirstInit)
 			ModifyConfig.Instigator = Instigator;
 			ModifyConfig.DescribeTag = GetFName();
 
-			switch (Config.Operand)
-			{
-			case EGeneralBuffPropertyOperand::Additive:
-				PropertyModifier->PushAdditiveMultipleModifier(Owner, ModifyConfig);
-				break;
-			case EGeneralBuffPropertyOperand::Multiple:
-				PropertyModifier->PushMultipleModifier(Owner, ModifyConfig);
-				break;
-			}
+			PropertyModifier->PushModifier(Config.Operand, Owner, ModifyConfig);
 		}
 	}
+
+	for (FGeneralBuffOperatorConfig& Config : ActiveOperators)
+	{
+		if (Config.OperatorProperty)
+		{
+			UARPG_GameplayFloatPropertyOperatorBase* OperatorProperty = Config.OperatorProperty.GetDefaultObject();
+
+			OperatorProperty->ApplyValue(Config.Operand, Owner, Config.Value, Instigator);
+		}
+	}
+
+	Super::WhenActived(IsFirstInit);
 }
 
 void UARPG_CS_Buff_General::WhenTick(float DeltaTime)
 {
+	for (FGeneralBuffOperatorConfig& Config : TickOperators)
+	{
+		if (Config.OperatorProperty)
+		{
+			UARPG_GameplayFloatPropertyOperatorBase* OperatorProperty = Config.OperatorProperty.GetDefaultObject();
 
+			OperatorProperty->ApplyValue(Config.Operand, Owner, Config.Value, Instigator);
+		}
+	}
+
+	Super::WhenTick(DeltaTime);
 }
 
 void UARPG_CS_Buff_General::WhenDeactived()
 {
-	for (FGeneralBuffPropertyConfig& Config : EffectPropertys)
+	for (FGeneralBuffModifierConfig& Config : EffectModifiers)
 	{
 		if (Config.ModifyProperty)
 		{
@@ -49,15 +63,19 @@ void UARPG_CS_Buff_General::WhenDeactived()
 			ModifyConfig.Instigator = Instigator;
 			ModifyConfig.DescribeTag = GetFName();
 
-			switch (Config.Operand)
-			{
-			case EGeneralBuffPropertyOperand::Additive:
-				PropertyModifier->PopAdditiveMultipleModifier(Owner, ModifyConfig);
-				break;
-			case EGeneralBuffPropertyOperand::Multiple:
-				PropertyModifier->PopMultipleModifier(Owner, ModifyConfig);
-				break;
-			}
+			PropertyModifier->PopModifier(Config.Operand, Owner, ModifyConfig);
 		}
 	}
+
+	for (FGeneralBuffOperatorConfig& Config : DeactiveOperators)
+	{
+		if (Config.OperatorProperty)
+		{
+			UARPG_GameplayFloatPropertyOperatorBase* OperatorProperty = Config.OperatorProperty.GetDefaultObject();
+
+			OperatorProperty->ApplyValue(Config.Operand, Owner, Config.Value, Instigator.Get());
+		}
+	}
+
+	Super::WhenDeactived();
 }

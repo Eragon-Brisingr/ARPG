@@ -61,14 +61,15 @@ class ARPG_API UARPG_CharacterState_BuffBase : public UARPG_CharacterStateBase
 public:
 	void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
 public:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	// TODO：确认如何覆盖
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Buff")
 	EBuffOverlapType BuffOverlapType;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Buff")
 	float IntervalTime = 0.f;
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Buff")
 	float DurationTime = 0.f;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, SaveGame, Replicated)
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, SaveGame, Replicated, Category = "Buff")
 	float ContinuedTime = 0.f;
 
 	void Active(bool IsFirstInit) { WhenActived(IsFirstInit); }
