@@ -70,6 +70,8 @@ void FARPG_EditorModule::StartupModule()
 				}
 			}
 		});
+
+	CharacterStateSubModule.ShutdownModule();
 }
 
 
@@ -80,6 +82,8 @@ void FARPG_EditorModule::ShutdownModule()
 	{
 		GEditor->OnObjectsReplaced().Remove(EditorReplaceItemHandle);
 	}
+
+	CharacterStateSubModule.ShutdownModule();
 }
 
 IMPLEMENT_MODULE(FARPG_EditorModule, ARPG_Editor);

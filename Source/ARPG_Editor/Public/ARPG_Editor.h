@@ -8,6 +8,8 @@
 #include "Modules/ModuleManager.h"
 #include "UnrealEd.h"
 
+#include "ARPG_CharacterStateSubModule.h"
+
 
 class FARPG_EditorModule : public IModuleInterface
 {
@@ -19,5 +21,7 @@ public:
 
 private:
 	FDelegateHandle EditorReplaceItemHandle;
+
+	FARPG_CharacterStateSubModule CharacterStateSubModule;
 };
 

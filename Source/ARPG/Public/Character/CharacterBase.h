@@ -42,6 +42,7 @@ class UPathFollowingComponent;
 class AARPG_WeaponBase;
 class AARPG_ArrowBase;
 class AARPG_EquipmentBase;
+class ACharacterBase;
 
 UENUM()
 enum class EInteractEndResult : uint8
@@ -109,15 +110,21 @@ public:
 
 	UPROPERTY(EditAnywhere, Category = "角色|属性", Replicated, SaveGame)
 	float Health = 1000.f;
-	UPROPERTY(EditAnywhere, Category = "角色|属性", Replicated, SaveGame)
+	UPROPERTY(EditAnywhere, Category = "角色|属性", Replicated)
 	FARPG_FloatProperty MaxHelath = 1000.f;
 
 	UFUNCTION(BlueprintCallable, Category = "角色|属性", meta = (CompactNodeTitle = "Health"))
-	float GetHealth() const { return Health; }
-	UFUNCTION(BlueprintCallable, Category = "角色|属性", meta = (CompactNodeTitle = "Health"))
-	float GetMaxHealth() const { return MaxHelath.Value(); }
+	FORCEINLINE float GetHealth() const { return Health; }
 	UFUNCTION(BlueprintCallable, Category = "角色|属性")
-	void SetHealth(float InHelath, const TSoftObjectPtr<const UObject>& InInstigator);
+	void SetHealth(float InHelath, const FARPG_PropertyChangeContext& ChangeContext);
+	UFUNCTION(BlueprintCallable, Category = "角色|属性", meta = (CompactNodeTitle = "Health"))
+	FORCEINLINE float GetMaxHealth() const { return MaxHelath.Value(); }
+
+	void MaxHealth_AdjustForMaxChange(float InMaxHealth, const FARPG_PropertyChangeContext& ChangeContext);
+	void MaxHealth_PushAdditiveModifier(const FARPG_FloatProperty_ModifyConfig& ModifyConfig);
+	void MaxHealth_PopAdditiveModifier(const FARPG_FloatProperty_ModifyConfig& ModifyConfig);
+	void MaxHealth_PushMultipleModifier(const FARPG_FloatProperty_ModifyConfig& ModifyConfig);
+	void MaxHealth_PopMultipleModifier(const FARPG_FloatProperty_ModifyConfig& ModifyConfig);
 
 	UFUNCTION(BlueprintCallable, Category = "角色|状态")
 	bool IsAlive() const { return Health > 0.f; }
@@ -126,8 +133,31 @@ public:
 
 	virtual void WhenDead();
 
+	// 精力
+	UPROPERTY(EditAnywhere, Category = "角色|属性", Replicated, SaveGame)
+	float Stamina = 300.f;
+	UPROPERTY(EditAnywhere, Category = "角色|属性", Replicated)
+	FARPG_FloatProperty MaxStamina = 300.f;
+	UFUNCTION(BlueprintCallable, Category = "角色|属性", meta = (CompactNodeTitle = "Health"))
+	FORCEINLINE float GetStamina() const { return Stamina; }
+	UFUNCTION(BlueprintCallable, Category = "角色|属性")
+	void SetStamina(float InStamina, const FARPG_PropertyChangeContext& ChangeContext);
+	UFUNCTION(BlueprintCallable, Category = "角色|属性", meta = (CompactNodeTitle = "Health"))
+	FORCEINLINE float GetMaxStamina() const { return MaxStamina.Value(); }
+
+	float StaminaCoolDownRemainTime = 0.f;
+
+	void MaxStamina_AdjustForMaxChange(float InMaxStamina, const FARPG_PropertyChangeContext& ChangeContext);
+	void MaxStamina_PushAdditiveModifier(const FARPG_FloatProperty_ModifyConfig& ModifyConfig);
+	void MaxStamina_PopAdditiveModifier(const FARPG_FloatProperty_ModifyConfig& ModifyConfig);
+	void MaxStamina_PushMultipleModifier(const FARPG_FloatProperty_ModifyConfig& ModifyConfig);
+	void MaxStamina_PopMultipleModifier(const FARPG_FloatProperty_ModifyConfig& ModifyConfig);
+
+	// 状态
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "角色|状态")
 	class UARPG_CharacterStateComponent* CharacterStateComponent;
+
+	bool IsSprinting() const;
 	//DispatchableEntityInterface
 public:
 	FXD_DispatchableActionList GetCurrentDispatchableActions_Implementation() override;
@@ -488,7 +518,7 @@ public:
 	UFUNCTION(BlueprintImplementableEvent, BlueprintAuthorityOnly, meta = (DisplayName = "WhenDamagedOther"), Category = "角色|行为")
 	void ReceiveWhenDamagedOther(ACharacterBase* WhoBeDamaged, float DamageValue, UObject* DamageInstigator);
 
-	float ApplyPointDamage(float BaseDamage, const FVector& HitFromDirection, const FHitResult& HitInfo, ACharacterBase* InstigatorBy, AActor* DamageCauser, TSubclassOf<class UDamageType> DamageTypeClass, const FApplyPointDamageParameter& Param);
+	float ApplyPointDamage(float BaseDamage, const FVector& HitFromDirection, const FHitResult& HitInfo, const FARPG_PropertyChangeContext& ChangeContext, TSubclassOf<class UDamageType> DamageTypeClass, const FApplyPointDamageParameter& Param);
 
 	//潜行相关
 public:

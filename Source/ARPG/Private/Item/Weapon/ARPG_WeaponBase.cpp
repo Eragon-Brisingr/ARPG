@@ -159,7 +159,8 @@ void AARPG_WeaponBase::WhenAttackTracedActor(UPrimitiveComponent* HitComponent, 
 			{
 				PointDamageParameter.AddHitStunValue = WeaponCore->GetHitStunValue(PointDamageParameter.AddHitStunValue);
 
-				if (ReceiveDamageCharacter->ApplyPointDamage(WeaponCore->GetPhysicsAttackValue(), (ReceiveDamageCharacter->GetActorLocation() - TraceResult.ImpactPoint).GetSafeNormal2D(), TraceResult, WeaponOnwer, this, nullptr, PointDamageParameter) > 0.f)
+				float CauseDamage = ReceiveDamageCharacter->ApplyPointDamage(WeaponCore->GetPhysicsAttackValue(), (ReceiveDamageCharacter->GetActorLocation() - TraceResult.ImpactPoint).GetSafeNormal2D(), TraceResult, FARPG_PropertyChangeContext(WeaponOnwer, this), nullptr, PointDamageParameter);
+				if (CauseDamage > 0.f)
 				{
 					WeaponOnwer->NearAttackSuccessTimeDilation(0.2f);
 				}

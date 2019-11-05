@@ -43,7 +43,7 @@ float AARPG_ArrowBase::ApplyDamamgeToCharacter(ACharacterBase* Character, const 
 	{
 		FApplyPointDamageParameter Param(ApplyPointDamageParameter);
 		Param.AddHitStunValue = ArrowCore->GetHitStunValue(ApplyPointDamageParameter.AddHitStunValue);
-		return Character->ApplyPointDamage(GetArrowDamage(), GetVelocity().GetSafeNormal(), Hit, GetItemOwner(), this, nullptr, Param);
+		return Character->ApplyPointDamage(GetArrowDamage(), GetVelocity().GetSafeNormal(), Hit, FARPG_PropertyChangeContext(GetItemOwner(), this), nullptr, Param);
 	}
 	return 0.f;
 }
@@ -64,7 +64,7 @@ void AARPG_ArrowBase::WhenArrowHitEnvironment(UPrimitiveComponent* HitComponent,
 				FVector Velocity = GetVelocity();
 				Arrow->AddActorWorldOffset(Velocity.GetSafeNormal() * FMath::GetMappedRangeValueClamped({ 0.f, 3000.f }, { 0.f, 50.f }, Velocity.Size()));
 
-				//假如扎在角色身上，则造成伤害
+				// （扎在角色身上的箭不能与别的物体碰撞比较合理）TODO：考虑箭击中扎在角色身上的箭造成伤害？
 // 				if (HasAuthority())
 // 				{
 // 					if (ACharacterBase* Character = Cast<ACharacterBase>(ParentActor))

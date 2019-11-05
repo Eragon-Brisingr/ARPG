@@ -4,12 +4,27 @@
 
 #include "CoreMinimal.h"
 #include "UObject/NoExportTypes.h"
-#include <Kismet/BlueprintFunctionLibrary.h>
 #include "ARPG_PropertyDef.generated.h"
 
 /**
  * 
  */
+USTRUCT(BlueprintType)
+struct ARPG_API FARPG_PropertyChangeContext
+{
+	GENERATED_BODY()
+public:
+	FARPG_PropertyChangeContext() = default;
+	FARPG_PropertyChangeContext(const TSoftObjectPtr<UObject>& Causer, const TSoftObjectPtr<UObject>& Instigator)
+		:Causer(Causer), Instigator(Instigator)
+	{}
+
+	// 执行修改的实例，例如是武器、BUFF等
+	TSoftObjectPtr<UObject> Causer;
+	// 修改的始作俑者，一般为角色
+	TSoftObjectPtr<UObject> Instigator;
+};
+
 USTRUCT(BlueprintType)
 struct ARPG_API FARPG_GameplayFloatPropertyBase
 {
@@ -22,9 +37,14 @@ struct FARPG_FloatProperty_ModifyConfig
 {
 	GENERATED_BODY()
 public:
+	FARPG_FloatProperty_ModifyConfig() = default;
+	FARPG_FloatProperty_ModifyConfig(float Value, const FName& DescribeTag, const TSoftObjectPtr<UObject>& Causer, const TSoftObjectPtr<UObject>& Instigator)
+		:Value(Value), DescribeTag(DescribeTag), ChangeContext(Causer, Instigator)
+	{}
+
 	float Value;
-	TSoftObjectPtr<const UObject> Instigator;
 	FName DescribeTag;
+	FARPG_PropertyChangeContext ChangeContext;
 };
 
 USTRUCT(BlueprintType)
@@ -52,14 +72,14 @@ private:
 
 	FORCEINLINE void UpdateFinalValue() { Final = (Base + Additive) * Multiple; }
 public:
-	float Value() const { return Final; }
+	FORCEINLINE float Value() const { return Final; }
 
-	void PushAdditiveMultipleModifier(const FARPG_FloatProperty_ModifyConfig& ModifyConfig)
+	void PushAdditiveModifier(const FARPG_FloatProperty_ModifyConfig& ModifyConfig)
 	{
 		Additive += ModifyConfig.Value;
 		UpdateFinalValue();
 	}
-	void PopAdditiveMultipleModifier(const FARPG_FloatProperty_ModifyConfig& ModifyConfig)
+	void PopAdditiveModifier(const FARPG_FloatProperty_ModifyConfig& ModifyConfig)
 	{
 		Additive -= ModifyConfig.Value;
 		UpdateFinalValue();
@@ -76,14 +96,6 @@ public:
 	}
 };
 
-UCLASS(const, BlueprintType, hidedropdown)
-class ARPG_API UARPG_GameplayFloatPropertyGetterBase : public UObject
-{
-	GENERATED_BODY()
-public:
-	virtual float GetValue(const UObject* Owner) const { unimplemented(); return 0.f; }
-};
-
 UENUM()
 enum class EARPG_PropertyOperatorOperand : uint8
 {
@@ -92,45 +104,9 @@ enum class EARPG_PropertyOperatorOperand : uint8
 	Set
 };
 
-UCLASS(const, BlueprintType, hidedropdown)
-class ARPG_API UARPG_GameplayFloatPropertyOperatorBase : public UARPG_GameplayFloatPropertyGetterBase
-{
-	GENERATED_BODY()
-public:
-	virtual void SetValue(UObject* Owner, float InValue, const TSoftObjectPtr<const UObject>& InInstigator) const { unimplemented(); }
-
-	void AddValue(UObject* Owner, float AddValue, const TSoftObjectPtr<const UObject>& InInstigator) { SetValue(Owner, GetValue(Owner) + AddValue, InInstigator); }
-	void MultipleValue(UObject* Owner, float AddValue, const TSoftObjectPtr<const UObject>& InInstigator) { SetValue(Owner, GetValue(Owner) * AddValue, InInstigator); }
-
-	void ApplyValue(EARPG_PropertyOperatorOperand Operand, UObject* Owner, float Value, const TSoftObjectPtr<const UObject>& InInstigator);
-};
-
 UENUM()
 enum class EARPG_PropertyModifierOperand : uint8
 {
 	Additive,
 	Multiple
-};
-
-UCLASS(const, BlueprintType, hidedropdown)
-class ARPG_API UARPG_GameplayFloatPropertyModifierBase : public UARPG_GameplayFloatPropertyGetterBase
-{
-	GENERATED_BODY()
-public:
-	virtual void PushAdditiveMultipleModifier(UObject* Owner, const FARPG_FloatProperty_ModifyConfig& ModifyConfig) { unimplemented(); }
-	virtual void PopAdditiveMultipleModifier(UObject* Owner, const FARPG_FloatProperty_ModifyConfig& ModifyConfig) { unimplemented(); }
-	virtual void PushMultipleModifier(UObject* Owner, const FARPG_FloatProperty_ModifyConfig& ModifyConfig) { unimplemented(); }
-	virtual void PopMultipleModifier(UObject* Owner, const FARPG_FloatProperty_ModifyConfig& ModifyConfig) { unimplemented(); }
-
-	void PushModifier(EARPG_PropertyModifierOperand Operand, UObject* Owner, const FARPG_FloatProperty_ModifyConfig& ModifyConfig);
-	void PopModifier(EARPG_PropertyModifierOperand Operand, UObject* Owner, const FARPG_FloatProperty_ModifyConfig& ModifyConfig);
-};
-
-UCLASS(const)
-class ARPG_API UARPG_GameplayFloatPropertyOperatorLibrary : public UBlueprintFunctionLibrary
-{
-	GENERATED_BODY()
-public:
-	UFUNCTION(BlueprintPure, Category = "角色|属性", meta = (CompactNodeTitle = "GetValue"))
-	static float GetValue(TSubclassOf<UARPG_GameplayFloatPropertyGetterBase> Getter, const UObject* Owner) { return Owner && Getter ? Getter.GetDefaultObject()->GetValue(Owner) : 0.f; }
 };

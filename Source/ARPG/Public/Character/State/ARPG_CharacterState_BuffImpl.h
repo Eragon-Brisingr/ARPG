@@ -5,7 +5,11 @@
 #include "CoreMinimal.h"
 #include "ARPG_CharacterStateBase.h"
 #include "ARPG_PropertyDef.h"
+#include "SubclassOf.h"
 #include "ARPG_CharacterState_BuffImpl.generated.h"
+
+class UARPG_GameplayFloatPropertyModifierBase;
+class UARPG_GameplayFloatPropertyOperatorBase;
 
 /**
  * 
@@ -51,7 +55,7 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Buff")
 	TArray<FGeneralBuffOperatorConfig> DeactiveOperators;
 
-	void WhenActived(bool IsFirstInit);
-	void WhenTick(float DeltaTime);
-	void WhenDeactived();
+	void WhenActived(bool IsFirstInit) override;
+	void WhenTick(float DeltaTime) override;
+	void WhenDeactived() override;
 };

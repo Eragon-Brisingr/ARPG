@@ -2,7 +2,7 @@
 
 
 #include "ARPG_CharacterState_BuffImpl.h"
-#include "ARPG_PropertyDef.h"
+#include "ARPG_PropertyOperator.h"
 #include "CharacterBase.h"
 
 void UARPG_CS_Buff_General::WhenActived(bool IsFirstInit)
@@ -13,12 +13,7 @@ void UARPG_CS_Buff_General::WhenActived(bool IsFirstInit)
 		{
 			UARPG_GameplayFloatPropertyModifierBase* PropertyModifier = Config.ModifyProperty.GetDefaultObject();
 
-			FARPG_FloatProperty_ModifyConfig ModifyConfig;
-			ModifyConfig.Value = Config.Value;
-			ModifyConfig.Instigator = Instigator;
-			ModifyConfig.DescribeTag = GetFName();
-
-			PropertyModifier->PushModifier(Config.Operand, Owner, ModifyConfig);
+			PropertyModifier->PushModifier(Config.Operand, Owner, FARPG_FloatProperty_ModifyConfig(Config.Value, GetFName(), this, Instigator));
 		}
 	}
 
@@ -28,7 +23,7 @@ void UARPG_CS_Buff_General::WhenActived(bool IsFirstInit)
 		{
 			UARPG_GameplayFloatPropertyOperatorBase* OperatorProperty = Config.OperatorProperty.GetDefaultObject();
 
-			OperatorProperty->ApplyValue(Config.Operand, Owner, Config.Value, Instigator);
+			OperatorProperty->ApplyValue(Config.Operand, Owner, Config.Value, FARPG_PropertyChangeContext(this, Instigator));
 		}
 	}
 
@@ -43,7 +38,7 @@ void UARPG_CS_Buff_General::WhenTick(float DeltaTime)
 		{
 			UARPG_GameplayFloatPropertyOperatorBase* OperatorProperty = Config.OperatorProperty.GetDefaultObject();
 
-			OperatorProperty->ApplyValue(Config.Operand, Owner, Config.Value, Instigator);
+			OperatorProperty->ApplyValue(Config.Operand, Owner, Config.Value, FARPG_PropertyChangeContext(this, Instigator));
 		}
 	}
 
@@ -58,12 +53,7 @@ void UARPG_CS_Buff_General::WhenDeactived()
 		{
 			UARPG_GameplayFloatPropertyModifierBase* PropertyModifier = Config.ModifyProperty.GetDefaultObject();
 
-			FARPG_FloatProperty_ModifyConfig ModifyConfig;
-			ModifyConfig.Value = Config.Value;
-			ModifyConfig.Instigator = Instigator;
-			ModifyConfig.DescribeTag = GetFName();
-
-			PropertyModifier->PopModifier(Config.Operand, Owner, ModifyConfig);
+			PropertyModifier->PopModifier(Config.Operand, Owner, FARPG_FloatProperty_ModifyConfig(Config.Value, GetFName(), this, Instigator));
 		}
 	}
 
@@ -73,7 +63,7 @@ void UARPG_CS_Buff_General::WhenDeactived()
 		{
 			UARPG_GameplayFloatPropertyOperatorBase* OperatorProperty = Config.OperatorProperty.GetDefaultObject();
 
-			OperatorProperty->ApplyValue(Config.Operand, Owner, Config.Value, Instigator.Get());
+			OperatorProperty->ApplyValue(Config.Operand, Owner, Config.Value, FARPG_PropertyChangeContext(this, Instigator));
 		}
 	}
 

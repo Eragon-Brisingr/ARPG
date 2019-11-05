@@ -219,7 +219,11 @@ void UARPG_EnableAttackTracer::NotifyBegin(USkeletalMeshComponent* MeshComp, UAn
 		{
 			if (ACharacterBase* DamagedCharacter = Cast<ACharacterBase>(OtherActor))
 			{
-				DamagedCharacter->ApplyPointDamage(100.f, (DamagedCharacter->GetActorLocation() - TraceResult.ImpactPoint).GetSafeNormal(), TraceResult, Character, Character, nullptr, PointDamageParameter);
+				float CauseDamage = DamagedCharacter->ApplyPointDamage(100.f, (DamagedCharacter->GetActorLocation() - TraceResult.ImpactPoint).GetSafeNormal(), TraceResult, FARPG_PropertyChangeContext(Character, Character), nullptr, PointDamageParameter);
+				if (CauseDamage > 0.f)
+				{
+					DamagedCharacter->NearAttackSuccessTimeDilation(0.2f);
+				}
 			}
 		});
 		ValidSocketMoveTracer->EnableTrace(true);

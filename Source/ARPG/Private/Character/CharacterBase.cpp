@@ -136,8 +136,29 @@ void ACharacterBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	const bool bIsSprinting = IsSprinting();
+
 	//TODO 挪入bIsLockingOther与bInvokeSprint的Setter驱动而不是轮询
-	ARPG_MovementComponent->SetRotationMode(bIsLockingOther && ARPG_MovementComponent->IsSprinting() == false ? ECharacterRotationMode::LookingDirection : ECharacterRotationMode::VelocityDirection);
+	ARPG_MovementComponent->SetRotationMode(bIsLockingOther && bIsSprinting == false ? ECharacterRotationMode::LookingDirection : ECharacterRotationMode::VelocityDirection);
+
+	// 精力增减逻辑
+	ARPG_MovementComponent->bCanSprint = Stamina > 0.f;
+	if (bIsSprinting)
+	{
+		Stamina -= 100.f * DeltaTime;
+		if (Stamina <= 0.f)
+		{
+			StaminaCoolDownRemainTime = 2.f;
+		}
+	}
+	else if (StaminaCoolDownRemainTime > 0.f)
+	{
+		StaminaCoolDownRemainTime -= DeltaTime;
+	}
+	else
+	{
+		Stamina = FMath::Max(Stamina + 100.f * DeltaTime, MaxStamina.Value());
+	}
 }
 
 // Called to bind functionality to input
@@ -159,6 +180,8 @@ void ACharacterBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLi
 	// 属性
 	DOREPLIFETIME(ACharacterBase, Health);
 	DOREPLIFETIME(ACharacterBase, MaxHelath);
+	DOREPLIFETIME(ACharacterBase, Stamina);
+	DOREPLIFETIME(ACharacterBase, MaxStamina);
 }
 
 void ACharacterBase::OnConstruction(const FTransform& Transform)
@@ -255,20 +278,99 @@ TArray<UARPG_ItemCoreBase*> ACharacterBase::GetInitItemList() const
 	return ReceivedGetInitItemList();
 }
 
-void ACharacterBase::SetHealth(float InHelath, const TSoftObjectPtr<const UObject>& InInstigator)
+void ACharacterBase::SetHealth(float InHelath, const FARPG_PropertyChangeContext& ChangeContext)
 {
 	bool PrevIsAlive = IsAlive();
 	Health = FMath::Clamp(InHelath, 0.f, GetMaxHealth());
 	if (PrevIsAlive && IsDead())
 	{
+		Gameplay_Display_BLog(this, "%s 死亡，作用方为 %s", *UXD_DebugFunctionLibrary::GetDebugName(this), *UXD_DebugFunctionLibrary::GetDebugName(ChangeContext.Instigator.Get()));
 		WhenDead();
-		Gameplay_Display_BLog(this, "%s 死亡，作用方为 %s", *UXD_DebugFunctionLibrary::GetDebugName(this), *UXD_DebugFunctionLibrary::GetDebugName(InInstigator.Get()));
 	}
+}
+
+void ACharacterBase::MaxHealth_AdjustForMaxChange(float InMaxHealth, const FARPG_PropertyChangeContext& ChangeContext)
+{
+	if (Health > InMaxHealth)
+	{
+		SetHealth(InMaxHealth, ChangeContext);
+	}
+}
+
+void ACharacterBase::MaxHealth_PushAdditiveModifier(const FARPG_FloatProperty_ModifyConfig& ModifyConfig)
+{
+	MaxHelath.PushAdditiveModifier(ModifyConfig);
+	MaxHealth_AdjustForMaxChange(MaxHelath.Value(), ModifyConfig.ChangeContext);
+}
+
+void ACharacterBase::MaxHealth_PopAdditiveModifier(const FARPG_FloatProperty_ModifyConfig& ModifyConfig)
+{
+	MaxHelath.PopAdditiveModifier(ModifyConfig);
+	MaxHealth_AdjustForMaxChange(MaxHelath.Value(), ModifyConfig.ChangeContext);
+}
+
+void ACharacterBase::MaxHealth_PushMultipleModifier(const FARPG_FloatProperty_ModifyConfig& ModifyConfig)
+{
+	MaxHelath.PushMultipleModifier(ModifyConfig);
+	MaxHealth_AdjustForMaxChange(MaxHelath.Value(), ModifyConfig.ChangeContext);
+}
+
+void ACharacterBase::MaxHealth_PopMultipleModifier(const FARPG_FloatProperty_ModifyConfig& ModifyConfig)
+{
+	MaxHelath.PopMultipleModifier(ModifyConfig);
+	MaxHealth_AdjustForMaxChange(MaxHelath.Value(), ModifyConfig.ChangeContext);
 }
 
 void ACharacterBase::WhenDead()
 {
-	
+	// TODO：禁止移动
+}
+
+void ACharacterBase::SetStamina(float InStamina, const FARPG_PropertyChangeContext& ChangeContext)
+{
+	Stamina = FMath::Clamp(InStamina, 0.f, GetMaxStamina());
+
+	if (Stamina == 0.f)
+	{
+		StaminaCoolDownRemainTime = 2.f;
+	}
+}
+
+void ACharacterBase::MaxStamina_AdjustForMaxChange(float InMaxStamina, const FARPG_PropertyChangeContext& ChangeContext)
+{
+	if (Stamina > InMaxStamina)
+	{
+		SetStamina(InMaxStamina, ChangeContext);
+	}
+}
+
+void ACharacterBase::MaxStamina_PushAdditiveModifier(const FARPG_FloatProperty_ModifyConfig& ModifyConfig)
+{
+	MaxStamina.PushAdditiveModifier(ModifyConfig);
+	MaxStamina_AdjustForMaxChange(MaxStamina.Value(), ModifyConfig.ChangeContext);
+}
+
+void ACharacterBase::MaxStamina_PopAdditiveModifier(const FARPG_FloatProperty_ModifyConfig& ModifyConfig)
+{
+	MaxStamina.PopAdditiveModifier(ModifyConfig);
+	MaxStamina_AdjustForMaxChange(MaxStamina.Value(), ModifyConfig.ChangeContext);
+}
+
+void ACharacterBase::MaxStamina_PushMultipleModifier(const FARPG_FloatProperty_ModifyConfig& ModifyConfig)
+{
+	MaxStamina.PushMultipleModifier(ModifyConfig);
+	MaxStamina_AdjustForMaxChange(MaxStamina.Value(), ModifyConfig.ChangeContext);
+}
+
+void ACharacterBase::MaxStamina_PopMultipleModifier(const FARPG_FloatProperty_ModifyConfig& ModifyConfig)
+{
+	MaxStamina.PopMultipleModifier(ModifyConfig);
+	MaxStamina_AdjustForMaxChange(MaxStamina.Value(), ModifyConfig.ChangeContext);
+}
+
+bool ACharacterBase::IsSprinting() const
+{
+	return ARPG_MovementComponent->IsSprinting();
 }
 
 FXD_DispatchableActionList ACharacterBase::GetCurrentDispatchableActions_Implementation()
@@ -1240,7 +1342,7 @@ void ACharacterBase::WhenDamagedOther(ACharacterBase* WhoBeDamaged, float Damage
 	OnDamagedOther.Broadcast(this, WhoBeDamaged, DamageValue, DamageInstigator);
 }
 
-float ACharacterBase::ApplyPointDamage(float BaseDamage, const FVector& HitFromDirection, const FHitResult& HitInfo, class ACharacterBase* InstigatorBy, AActor* DamageCauser, TSubclassOf<class UDamageType> DamageTypeClass, const FApplyPointDamageParameter& Param)
+float ACharacterBase::ApplyPointDamage(float BaseDamage, const FVector& HitFromDirection, const FHitResult& HitInfo, const FARPG_PropertyChangeContext& ChangeContext, TSubclassOf<class UDamageType> DamageTypeClass, const FApplyPointDamageParameter& Param)
 {
 	// 假如角色已经死亡不进入计算流程
 	if (IsDead())
@@ -1255,32 +1357,32 @@ float ACharacterBase::ApplyPointDamage(float BaseDamage, const FVector& HitFromD
 		return 0.f;
 	}
 
-	if (InstigatorBy)
+	UObject* InstigatorBy = ChangeContext.Instigator.Get();
+	UObject* DamageCauser = ChangeContext.Causer.Get();
+	ACharacterBase* InstigatorPawn = Cast<ACharacterBase>(InstigatorBy);
+	if (InstigatorPawn)
 	{
-		if (ACharacterBase* InstigatorPawn = Cast<ACharacterBase>(InstigatorBy))
+		//闪避
+		if (Param.bCanDodge && bIsDodging)
 		{
-			//闪避
-			if (Param.bCanDodge && bIsDodging)
-			{
-				WhenDodgeSucceed(FinalReduceValue, InstigatorBy, HitInfo);
-				return 0.f;
-			}
-			//防御反击
-			else if (Param.bCanDefenseSwipe && IsDefenseSwipeSucceed(InstigatorPawn->GetActorLocation(), HitInfo))
-			{
-				return 0.f;
-			}
-			//防御
-			else if (Param.bCanDefense && IsDefenseSucceed(InstigatorPawn->GetActorLocation(), HitInfo))
-			{
-				WhenDefenseSucceed(FinalReduceValue, InstigatorBy, HitFromDirection, Param.DefenseBeakBackDistance, HitInfo);
-				InstigatorPawn->WhenAttackedDefenseCharacter(FinalReduceValue, this, HitInfo);
-				return 0.f;
-			}
+			WhenDodgeSucceed(FinalReduceValue, InstigatorPawn, HitInfo);
+			return 0.f;
+		}
+		//防御反击
+		else if (Param.bCanDefenseSwipe && IsDefenseSwipeSucceed(InstigatorPawn->GetActorLocation(), HitInfo))
+		{
+			return 0.f;
+		}
+		//防御
+		else if (Param.bCanDefense && IsDefenseSucceed(InstigatorPawn->GetActorLocation(), HitInfo))
+		{
+			WhenDefenseSucceed(FinalReduceValue, InstigatorPawn, HitFromDirection, Param.DefenseBeakBackDistance, HitInfo);
+			InstigatorPawn->WhenAttackedDefenseCharacter(FinalReduceValue, this, HitInfo);
+			return 0.f;
 		}
 	}
 
-	SetHealth(Health - FinalReduceValue, InstigatorBy);
+	SetHealth(Health - FinalReduceValue, ChangeContext);
 
 	if (UARPG_ReceiveDamageActionBase* ReceiveDamageAction = GetReceiveDamageAction())
 	{
@@ -1319,7 +1421,7 @@ float ACharacterBase::ApplyPointDamage(float BaseDamage, const FVector& HitFromD
 		}
 	}
 
-	UGameplayStatics::ApplyPointDamage(this, FinalReduceValue, GetActorLocation(), HitInfo, InstigatorBy ? InstigatorBy->GetController() : nullptr, DamageCauser, DamageTypeClass);
+	UGameplayStatics::ApplyPointDamage(this, FinalReduceValue, GetActorLocation(), HitInfo, InstigatorPawn ? InstigatorPawn->GetController() : nullptr, Cast<AActor>(DamageCauser), DamageTypeClass);
 	return FinalReduceValue;
 }
 
