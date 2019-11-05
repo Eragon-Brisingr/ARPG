@@ -71,7 +71,7 @@ void FARPG_EditorModule::StartupModule()
 			}
 		});
 
-	CharacterStateSubModule.ShutdownModule();
+	CharacterStateSubModule.StartupModule();
 }
 
 

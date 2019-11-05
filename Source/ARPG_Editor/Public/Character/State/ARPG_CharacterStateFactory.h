@@ -23,7 +23,6 @@ public:
 
 	FText GetDisplayName() const override;
 	FText GetToolTip() const override;
-	uint32 GetMenuCategories() const override;
 
 	UObject* FactoryCreateNew(UClass* InClass, UObject* InParent, FName InName, EObjectFlags Flags, UObject* Context, FFeedbackContext* Warn) override;
 	bool ConfigureProperties() override;

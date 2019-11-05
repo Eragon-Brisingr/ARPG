@@ -148,7 +148,9 @@ void ACharacterBase::Tick(float DeltaTime)
 		Stamina -= 100.f * DeltaTime;
 		if (Stamina <= 0.f)
 		{
+			Stamina = 0.f;
 			StaminaCoolDownRemainTime = 2.f;
+			InvokeChangeMoveGait(ECharacterGait::Running);
 		}
 	}
 	else if (StaminaCoolDownRemainTime > 0.f)
@@ -157,7 +159,7 @@ void ACharacterBase::Tick(float DeltaTime)
 	}
 	else
 	{
-		Stamina = FMath::Max(Stamina + 100.f * DeltaTime, MaxStamina.Value());
+		Stamina = FMath::Min(Stamina + 100.f * DeltaTime, MaxStamina.Value());
 	}
 }
 

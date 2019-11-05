@@ -5,7 +5,6 @@
 #include "ModuleManager.h"
 #include "ClassViewerModule.h"
 #include "SClassPickerDialog.h"
-#include "AssetTypeCategories.h"
 #include "ClassViewerFilter.h"
 #include "KismetEditorUtilities.h"
 
@@ -32,11 +31,6 @@ FText UARPG_CharacterStateFactory::GetDisplayName() const
 FText UARPG_CharacterStateFactory::GetToolTip() const
 {
 	return LOCTEXT("创造新角色状态（Buff）", "创造新角色状态（Buff）");
-}
-
-uint32 UARPG_CharacterStateFactory::GetMenuCategories() const
-{
-	return EAssetTypeCategories::Gameplay;
 }
 
 UObject* UARPG_CharacterStateFactory::FactoryCreateNew(UClass* InClass, UObject* InParent, FName InName, EObjectFlags Flags, UObject* Context, FFeedbackContext* Warn)
