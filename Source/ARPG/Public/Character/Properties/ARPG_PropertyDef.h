@@ -96,6 +96,13 @@ public:
 	}
 };
 
+#define ARPG_FLOAT_PPROPERTY_ACCESSORS(Property) \
+FORCEINLINE float Get##Property() const { return Property.Value(); } \
+FORCEINLINE void Property##_PushAdditiveModifier(const FARPG_FloatProperty_ModifyConfig& ModifyConfig) { Property.PushAdditiveModifier(ModifyConfig); } \
+FORCEINLINE void Property##_PopAdditiveModifier(const FARPG_FloatProperty_ModifyConfig& ModifyConfig) { Property.PopAdditiveModifier(ModifyConfig); } \
+FORCEINLINE void Property##_PushMultipleModifier(const FARPG_FloatProperty_ModifyConfig& ModifyConfig) { Property.PushMultipleModifier(ModifyConfig); } \
+FORCEINLINE void Property##_PopMultipleModifier(const FARPG_FloatProperty_ModifyConfig& ModifyConfig) { Property.PopMultipleModifier(ModifyConfig); }
+
 UENUM()
 enum class EARPG_PropertyOperatorOperand : uint8
 {

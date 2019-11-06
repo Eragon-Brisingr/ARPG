@@ -34,12 +34,30 @@ float UARPG_MaxHealth_PropertyModifier::GetValue(const UObject* Owner) const
 
 void UARPG_MaxHealth_PropertyModifier::PushAdditiveModifier(UObject* Owner, const FARPG_FloatProperty_ModifyConfig& ModifyConfig)
 {
-	CastChecked<ACharacterBase>(Owner)->MaxHealth_PushAdditiveModifier(ModifyConfig);
+	ACharacterBase* Character = CastChecked<ACharacterBase>(Owner);
+	bool PrevIsAlive = Character->IsAlive();
+	Character->MaxHealth_PushAdditiveModifier(ModifyConfig);
+	if (PrevIsAlive && Character->IsDead())
+	{
+		if (UARPG_ReceiveDamageActionBase* ReceiveDamageAction = Character->GetReceiveDamageAction())
+		{
+			ReceiveDamageAction->PlayNormalDeadMontage(Character);
+		}
+	}
 }
 
 void UARPG_MaxHealth_PropertyModifier::PopAdditiveModifier(UObject* Owner, const FARPG_FloatProperty_ModifyConfig& ModifyConfig)
 {
+	ACharacterBase* Character = CastChecked<ACharacterBase>(Owner);
+	bool PrevIsAlive = Character->IsAlive();
 	CastChecked<ACharacterBase>(Owner)->MaxHealth_PopAdditiveModifier(ModifyConfig);
+	if (PrevIsAlive && Character->IsDead())
+	{
+		if (UARPG_ReceiveDamageActionBase* ReceiveDamageAction = Character->GetReceiveDamageAction())
+		{
+			ReceiveDamageAction->PlayNormalDeadMontage(Character);
+		}
+	}
 }
 
 void UARPG_MaxHealth_PropertyModifier::PushMultipleModifier(UObject* Owner, const FARPG_FloatProperty_ModifyConfig& ModifyConfig)
@@ -62,27 +80,12 @@ void UARPG_Stamina_PropertyOperator::SetValue(UObject* Owner, float InValue, con
 	CastChecked<ACharacterBase>(Owner)->SetStamina(InValue, ChangeContext);
 }
 
-float UARPG_MaxStamina_PropertyModifier::GetValue(const UObject* Owner) const
-{
-	return CastChecked<ACharacterBase>(Owner)->GetMaxStamina();
-}
+ARPG_FLOAT_PPROPERTY_MODIFIER_CLASS_IMPL(UARPG_MaxStamina_PropertyModifier, ACharacterBase, MaxStamina);
 
-void UARPG_MaxStamina_PropertyModifier::PushAdditiveModifier(UObject* Owner, const FARPG_FloatProperty_ModifyConfig& ModifyConfig)
-{
-	CastChecked<ACharacterBase>(Owner)->MaxStamina_PushAdditiveModifier(ModifyConfig);
-}
+ARPG_FLOAT_PPROPERTY_MODIFIER_CLASS_IMPL(UARPG_StaminaRestoreSpeed_PropertyModifier, ACharacterBase, StaminaRestoreSpeed);
 
-void UARPG_MaxStamina_PropertyModifier::PopAdditiveModifier(UObject* Owner, const FARPG_FloatProperty_ModifyConfig& ModifyConfig)
-{
-	CastChecked<ACharacterBase>(Owner)->MaxStamina_PopAdditiveModifier(ModifyConfig);
-}
+ARPG_FLOAT_PPROPERTY_MODIFIER_CLASS_IMPL(UARPG_StaminaRestoreCoolDownTime_PropertyModifier, ACharacterBase, StaminaRestoreCoolDownTime);
 
-void UARPG_MaxStamina_PropertyModifier::PushMultipleModifier(UObject* Owner, const FARPG_FloatProperty_ModifyConfig& ModifyConfig)
-{
-	CastChecked<ACharacterBase>(Owner)->MaxStamina_PushMultipleModifier(ModifyConfig);
-}
+ARPG_FLOAT_PPROPERTY_MODIFIER_CLASS_IMPL(UARPG_MaxBearload_PropertyModifier, ACharacterBase, MaxBearload);
 
-void UARPG_MaxStamina_PropertyModifier::PopMultipleModifier(UObject* Owner, const FARPG_FloatProperty_ModifyConfig& ModifyConfig)
-{
-	CastChecked<ACharacterBase>(Owner)->MaxStamina_PopMultipleModifier(ModifyConfig);
-}
+ARPG_FLOAT_PPROPERTY_MODIFIER_CLASS_IMPL(UARPG_MaxEquipLoad_PropertyModifier, ACharacterBase, MaxEquipLoad);

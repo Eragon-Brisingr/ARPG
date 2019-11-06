@@ -2,6 +2,7 @@
 
 #include "AssetTypeActions_CharacterState.h"
 #include "AssetTypeCategories.h"
+#include "ARPG_CharacterStateBlueprint.h"
 #include "ARPG_CharacterStateBase.h"
 
 #define LOCTEXT_NAMESPACE "ARPG_CharacterState"
@@ -13,7 +14,7 @@ FText FAssetTypeActions_CharacterState::GetName() const
 
 UClass* FAssetTypeActions_CharacterState::GetSupportedClass() const
 {
-	return UARPG_CharacterStateBase::StaticClass();
+	return UARPG_CharacterStateBlueprint::StaticClass();
 }
 
 FColor FAssetTypeActions_CharacterState::GetTypeColor() const
@@ -28,11 +29,15 @@ uint32 FAssetTypeActions_CharacterState::GetCategories()
 
 FText FAssetTypeActions_CharacterState::GetDisplayNameFromAssetData(const FAssetData& AssetData) const
 {
-	if (AssetData.GetClass()->IsChildOf<UARPG_CharacterState_AccumulationBase>())
+	FString NativeParentClassPath = AssetData.GetTagValueRef<FString>(FBlueprintTags::NativeParentClassPath);
+	UObject* Outer = nullptr;
+	ResolveName(Outer, NativeParentClassPath, false, false);
+	UClass* ParentClass = FindObject<UClass>(ANY_PACKAGE, *NativeParentClassPath);
+	if (ParentClass->IsChildOf(UARPG_CharacterState_AccumulationBase::StaticClass()))
 	{
 		return LOCTEXT("积累状态", "积累状态");
 	}
-	else if (AssetData.GetClass()->IsChildOf<UARPG_CharacterState_AccumulationBase>())
+	else if (ParentClass->IsChildOf(UARPG_CharacterState_BuffBase::StaticClass()))
 	{
 		return LOCTEXT("BUFF", "BUFF");
 	}

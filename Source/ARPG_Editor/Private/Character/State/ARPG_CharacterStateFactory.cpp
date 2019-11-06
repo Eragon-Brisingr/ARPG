@@ -20,7 +20,7 @@ UARPG_CharacterStateFactory::UARPG_CharacterStateFactory()
 
 	bEditAfterNew = true;
 
-	SupportedClass = UARPG_CharacterStateBase::StaticClass();
+	SupportedClass = UARPG_CharacterStateBlueprint::StaticClass();
 }
 
 FText UARPG_CharacterStateFactory::GetDisplayName() const

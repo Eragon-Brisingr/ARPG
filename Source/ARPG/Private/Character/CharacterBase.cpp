@@ -116,6 +116,9 @@ void ACharacterBase::Destroyed()
 void ACharacterBase::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
 	Super::EndPlay(EndPlayReason);
+
+	Inventory->OnAddItem.AddDynamic(this, &ACharacterBase::WhenAddItem);
+	Inventory->OnRemoveItem.AddDynamic(this, &ACharacterBase::WhenRemoveItem);
 }
 
 bool ACharacterBase::NeedSave_Implementation() const
@@ -149,7 +152,7 @@ void ACharacterBase::Tick(float DeltaTime)
 		if (Stamina <= 0.f)
 		{
 			Stamina = 0.f;
-			StaminaCoolDownRemainTime = 2.f;
+			StaminaCoolDownRemainTime = StaminaRestoreCoolDownTime.Value();
 			InvokeChangeMoveGait(ECharacterGait::Running);
 		}
 	}
@@ -159,8 +162,11 @@ void ACharacterBase::Tick(float DeltaTime)
 	}
 	else
 	{
-		Stamina = FMath::Min(Stamina + 100.f * DeltaTime, MaxStamina.Value());
+		Stamina = FMath::Min(Stamina + GetStaminaRestoreSpeed() * DeltaTime, MaxStamina.Value());
 	}
+
+	// 负重逻辑
+
 }
 
 // Called to bind functionality to input
@@ -180,10 +186,17 @@ void ACharacterBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLi
 	DOREPLIFETIME(ACharacterBase, bMirrorFullBodyMontage);
 
 	// 属性
+	// TODO：划分只给Owner发送的部分
 	DOREPLIFETIME(ACharacterBase, Health);
 	DOREPLIFETIME(ACharacterBase, MaxHelath);
 	DOREPLIFETIME(ACharacterBase, Stamina);
 	DOREPLIFETIME(ACharacterBase, MaxStamina);
+	DOREPLIFETIME(ACharacterBase, StaminaRestoreSpeed);
+	DOREPLIFETIME(ACharacterBase, StaminaRestoreCoolDownTime);
+	DOREPLIFETIME(ACharacterBase, Bearload);
+	DOREPLIFETIME(ACharacterBase, MaxBearload);
+	DOREPLIFETIME(ACharacterBase, EquipLoad);
+	DOREPLIFETIME(ACharacterBase, MaxEquipLoad);
 }
 
 void ACharacterBase::OnConstruction(const FTransform& Transform)
@@ -334,7 +347,7 @@ void ACharacterBase::SetStamina(float InStamina, const FARPG_PropertyChangeConte
 
 	if (Stamina == 0.f)
 	{
-		StaminaCoolDownRemainTime = 2.f;
+		StaminaCoolDownRemainTime = StaminaRestoreCoolDownTime.Value();
 	}
 }
 
@@ -368,6 +381,21 @@ void ACharacterBase::MaxStamina_PopMultipleModifier(const FARPG_FloatProperty_Mo
 {
 	MaxStamina.PopMultipleModifier(ModifyConfig);
 	MaxStamina_AdjustForMaxChange(MaxStamina.Value(), ModifyConfig.ChangeContext);
+}
+
+void ACharacterBase::SetBearload(float InBearload, const FARPG_PropertyChangeContext& ChangeContext)
+{
+	Bearload = InBearload;
+}
+
+void ACharacterBase::SetEquipLoad(float InEquipLoad, const FARPG_PropertyChangeContext& ChangeContext)
+{
+	EquipLoad = InEquipLoad;
+}
+
+bool ACharacterBase::CanSprint() const
+{
+	return GetStamina() > 0.f;
 }
 
 bool ACharacterBase::IsSprinting() const
@@ -465,7 +493,10 @@ void ACharacterBase::InvokeChangeMoveGait(ECharacterGait Gait)
 
 void ACharacterBase::InvokeChangeMoveGaitToServer_Implementation(const ECharacterGait& Gait)
 {
-	ARPG_MovementComponent->bInvokeSprint = (Gait == ECharacterGait::Sprinting);
+	if (CanSprint())
+	{
+		ARPG_MovementComponent->bInvokeSprint = (Gait == ECharacterGait::Sprinting);
+	}
 	ARPG_MovementComponent->SetGait(Gait);
 }
 
@@ -1138,6 +1169,16 @@ void ACharacterBase::WhenCloseTardeItemPanel_Implementation()
 bool ACharacterBase::WhenCloseTardeItemPanel_Validate()
 {
 	return true;
+}
+
+void ACharacterBase::WhenAddItem(UXD_ItemCoreBase* ItemCore, int32 AddNumber, int32 ExistNumber)
+{
+	Bearload += CastChecked<UARPG_ItemCoreBase>(ItemCore)->GetWeight() * AddNumber;
+}
+
+void ACharacterBase::WhenRemoveItem(UXD_ItemCoreBase* ItemCore, int32 RemoveNumber, int32 ExistNumber)
+{
+	Bearload -= CastChecked<UARPG_ItemCoreBase>(ItemCore)->GetWeight() * RemoveNumber;
 }
 
 void ACharacterBase::InvokeUseItem(const class UARPG_ItemCoreBase* ItemCore, EUseItemInput UseItemInput /*= EUseItemInput::LeftMouse*/)

@@ -43,6 +43,7 @@ class AARPG_WeaponBase;
 class AARPG_ArrowBase;
 class AARPG_EquipmentBase;
 class ACharacterBase;
+class UXD_ItemCoreBase;
 
 UENUM()
 enum class EInteractEndResult : uint8
@@ -57,7 +58,7 @@ DECLARE_DELEGATE_OneParam(FOnInteractEnd, EInteractEndResult);
 DECLARE_DELEGATE(FOnInteractAbortEnd);
 
 UCLASS()
-class ARPG_API ACharacterBase : public ACharacter, 
+class ARPG_API ACharacterBase : public ACharacter,
 	public IXD_SaveGameInterface,
 	public IXD_DispatchableEntityInterface,
 	public IARPG_LockOnTargetInterface,
@@ -99,7 +100,7 @@ public:
 	void Reset() override;
 
 	TArray<UARPG_ItemCoreBase*> GetReInitItemList() const;
-	
+
 	virtual TArray<UARPG_ItemCoreBase*> GetInitItemList() const;
 	UFUNCTION(BlueprintImplementableEvent, Category = "角色|初始化", meta = (DisplayName = "GetInitItemList"))
 	TArray<UARPG_ItemCoreBase*> ReceivedGetInitItemList() const;
@@ -138,14 +139,12 @@ public:
 	float Stamina = 300.f;
 	UPROPERTY(EditAnywhere, Category = "角色|属性", Replicated)
 	FARPG_FloatProperty MaxStamina = 300.f;
-	UFUNCTION(BlueprintCallable, Category = "角色|属性", meta = (CompactNodeTitle = "Health"))
+	UFUNCTION(BlueprintCallable, Category = "角色|属性", meta = (CompactNodeTitle = "Stamina"))
 	FORCEINLINE float GetStamina() const { return Stamina; }
 	UFUNCTION(BlueprintCallable, Category = "角色|属性")
 	void SetStamina(float InStamina, const FARPG_PropertyChangeContext& ChangeContext);
-	UFUNCTION(BlueprintCallable, Category = "角色|属性", meta = (CompactNodeTitle = "Health"))
+	UFUNCTION(BlueprintCallable, Category = "角色|属性", meta = (CompactNodeTitle = "MaxStamina"))
 	FORCEINLINE float GetMaxStamina() const { return MaxStamina.Value(); }
-
-	float StaminaCoolDownRemainTime = 0.f;
 
 	void MaxStamina_AdjustForMaxChange(float InMaxStamina, const FARPG_PropertyChangeContext& ChangeContext);
 	void MaxStamina_PushAdditiveModifier(const FARPG_FloatProperty_ModifyConfig& ModifyConfig);
@@ -153,10 +152,49 @@ public:
 	void MaxStamina_PushMultipleModifier(const FARPG_FloatProperty_ModifyConfig& ModifyConfig);
 	void MaxStamina_PopMultipleModifier(const FARPG_FloatProperty_ModifyConfig& ModifyConfig);
 
+	// 精力恢复相关
+	float StaminaCoolDownRemainTime = 0.f;
+	UPROPERTY(EditAnywhere, Category = "角色|属性", Replicated)
+	FARPG_FloatProperty StaminaRestoreSpeed = 60.f;
+	ARPG_FLOAT_PPROPERTY_ACCESSORS(StaminaRestoreSpeed);
+	UFUNCTION(BlueprintCallable, Category = "角色|属性", meta = (CompactNodeTitle = "StaminaRestoreSpeed", DisplayName = "GetStaminaRestoreSpeed"))
+	float K2_GetStaminaRestoreSpeed() const { return StaminaRestoreSpeed.Value(); }
+
+	UPROPERTY(EditAnywhere, Category = "角色|属性", Replicated)
+	FARPG_FloatProperty StaminaRestoreCoolDownTime = 2.f;
+	ARPG_FLOAT_PPROPERTY_ACCESSORS(StaminaRestoreCoolDownTime);
+	UFUNCTION(BlueprintCallable, Category = "角色|属性", meta = (CompactNodeTitle = "StaminaRestoreCoolDownTime", DisplayName = "GetStaminaRestoreCoolDownTime"))
+	float K2_StaminaRestoreCoolDownTime() const { return StaminaRestoreCoolDownTime.Value(); }
+
+	// 总负重
+	UPROPERTY(EditAnywhere, Category = "角色|属性", Replicated)
+	float Bearload;
+	UFUNCTION(BlueprintCallable, Category = "角色|属性", meta = (CompactNodeTitle = "Bearload"))
+	FORCEINLINE float GetBearload() const { return Bearload; }
+	void SetBearload(float InBearload, const FARPG_PropertyChangeContext& ChangeContext);
+	UPROPERTY(EditAnywhere, Category = "角色|属性", Replicated)
+	FARPG_FloatProperty MaxBearload = 60.f;
+	ARPG_FLOAT_PPROPERTY_ACCESSORS(MaxBearload);
+	UFUNCTION(BlueprintCallable, Category = "角色|属性", meta = (CompactNodeTitle = "MaxBearload", DisplayName = "GetMaxBearload"))
+	float K2_GetMaxBearload() const { return MaxBearload.Value(); }
+
+	// 装备负重
+	UPROPERTY(EditAnywhere, Category = "角色|属性", Replicated)
+	float EquipLoad;
+	UFUNCTION(BlueprintCallable, Category = "角色|属性", meta = (CompactNodeTitle = "EquipLoad"))
+	FORCEINLINE float GetEquipLoad() const { return EquipLoad; }
+	void SetEquipLoad(float InEquipLoad, const FARPG_PropertyChangeContext& ChangeContext);
+	UPROPERTY(EditAnywhere, Category = "角色|属性", Replicated)
+	FARPG_FloatProperty MaxEquipLoad;
+	ARPG_FLOAT_PPROPERTY_ACCESSORS(MaxEquipLoad);
+	UFUNCTION(BlueprintCallable, Category = "角色|属性", meta = (CompactNodeTitle = "MaxEquipLoad", DisplayName = "GetMaxEquipLoad"))
+	float K2_GetMaxEquipLoad() const { return MaxEquipLoad.Value(); }
+
 	// 状态
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "角色|状态")
 	class UARPG_CharacterStateComponent* CharacterStateComponent;
 
+	bool CanSprint() const;
 	bool IsSprinting() const;
 	//DispatchableEntityInterface
 public:
@@ -304,7 +342,7 @@ public:
 	//闪避
 	UPROPERTY(EditDefaultsOnly, Category = "角色|动画配置")
 	class UARPG_DodgeAnimSetBase* DodgeAnimSet;
-	
+
 	UFUNCTION(BlueprintCallable, Category = "角色|动作")
 	void InvokeDodge();
 
@@ -323,7 +361,7 @@ public:
 	void SetRootMotionTranslationScale(const FVector& Scale);
 	UFUNCTION(BlueprintCallable, Category = "角色|动作")
 	FVector GetRootMotionTranslationScale() const;
-	
+
 	//动画配置
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "角色|动作")
@@ -379,6 +417,11 @@ public:
 	void WhenCloseTardeItemPanel();
 	DECLARE_MULTICAST_DELEGATE(FOnCloseTradeItemPanelNative);
 	FOnCloseTradeItemPanelNative OnCloseTradeItemPanelNative;
+
+	UFUNCTION()
+	void WhenAddItem(UXD_ItemCoreBase* ItemCore, int32 AddNumber, int32 ExistNumber);
+	UFUNCTION()
+	void WhenRemoveItem(UXD_ItemCoreBase* ItemCore, int32 RemoveNumber, int32 ExistNumber);
 	//使用道具相关
 public:
 	UFUNCTION(BlueprintCallable, Category = "角色|物品")
@@ -393,7 +436,7 @@ public:
 	UFUNCTION(BlueprintNativeEvent, Category = "角色|物品")
 	AARPG_WeaponBase* EquipWaepon(const UARPG_WeaponCoreBase* WeaponCore, EUseItemInput UseItemInput);
 	virtual AARPG_WeaponBase* EquipWaepon_Implementation(class UARPG_WeaponCoreBase* WeaponCore, EUseItemInput UseItemInput) { return nullptr; }
-	
+
 	UFUNCTION(BlueprintNativeEvent, Category = "角色|物品")
 	AARPG_ArrowBase* EquipArrow(const UARPG_ArrowCoreBase* ArrowCore, EUseItemInput UseItemInput);
 	virtual AARPG_ArrowBase* EquipArrow_Implementation(class UARPG_ArrowCoreBase* ArrowCore, EUseItemInput UseItemInput) { return nullptr; }
@@ -409,7 +452,7 @@ public:
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnEquip, ACharacterBase*, Character, AARPG_ItemBase*, EquipItem);
 	UPROPERTY(BlueprintAssignable, Category = "角色|物品")
 	FOnEquip OnEquip;
-	 
+
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnNotEquip, ACharacterBase*, Character, AARPG_ItemBase*, NotEquipItem);
 	UPROPERTY(BlueprintAssignable, Category = "角色|物品")
 	FOnNotEquip OnNotEquip;
@@ -681,7 +724,7 @@ public:
 	UFUNCTION(BlueprintNativeEvent, Category = "角色|AI|寻路")
 	void WhenStartNavLink(EARPG_NavAreaFlag NavAreaFlag, const FVector& StartLocation, const FVector& EndLocation);
 	virtual void WhenStartNavLink_Implementation(EARPG_NavAreaFlag NavAreaFlag, const FVector& StartLocation, const FVector& EndLocation);
-	
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "角色|AI|配置")
 	TSubclassOf<class UNavigationQueryFilter> NavigationQueryFilter;
 
@@ -713,7 +756,7 @@ public:
 	virtual bool IsInReleaseState() const { return true; }
 
 	UARPG_CharacterBehaviorBase* EnterReleaseState(const FOnCharacterBehaviorFinished& OnBehaviorFinished);
-	
+
 	//转身
 	UPROPERTY(EditDefaultsOnly, Category = "角色|动画配置")
 	UCA_TurnConfigBase* TurnConfig;

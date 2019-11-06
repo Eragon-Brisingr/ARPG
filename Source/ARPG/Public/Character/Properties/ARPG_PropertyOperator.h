@@ -55,3 +55,17 @@ public:
 	UFUNCTION(BlueprintPure, Category = "½ÇÉ«|ÊôÐÔ", meta = (CompactNodeTitle = "GetValue"))
 	static float GetValue(TSubclassOf<UARPG_GameplayFloatPropertyGetterBase> Getter, const UObject* Owner) { return Owner && Getter ? Getter.GetDefaultObject()->GetValue(Owner) : 0.f; }
 };
+
+#define ARPG_FLOAT_PPROPERTY_MODIFIER_CLASS_DECLARE() \
+float GetValue(const UObject* Owner) const override; \
+void PushAdditiveModifier(UObject* Owner, const FARPG_FloatProperty_ModifyConfig& ModifyConfig) override; \
+void PopAdditiveModifier(UObject* Owner, const FARPG_FloatProperty_ModifyConfig& ModifyConfig) override; \
+void PushMultipleModifier(UObject* Owner, const FARPG_FloatProperty_ModifyConfig& ModifyConfig) override; \
+void PopMultipleModifier(UObject* Owner, const FARPG_FloatProperty_ModifyConfig& ModifyConfig) override;
+
+#define ARPG_FLOAT_PPROPERTY_MODIFIER_CLASS_IMPL(ClassName, OwnerType, PropertyName) \
+float ClassName##::GetValue(const UObject* Owner) const { return CastChecked<OwnerType>(Owner)->PropertyName.Value(); } \
+void ClassName##::PushAdditiveModifier(UObject* Owner, const FARPG_FloatProperty_ModifyConfig& ModifyConfig) { CastChecked<OwnerType>(Owner)->PropertyName##_PushAdditiveModifier(ModifyConfig); } \
+void ClassName##::PopAdditiveModifier(UObject* Owner, const FARPG_FloatProperty_ModifyConfig& ModifyConfig) { CastChecked<OwnerType>(Owner)->PropertyName##_PopAdditiveModifier(ModifyConfig); } \
+void ClassName##::PushMultipleModifier(UObject* Owner, const FARPG_FloatProperty_ModifyConfig& ModifyConfig) { CastChecked<OwnerType>(Owner)->PropertyName##_PushMultipleModifier(ModifyConfig); } \
+void ClassName##::PopMultipleModifier(UObject* Owner, const FARPG_FloatProperty_ModifyConfig& ModifyConfig) { CastChecked<OwnerType>(Owner)->PropertyName##_PopMultipleModifier(ModifyConfig); }
