@@ -99,8 +99,8 @@ private:
 	template<typename EquipType>
 	void SetEquipVariable(EquipType*& CurEquip, EquipType* ToEquip);
 	void OnRep_EquipVariable(class AARPG_ItemBase* CurEquip, class AARPG_ItemBase* PreEquip);
-	void OnRep_UseItemImpl(class AARPG_ItemBase* CurEquip);
-	void OnRep_NotUseImpl(class AARPG_ItemBase* PreEquip);
+	void OnRep_EquipItemImpl(class AARPG_ItemBase* CurEquip);
+	void OnRep_NotEquipItemImpl(class AARPG_ItemBase* PreEquip);
 
 public:
 	UPROPERTY(ReplicatedUsing = OnRep_LeftWeapon, VisibleAnywhere, AdvancedDisplay, BlueprintReadWrite, BlueprintSetter = "SetLeftWeapon", Category = "角色", SaveGame)

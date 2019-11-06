@@ -79,8 +79,6 @@ protected:
 	void Destroyed() override;
 	void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
-	virtual bool NeedSave_Implementation() const override;
-
 	void PreInitializeComponents() override;
 public:
 	// Called every frame
@@ -95,7 +93,8 @@ public:
 
 	float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
 public:
-	virtual void WhenGameInit_Implementation() override;
+	bool NeedSave_Implementation() const override;
+	void WhenGameInit_Implementation() override;
 
 	void Reset() override;
 
@@ -107,11 +106,11 @@ public:
 
 	// 属性
 public:
-	//生命
+	// 生命
 
-	UPROPERTY(EditAnywhere, Category = "角色|属性", Replicated, SaveGame)
+	UPROPERTY(EditAnywhere, Category = "角色|属性", Replicated, SaveGame, meta = (DisplayName = "当前生命"))
 	float Health = 1000.f;
-	UPROPERTY(EditAnywhere, Category = "角色|属性", Replicated)
+	UPROPERTY(EditAnywhere, Category = "角色|属性", Replicated, meta = (DisplayName = "生命上限"))
 	FARPG_FloatProperty MaxHelath = 1000.f;
 
 	UFUNCTION(BlueprintCallable, Category = "角色|属性", meta = (CompactNodeTitle = "Health"))
@@ -135,9 +134,9 @@ public:
 	virtual void WhenDead();
 
 	// 精力
-	UPROPERTY(EditAnywhere, Category = "角色|属性", Replicated, SaveGame)
+	UPROPERTY(EditAnywhere, Category = "角色|属性", Replicated, SaveGame, meta = (DisplayName = "当前精力"))
 	float Stamina = 300.f;
-	UPROPERTY(EditAnywhere, Category = "角色|属性", Replicated)
+	UPROPERTY(EditAnywhere, Category = "角色|属性", Replicated, meta = (DisplayName = "精力上限"))
 	FARPG_FloatProperty MaxStamina = 300.f;
 	UFUNCTION(BlueprintCallable, Category = "角色|属性", meta = (CompactNodeTitle = "Stamina"))
 	FORCEINLINE float GetStamina() const { return Stamina; }
@@ -154,38 +153,46 @@ public:
 
 	// 精力恢复相关
 	float StaminaCoolDownRemainTime = 0.f;
-	UPROPERTY(EditAnywhere, Category = "角色|属性", Replicated)
+	UPROPERTY(EditAnywhere, Category = "角色|属性", Replicated, meta = (DisplayName = "精力恢复速度"))
 	FARPG_FloatProperty StaminaRestoreSpeed = 60.f;
 	ARPG_FLOAT_PPROPERTY_ACCESSORS(StaminaRestoreSpeed);
 	UFUNCTION(BlueprintCallable, Category = "角色|属性", meta = (CompactNodeTitle = "StaminaRestoreSpeed", DisplayName = "GetStaminaRestoreSpeed"))
 	float K2_GetStaminaRestoreSpeed() const { return StaminaRestoreSpeed.Value(); }
 
-	UPROPERTY(EditAnywhere, Category = "角色|属性", Replicated)
+	UPROPERTY(EditAnywhere, Category = "角色|属性", Replicated, meta = (DisplayName = "精力再恢复冷却时间"))
 	FARPG_FloatProperty StaminaRestoreCoolDownTime = 2.f;
 	ARPG_FLOAT_PPROPERTY_ACCESSORS(StaminaRestoreCoolDownTime);
 	UFUNCTION(BlueprintCallable, Category = "角色|属性", meta = (CompactNodeTitle = "StaminaRestoreCoolDownTime", DisplayName = "GetStaminaRestoreCoolDownTime"))
-	float K2_StaminaRestoreCoolDownTime() const { return StaminaRestoreCoolDownTime.Value(); }
+	float K2_GetStaminaRestoreCoolDownTime() const { return StaminaRestoreCoolDownTime.Value(); }
+
+	UPROPERTY(EditAnywhere, Category = "角色|属性", Replicated, meta = (DisplayName = "冲刺精力消耗速度"))
+	FARPG_FloatProperty SprintStaminaReduceSpeed = 30.f;
+	ARPG_FLOAT_PPROPERTY_ACCESSORS(SprintStaminaReduceSpeed);
+	UFUNCTION(BlueprintCallable, Category = "角色|属性", meta = (CompactNodeTitle = "SprintStaminaReduceSpeed", DisplayName = "GetSprintStaminaReduceSpeed"))
+	float K2_GetSprintStaminaReduceSpeed() const { return SprintStaminaReduceSpeed.Value(); }
 
 	// 总负重
-	UPROPERTY(EditAnywhere, Category = "角色|属性", Replicated)
-	float Bearload;
-	UFUNCTION(BlueprintCallable, Category = "角色|属性", meta = (CompactNodeTitle = "Bearload"))
-	FORCEINLINE float GetBearload() const { return Bearload; }
+	UPROPERTY(EditAnywhere, Category = "角色|属性", Replicated, meta = (DisplayName = "当前总计负重"))
+	FARPG_FloatProperty Bearload;
+	ARPG_FLOAT_PPROPERTY_ACCESSORS(Bearload);
+	UFUNCTION(BlueprintCallable, Category = "角色|属性", meta = (CompactNodeTitle = "Bearload", DisplayName = "GetBearload"))
+	FORCEINLINE float K2_GetBearload() const { return Bearload.Value(); }
 	void SetBearload(float InBearload, const FARPG_PropertyChangeContext& ChangeContext);
-	UPROPERTY(EditAnywhere, Category = "角色|属性", Replicated)
-	FARPG_FloatProperty MaxBearload = 60.f;
+	UPROPERTY(EditAnywhere, Category = "角色|属性", Replicated, meta = (DisplayName = "总计负重上限"))
+	FARPG_FloatProperty MaxBearload = 100.f;
 	ARPG_FLOAT_PPROPERTY_ACCESSORS(MaxBearload);
 	UFUNCTION(BlueprintCallable, Category = "角色|属性", meta = (CompactNodeTitle = "MaxBearload", DisplayName = "GetMaxBearload"))
 	float K2_GetMaxBearload() const { return MaxBearload.Value(); }
 
 	// 装备负重
-	UPROPERTY(EditAnywhere, Category = "角色|属性", Replicated)
-	float EquipLoad;
-	UFUNCTION(BlueprintCallable, Category = "角色|属性", meta = (CompactNodeTitle = "EquipLoad"))
-	FORCEINLINE float GetEquipLoad() const { return EquipLoad; }
+	UPROPERTY(EditAnywhere, Category = "角色|属性", Replicated, meta = (DisplayName = "当前装备负重"))
+	FARPG_FloatProperty EquipLoad;
+	ARPG_FLOAT_PPROPERTY_ACCESSORS(EquipLoad);
+	UFUNCTION(BlueprintCallable, Category = "角色|属性", meta = (CompactNodeTitle = "EquipLoad", DisplayName = "GetEquipLoad"))
+	FORCEINLINE float K2_GetEquipLoad() const { return EquipLoad.Value(); }
 	void SetEquipLoad(float InEquipLoad, const FARPG_PropertyChangeContext& ChangeContext);
-	UPROPERTY(EditAnywhere, Category = "角色|属性", Replicated)
-	FARPG_FloatProperty MaxEquipLoad;
+	UPROPERTY(EditAnywhere, Category = "角色|属性", Replicated, meta = (DisplayName = "装备负重上限"))
+	FARPG_FloatProperty MaxEquipLoad = 100.f;
 	ARPG_FLOAT_PPROPERTY_ACCESSORS(MaxEquipLoad);
 	UFUNCTION(BlueprintCallable, Category = "角色|属性", meta = (CompactNodeTitle = "MaxEquipLoad", DisplayName = "GetMaxEquipLoad"))
 	float K2_GetMaxEquipLoad() const { return MaxEquipLoad.Value(); }
@@ -194,6 +201,7 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "角色|状态")
 	class UARPG_CharacterStateComponent* CharacterStateComponent;
 
+	bool CanRun() const;
 	bool CanSprint() const;
 	bool IsSprinting() const;
 	//DispatchableEntityInterface
@@ -251,6 +259,8 @@ public:
 	bool ARPG_AllInputIsReleased(UPARAM(meta = (Bitmask, BitmaskEnum = "EARPG_InputType")) int32 InputType) const;
 	//移动行为
 public:
+	ECharacterGait InvokedGaitState;
+
 	UFUNCTION(BlueprintCallable, Category = "角色|行为")
 	void InvokeChangeMoveGait(ECharacterGait Gait);
 
@@ -354,7 +364,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "角色|动作")
 	bool CanDodge() const;
 
-	//RootMotion的距离比例,（现在还无效，需要改MovementComponent）
+	// TODO:RootMotion的距离比例,（现在还无效，需要改MovementComponent）
 	UPROPERTY(Replicated)
 	FVector RootMotionScale = FVector::OneVector;
 	UFUNCTION(BlueprintCallable, Category = "角色|动作")
@@ -452,10 +462,12 @@ public:
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnEquip, ACharacterBase*, Character, AARPG_ItemBase*, EquipItem);
 	UPROPERTY(BlueprintAssignable, Category = "角色|物品")
 	FOnEquip OnEquip;
+	virtual void WhenEquip(AARPG_ItemBase* EquipItem);
 
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnNotEquip, ACharacterBase*, Character, AARPG_ItemBase*, NotEquipItem);
 	UPROPERTY(BlueprintAssignable, Category = "角色|物品")
 	FOnNotEquip OnNotEquip;
+	virtual void WhenNotEquip(AARPG_ItemBase* NotEquipItem);
 
 	//使用物品时显示的物品
 	UPROPERTY(BlueprintReadOnly, Category = "角色|物品")

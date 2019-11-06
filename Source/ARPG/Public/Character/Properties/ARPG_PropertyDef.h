@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -74,6 +74,14 @@ private:
 public:
 	FORCEINLINE float Value() const { return Final; }
 
+	FORCEINLINE float GetBaseValue() const { return Base; }
+	void SetBaseValue(float InBaseValue)
+	{
+		Base = InBaseValue;
+		UpdateFinalValue();
+	}
+
+	FORCEINLINE float GetAdditiveValue() const { return Additive; }
 	void PushAdditiveModifier(const FARPG_FloatProperty_ModifyConfig& ModifyConfig)
 	{
 		Additive += ModifyConfig.Value;
@@ -84,6 +92,8 @@ public:
 		Additive -= ModifyConfig.Value;
 		UpdateFinalValue();
 	}
+
+	FORCEINLINE float GetMultipleValue() const { return Multiple; }
 	void PushMultipleModifier(const FARPG_FloatProperty_ModifyConfig& ModifyConfig)
 	{
 		Multiple += ModifyConfig.Value;

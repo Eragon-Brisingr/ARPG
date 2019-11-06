@@ -595,22 +595,23 @@ void AHumanBase::OnRep_EquipVariable(class AARPG_ItemBase* CurEquip, class AARPG
 {
 	if (PreEquip)
 	{
-		OnRep_NotUseImpl(PreEquip);
+		OnRep_NotEquipItemImpl(PreEquip);
 	}
 	if (CurEquip)
 	{
-		OnRep_UseItemImpl(CurEquip);
+		OnRep_EquipItemImpl(CurEquip);
 	}
 	return;
 }
 
-void AHumanBase::OnRep_UseItemImpl(class AARPG_ItemBase* CurEquip)
+void AHumanBase::OnRep_EquipItemImpl(class AARPG_ItemBase* CurEquip)
 {
 	CurEquip->WhenUse(this);
+	WhenEquip(CurEquip);
 	OnEquip.Broadcast(this, CurEquip);
 }
 
-void AHumanBase::OnRep_NotUseImpl(class AARPG_ItemBase* PreEquip)
+void AHumanBase::OnRep_NotEquipItemImpl(class AARPG_ItemBase* PreEquip)
 {
 #if WITH_EDITOR
 	if (!GetWorld()->IsGameWorld())
@@ -623,9 +624,11 @@ void AHumanBase::OnRep_NotUseImpl(class AARPG_ItemBase* PreEquip)
 		PreEquip->SetLifeSpan(1.f);
 		PreEquip->SetActorHiddenInGame(true);
 	}
+
 	if (PreEquip->ItemCore)
 	{
 		PreEquip->WhenNotUse(this);
+		WhenNotEquip(PreEquip);
 		OnNotEquip.Broadcast(this, PreEquip);
 	}
 }
@@ -892,7 +895,7 @@ void AHumanBase::OnRep_EquipmentList()
 	{
 		if (Equipment)
 		{
-			OnRep_NotUseImpl(Equipment);
+			OnRep_NotEquipItemImpl(Equipment);
 		}
 	}
 	//找出现在的
@@ -902,13 +905,13 @@ void AHumanBase::OnRep_EquipmentList()
 		{
 			if (Equipment->ItemCore)
 			{
-				OnRep_UseItemImpl(Equipment);
+				OnRep_EquipItemImpl(Equipment);
 			}
 			else
 			{
 				Equipment->OnItemCoreValidNative.BindWeakLambda(this, [=]()
 					{
-						OnRep_UseItemImpl(Equipment);
+						OnRep_EquipItemImpl(Equipment);
 					});
 			}
 		}

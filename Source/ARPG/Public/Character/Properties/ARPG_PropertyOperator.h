@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+ï»¿// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -18,6 +18,7 @@ class ARPG_API UARPG_GameplayFloatPropertyGetterBase : public UObject
 	GENERATED_BODY()
 public:
 	virtual float GetValue(const UObject* Owner) const { unimplemented(); return 0.f; }
+	virtual FText GetPropertyName() const { unimplemented(); return FText::GetEmpty(); }
 };
 
 UCLASS(const, BlueprintType, hidedropdown)
@@ -52,8 +53,11 @@ class ARPG_API UARPG_GameplayFloatPropertyOperatorLibrary : public UBlueprintFun
 {
 	GENERATED_BODY()
 public:
-	UFUNCTION(BlueprintPure, Category = "½ÇÉ«|ÊôÐÔ", meta = (CompactNodeTitle = "GetValue"))
+	UFUNCTION(BlueprintPure, Category = "è§’è‰²|å±žæ€§", meta = (CompactNodeTitle = "GetValue"))
 	static float GetValue(TSubclassOf<UARPG_GameplayFloatPropertyGetterBase> Getter, const UObject* Owner) { return Owner && Getter ? Getter.GetDefaultObject()->GetValue(Owner) : 0.f; }
+
+	UFUNCTION(BlueprintPure, Category = "è§’è‰²|å±žæ€§", meta = (CompactNodeTitle = "GetName"))
+	static FText GetPropertyName(TSubclassOf<UARPG_GameplayFloatPropertyGetterBase> Getter) { return Getter ? Getter.GetDefaultObject()->GetPropertyName() : FText::GetEmpty(); }
 };
 
 #define ARPG_FLOAT_PPROPERTY_MODIFIER_CLASS_DECLARE() \

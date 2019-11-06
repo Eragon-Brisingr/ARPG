@@ -116,9 +116,6 @@ void ACharacterBase::Destroyed()
 void ACharacterBase::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
 	Super::EndPlay(EndPlayReason);
-
-	Inventory->OnAddItem.AddDynamic(this, &ACharacterBase::WhenAddItem);
-	Inventory->OnRemoveItem.AddDynamic(this, &ACharacterBase::WhenRemoveItem);
 }
 
 bool ACharacterBase::NeedSave_Implementation() const
@@ -132,6 +129,12 @@ void ACharacterBase::PreInitializeComponents()
 
 	//先于组件的初始化注册，使得组件中可以覆盖注册
 	BattleControl = this;
+
+	if (HasAuthority())
+	{
+		Inventory->OnAddItem.AddDynamic(this, &ACharacterBase::WhenAddItem);
+		Inventory->OnRemoveItem.AddDynamic(this, &ACharacterBase::WhenRemoveItem);
+	}
 }
 
 // Called every frame
@@ -139,16 +142,39 @@ void ACharacterBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	// 移动逻辑
+	if (HasAuthority() || IsLocallyControlled())
+	{
+		switch (InvokedGaitState)
+		{
+		case ECharacterGait::Walking:
+			ARPG_MovementComponent->SetGait(ECharacterGait::Walking);
+			break;
+		case ECharacterGait::Running:
+			ARPG_MovementComponent->SetGait(CanRun() ? ECharacterGait::Running : ECharacterGait::Walking);
+			break;
+		case ECharacterGait::Sprinting:
+			if (CanRun())
+			{
+				ARPG_MovementComponent->SetGait(CanSprint() ? ECharacterGait::Sprinting : ECharacterGait::Running);
+			}
+			else
+			{
+				ARPG_MovementComponent->SetGait(ECharacterGait::Walking);
+			}
+			break;
+		}
+	}
+
 	const bool bIsSprinting = IsSprinting();
 
 	//TODO 挪入bIsLockingOther与bInvokeSprint的Setter驱动而不是轮询
 	ARPG_MovementComponent->SetRotationMode(bIsLockingOther && bIsSprinting == false ? ECharacterRotationMode::LookingDirection : ECharacterRotationMode::VelocityDirection);
 
 	// 精力增减逻辑
-	ARPG_MovementComponent->bCanSprint = Stamina > 0.f;
 	if (bIsSprinting)
 	{
-		Stamina -= 100.f * DeltaTime;
+		Stamina -= GetSprintStaminaReduceSpeed() * DeltaTime;
 		if (Stamina <= 0.f)
 		{
 			Stamina = 0.f;
@@ -164,9 +190,6 @@ void ACharacterBase::Tick(float DeltaTime)
 	{
 		Stamina = FMath::Min(Stamina + GetStaminaRestoreSpeed() * DeltaTime, MaxStamina.Value());
 	}
-
-	// 负重逻辑
-
 }
 
 // Called to bind functionality to input
@@ -189,14 +212,14 @@ void ACharacterBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLi
 	// TODO：划分只给Owner发送的部分
 	DOREPLIFETIME(ACharacterBase, Health);
 	DOREPLIFETIME(ACharacterBase, MaxHelath);
-	DOREPLIFETIME(ACharacterBase, Stamina);
-	DOREPLIFETIME(ACharacterBase, MaxStamina);
-	DOREPLIFETIME(ACharacterBase, StaminaRestoreSpeed);
-	DOREPLIFETIME(ACharacterBase, StaminaRestoreCoolDownTime);
-	DOREPLIFETIME(ACharacterBase, Bearload);
-	DOREPLIFETIME(ACharacterBase, MaxBearload);
-	DOREPLIFETIME(ACharacterBase, EquipLoad);
-	DOREPLIFETIME(ACharacterBase, MaxEquipLoad);
+	DOREPLIFETIME_CONDITION(ACharacterBase, Stamina, COND_OwnerOnly);
+	DOREPLIFETIME_CONDITION(ACharacterBase, MaxStamina, COND_OwnerOnly);
+	DOREPLIFETIME_CONDITION(ACharacterBase, StaminaRestoreSpeed, COND_OwnerOnly);
+	DOREPLIFETIME_CONDITION(ACharacterBase, StaminaRestoreCoolDownTime, COND_OwnerOnly);
+	DOREPLIFETIME_CONDITION(ACharacterBase, Bearload, COND_OwnerOnly);
+	DOREPLIFETIME_CONDITION(ACharacterBase, MaxBearload, COND_OwnerOnly);
+	DOREPLIFETIME_CONDITION(ACharacterBase, EquipLoad, COND_OwnerOnly);
+	DOREPLIFETIME_CONDITION(ACharacterBase, MaxEquipLoad, COND_OwnerOnly);
 }
 
 void ACharacterBase::OnConstruction(const FTransform& Transform)
@@ -393,6 +416,11 @@ void ACharacterBase::SetEquipLoad(float InEquipLoad, const FARPG_PropertyChangeC
 	EquipLoad = InEquipLoad;
 }
 
+bool ACharacterBase::CanRun() const
+{
+	return GetBearload() < GetMaxBearload();
+}
+
 bool ACharacterBase::CanSprint() const
 {
 	return GetStamina() > 0.f;
@@ -493,11 +521,7 @@ void ACharacterBase::InvokeChangeMoveGait(ECharacterGait Gait)
 
 void ACharacterBase::InvokeChangeMoveGaitToServer_Implementation(const ECharacterGait& Gait)
 {
-	if (CanSprint())
-	{
-		ARPG_MovementComponent->bInvokeSprint = (Gait == ECharacterGait::Sprinting);
-	}
-	ARPG_MovementComponent->SetGait(Gait);
+	InvokedGaitState = Gait;
 }
 
 void ACharacterBase::StopMovement()
@@ -1173,12 +1197,14 @@ bool ACharacterBase::WhenCloseTardeItemPanel_Validate()
 
 void ACharacterBase::WhenAddItem(UXD_ItemCoreBase* ItemCore, int32 AddNumber, int32 ExistNumber)
 {
-	Bearload += CastChecked<UARPG_ItemCoreBase>(ItemCore)->GetWeight() * AddNumber;
+	Bearload.SetBaseValue(Bearload.GetBaseValue() + CastChecked<UARPG_ItemCoreBase>(ItemCore)->GetWeight() * AddNumber);
 }
 
 void ACharacterBase::WhenRemoveItem(UXD_ItemCoreBase* ItemCore, int32 RemoveNumber, int32 ExistNumber)
 {
-	Bearload -= CastChecked<UARPG_ItemCoreBase>(ItemCore)->GetWeight() * RemoveNumber;
+	Bearload.SetBaseValue(Bearload.GetBaseValue() - CastChecked<UARPG_ItemCoreBase>(ItemCore)->GetWeight() * RemoveNumber);
+
+	check(Bearload.Value() >= 0);
 }
 
 void ACharacterBase::InvokeUseItem(const class UARPG_ItemCoreBase* ItemCore, EUseItemInput UseItemInput /*= EUseItemInput::LeftMouse*/)
@@ -1234,6 +1260,23 @@ void ACharacterBase::UseItemImmediately(const class UARPG_ItemCoreBase* ItemCore
 			E_ItemCore->UseItem(this, UseItemInput);
 			break;
 		}
+	}
+}
+
+void ACharacterBase::WhenEquip(AARPG_ItemBase* EquipItem)
+{
+	if (HasAuthority())
+	{
+		EquipLoad.SetBaseValue(EquipLoad.GetBaseValue() + EquipItem->GetWeight());
+	}
+}
+
+void ACharacterBase::WhenNotEquip(AARPG_ItemBase* NotEquipItem)
+{
+	if (HasAuthority())
+	{
+		EquipLoad.SetBaseValue(EquipLoad.GetBaseValue() - NotEquipItem->GetWeight());
+		check(EquipLoad.GetBaseValue() >= 0.f);
 	}
 }
 
