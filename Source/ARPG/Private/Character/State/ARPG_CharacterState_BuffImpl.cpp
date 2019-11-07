@@ -38,7 +38,7 @@ void UARPG_CS_Buff_General::WhenTick(float DeltaTime)
 		{
 			UARPG_GameplayFloatPropertyOperatorBase* OperatorProperty = Config.OperatorProperty.GetDefaultObject();
 
-			OperatorProperty->ApplyValue(Config.Operand, Owner, Config.Value, FARPG_PropertyChangeContext(this, Instigator));
+			OperatorProperty->ApplyValue(Config.Operand, Owner, Config.Value * DeltaTime, FARPG_PropertyChangeContext(this, Instigator));
 		}
 	}
 
@@ -68,4 +68,19 @@ void UARPG_CS_Buff_General::WhenDeactived()
 	}
 
 	Super::WhenDeactived();
+}
+
+void UARPG_CS_Buff_General::WhenRepeatActive()
+{
+	switch (GeneralBuffOverlayType)
+	{
+	case EGeneralBuffOverlayType::Replace:
+		ContinuedTime = 0.f;
+		break;
+	case EGeneralBuffOverlayType::ExtendTime:
+		DurationTime += GetClass()->GetDefaultObject<UARPG_CS_Buff_General>()->DurationTime;
+		break;
+	}
+
+	Super::WhenRepeatActive();
 }

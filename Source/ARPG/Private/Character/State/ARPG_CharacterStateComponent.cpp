@@ -36,9 +36,8 @@ void UARPG_CharacterStateComponent::TickComponent(float DeltaTime, ELevelTick Ti
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
 	// ...
-	for (int32 Idx = 0; Idx < ActivedBuffes.Num();)
+	for (UARPG_CharacterState_BuffBase* Buff : ActivedBuffes)
 	{
-		UARPG_CharacterState_BuffBase* Buff = ActivedBuffes[Idx];
 		const float NextContinuedTime = Buff->ContinuedTime + DeltaTime;
 
 		const float IntervalTime = Buff->IntervalTime;
@@ -56,13 +55,9 @@ void UARPG_CharacterStateComponent::TickComponent(float DeltaTime, ELevelTick Ti
 		if (Buff->DurationTime > 0.f && Buff->DurationTime < NextContinuedTime)
 		{
 			Buff->Deactive();
-			ActivedBuffes.RemoveAt(Idx);
-		}
-		else
-		{
-			++Idx;
 		}
 	}
+	ActivedBuffes.RemoveAll([](UARPG_CharacterState_BuffBase* E) {return E->DurationTime > 0.f && E->ContinuedTime > E->DurationTime; });
 
 	for (int32 Idx = 0; Idx < ActivedAccumulations.Num();)
 	{
@@ -148,13 +143,40 @@ void UARPG_CharacterStateComponent::OnRep_ActivedBuffes()
 	PrevActivedBuffes = ActivedBuffes;
 }
 
-void UARPG_CharacterStateComponent::ApplyBuff(TSubclassOf<UARPG_CharacterState_BuffBase> BuffType)
+void UARPG_CharacterStateComponent::ApplyBuffByType(TSubclassOf<UARPG_CharacterState_BuffBase> BuffType)
 {
-	UARPG_CharacterState_BuffBase* Buff = NewObject<UARPG_CharacterState_BuffBase>(this, BuffType);
-	Buff->Owner = CastChecked<ACharacterBase>(GetOwner());
+	if (GetOwner()->HasAuthority() && BuffType)
+	{
+		const bool bAllowMulitSameTypeBuff = BuffType.GetDefaultObject()->bAllowMulitSameTypeBuff;
+		if (bAllowMulitSameTypeBuff == false)
+		{
+			int32 FindIdx = ActivedBuffes.IndexOfByPredicate([&](const UARPG_CharacterState_BuffBase* E) {return E->GetClass() == BuffType; });
+			if (FindIdx != INDEX_NONE)
+			{
+				ActivedBuffes[FindIdx]->RepeatActive();
+				return;
+			}
+		}
+		UARPG_CharacterState_BuffBase* Buff = NewObject<UARPG_CharacterState_BuffBase>(this, BuffType);
+		Buff->Owner = CastChecked<ACharacterBase>(GetOwner());
+		Buff->Active(true);
+		ActivedBuffes.Add(Buff);
+	}
+}
 
-	Buff->Active(true);
-	ActivedBuffes.Add(Buff);
+void UARPG_CharacterStateComponent::RemoveBuffByType(TSubclassOf<UARPG_CharacterState_BuffBase> BuffType)
+{
+	if (GetOwner()->HasAuthority() && BuffType)
+	{
+		for (UARPG_CharacterState_BuffBase* ActivedBuff : ActivedBuffes)
+		{
+			if (ActivedBuff->IsA(BuffType))
+			{
+				ActivedBuff->Deactive();
+			}
+		}
+		ActivedBuffes.RemoveAll([&](UARPG_CharacterState_BuffBase* E) {return E->IsA(BuffType); });
+	}
 }
 
 void UARPG_CharacterStateComponent::OnRep_ActivedAccumulations()

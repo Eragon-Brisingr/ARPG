@@ -300,7 +300,7 @@ void UARPG_AddToughnessValue::NotifyBegin(USkeletalMeshComponent* MeshComp, UAni
 {
 	if (ACharacterBase* Character = Cast<ACharacterBase>(MeshComp->GetOwner()))
 	{
-		Character->ToughnessValue += AddToughnessValue;
+		Character->Toughness.PushAdditiveModifier(FARPG_FloatProperty_ModifyConfig(AddToughnessValue, GetFName(), this, Character));
 	}
 }
 
@@ -308,7 +308,7 @@ void UARPG_AddToughnessValue::NotifyEnd(USkeletalMeshComponent* MeshComp, UAnimS
 {
 	if (ACharacterBase* Character = Cast<ACharacterBase>(MeshComp->GetOwner()))
 	{
-		Character->ToughnessValue -= AddToughnessValue;
+		Character->Toughness.PopAdditiveModifier(FARPG_FloatProperty_ModifyConfig(AddToughnessValue, GetFName(), this, Character));
 	}
 }
 

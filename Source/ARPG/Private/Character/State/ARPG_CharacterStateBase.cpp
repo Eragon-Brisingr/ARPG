@@ -26,9 +26,17 @@ void UARPG_CharacterStateBase::GetLifetimeReplicatedProps(TArray<class FLifetime
 	}
 }
 
+UARPG_CharacterState_BuffBase::UARPG_CharacterState_BuffBase()
+	:bAllowMulitSameTypeBuff(false)
+{
+
+}
+
 void UARPG_CharacterState_BuffBase::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
+	DOREPLIFETIME(UARPG_CharacterState_BuffBase, IntervalTime);
+	DOREPLIFETIME(UARPG_CharacterState_BuffBase, DurationTime);
 	DOREPLIFETIME(UARPG_CharacterState_BuffBase, ContinuedTime);
 }

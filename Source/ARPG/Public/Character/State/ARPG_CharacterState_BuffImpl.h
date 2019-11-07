@@ -40,11 +40,23 @@ public:
 	float Value;
 };
 
+UENUM()
+enum class EGeneralBuffOverlayType : uint8
+{
+	// 用新的覆盖旧的效果
+	Replace,
+	// 延长持续时间
+	ExtendTime
+};
+
 UCLASS(meta = (DisplayName = "一般Buff"))
 class ARPG_API UARPG_CS_Buff_General : public UARPG_CharacterState_BuffBase
 {
 	GENERATED_BODY()
 public:
+	UPROPERTY(EditAnywhere, Category = "Buff", meta = (EditCondition = bAllowMulitSameTypeBuff))
+	EGeneralBuffOverlayType GeneralBuffOverlayType;
+
 	UPROPERTY(EditAnywhere, Category = "Buff")
 	TArray<FGeneralBuffModifierConfig> EffectModifiers;
 
@@ -57,5 +69,6 @@ public:
 
 	void WhenActived(bool IsFirstInit) override;
 	void WhenTick(float DeltaTime) override;
-	void WhenDeactived() override;
+	void WhenDeactived() override; 
+	void WhenRepeatActive() override;
 };

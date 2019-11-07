@@ -17,7 +17,7 @@ public class ARPG_Editor : ModuleRules
             "PropertyEditor",
             "Slate",
             "SlateCore",
-            
+            "AssetTools",
             "NavigationSystem",
 
             "ARPG",

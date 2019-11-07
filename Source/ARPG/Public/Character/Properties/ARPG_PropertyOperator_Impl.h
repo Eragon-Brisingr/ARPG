@@ -137,3 +137,24 @@ public:
 	ARPG_FLOAT_PPROPERTY_MODIFIER_CLASS_DECLARE();
 };
 
+// 削韧积累值
+UCLASS(meta = (DisplayName = "Stamina"))
+class ARPG_API UARPG_HitStunValue_PropertyOperator : public UARPG_GameplayFloatPropertyGetterBase
+{
+	GENERATED_BODY()
+public:
+	FText GetPropertyName() const override;
+
+	float GetValue(const UObject* Owner) const override;
+};
+
+// 强韧度
+UCLASS(meta = (DisplayName = "Toughness"))
+class ARPG_API UARPG_Toughness_PropertyModifier : public UARPG_GameplayFloatPropertyModifierBase
+{
+	GENERATED_BODY()
+public:
+	FText GetPropertyName() const override;
+
+	ARPG_FLOAT_PPROPERTY_MODIFIER_CLASS_DECLARE();
+};

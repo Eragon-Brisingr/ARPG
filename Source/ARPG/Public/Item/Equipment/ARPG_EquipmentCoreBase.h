@@ -6,6 +6,8 @@
 #include "Item/Abstract/ARPG_ItemCoreBase.h"
 #include "ARPG_EquipmentCoreBase.generated.h"
 
+class UARPG_CharacterState_BuffBase;
+
 /**
  * 
  */
@@ -45,4 +47,11 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "装备", meta = (DisplayName = "隐藏内衣"))
 	uint8 bHideUnderwear : 1;
+
+public:
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "装备", meta = (DisplayName = "启用的Buff"))
+	TArray<TSubclassOf<UARPG_CharacterState_BuffBase>> EnableBuffes;
+
+	void WhenUse(ACharacterBase* ItemOwner) override;
+	void WhenNotUse(ACharacterBase* ItemOwner) override;
 };

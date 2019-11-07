@@ -3,6 +3,7 @@
 #include "ARPG_EquipmentCoreBase.h"
 #include "HumanBase.h"
 #include "ARPG_EquipmentBase.h"
+#include "ARPG_CharacterStateComponent.h"
 
 #define LOCTEXT_NAMESPACE "ARPG_Item"
 
@@ -40,6 +41,26 @@ TSubclassOf<AXD_ItemBase> UARPG_EquipmentCoreBase::GetStaticMeshActor() const
 TSubclassOf<AXD_ItemBase> UARPG_EquipmentCoreBase::GetSkeletalMeshActor() const
 {
 	return AARPG_Equipment_SkeletalMesh::StaticClass();
+}
+
+void UARPG_EquipmentCoreBase::WhenUse(ACharacterBase* ItemOwner)
+{
+	for (const TSubclassOf<UARPG_CharacterState_BuffBase>& BuffType : EnableBuffes)
+	{
+		ItemOwner->CharacterStateComponent->ApplyBuffByType(BuffType);
+	}
+
+	Super::WhenUse(ItemOwner);
+}
+
+void UARPG_EquipmentCoreBase::WhenNotUse(ACharacterBase* ItemOwner)
+{
+	for (const TSubclassOf<UARPG_CharacterState_BuffBase>& BuffType : EnableBuffes)
+	{
+		ItemOwner->CharacterStateComponent->RemoveBuffByType(BuffType);
+	}
+
+	Super::WhenNotUse(ItemOwner);
 }
 
 #undef LOCTEXT_NAMESPACE

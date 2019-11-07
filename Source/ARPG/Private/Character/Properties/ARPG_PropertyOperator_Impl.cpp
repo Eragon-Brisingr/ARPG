@@ -153,4 +153,21 @@ FText UARPG_MaxEquipLoad_PropertyModifier::GetPropertyName() const
 
 ARPG_FLOAT_PPROPERTY_MODIFIER_CLASS_IMPL(UARPG_MaxEquipLoad_PropertyModifier, ACharacterBase, MaxEquipLoad);
 
+FText UARPG_HitStunValue_PropertyOperator::GetPropertyName() const
+{
+	return LOCTEXT("削韧积累值", "削韧积累值");
+}
+
+float UARPG_HitStunValue_PropertyOperator::GetValue(const UObject* Owner) const
+{
+	return CastChecked<ACharacterBase>(Owner)->GetHitStunValue();
+}
+
+FText UARPG_Toughness_PropertyModifier::GetPropertyName() const
+{
+	return LOCTEXT("强韧度", "强韧度");
+}
+
+ARPG_FLOAT_PPROPERTY_MODIFIER_CLASS_IMPL(UARPG_Toughness_PropertyModifier, ACharacterBase, Toughness);
+
 #undef LOCTEXT_NAMESPACE

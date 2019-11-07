@@ -37,7 +37,9 @@ public:
 	void OnRep_ActivedBuffes();
 
 	UFUNCTION(BlueprintCallable)
-	void ApplyBuff(TSubclassOf<UARPG_CharacterState_BuffBase> BuffType);
+	void ApplyBuffByType(TSubclassOf<UARPG_CharacterState_BuffBase> BuffType);
+	UFUNCTION(BlueprintCallable)
+	void RemoveBuffByType(TSubclassOf<UARPG_CharacterState_BuffBase> BuffType);
 public:
 	TArray<UARPG_CharacterState_AccumulationBase*> PrevActivedAccumulations;
 	UPROPERTY(SaveGame, ReplicatedUsing = OnRep_ActivedAccumulations, VisibleAnywhere)

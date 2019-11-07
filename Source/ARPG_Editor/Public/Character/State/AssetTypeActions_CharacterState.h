@@ -3,9 +3,9 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "AssetTypeActions_Base.h"
+#include "AssetTypeActions_Blueprint.h"
 
-class ARPG_EDITOR_API FAssetTypeActions_CharacterState : public FAssetTypeActions_Base
+class ARPG_EDITOR_API FAssetTypeActions_CharacterState : public FAssetTypeActions_Blueprint
 {
 public:
 	using Super = FAssetTypeActions_Base;

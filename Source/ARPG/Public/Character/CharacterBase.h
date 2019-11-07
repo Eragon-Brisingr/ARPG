@@ -196,6 +196,27 @@ public:
 	ARPG_FLOAT_PPROPERTY_ACCESSORS(MaxEquipLoad);
 	UFUNCTION(BlueprintCallable, Category = "角色|属性", meta = (CompactNodeTitle = "MaxEquipLoad", DisplayName = "GetMaxEquipLoad"))
 	float K2_GetMaxEquipLoad() const { return MaxEquipLoad.Value(); }
+	
+	// 削韧积累值
+	UPROPERTY(BlueprintReadOnly, Category = "角色|战斗", meta = (DisplayName = "削韧积累值"))
+	float HitStunValue;
+	UFUNCTION(BlueprintCallable, Category = "角色|属性", meta = (CompactNodeTitle = "HitStunValue", DisplayName = "GetHitStunValue"))
+	float GetHitStunValue() const { return HitStunValue; }
+	// 削韧积累值清空时间
+	UPROPERTY(EditDefaultsOnly, Category = "角色|配置")
+	float HitStunClearTime = 30.f;
+
+	// 强韧度，当硬直积累量高于该值则播放硬直动画
+	UPROPERTY(EditAnywhere, Category = "角色|属性", Replicated, meta = (DisplayName = "强韧度"))
+	FARPG_FloatProperty Toughness = 50.f;
+	ARPG_FLOAT_PPROPERTY_ACCESSORS(Toughness);
+	UFUNCTION(BlueprintCallable, Category = "角色|属性", meta = (CompactNodeTitle = "Toughness", DisplayName = "GetToughness"))
+	float K2_GetToughness() const { return Toughness.Value(); }
+
+	// 返回削韧溢出数值，若没溢出则返回-1
+	float AddHitStun(float Value);
+	FTimerHandle ClearHitStun_TimeHandle;
+	void ClearHitStun();
 
 	// 状态
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "角色|状态")
@@ -517,22 +538,6 @@ public:
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "角色|行为")
 	bool IsDefenseSwipeSucceed(const FVector& DamageFromLocation, const FHitResult& HitInfo) const;
 	virtual bool IsDefenseSwipeSucceed_Implementation(const FVector& DamageFromLocation, const FHitResult& HitInfo) const;
-
-	//强韧度，当硬直积累量高于该值则播放硬直动画
-	//只可加减
-	float ToughnessValue = 50.f;
-
-	//削韧积累值
-	UPROPERTY(BlueprintReadOnly, Category = "角色|战斗")
-	float HitStunValue;
-
-	UPROPERTY(EditDefaultsOnly, Category = "角色|配置")
-	float HitStunClearTime = 30.f;
-
-	//返回削韧溢出数值，若没溢出则返回-1
-	float AddHitStun(float Value);
-	FTimerHandle ClearHitStun_TimeHandle;
-	void ClearHitStun();
 
 	UPROPERTY()
 	TMap<class UAnimNotifyState*, class USocketMoveTracer*> SocketMoveTracerMap;

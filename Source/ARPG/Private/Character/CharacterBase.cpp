@@ -416,6 +416,25 @@ void ACharacterBase::SetEquipLoad(float InEquipLoad, const FARPG_PropertyChangeC
 	EquipLoad = InEquipLoad;
 }
 
+float ACharacterBase::AddHitStun(float Value)
+{
+	HitStunValue += Value;
+	if (HitStunValue >= Toughness.Value())
+	{
+		float OverflowValue = HitStunValue - Toughness.Value();
+		HitStunValue = 0;
+		GetWorld()->GetTimerManager().ClearTimer(ClearHitStun_TimeHandle);
+		return OverflowValue;
+	}
+	GetWorld()->GetTimerManager().SetTimer(ClearHitStun_TimeHandle, this, &ACharacterBase::ClearHitStun, HitStunClearTime);
+	return -1;
+}
+
+void ACharacterBase::ClearHitStun()
+{
+	HitStunValue = 0;
+}
+
 bool ACharacterBase::CanRun() const
 {
 	return GetBearload() < GetMaxBearload();
@@ -1325,25 +1344,6 @@ void ACharacterBase::WhenAttackedDefenseCharacter(float BaseDamage, ACharacterBa
 bool ACharacterBase::IsDefenseSwipeSucceed_Implementation(const FVector& DamageFromLocation, const FHitResult& HitInfo) const
 {
 	return bIsDefenseSwipe;
-}
-
-float ACharacterBase::AddHitStun(float Value)
-{
-	HitStunValue += Value;
-	if (HitStunValue >= ToughnessValue)
-	{
-		float OverflowValue = HitStunValue - ToughnessValue;
-		HitStunValue = 0;
-		GetWorld()->GetTimerManager().ClearTimer(ClearHitStun_TimeHandle);
-		return OverflowValue;
-	}
-	GetWorld()->GetTimerManager().SetTimer(ClearHitStun_TimeHandle, this, &ACharacterBase::ClearHitStun, HitStunClearTime);
-	return -1;
-}
-
-void ACharacterBase::ClearHitStun()
-{
-	HitStunValue = 0;
 }
 
 bool ACharacterBase::CanBeBackstab(ACharacterBase* BackstabInvoker) const
