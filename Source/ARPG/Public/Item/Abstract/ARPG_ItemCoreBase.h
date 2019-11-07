@@ -32,17 +32,23 @@ public:
 	FText Describe;
 
 public:
-	UFUNCTION(BlueprintPure, BlueprintNativeEvent, Category = "物品|基础")
-	float GetWeight() const;
-	virtual float GetWeight_Implementation() const { return Weight; }
+	UFUNCTION(BlueprintPure, Category = "物品|基础")
+	virtual float GetWeight() const { return ReceiveGetWeight(); }
+	UFUNCTION(BlueprintPure, BlueprintNativeEvent, Category = "物品|基础", meta = (DisplayName = "GetWeight"))
+	float ReceiveGetWeight() const;
+	float ReceiveGetWeight_Implementation() const { return Weight; }
 
-	UFUNCTION(BlueprintPure, BlueprintNativeEvent, Category = "物品|基础")
-	float GetPrice() const;
-	virtual float GetPrice_Implementation() const { return Price; }
+	UFUNCTION(BlueprintPure, Category = "物品|基础")
+	virtual float GetPrice() const { return ReceiveGetPrice(); }
+	UFUNCTION(BlueprintPure, BlueprintNativeEvent, Category = "物品|基础", meta = (DisplayName = "GetPrice"))
+	float ReceiveGetPrice() const;
+	float ReceiveGetPrice_Implementation() const { return Price; }
 
+	UFUNCTION(BlueprintPure, Category = "物品|基础")
+	virtual FText GetItemTypeDesc() const { return ReceiveGetItemTypeDesc(); }
 	UFUNCTION(BlueprintPure, BlueprintNativeEvent, Category = "物品|基础")
-	FText GetItemTypeDesc() const;
-	virtual FText GetItemTypeDesc_Implementation() const;
+	FText ReceiveGetItemTypeDesc() const;
+	FText ReceiveGetItemTypeDesc_Implementation() const;
 	
 	UFUNCTION(BlueprintPure, Category = "物品|基础")
 	FText GetDescribe() const { return Describe; }
@@ -50,9 +56,9 @@ public:
 	UFUNCTION(BlueprintPure, Category = "物品|基础")
 	float GetTradePrice(class UXD_InventoryComponentBase* Invoker, class UXD_InventoryComponentBase* Trader, ETradePart InvokerTradePart) const;
 public:
-	UFUNCTION(BlueprintNativeEvent, Category = "物品|基础")
-	void UseItem(ACharacterBase* ItemOwner, EUseItemInput UseItemInput);
-	virtual void UseItem_Implementation(ACharacterBase* ItemOwner, EUseItemInput UseItemInput);
+	virtual void UseItem(ACharacterBase* ItemOwner, EUseItemInput UseItemInput);
+	UFUNCTION(BlueprintImplementableEvent, Category = "物品|基础", meta = (DisplayName = "UseItem"))
+	void ReceiveUseItem(ACharacterBase* ItemOwner, EUseItemInput UseItemInput);
 
 	virtual void WhenUse(ACharacterBase* ItemOwner) {}
 	UFUNCTION(BlueprintImplementableEvent, Category = "物品|基础", meta = (DisplayName = "WhenUse"))

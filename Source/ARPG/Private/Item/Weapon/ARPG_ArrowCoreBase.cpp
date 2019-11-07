@@ -13,12 +13,12 @@ UARPG_ArrowCoreBase::UARPG_ArrowCoreBase(const FObjectInitializer& ObjectInitial
 
 }
 
-FText UARPG_ArrowCoreBase::GetItemTypeDesc_Implementation() const
+FText UARPG_ArrowCoreBase::GetItemTypeDesc() const
 {
 	return LOCTEXT("ARPG_ArrowType", "箭");
 }
 
-void UARPG_ArrowCoreBase::UseItem_Implementation(ACharacterBase* ItemOwner, EUseItemInput UseItemInput)
+void UARPG_ArrowCoreBase::UseItem(ACharacterBase* ItemOwner, EUseItemInput UseItemInput)
 {
 	ItemOwner->EquipArrow(this, UseItemInput);
 }

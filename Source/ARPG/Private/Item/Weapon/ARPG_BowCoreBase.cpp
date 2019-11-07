@@ -5,7 +5,7 @@
 
 #define LOCTEXT_NAMESPACE "ARPG_Item"
 
-FText UARPG_BowCoreBase::GetItemTypeDesc_Implementation() const
+FText UARPG_BowCoreBase::GetItemTypeDesc() const
 {
 	return LOCTEXT("ARPG_BowType", "弓");
 }

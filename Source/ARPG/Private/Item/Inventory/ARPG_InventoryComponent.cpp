@@ -2,7 +2,7 @@
 
 #include "ARPG_InventoryComponent.h"
 #include "ARPG_ItemCoreBase.h"
-#include "ARPG_MoneyBase.h"
+#include "ARPG_MoneyCoreBase.h"
 #include "CharacterBase.h"
 #include "XD_TemplateLibrary.h"
 
@@ -64,7 +64,7 @@ bool UARPG_InventoryComponent::SpendMoney(int32 SpandStandardMoney, TArray<class
 			//TODO: 游戏性相关，应该允许金钱使用的排序策略
 			for (UXD_ItemCoreBase* ItemCore : ItemCoreList)
 			{
-				if (UARPG_MoneyBase* Money = Cast<UARPG_MoneyBase>(ItemCore))
+				if (UARPG_MoneyCoreBase* Money = Cast<UARPG_MoneyCoreBase>(ItemCore))
 				{
 					int32 Temp = SpandStandardMoney;
 					SpandStandardMoney -= ItemCore->Number * Money->GetPrice();
@@ -88,7 +88,7 @@ float UARPG_InventoryComponent::GetStandardMoneyNumber() const
 	float StandardMoney = 0.f;
 	for (UXD_ItemCoreBase* ItemCore : ItemCoreList)
 	{
-		if (const UARPG_MoneyBase* Money = Cast<UARPG_MoneyBase>(ItemCore))
+		if (const UARPG_MoneyCoreBase* Money = Cast<UARPG_MoneyCoreBase>(ItemCore))
 		{
 			StandardMoney += ItemCore->Number * Money->GetPrice();
 		}

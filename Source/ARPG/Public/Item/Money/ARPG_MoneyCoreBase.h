@@ -3,18 +3,17 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "ARPG_WeaponCoreBase.h"
-#include "ARPG_BowCoreBase.generated.h"
+#include "ARPG_ItemCoreBase.h"
+#include "ARPG_MoneyCoreBase.generated.h"
 
 /**
  * 
  */
-UCLASS(abstract, meta = (DisplayName = "弓"))
-class ARPG_API UARPG_BowCoreBase : public UARPG_WeaponCoreBase
+UCLASS(abstract, meta = (DisplayName = "金钱"))
+class ARPG_API UARPG_MoneyCoreBase : public UARPG_ItemCoreBase
 {
 	GENERATED_BODY()
-	
-public:
+public:	
 	FText GetItemTypeDesc() const override;
 	TSubclassOf<AXD_ItemBase> GetStaticMeshActor() const override;
 	TSubclassOf<AXD_ItemBase> GetSkeletalMeshActor() const override;

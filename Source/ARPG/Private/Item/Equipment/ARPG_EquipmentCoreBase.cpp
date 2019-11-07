@@ -7,12 +7,12 @@
 
 #define LOCTEXT_NAMESPACE "ARPG_Item"
 
-FText UARPG_EquipmentCoreBase::GetItemTypeDesc_Implementation() const
+FText UARPG_EquipmentCoreBase::GetItemTypeDesc() const
 {
 	return LOCTEXT("ARPG_Equipment", "装备");
 }
 
-void UARPG_EquipmentCoreBase::UseItem_Implementation(ACharacterBase* ItemOwner, EUseItemInput UseItemInput)
+void UARPG_EquipmentCoreBase::UseItem(ACharacterBase* ItemOwner, EUseItemInput UseItemInput)
 {
 	ItemOwner->EquipEquipment(this, UseItemInput);
 }

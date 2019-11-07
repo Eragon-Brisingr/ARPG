@@ -31,8 +31,8 @@ class ARPG_API UARPG_WeaponCoreBase : public UARPG_ItemCoreBase
 public:
 	UARPG_WeaponCoreBase(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
-	FText GetItemTypeDesc_Implementation() const override;
-	void UseItem_Implementation(ACharacterBase* ItemOwner, EUseItemInput UseItemInput) override;
+	FText GetItemTypeDesc() const override;
+	void UseItem(ACharacterBase* ItemOwner, EUseItemInput UseItemInput) override;
 	void WhenRemoveFromInventory(class AActor* ItemOwner, int32 RemoveNumber, int32 ExistNumber) override;
 	TSubclassOf<AXD_ItemBase> GetStaticMeshActor() const override;
 	TSubclassOf<AXD_ItemBase> GetSkeletalMeshActor() const override;

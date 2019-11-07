@@ -10,11 +10,15 @@
 
 TSubclassOf<AXD_ItemBase> UARPG_ItemCoreBase::GetStaticMeshActor() const
 {
+	// 要求每个子道具种类自己实现自己道具类型的实例
+	checkNoEntry();
 	return AARPG_Item_StaticMesh::StaticClass();
 }
 
 TSubclassOf<AXD_ItemBase> UARPG_ItemCoreBase::GetSkeletalMeshActor() const
 {
+	// 要求每个子道具种类自己实现自己道具类型的实例
+	checkNoEntry();
 	return AARPG_Item_SkeletalMesh::StaticClass();
 }
 
@@ -24,7 +28,7 @@ UARPG_ItemCoreBase::UARPG_ItemCoreBase(const FObjectInitializer& ObjectInitializ
 
 }
 
-FText UARPG_ItemCoreBase::GetItemTypeDesc_Implementation() const
+FText UARPG_ItemCoreBase::ReceiveGetItemTypeDesc_Implementation() const
 {
 	return LOCTEXT("ARPG_ItemBase ItemTypeDesc", "物品");
 }
@@ -35,9 +39,9 @@ float UARPG_ItemCoreBase::GetTradePrice(class UXD_InventoryComponentBase* Invoke
 	return GetPrice() * 1.f;
 }
 
-void UARPG_ItemCoreBase::UseItem_Implementation(class ACharacterBase* ItemOwner, EUseItemInput UseItemInput)
+void UARPG_ItemCoreBase::UseItem(class ACharacterBase* ItemOwner, EUseItemInput UseItemInput)
 {
-	unimplemented();
+	ReceiveUseItem(ItemOwner, UseItemInput);
 }
 
 #undef LOCTEXT_NAMESPACE

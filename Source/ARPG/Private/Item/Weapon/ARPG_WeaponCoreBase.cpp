@@ -13,12 +13,12 @@ UARPG_WeaponCoreBase::UARPG_WeaponCoreBase(const FObjectInitializer& ObjectIniti
 	AttackAnimSet = CreateOptionalDefaultSubobject<UARPG_AttackAnimSetNormal>(GET_MEMBER_NAME_CHECKED(UARPG_WeaponCoreBase, AttackAnimSet));
 }
 
-FText UARPG_WeaponCoreBase::GetItemTypeDesc_Implementation() const
+FText UARPG_WeaponCoreBase::GetItemTypeDesc() const
 {
 	return LOCTEXT("ARPG_WeaponType", "武器");
 }
 
-void UARPG_WeaponCoreBase::UseItem_Implementation(ACharacterBase* ItemOwner, EUseItemInput UseItemInput)
+void UARPG_WeaponCoreBase::UseItem(ACharacterBase* ItemOwner, EUseItemInput UseItemInput)
 {
 	ItemOwner->EquipWaepon(this, UseItemInput);
 }
