@@ -14,7 +14,16 @@ UARPG_ActionDispatcherBase::UARPG_ActionDispatcherBase()
 
 namespace ActionCompatibleMapUtils
 {
-	static TArray<TSubclassOf<UXD_DispatchableActionBase>> ActionIdxs = { UARPG_DA_RoleSelectionBase::StaticClass(), UARPG_DA_PlayMontage::StaticClass(), UARPG_DA_SpeakOneSentence::StaticClass() };
+	// 这边的顺序必须与ActionCompatibleMap一致
+	const TArray<TSubclassOf<UXD_DispatchableActionBase>>& GetActionIdxs()
+	{
+		static TArray<TSubclassOf<UXD_DispatchableActionBase>> ActionIdxs = { 
+			UARPG_DA_RoleSelectionBase::StaticClass(), 
+			UARPG_DA_PlayMontage::StaticClass(), 
+			UARPG_DA_SpeakOneSentence::StaticClass() 
+		};
+		return ActionIdxs;
+	}
 	static TArray<TArray<bool>> ActionCompatibleMap =
 	{								/*RoleSelectionBase*/	/*PlayMontage*/		/*SpeakOneSentence*/
 		/*RoleSelectionBase*/		{false,					true,				true},
@@ -25,7 +34,7 @@ namespace ActionCompatibleMapUtils
 	{
 		for (TSubclassOf<UXD_DispatchableActionBase> Class = Action->GetClass(); Class->IsChildOf<UXD_DispatchableActionBase>(); Class = Class->GetSuperClass())
 		{
-			int32 Idx = ActionIdxs.IndexOfByKey(Class);
+			int32 Idx = GetActionIdxs().IndexOfByKey(Class);
 			if (Idx != INDEX_NONE)
 			{
 				return Idx;
@@ -33,10 +42,9 @@ namespace ActionCompatibleMapUtils
 		}
 		return INDEX_NONE;
 	};
-
 	bool ActionIsBothCompatible(UXD_DispatchableActionBase* LHS, UXD_DispatchableActionBase* RHS)
 	{
-		check(ActionCompatibleMap.Num() == ActionIdxs.Num());
+		check(ActionCompatibleMap.Num() == GetActionIdxs().Num());
 
 		int32 LHS_Idx = GetActionIdx(LHS);
 		int32 RHS_Idx = GetActionIdx(RHS);
