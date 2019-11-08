@@ -6,13 +6,15 @@
 #include "GameFramework/PlayerController.h"
 #include "ARPG_LockOnTargetSystem.h"
 #include "GenericTeamAgentInterface.h"
+#include "XD_SaveGameInterface.h"
 #include "ARPG_PlayerControllerBase.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class ARPG_API AARPG_PlayerControllerBase : public APlayerController
+class ARPG_API AARPG_PlayerControllerBase : public APlayerController, 
+	public IXD_SaveGameInterface
 {
 	GENERATED_BODY()
 	
@@ -22,6 +24,12 @@ public:
 	virtual void Tick(float DeltaSeconds) override;
 	
 	void GetLifetimeReplicatedProps(TArray< class FLifetimeProperty > & OutLifetimeProps) const override;
+
+public:
+	void OnPossess(APawn* aPawn) override;
+
+	bool NeedSave_Implementation() const override { return false; }
+	void WhenGameInit_Implementation() override;
 public:
 	UPROPERTY(EditAnywhere, Category = "锁定系统", meta = (ShowOnlyInnerProperties))
 	FARPG_LockOnTargetSystem LockOnTargetSystem;

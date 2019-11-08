@@ -8,6 +8,8 @@
 #include "XD_SaveGameInterface.h"
 #include "ARPG_WorldSettingsBase.generated.h"
 
+class UARPG_ItemCoreBase;
+
 /**
  * 
  */
@@ -27,4 +29,10 @@ public:
 	bool NeedSave_Implementation() const override;
 
 	bool IsMainWorldSettings() const;
+
+public:
+#if WITH_EDITORONLY_DATA
+	UPROPERTY(EditAnywhere, Instanced, Category = "游戏性配置")
+	TArray<UARPG_ItemCoreBase*> PlayerInitItems;
+#endif
 };

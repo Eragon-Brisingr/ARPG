@@ -5,6 +5,8 @@
 #include "ARPG_PathFollowingComponent.h"
 #include "UnrealNetwork.h"
 #include "ARPG_GameTaskManager.h"
+#include "ARPG_WorldSettingsBase.h"
+#include "ARPG_InventoryComponent.h"
 
 
 AARPG_PlayerControllerBase::AARPG_PlayerControllerBase()
@@ -33,6 +35,25 @@ void AARPG_PlayerControllerBase::GetLifetimeReplicatedProps(TArray< class FLifet
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME(AARPG_PlayerControllerBase, bIsInPathFollowing);
+}
+
+void AARPG_PlayerControllerBase::OnPossess(APawn* aPawn)
+{
+	Super::OnPossess(aPawn);
+
+}
+
+void AARPG_PlayerControllerBase::WhenGameInit_Implementation()
+{
+#if WITH_EDITOR
+	if (ACharacterBase* ControlledCharacter = Cast<ACharacterBase>(GetPawn()))
+	{
+		if (AARPG_WorldSettingsBase* ARPG_WorldSettings = Cast<AARPG_WorldSettingsBase>(GetWorld()->GetWorldSettings()))
+		{
+			ControlledCharacter->Inventory->AddItemArray(ARPG_WorldSettings->PlayerInitItems);
+		}
+	}
+#endif
 }
 
 AActor* AARPG_PlayerControllerBase::GetLockedTarget() const
