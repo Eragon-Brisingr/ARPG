@@ -2,6 +2,7 @@
 
 
 #include "ARPG_PropCoreBase.h"
+#include <UnrealNetwork.h>
 #include "ARPG_PropBase.h"
 #include "ARPG_PropertyOperator.h"
 #include "CharacterBase.h"
@@ -9,16 +10,36 @@
 
 #define LOCTEXT_NAMESPACE "ARPG_Item"
 
+void UARPG_CS_PropBuff_Modifier::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(UARPG_CS_PropBuff_Modifier, EffectProperty);
+	DOREPLIFETIME(UARPG_CS_PropBuff_Modifier, AdditiveValue);
+	DOREPLIFETIME(UARPG_CS_PropBuff_Modifier, MultipleAdditiveValue);
+}
+
 void UARPG_CS_PropBuff_Modifier::WhenActived(bool IsFirstInit)
 {
-	EffectProperty.GetDefaultObject()->PushAdditiveModifier(Owner, FARPG_FloatProperty_ModifyConfig(AdditiveValue, NAME_None, this, Instigator));
-	EffectProperty.GetDefaultObject()->PushMultipleModifier(Owner, FARPG_FloatProperty_ModifyConfig(MultipleAdditiveValue, NAME_None, this, Instigator));
+	if (HasAuthority())
+	{
+		EffectProperty.GetDefaultObject()->PushAdditiveModifier(Owner, FARPG_FloatProperty_ModifyConfig(AdditiveValue, NAME_None, this, Instigator));
+		EffectProperty.GetDefaultObject()->PushMultipleModifier(Owner, FARPG_FloatProperty_ModifyConfig(MultipleAdditiveValue, NAME_None, this, Instigator));
+	}
 }
 
 void UARPG_CS_PropBuff_Modifier::WhenDeactived()
 {
-	EffectProperty.GetDefaultObject()->PopAdditiveModifier(Owner, FARPG_FloatProperty_ModifyConfig(AdditiveValue, NAME_None, this, Instigator));
-	EffectProperty.GetDefaultObject()->PushMultipleModifier(Owner, FARPG_FloatProperty_ModifyConfig(MultipleAdditiveValue, NAME_None, this, Instigator));
+	if (HasAuthority())
+	{
+		EffectProperty.GetDefaultObject()->PopAdditiveModifier(Owner, FARPG_FloatProperty_ModifyConfig(AdditiveValue, NAME_None, this, Instigator));
+		EffectProperty.GetDefaultObject()->PushMultipleModifier(Owner, FARPG_FloatProperty_ModifyConfig(MultipleAdditiveValue, NAME_None, this, Instigator));
+	}
+}
+
+FText UARPG_CS_PropBuff_Modifier::GetStateName() const
+{
+	return FText::Format(LOCTEXT("PropBuff_Modifier 命名", "影响{0}"), EffectProperty ? EffectProperty.GetDefaultObject()->GetPropertyName() : FText::GetEmpty());
 }
 
 void UARPG_CS_PropBuff_Modifier::SetAdditiveValueAfterActived(float Value)
@@ -29,13 +50,30 @@ void UARPG_CS_PropBuff_Modifier::SetAdditiveValueAfterActived(float Value)
 
 void UARPG_CS_PropBuff_Modifier::SetMultipleValueAfterActived(float Value)
 {
-	EffectProperty.GetDefaultObject()->ChangePushedMultipleModifier(Owner, FARPG_FloatProperty_ModifyConfig(AdditiveValue, NAME_None, this, Instigator), FARPG_FloatProperty_ModifyConfig(Value, NAME_None, this, Instigator));
+	EffectProperty.GetDefaultObject()->ChangePushedMultipleModifier(Owner, FARPG_FloatProperty_ModifyConfig(MultipleAdditiveValue, NAME_None, this, Instigator), FARPG_FloatProperty_ModifyConfig(Value, NAME_None, this, Instigator));
 	MultipleAdditiveValue = Value;
+}
+
+void UARPG_CS_PropBuff_Operator::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(UARPG_CS_PropBuff_Operator, EffectProperty);
+	DOREPLIFETIME(UARPG_CS_PropBuff_Operator, TickAdditiveValue);
+	DOREPLIFETIME(UARPG_CS_PropBuff_Operator, TickMultipleValue);
 }
 
 void UARPG_CS_PropBuff_Operator::WhenTick(float DeltaTime)
 {
-	EffectProperty.GetDefaultObject()->AddValue(Owner, TickAdditiveValue * DeltaTime, FARPG_PropertyChangeContext(this, Instigator));
+	if (HasAuthority())
+	{
+		EffectProperty.GetDefaultObject()->AddValue(Owner, TickAdditiveValue * DeltaTime, FARPG_PropertyChangeContext(this, Instigator));
+	}
+}
+
+FText UARPG_CS_PropBuff_Operator::GetStateName() const
+{
+	return FText::Format(LOCTEXT("PropBuff_Operator 命名", "持续修改{0}"), EffectProperty ? EffectProperty.GetDefaultObject()->GetPropertyName() : FText::GetEmpty());
 }
 
 FText UARPG_PropCoreBase::GetItemTypeDesc() const
@@ -221,6 +259,8 @@ void UARPG_PropCore_General::UseItem(ACharacterBase* ItemOwner, EUseItemInput Us
 	}
 
 	Super::UseItem(ItemOwner, UseItemInput);
+
+	RemoveItemCore(ItemOwner);
 }
 
 #undef LOCTEXT_NAMESPACE

@@ -11,7 +11,7 @@ class ACharacterBase;
 /**
  * 
  */
-UCLASS(meta = (DisplayName = "状态"))
+UCLASS(BlueprintType, meta = (DisplayName = "状态"))
 class ARPG_API UARPG_CharacterStateBase : public UObject
 {
 	GENERATED_BODY()
@@ -25,7 +25,12 @@ public:
 	UPROPERTY(BlueprintReadOnly)
 	TSoftObjectPtr<UObject> Instigator;
 
+	UFUNCTION(BlueprintCallable, Category = "State")
 	virtual FText GetDiscribe() const { unimplemented(); return FText::GetEmpty(); };
+	UFUNCTION(BlueprintCallable, Category = "State")
+	virtual FText GetStateName() const { unimplemented(); return FText::GetEmpty(); }
+protected:
+	bool HasAuthority() const;
 };
 
 UCLASS(meta = (DisplayName = "积累状态"))

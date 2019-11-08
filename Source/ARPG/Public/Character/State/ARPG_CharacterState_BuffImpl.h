@@ -54,6 +54,9 @@ class ARPG_API UARPG_CS_Buff_General : public UARPG_CharacterState_BuffBase
 {
 	GENERATED_BODY()
 public:
+	UPROPERTY(EditAnywhere, Category = "Buff", DisplayName = "Buff名")
+	FText BuffName;
+
 	UPROPERTY(EditAnywhere, Category = "Buff", meta = (EditCondition = bAllowMulitSameTypeBuff, DisplayName = "覆盖方式"))
 	EGeneralBuffOverlayType GeneralBuffOverlayType;
 
@@ -71,4 +74,5 @@ public:
 	void WhenTick(float DeltaTime) override;
 	void WhenDeactived() override; 
 	void WhenRepeatActive() override;
+	FText GetStateName() const override { return BuffName; }
 };

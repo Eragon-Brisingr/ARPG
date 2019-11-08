@@ -4,6 +4,7 @@
 #include "ARPG_CharacterStateBase.h"
 #include <UnrealNetwork.h>
 #include <Engine/BlueprintGeneratedClass.h>
+#include <CharacterBase.h>
 
 UWorld* UARPG_CharacterStateBase::GetWorld() const
 {
@@ -24,6 +25,11 @@ void UARPG_CharacterStateBase::GetLifetimeReplicatedProps(TArray<class FLifetime
 	{
 		BPClass->GetLifetimeBlueprintReplicationList(OutLifetimeProps);
 	}
+}
+
+inline bool UARPG_CharacterStateBase::HasAuthority() const 
+{ 
+	return Owner->HasAuthority(); 
 }
 
 UARPG_CharacterState_BuffBase::UARPG_CharacterState_BuffBase()

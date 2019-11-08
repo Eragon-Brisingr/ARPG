@@ -32,7 +32,7 @@ public:
 	bool ReplicateSubobjects(class UActorChannel* Channel, class FOutBunch* Bunch, FReplicationFlags* RepFlags) override;
 public:
 	TArray<UARPG_CharacterState_BuffBase*> PrevActivedBuffes;
-	UPROPERTY(SaveGame, ReplicatedUsing = OnRep_ActivedBuffes, VisibleAnywhere)
+	UPROPERTY(SaveGame, ReplicatedUsing = OnRep_ActivedBuffes, VisibleAnywhere, BlueprintReadOnly, Category = "角色|状态")
 	TArray<UARPG_CharacterState_BuffBase*> ActivedBuffes;
 	UFUNCTION()
 	void OnRep_ActivedBuffes();
@@ -43,13 +43,35 @@ public:
 	void RemoveBuffByType(TSubclassOf<UARPG_CharacterState_BuffBase> BuffType);
 
 	void AddBuffByRef(UARPG_CharacterState_BuffBase* BuffInstance, const FARPG_PropertyChangeContext& ChangeContext);
+	
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnBuffAdded, UARPG_CharacterState_BuffBase*, Buff);
+	UPROPERTY(BlueprintAssignable, Category = "角色|状态")
+	FOnBuffAdded OnBuffAdded;
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnBuffRemoved, UARPG_CharacterState_BuffBase*, Buff);
+	UPROPERTY(BlueprintAssignable, Category = "角色|状态")
+	FOnBuffRemoved OnBuffRemoved;
+
+private:
+	void WhenBuffAdded(UARPG_CharacterState_BuffBase* Buff);
+	void WhenBuffRemoved(UARPG_CharacterState_BuffBase* Buff);
 public:
 	TArray<UARPG_CharacterState_AccumulationBase*> PrevActivedAccumulations;
-	UPROPERTY(SaveGame, ReplicatedUsing = OnRep_ActivedAccumulations, VisibleAnywhere)
+	UPROPERTY(SaveGame, ReplicatedUsing = OnRep_ActivedAccumulations, VisibleAnywhere, BlueprintReadOnly, Category = "角色|状态")
 	TArray<UARPG_CharacterState_AccumulationBase*> ActivedAccumulations;
 	UFUNCTION()
 	void OnRep_ActivedAccumulations();
 
 	UFUNCTION(BlueprintCallable)
 	void AddAccumulation(TSubclassOf<UARPG_CharacterState_AccumulationBase> AccumulationType, float AddAccumulationValue);
+
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnAccumulationAdded, UARPG_CharacterState_AccumulationBase*, Accumulation);
+	UPROPERTY(BlueprintAssignable, Category = "角色|状态")
+	FOnAccumulationAdded OnAccumulationAdded;
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnAccumulationRemoved, UARPG_CharacterState_AccumulationBase*, Accumulation);
+	UPROPERTY(BlueprintAssignable, Category = "角色|状态")
+	FOnAccumulationRemoved OnAccumulationRemoved;
+
+private:
+	void WhenAccumulationAdded(UARPG_CharacterState_AccumulationBase* Accumulation);
+	void WhenAccumulationRemoved(UARPG_CharacterState_AccumulationBase* Accumulation);
 };

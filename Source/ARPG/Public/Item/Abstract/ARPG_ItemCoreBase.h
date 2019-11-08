@@ -73,4 +73,7 @@ public:
 	UAnimMontage* UseItemMontage;
 	UPROPERTY(EditDefaultsOnly, Category = "物品", meta = (DisplayName = "使用时位置插槽"))
 	FName UseItemAttachSocketName;
+
+protected:
+	void RemoveItemCore(ACharacterBase* ItemOwner, int32 RemoveNumber = 1) const;
 };

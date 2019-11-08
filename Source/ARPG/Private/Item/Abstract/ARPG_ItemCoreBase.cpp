@@ -5,6 +5,7 @@
 #include "CharacterBase.h"
 #include "ARPG_Item_Log.h"
 #include "ARPG_DebugFunctionLibrary.h"
+#include "ARPG_InventoryComponent.h"
 
 #define LOCTEXT_NAMESPACE "ARPG_Item"
 
@@ -42,6 +43,11 @@ float UARPG_ItemCoreBase::GetTradePrice(class UXD_InventoryComponentBase* Invoke
 void UARPG_ItemCoreBase::UseItem(class ACharacterBase* ItemOwner, EUseItemInput UseItemInput)
 {
 	ReceiveUseItem(ItemOwner, UseItemInput);
+}
+
+void UARPG_ItemCoreBase::RemoveItemCore(ACharacterBase* ItemOwner, int32 RemoveNumber) const
+{
+	ItemOwner->Inventory->RemoveItemCore(this, RemoveNumber);
 }
 
 #undef LOCTEXT_NAMESPACE

@@ -94,15 +94,17 @@ public:
 		IntervalTime = -1.f;
 	}
 
+	void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
 	void WhenActived(bool IsFirstInit) override;
 	void WhenDeactived() override;
+	FText GetStateName() const override;
 
-	UPROPERTY(SaveGame)
+	UPROPERTY(SaveGame, Replicated)
 	TSubclassOf<UARPG_GameplayFloatPropertyModifierBase> EffectProperty;
 
-	UPROPERTY(SaveGame)
+	UPROPERTY(SaveGame, Replicated)
 	float AdditiveValue;
-	UPROPERTY(SaveGame)
+	UPROPERTY(SaveGame, Replicated)
 	float MultipleAdditiveValue;
 public:
 	void SetAdditiveValueAfterActived(float Value);
@@ -119,14 +121,16 @@ public:
 		bAllowMulitSameTypeBuff = true;
 	}
 
+	void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
 	void WhenTick(float DeltaTime) override;
+	FText GetStateName() const override;
 
-	UPROPERTY(SaveGame)
+	UPROPERTY(SaveGame, Replicated)
 	TSubclassOf<UARPG_GameplayFloatPropertyOperatorBase> EffectProperty;
 
-	UPROPERTY(SaveGame)
+	UPROPERTY(SaveGame, Replicated)
 	float TickAdditiveValue;
-	UPROPERTY(SaveGame)
+	UPROPERTY(SaveGame, Replicated)
 	float TickMultipleValue = 1.f;
 };
 

@@ -32,7 +32,7 @@ public:
 
 public:
 #if WITH_EDITORONLY_DATA
-	UPROPERTY(EditAnywhere, Instanced, Category = "游戏性配置")
+	UPROPERTY(EditAnywhere, Instanced, Category = "游戏性配置", meta = (DisplayName = "玩家初始道具", ConfigUseItem = true))
 	TArray<UARPG_ItemCoreBase*> PlayerInitItems;
 #endif
 };

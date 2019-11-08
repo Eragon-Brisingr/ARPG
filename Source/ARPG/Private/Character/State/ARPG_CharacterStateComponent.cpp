@@ -54,7 +54,7 @@ void UARPG_CharacterStateComponent::TickComponent(float DeltaTime, ELevelTick Ti
 
 		if (Buff->DurationTime > 0.f && Buff->DurationTime < NextContinuedTime)
 		{
-			Buff->Deactive();
+			WhenBuffRemoved(Buff);
 		}
 	}
 	ActivedBuffes.RemoveAll([](UARPG_CharacterState_BuffBase* E) {return E->DurationTime > 0.f && E->ContinuedTime > E->DurationTime; });
@@ -128,7 +128,7 @@ void UARPG_CharacterStateComponent::OnRep_ActivedBuffes()
 		if (AddBuff)
 		{
 			AddBuff->Owner = Owner;
-			AddBuff->Active(true);
+			WhenBuffAdded(AddBuff);
 		}
 	}
 
@@ -136,7 +136,7 @@ void UARPG_CharacterStateComponent::OnRep_ActivedBuffes()
 	{
 		if (RemoveBuff)
 		{
-			RemoveBuff->Deactive();
+			WhenBuffRemoved(RemoveBuff);
 		}
 	}
 
@@ -170,7 +170,7 @@ void UARPG_CharacterStateComponent::RemoveBuffByType(TSubclassOf<UARPG_Character
 		{
 			if (ActivedBuff->IsA(BuffType))
 			{
-				ActivedBuff->Deactive();
+				WhenBuffRemoved(ActivedBuff);
 			}
 		}
 		ActivedBuffes.RemoveAll([&](UARPG_CharacterState_BuffBase* E) {return E->IsA(BuffType); });
@@ -181,8 +181,20 @@ void UARPG_CharacterStateComponent::AddBuffByRef(UARPG_CharacterState_BuffBase* 
 {
 	BuffInstance->Owner = CastChecked<ACharacterBase>(GetOwner());
 	BuffInstance->Instigator = ChangeContext.Instigator;
-	BuffInstance->Active(true);
 	ActivedBuffes.Add(BuffInstance);
+	WhenBuffAdded(BuffInstance);
+}
+
+void UARPG_CharacterStateComponent::WhenBuffAdded(UARPG_CharacterState_BuffBase* Buff)
+{
+	Buff->Active(true);
+	OnBuffAdded.Broadcast(Buff);
+}
+
+void UARPG_CharacterStateComponent::WhenBuffRemoved(UARPG_CharacterState_BuffBase* Buff)
+{
+	Buff->Deactive();
+	OnBuffRemoved.Broadcast(Buff);
 }
 
 void UARPG_CharacterStateComponent::OnRep_ActivedAccumulations()
@@ -193,6 +205,7 @@ void UARPG_CharacterStateComponent::OnRep_ActivedAccumulations()
 		if (Accumulation)
 		{
 			Accumulation->Owner = Owner;
+			WhenAccumulationAdded(Accumulation);
 		}
 	}
 
@@ -200,7 +213,7 @@ void UARPG_CharacterStateComponent::OnRep_ActivedAccumulations()
 	{
 		if (Accumulation)
 		{
-
+			WhenAccumulationRemoved(Accumulation);
 		}
 	}
 
@@ -218,6 +231,7 @@ void UARPG_CharacterStateComponent::AddAccumulation(TSubclassOf<UARPG_CharacterS
 		Accumulation->Owner = CastChecked<ACharacterBase>(GetOwner());
 		Accumulation->AccumulationValue = AddAccumulationValue;
 		ActivedAccumulations.Add(Accumulation);
+		WhenAccumulationAdded(Accumulation);
 	}
 	else
 	{
@@ -229,5 +243,16 @@ void UARPG_CharacterStateComponent::AddAccumulation(TSubclassOf<UARPG_CharacterS
 	{
 		ActivedAccumulations.Remove(Accumulation);
 		Accumulation->Overflow();
+		WhenAccumulationRemoved(Accumulation);
 	}
+}
+
+void UARPG_CharacterStateComponent::WhenAccumulationAdded(UARPG_CharacterState_AccumulationBase* Accumulation)
+{
+	OnAccumulationAdded.Broadcast(Accumulation);
+}
+
+void UARPG_CharacterStateComponent::WhenAccumulationRemoved(UARPG_CharacterState_AccumulationBase* Accumulation)
+{
+	OnAccumulationRemoved.Broadcast(Accumulation);
 }
