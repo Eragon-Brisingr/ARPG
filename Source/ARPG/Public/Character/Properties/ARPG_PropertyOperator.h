@@ -34,6 +34,7 @@ public:
 	void ApplyValue(EARPG_PropertyOperatorOperand Operand, UObject* Owner, float Value, const FARPG_PropertyChangeContext& ChangeContext);
 };
 
+// 属性修改器维持了属性的状态，激活时添加修改，反激活后回退修改
 UCLASS(const, BlueprintType, hidedropdown)
 class ARPG_API UARPG_GameplayFloatPropertyModifierBase : public UARPG_GameplayFloatPropertyGetterBase
 {
@@ -44,8 +45,14 @@ public:
 	virtual void PushMultipleModifier(UObject* Owner, const FARPG_FloatProperty_ModifyConfig& ModifyConfig) { unimplemented(); }
 	virtual void PopMultipleModifier(UObject* Owner, const FARPG_FloatProperty_ModifyConfig& ModifyConfig) { unimplemented(); }
 
+	// 这个函数不应该触发其它受影响的属性
+	virtual void ChangePushedAdditiveModifier(UObject* Owner, const FARPG_FloatProperty_ModifyConfig& OldModifyConfig, const FARPG_FloatProperty_ModifyConfig& ChangeToModifyConfig);
+	// 这个函数不应该触发其它受影响的属性
+	virtual void ChangePushedMultipleModifier(UObject* Owner, const FARPG_FloatProperty_ModifyConfig& OldModifyConfig, const FARPG_FloatProperty_ModifyConfig& ChangeToModifyConfig);
+
 	void PushModifier(EARPG_PropertyModifierOperand Operand, UObject* Owner, const FARPG_FloatProperty_ModifyConfig& ModifyConfig);
 	void PopModifier(EARPG_PropertyModifierOperand Operand, UObject* Owner, const FARPG_FloatProperty_ModifyConfig& ModifyConfig);
+	void ChangePushedModifier(EARPG_PropertyModifierOperand Operand, UObject* Owner, const FARPG_FloatProperty_ModifyConfig& OldModifyConfig, const FARPG_FloatProperty_ModifyConfig& ChangeToModifyConfig);
 };
 
 UCLASS(const)

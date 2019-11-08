@@ -82,28 +82,14 @@ public:
 	}
 
 	FORCEINLINE float GetAdditiveValue() const { return Additive; }
-	void PushAdditiveModifier(const FARPG_FloatProperty_ModifyConfig& ModifyConfig)
-	{
-		Additive += ModifyConfig.Value;
-		UpdateFinalValue();
-	}
-	void PopAdditiveModifier(const FARPG_FloatProperty_ModifyConfig& ModifyConfig)
-	{
-		Additive -= ModifyConfig.Value;
-		UpdateFinalValue();
-	}
+	void PushAdditiveModifier(const FARPG_FloatProperty_ModifyConfig& ModifyConfig);
+	void PopAdditiveModifier(const FARPG_FloatProperty_ModifyConfig& ModifyConfig);
+	void ChangePushedAdditiveModifier(const FARPG_FloatProperty_ModifyConfig& OldModifyConfig, const FARPG_FloatProperty_ModifyConfig& ChangeToModifyConfig);
 
 	FORCEINLINE float GetMultipleValue() const { return Multiple; }
-	void PushMultipleModifier(const FARPG_FloatProperty_ModifyConfig& ModifyConfig)
-	{
-		Multiple += ModifyConfig.Value;
-		UpdateFinalValue();
-	}
-	void PopMultipleModifier(const FARPG_FloatProperty_ModifyConfig& ModifyConfig)
-	{
-		Multiple -= ModifyConfig.Value;
-		UpdateFinalValue();
-	}
+	void PushMultipleModifier(const FARPG_FloatProperty_ModifyConfig& ModifyConfig);
+	void PopMultipleModifier(const FARPG_FloatProperty_ModifyConfig& ModifyConfig);
+	void ChangePushedMultipleModifier(const FARPG_FloatProperty_ModifyConfig& OldModifyConfig, const FARPG_FloatProperty_ModifyConfig& ChangeToModifyConfig);
 };
 
 #define ARPG_FLOAT_PPROPERTY_ACCESSORS(Property) \

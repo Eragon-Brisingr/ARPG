@@ -82,6 +82,16 @@ void UARPG_MaxHealth_PropertyModifier::PopMultipleModifier(UObject* Owner, const
 	CastChecked<ACharacterBase>(Owner)->MaxHealth_PopMultipleModifier(ModifyConfig);
 }
 
+void UARPG_MaxHealth_PropertyModifier::ChangePushedAdditiveModifier(UObject* Owner, const FARPG_FloatProperty_ModifyConfig& OldModifyConfig, const FARPG_FloatProperty_ModifyConfig& ChangeToModifyConfig)
+{
+	CastChecked<ACharacterBase>(Owner)->MaxHelath.ChangePushedAdditiveModifier(OldModifyConfig, ChangeToModifyConfig);
+}
+
+void UARPG_MaxHealth_PropertyModifier::ChangePushedMultipleModifier(UObject* Owner, const FARPG_FloatProperty_ModifyConfig& OldModifyConfig, const FARPG_FloatProperty_ModifyConfig& ChangeToModifyConfig)
+{
+	CastChecked<ACharacterBase>(Owner)->MaxHelath.ChangePushedMultipleModifier(OldModifyConfig, ChangeToModifyConfig);
+}
+
 FText UARPG_Stamina_PropertyOperator::GetPropertyName() const
 {
 	return LOCTEXT("当前精力", "当前精力");
@@ -100,6 +110,16 @@ void UARPG_Stamina_PropertyOperator::SetValue(UObject* Owner, float InValue, con
 FText UARPG_MaxStamina_PropertyModifier::GetPropertyName() const
 {
 	return LOCTEXT("精力上限", "精力上限");
+}
+
+void UARPG_MaxStamina_PropertyModifier::ChangePushedAdditiveModifier(UObject* Owner, const FARPG_FloatProperty_ModifyConfig& OldModifyConfig, const FARPG_FloatProperty_ModifyConfig& ChangeToModifyConfig)
+{
+	CastChecked<ACharacterBase>(Owner)->MaxStamina.ChangePushedAdditiveModifier(OldModifyConfig, ChangeToModifyConfig);
+}
+
+void UARPG_MaxStamina_PropertyModifier::ChangePushedMultipleModifier(UObject* Owner, const FARPG_FloatProperty_ModifyConfig& OldModifyConfig, const FARPG_FloatProperty_ModifyConfig& ChangeToModifyConfig)
+{
+	CastChecked<ACharacterBase>(Owner)->MaxStamina.ChangePushedMultipleModifier(OldModifyConfig, ChangeToModifyConfig);
 }
 
 ARPG_FLOAT_PPROPERTY_MODIFIER_CLASS_IMPL(UARPG_MaxStamina_PropertyModifier, ACharacterBase, MaxStamina);

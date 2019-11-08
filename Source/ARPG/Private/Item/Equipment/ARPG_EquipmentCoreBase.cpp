@@ -47,7 +47,7 @@ void UARPG_EquipmentCoreBase::WhenUse(ACharacterBase* ItemOwner)
 {
 	for (const TSubclassOf<UARPG_CharacterState_BuffBase>& BuffType : EnableBuffes)
 	{
-		ItemOwner->CharacterStateComponent->ApplyBuffByType(BuffType);
+		ItemOwner->CharacterStateComponent->TryAddBuffByType(BuffType, FARPG_PropertyChangeContext(this, ItemOwner));
 	}
 
 	Super::WhenUse(ItemOwner);

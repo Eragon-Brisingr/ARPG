@@ -49,22 +49,22 @@ enum class EGeneralBuffOverlayType : uint8
 	ExtendTime
 };
 
-UCLASS(meta = (DisplayName = "一般Buff"))
+UCLASS(meta = (DisplayName = "通用Buff"))
 class ARPG_API UARPG_CS_Buff_General : public UARPG_CharacterState_BuffBase
 {
 	GENERATED_BODY()
 public:
-	UPROPERTY(EditAnywhere, Category = "Buff", meta = (EditCondition = bAllowMulitSameTypeBuff))
+	UPROPERTY(EditAnywhere, Category = "Buff", meta = (EditCondition = bAllowMulitSameTypeBuff, DisplayName = "覆盖方式"))
 	EGeneralBuffOverlayType GeneralBuffOverlayType;
 
-	UPROPERTY(EditAnywhere, Category = "Buff")
+	UPROPERTY(EditAnywhere, Category = "Buff", DisplayName = "起效的属性修改器")
 	TArray<FGeneralBuffModifierConfig> EffectModifiers;
 
-	UPROPERTY(EditAnywhere, Category = "Buff")
+	UPROPERTY(EditAnywhere, Category = "Buff", DisplayName = "激活时修改的属性")
 	TArray<FGeneralBuffOperatorConfig> ActiveOperators;
-	UPROPERTY(EditAnywhere, Category = "Buff")
+	UPROPERTY(EditAnywhere, Category = "Buff", DisplayName = "持续修改的属性")
 	TArray<FGeneralBuffOperatorConfig> TickOperators;
-	UPROPERTY(EditAnywhere, Category = "Buff")
+	UPROPERTY(EditAnywhere, Category = "Buff", DisplayName = "结束后修改的属性")
 	TArray<FGeneralBuffOperatorConfig> DeactiveOperators;
 
 	void WhenActived(bool IsFirstInit) override;

@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
 #include "XD_SaveGameInterface.h"
+#include "ARPG_PropertyDef.h"
 #include "ARPG_CharacterStateComponent.generated.h"
 
 class UARPG_CharacterStateBase;
@@ -37,9 +38,11 @@ public:
 	void OnRep_ActivedBuffes();
 
 	UFUNCTION(BlueprintCallable)
-	void ApplyBuffByType(TSubclassOf<UARPG_CharacterState_BuffBase> BuffType);
+	void TryAddBuffByType(TSubclassOf<UARPG_CharacterState_BuffBase> BuffType, const FARPG_PropertyChangeContext& ChangeContext);
 	UFUNCTION(BlueprintCallable)
 	void RemoveBuffByType(TSubclassOf<UARPG_CharacterState_BuffBase> BuffType);
+
+	void AddBuffByRef(UARPG_CharacterState_BuffBase* BuffInstance, const FARPG_PropertyChangeContext& ChangeContext);
 public:
 	TArray<UARPG_CharacterState_AccumulationBase*> PrevActivedAccumulations;
 	UPROPERTY(SaveGame, ReplicatedUsing = OnRep_ActivedAccumulations, VisibleAnywhere)

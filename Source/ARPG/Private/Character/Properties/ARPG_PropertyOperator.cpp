@@ -19,6 +19,18 @@ void UARPG_GameplayFloatPropertyOperatorBase::ApplyValue(EARPG_PropertyOperatorO
 	}
 }
 
+void UARPG_GameplayFloatPropertyModifierBase::ChangePushedAdditiveModifier(UObject* Owner, const FARPG_FloatProperty_ModifyConfig& OldModifyConfig, const FARPG_FloatProperty_ModifyConfig& ChangeToModifyConfig)
+{
+	PopAdditiveModifier(Owner, OldModifyConfig);
+	PushAdditiveModifier(Owner, ChangeToModifyConfig);
+}
+
+void UARPG_GameplayFloatPropertyModifierBase::ChangePushedMultipleModifier(UObject* Owner, const FARPG_FloatProperty_ModifyConfig& OldModifyConfig, const FARPG_FloatProperty_ModifyConfig& ChangeToModifyConfig)
+{
+	PopMultipleModifier(Owner, OldModifyConfig);
+	PushMultipleModifier(Owner, ChangeToModifyConfig);
+}
+
 void UARPG_GameplayFloatPropertyModifierBase::PushModifier(EARPG_PropertyModifierOperand Operand, UObject* Owner, const FARPG_FloatProperty_ModifyConfig& ModifyConfig)
 {
 	switch (Operand)
@@ -41,6 +53,19 @@ void UARPG_GameplayFloatPropertyModifierBase::PopModifier(EARPG_PropertyModifier
 		break;
 	case EARPG_PropertyModifierOperand::Multiple:
 		PopMultipleModifier(Owner, ModifyConfig);
+		break;
+	}
+}
+
+void UARPG_GameplayFloatPropertyModifierBase::ChangePushedModifier(EARPG_PropertyModifierOperand Operand, UObject* Owner, const FARPG_FloatProperty_ModifyConfig& OldModifyConfig, const FARPG_FloatProperty_ModifyConfig& ChangeToModifyConfig)
+{
+	switch (Operand)
+	{
+	case EARPG_PropertyModifierOperand::Additive:
+		ChangePushedAdditiveModifier(Owner, OldModifyConfig, ChangeToModifyConfig);
+		break;
+	case EARPG_PropertyModifierOperand::Multiple:
+		ChangePushedMultipleModifier(Owner, OldModifyConfig, ChangeToModifyConfig);
 		break;
 	}
 }

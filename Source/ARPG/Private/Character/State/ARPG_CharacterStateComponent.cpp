@@ -143,7 +143,7 @@ void UARPG_CharacterStateComponent::OnRep_ActivedBuffes()
 	PrevActivedBuffes = ActivedBuffes;
 }
 
-void UARPG_CharacterStateComponent::ApplyBuffByType(TSubclassOf<UARPG_CharacterState_BuffBase> BuffType)
+void UARPG_CharacterStateComponent::TryAddBuffByType(TSubclassOf<UARPG_CharacterState_BuffBase> BuffType, const FARPG_PropertyChangeContext& ChangeContext)
 {
 	if (GetOwner()->HasAuthority() && BuffType)
 	{
@@ -158,9 +158,7 @@ void UARPG_CharacterStateComponent::ApplyBuffByType(TSubclassOf<UARPG_CharacterS
 			}
 		}
 		UARPG_CharacterState_BuffBase* Buff = NewObject<UARPG_CharacterState_BuffBase>(this, BuffType);
-		Buff->Owner = CastChecked<ACharacterBase>(GetOwner());
-		Buff->Active(true);
-		ActivedBuffes.Add(Buff);
+		AddBuffByRef(Buff, ChangeContext);
 	}
 }
 
@@ -177,6 +175,14 @@ void UARPG_CharacterStateComponent::RemoveBuffByType(TSubclassOf<UARPG_Character
 		}
 		ActivedBuffes.RemoveAll([&](UARPG_CharacterState_BuffBase* E) {return E->IsA(BuffType); });
 	}
+}
+
+void UARPG_CharacterStateComponent::AddBuffByRef(UARPG_CharacterState_BuffBase* BuffInstance, const FARPG_PropertyChangeContext& ChangeContext)
+{
+	BuffInstance->Owner = CastChecked<ACharacterBase>(GetOwner());
+	BuffInstance->Instigator = ChangeContext.Instigator;
+	BuffInstance->Active(true);
+	ActivedBuffes.Add(BuffInstance);
 }
 
 void UARPG_CharacterStateComponent::OnRep_ActivedAccumulations()

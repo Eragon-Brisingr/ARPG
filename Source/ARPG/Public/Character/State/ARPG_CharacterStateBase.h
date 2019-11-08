@@ -23,7 +23,9 @@ public:
 	UPROPERTY(BlueprintReadOnly)
 	ACharacterBase* Owner;
 	UPROPERTY(BlueprintReadOnly)
-	TSoftObjectPtr<ACharacterBase> Instigator;
+	TSoftObjectPtr<UObject> Instigator;
+
+	virtual FText GetDiscribe() const { unimplemented(); return FText::GetEmpty(); };
 };
 
 UCLASS(meta = (DisplayName = "积累状态"))
