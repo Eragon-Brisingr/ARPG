@@ -48,13 +48,13 @@
 	url=http://scarfskiynas.tpddns.cn:10080/arpg_developer/plugins/xd_autogensequencer.git
 [submodule "RawAssets"]
 	path = RawAssets
-	url = http://scarfskiynas.tpddns.cn:10080/Eragon/arpg_rawassets.git
+	url=http://scarfskiynas.tpddns.cn:10080/arpg_developer/project/rawassets.git
 [submodule "Content/ARPG_Game"]
 	path = Content/ARPG_Game
-	url = http://scarfskiynas.tpddns.cn:10080/Eragon/arpg_game.git
+	url=http://scarfskiynas.tpddns.cn:10080/arpg_developer/project/arpg_game.git
 [submodule "Content/Developers/Eragon"]
 	path = Content/Developers/Eragon
-	url = http://scarfskiynas.tpddns.cn:10080/Eragon/arpg_developer_eragon.git
+	url=http://scarfskiynas.tpddns.cn:10080/arpg_developer/developer/arpg_developer_eragon.git
 [submodule "Content/Developers/Scarfskiy"]
 	path = Content/Developers/Scarfskiy
-	url = http://scarfskiynas.tpddns.cn:10080/Eragon/arpg_developer_scarfskiy.git
+	url=http://scarfskiynas.tpddns.cn:10080/arpg_developer/developer/arpg_developer_scarfskiy.git
