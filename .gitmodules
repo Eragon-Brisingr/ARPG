@@ -1,51 +1,51 @@
 [submodule "Plugins/XD_UnrealLibraryEx"]
 	path = Plugins/XD_UnrealLibraryEx
-	url = https://github.com/Eragon-Brisingr/XD_UnrealLibraryEx.git
+	url=http://scarfskiynas.tpddns.cn:10080/arpg_developer/plugins/xd_unreallibraryex.git
 [submodule "Plugins/XD_SaveGameSystem"]
 	path = Plugins/XD_SaveGameSystem
-	url = https://github.com/Eragon-Brisingr/XD_SaveGameSystem.git
+	url=http://scarfskiynas.tpddns.cn:10080/arpg_developer/plugins/xd_savegamesystem.git
 [submodule "Plugins/XD_ItemSystem"]
 	path = Plugins/XD_ItemSystem
-	url = https://github.com/Eragon-Brisingr/XD_ItemSystem.git
+	url=http://scarfskiynas.tpddns.cn:10080/arpg_developer/plugins/xd_itemsystem.git
 [submodule "Plugins/XD_CampSystem"]
 	path = Plugins/XD_CampSystem
-	url = https://github.com/Eragon-Brisingr/XD_CampSystem.git
+	url=http://scarfskiynas.tpddns.cn:10080/arpg_developer/plugins/xd_campsystem.git
 [submodule "Plugins/XD_TimeSystem"]
 	path = Plugins/XD_TimeSystem
-	url = https://github.com/Eragon-Brisingr/XD_TimeSystem.git
+	url=http://scarfskiynas.tpddns.cn:10080/arpg_developer/plugins/xd_timesystem.git
 [submodule "Plugins/XD_EnvironmentSystem"]
 	path = Plugins/XD_EnvironmentSystem
-url=http://scarfskiynas.tpddns.cn:10080/arpg_developer/plugins/xd_environmentsystem
+	url=http://scarfskiynas.tpddns.cn:10080/arpg_developer/plugins/xd_environmentsystem.git
 [submodule "Plugins/XD_AssetsLibrary"]
 	path = Plugins/XD_AssetsLibrary
-	url = https://github.com/Eragon-Brisingr/XD_AssetsLibrary.git
+	url=http://scarfskiynas.tpddns.cn:10080/arpg_developer/plugins/xd_assetslibrary.git
 [submodule "Plugins/XD_MovementComponentPlugin"]
 	path = Plugins/XD_MovementComponentPlugin
-	url = https://github.com/Eragon-Brisingr/XD_MovementComponentPlugin.git
+	url=http://scarfskiynas.tpddns.cn:10080/arpg_developer/plugins/xd_movementcomponentplugin.git
 [submodule "Plugins/XD_AI_SystemEx"]
 	path = Plugins/XD_AI_SystemEx
-	url = https://github.com/Eragon-Brisingr/XD_AI_SystemEx
+	url=http://scarfskiynas.tpddns.cn:10080/arpg_developer/plugins/xd_ai_systemex.git
 [submodule "Plugins/XD_EventFlowSystem"]
 	path = Plugins/XD_EventFlowSystem
-	url = https://github.com/Eragon-Brisingr/XD_EventFlowSystem.git
+	url=http://scarfskiynas.tpddns.cn:10080/arpg_developer/plugins/xd_eventflowsystem.git
 [submodule "Plugins/XD_CharacterActionDispatcher"]
 	path = Plugins/XD_CharacterActionDispatcher
-	url = https://github.com/Eragon-Brisingr/XD_CharacterActionDispatcher
+	url=http://scarfskiynas.tpddns.cn:10080/arpg_developer/plugins/xd_characteractiondispatcher.git
 [submodule "Plugins/XD_DrawGizmo"]
 	path = Plugins/XD_DrawGizmo
-	url = https://github.com/Eragon-Brisingr/XD_DrawGizmo.git
+	url=http://scarfskiynas.tpddns.cn:10080/arpg_developer/plugins/xd_drawgizmo.git
 [submodule "Plugins/AnimMirroring"]
 	path = Plugins/AnimMirroring
-	url = https://github.com/Eragon-Brisingr/AnimMirroring.git
+	url=http://scarfskiynas.tpddns.cn:10080/arpg_developer/plugins/animmirroring.git
 [submodule "Plugins/XD_AnimNodes"]
 	path = Plugins/XD_AnimNodes
-	url = https://github.com/Eragon-Brisingr/XD_AnimNodes.git
+	url=http://scarfskiynas.tpddns.cn:10080/arpg_developer/plugins/xd_animnodes.git
 [submodule "Plugins/XD_CustomCharacter"]
 	path = Plugins/XD_CustomCharacter
-	url = https://github.com/Eragon-Brisingr/XD_CustomCharacter.git
+	url=http://scarfskiynas.tpddns.cn:10080/arpg_developer/plugins/xd_customcharacter.git
 [submodule "Plugins/XD_AutoGenSequencer"]
 	path = Plugins/XD_AutoGenSequencer
-	url = https://github.com/Eragon-Brisingr/XD_AutoGenSequencer.git
+	url=http://scarfskiynas.tpddns.cn:10080/arpg_developer/plugins/xd_autogensequencer.git
 [submodule "RawAssets"]
 	path = RawAssets
 	url = http://scarfskiynas.tpddns.cn:10080/Eragon/arpg_rawassets.git
